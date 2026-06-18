@@ -9,9 +9,8 @@ Uses the google-genai SDK with Gemini's best long-agent setup:
 
 `google-genai` is an optional dependency. Model ids verified live on the key via models.list().
 
-PRICES BELOW ARE NOT YET VERIFIED against the live pricing page. The benchmark reports token counts
-(always real, from usage_metadata) regardless; dollars are only trustworthy once the prices are
-confirmed. See docs/VERIFIED_FACTS.md.
+Prices verified 2026-06-17 (paid tier) against the live pricing page. The benchmark reports token
+counts from usage_metadata, priced by the verified table below. See docs/VERIFIED_FACTS.md.
 """
 
 from __future__ import annotations
@@ -21,11 +20,11 @@ import time
 
 from engine.demo import build_chain, task_prompt  # the exact same task
 
-# per 1M tokens. UNVERIFIED placeholders, confirm at https://ai.google.dev/gemini-api/docs/pricing
+# per 1M tokens, paid tier, verified 2026-06-17 against ai.google.dev/gemini-api/docs/pricing
 GEMINI_PRICES = {
-    "gemini-3.5-flash": {"input": 0.30, "cached": 0.075, "output": 2.50, "verified": False},
-    "gemini-3.1-flash-lite": {"input": 0.10, "cached": 0.025, "output": 0.40, "verified": False},
-    "gemini-3.1-pro-preview": {"input": 2.50, "cached": 0.625, "output": 15.0, "verified": False},
+    "gemini-3.5-flash": {"input": 1.50, "cached": 0.15, "output": 9.00},
+    "gemini-3.1-flash-lite": {"input": 0.25, "cached": 0.025, "output": 1.50},
+    "gemini-3.1-pro-preview": {"input": 2.00, "cached": 0.20, "output": 12.00},
 }
 DEFAULT_GEMINI_MODEL = "gemini-3.5-flash"
 
@@ -98,6 +97,7 @@ def run_gemini_agent(docs, start, *, model=DEFAULT_GEMINI_MODEL, max_turns):
         cost, prompt, cached, out = _cost(model, resp.usage_metadata)
         records.append({
             "turn": turn, "input_tokens": prompt, "cache_read": cached,
+            "ctx": prompt,  # prompt_token_count already includes cached, so it is the carried context
             "output_tokens": out, "cost": cost, "latency_s": dt, "cleared": 0,
         })
         fcs = resp.function_calls

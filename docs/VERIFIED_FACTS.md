@@ -73,15 +73,28 @@ object the API returns: `input_tokens`, `output_tokens`, `cache_read_input_token
 `cache_creation_input_tokens` (and the `cache_creation` 5m/1h split when caching runs). Every
 dollar figure in this repo is those counts times the verified rates above.
 
+## Token fields differ across vendors (apples to apples)
+
+Carried context must count the same tokens on every side. Claude's `input_tokens` EXCLUDES cached
+tokens (they are in `cache_read_input_tokens`), so the true carried context on Claude is
+`input_tokens + cache_read_input_tokens`. OpenAI's `input_tokens` and Gemini's `prompt_token_count`
+already INCLUDE cached tokens, so those fields are the carried context as is. The benchmark records a
+`ctx` field per turn that applies this per vendor, and the peak-context column uses it. Comparing raw
+`input_tokens` across vendors would understate Claude's context, the confound recorded in
+[`FINDINGS.md`](FINDINGS.md).
+
 ## OpenAI comparison (the compare module)
 
 The cross-platform view ([`../engine/compare.py`](../engine/compare.py),
-[`../engine/openai_arm.py`](../engine/openai_arm.py)) runs on OpenAI's Chat Completions API,
-verified 2026-06-17 against developers.openai.com.
+[`../engine/openai_arm.py`](../engine/openai_arm.py), [`../engine/gemini_arm.py`](../engine/gemini_arm.py))
+runs OpenAI on the Responses API (compaction plus caching) and Gemini on the google-genai SDK
+(implicit caching, no server-side trimming), each best-config. Verified 2026-06-17.
 
-- Models and prices per 1M tokens, from the pricing page: `gpt-5.4-mini` is $0.75 input, $0.075
-  cached input, $4.50 output. `gpt-5.4-nano` is $0.20 / $0.02 / $1.25. The older `gpt-4o-mini` and
-  `gpt-5-mini` are no longer listed.
+- OpenAI prices per 1M tokens (developers.openai.com): `gpt-5.4-mini` is $0.75 input, $0.075 cached,
+  $4.50 output. `gpt-5.4-nano` is $0.20 / $0.02 / $1.25.
+- Gemini prices per 1M tokens, paid tier (ai.google.dev/gemini-api/docs/pricing): `gemini-3.5-flash`
+  is $1.50 input, $0.15 cached, $9.00 output. `gemini-3.1-flash-lite` is $0.25 / $0.025 / $1.50.
+  `gemini-3.1-pro-preview` is $2.00 / $0.20 / $12.00.
 - The tool-use loop is `client.chat.completions.create(model, messages, tools, parallel_tool_calls=False)`.
   `parallel_tool_calls=False` forces one step per turn, matching the Claude run.
 - Cost reads from `response.usage`: `prompt_tokens` (input, includes cached), `completion_tokens`

@@ -2,7 +2,9 @@
 
 A fair cross-platform agent benchmark has many knobs, and several of them quietly decide the
 result. These are the ones we found the hard way. Every one would have produced a false claim if we
-had trusted a single run.
+had trusted a single run. The meta-lesson under all of them: apples to apples, or the number does not
+ship. A number is not comparable until you have checked what it actually counts, and at what price,
+on every side.
 
 ## 1. Prompt ambiguity (the "Answer: K" confound)
 
@@ -44,6 +46,23 @@ stronger model, gpt-5.4, returned the correct 11 on the same task. So the gap wa
 gpt-5.4-mini at the cheap tier, not a platform property, and it disappears one tier up. Lesson:
 before any correctness claim, run the competitor's stronger model too. A cheap-tier win is a
 model-tier win, not a platform win.
+
+## 6. The context-token metric was apples-to-oranges (the one that nearly shipped)
+
+To compare carried context across vendors, we summed the wrong field. Claude's `input_tokens`
+EXCLUDES cached tokens (cache_read is reported separately), while OpenAI's `input_tokens` and
+Gemini's `prompt_token_count` INCLUDE them. So the peak-context column compared Claude's fresh tokens
+(about 3k) against the others' full context (19k, 33k), and we nearly shipped "Claude carries 6x less
+context." The true carried context is input plus cache_read on Claude, the total field on the others.
+Corrected: Claude with context editing carries about 15k, OpenAI 19k, Gemini 33k, and Claude without
+context editing 35k. Lesson: a token count is not comparable until you know exactly what it counts on
+each side. Apples to apples, or the number does not ship.
+
+## 7. Prices are verified, never assumed
+
+A placeholder price for gemini-3.5-flash (input $0.30) made it look cheaper than Claude. The live
+paid-tier price is $1.50 input and $9.00 output, so Gemini is actually pricier. Lesson: pull every
+per-token price from the vendor's live pricing page and date it, before any dollar figure ships.
 
 ## What the benchmark is for
 

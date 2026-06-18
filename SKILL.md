@@ -42,9 +42,25 @@ These are why the output is trusted. Break one and the trust is gone.
    `docs/FINDINGS.md` for why this is not optional.)
 4. **Honesty runs both directions.** When Claude wins, write the founder email. When a competitor
    wins or has something Claude lacks, write the product-team email. Same rigor either way.
-5. **Scrutinize every outbound word.** The founder email and the product email are the highest-stakes
-   surfaces. Every claim sourced and not overstated, the reproduction one command with clear key
-   placement and an upfront cost, the prose deslop-clean. When in doubt, weaken the claim.
+5. **Scrutinize every outbound word, with a mandatory adversarial panel.** The founder email and the
+   product email are the highest-stakes surfaces. Neither ships without a final outbound-scrutiny
+   pass: an adversarial review panel that hunts for one overclaim, checks every claim against the
+   brief and the benchmark, confirms the email opens with a measurable, true, Claude-favorable hook,
+   confirms the reproduction is one command with clear key placement and an upfront cost, and
+   confirms the prose is deslop-clean. If any reviewer flags an overclaim, weaken it. This pass is
+   mandatory on every run. An overstated outbound message is worse than no message.
+6. **Lead with the worth to the reader, and keep it transparent.** Every output (the two emails, the
+   README, the result tables) says what the reader gets before how it was made, and carries the
+   workload (the task, the agent shape, the model ids on each side, the features on), the run's cost
+   and time, and the cost and time for the reader to reproduce it, up front. Every review of an
+   outbound surface is done from the receiver's point of view, cold, as a busy founder: what is this,
+   what do I get, what does it cost me to check, why believe you, what next.
+7. **Apples to apples, or the number does not ship.** Every cross-vendor number counts the same thing
+   on every side, verified. Claude's `input_tokens` excludes cached tokens (cache_read is separate),
+   while OpenAI's `input_tokens` and Gemini's `prompt_token_count` include them, so carried context is
+   input plus cache_read on Claude and the total field on the others. Pull every price live, report the
+   caching config, and run the competitor's stronger model before a quality claim. When a number
+   cannot be made comparable, drop it. Credibility is the whole asset.
 
 ## The steps
 
@@ -74,6 +90,10 @@ clearly Claude-ahead and survived the skeptic, not whatever sounds best.
 make draft      # the founder email, anchored on the verified differentiator
 make alert      # the product-team email, when a competitor is ahead or has something we lack
 ```
+
+Each email leads with what the reader gets, names the workload (the agent shape and the model ids on
+each side), and states the cost and time to reproduce up front. It passes the reader-point-of-view
+review, read cold as a busy founder, before it is allowed out.
 
 ### 5. Ship the reproducible bundle
 A self-contained, dated bundle with both platforms' code, the receipts (cost, time, answers), clear

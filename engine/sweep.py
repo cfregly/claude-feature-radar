@@ -24,7 +24,7 @@ def _roll(recs):
     return {
         "cost": sum(r["cost"] for r in recs),
         "time": sum(r["latency_s"] for r in recs),
-        "peak": max((r["input_tokens"] for r in recs), default=0),
+        "peak": max((r["ctx"] for r in recs), default=0),
         "cache_read": sum(r["cache_read"] for r in recs),
         "turns": len(recs),
     }

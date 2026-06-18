@@ -91,6 +91,7 @@ def run_openai_agent(docs, start, *, model=DEFAULT_OPENAI_MODEL, compact_thresho
         cost, inp, cached = _cost(model, resp.usage)
         records.append({
             "turn": turn, "input_tokens": inp, "cache_read": cached,
+            "ctx": inp,  # Responses input_tokens already includes cached, so it is the carried context
             "output_tokens": getattr(resp.usage, "output_tokens", 0) or 0,
             "cost": cost, "latency_s": dt, "cleared": 0,
         })

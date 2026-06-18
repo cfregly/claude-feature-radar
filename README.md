@@ -6,26 +6,42 @@ Claude), and then shows the one agent primitive Claude ships that the others do 
 the claim against the live docs every run, because the platforms ship monthly and a hard-coded claim
 rots in weeks.
 
-Built on the Claude API and the Agent SDK. Run it on your own keys.
+**What you get, measured.** A long agent that stays bounded and fast, with no eviction code to write.
+On the same 32-step tool-using agent, context editing drops Claude's carried context (cached tokens
+included) from about 35,000 tokens to about 15,000. It clears stale tool results in place, the one
+primitive only Claude ships. OpenAI's compaction summarizes them instead, and Gemini does not trim
+at all, so it carries about 33,000. The fair benchmark is right below, and you run it in one command.
+
+```bash
+git clone <this-repo> && cd claude-competitive-engine
+make setup && pip install -r requirements-compare.txt
+cp .env.example .env     # paste your Anthropic, OpenAI, and Gemini keys (the file says where)
+make compare             # the fair three-way fight on your own keys, about a dollar
+```
+
+Built on the Claude API and the Agent SDK.
 
 ## The fair benchmark (we do not cheat)
 
-The same 32-step tool-using agent, both platforms at full strength (OpenAI on the Responses API with
-compaction and caching, Claude with context editing, memory, and caching):
+The same 32-step tool-using agent, all three at full strength: OpenAI on the Responses API with
+compaction and caching, Gemini with implicit caching, Claude with context editing, memory, and
+caching. Carried context counts cached tokens on every side, apples to apples:
 
-| platform | cost | correct | peak context |
+| platform | cost | correct | carried context |
 |---|--:|:--:|--:|
-| OpenAI gpt-5.4-mini | **$0.046** | no (9 vs 11) | 19,331 |
-| Claude Haiku 4.5 (best) | $0.153 | yes (11) | **3,035** |
-| Claude Haiku 4.5 (baseline) | $0.123 | yes (11) | 3,989 |
+| OpenAI gpt-5.4-mini | **$0.033** | no (8 vs 11) | 19,331 |
+| Gemini gemini-3.5-flash | $0.414 | yes (11) | 32,638 |
+| Claude Haiku 4.5 (context editing on) | $0.131 | yes (11) | **15,397** |
+| Claude Haiku 4.5 (off) | $0.121 | yes (11) | 34,597 |
 
-**OpenAI is cheaper.** We say so here and in the founder email, because a founder can check, and
-because saying it is what makes everything else believable. The cheap-tier correctness gap is not a
-Claude advantage either: it is a model-quality artifact, and OpenAI's stronger model answers
-correctly. Full receipt in [`sample_compare.txt`](sample_compare.txt), variant sweep in
-[`sample_sweep.txt`](sample_sweep.txt), and every confound we had to fix to make the fight fair (a
-prompt ambiguity, caching versus context editing, compaction losing the thread, the model-tier
-check) is in [`docs/FINDINGS.md`](docs/FINDINGS.md).
+**The honest read.** OpenAI's cheap model is the cheapest but got the count wrong here (a cheap-tier
+model-quality miss, its stronger model answers correctly). Gemini is correct but the priciest. Claude
+is correct and mid-cost, and it carries the least context, because context editing takes it from
+34,597 down to 15,397. **Claude is not the cheapest, and we say so.** Full receipt in
+[`sample_compare.txt`](sample_compare.txt), the variant sweep in [`sample_sweep.txt`](sample_sweep.txt),
+and every confound we caught to keep this apples-to-apples (a prompt ambiguity, caching versus context
+editing, compaction losing the thread, the model-tier check, and the context-token metric itself) is
+in [`docs/FINDINGS.md`](docs/FINDINGS.md).
 
 ## So why build on Claude: context editing
 
@@ -38,8 +54,9 @@ context server-side, **in place**, replaced with a placeholder, with one beta he
 - Gemini's in-place version is **realtime-API only**.
 
 Claude is the only one shipping in-place clearing as a managed API feature on the standard tool-use
-path. `make demo` shows it holding a long agent's context flat (peak around 3k tokens instead of
-36k) while the agent stays correct.
+path. `make demo` shows it dropping a long agent's carried context from about 35k tokens to about
+15k. Like any aggressive trim it can occasionally cost a count, which is why the repo measures
+instead of asserting.
 
 Honest scope: context editing **bounds context**, it is not a raw dollar win when caching is on,
 because clearing rewrites the cached prefix (see `docs/FINDINGS.md`). The win is a bounded context

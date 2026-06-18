@@ -30,7 +30,7 @@ def _roll(records):
     return {
         "cost": sum(r["cost"] for r in records),
         "time": sum(r["latency_s"] for r in records),
-        "peak": max((r["input_tokens"] for r in records), default=0),
+        "peak": max((r["ctx"] for r in records), default=0),
         "turns": len(records),
         "cache_read": sum(r["cache_read"] for r in records),
     }
@@ -74,7 +74,7 @@ def main():
     try:
         gem_r, gem_t, gem_model = run_gemini_agent(docs, start, model=a.gemini_model,
                                                    max_turns=cfg["max_turns"])
-        gem_row = (f"Gemini {gem_model} (prices unverified)", _roll(gem_r), parse_answer(gem_t))
+        gem_row = (f"Gemini {gem_model}", _roll(gem_r), parse_answer(gem_t))
     except Exception as e:  # noqa: BLE001
         print(f"  (Gemini skipped, quota or load: {str(e)[:70]})")
 

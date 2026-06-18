@@ -175,10 +175,13 @@ def run_agent(client, model_key, docs, start, *, managed, caching=True, trigger,
         )
         dt = time.perf_counter() - t0
         u = msg.usage
+        _in = getattr(u, "input_tokens", 0) or 0
+        _cr = getattr(u, "cache_read_input_tokens", 0) or 0
         records.append({
             "turn": turn,
-            "input_tokens": getattr(u, "input_tokens", 0) or 0,
-            "cache_read": getattr(u, "cache_read_input_tokens", 0) or 0,
+            "input_tokens": _in,
+            "cache_read": _cr,
+            "ctx": _in + _cr,  # true carried context: Claude reports cached separately from input_tokens
             "output_tokens": getattr(u, "output_tokens", 0) or 0,
             "cost": cost_breakdown(model.key, u).total,
             "latency_s": dt,

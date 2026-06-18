@@ -4,29 +4,29 @@ Paste into a Google Doc or your sending tool. Plain text, one link.
 
 ---
 
-**Subject:** OpenAI was cheaper in my benchmark. I still build on Claude. Here is why.
+**Subject:** Your tool-heavy agent carries 35k tokens of context. On Claude, one flag drops it to 15k.
 
 Hey {first_name},
 
-Straight up, because you have already tried all three: I ran the same agent on Claude and OpenAI, a
-fair fight, both at full strength. OpenAI came out cheaper. The benchmark is in the repo so you can
-run it on your own keys and check. We do not cheat, and the README says where we lose.
+What you get: a long agent that stays bounded and fast, with zero eviction code to write.
 
-So why build on Claude? Not price. The reason is the agent primitives the others do not ship. The
-sharpest one for anyone building tool-heavy agents is context editing. It clears stale tool results
-out of your context server-side, in place, with one header. OpenAI either summarizes them and loses
-detail, or makes you wire the eviction logic yourself. Gemini's version is realtime-only. Claude is
-the only one that ships it as a managed API feature, so a long agent stays bounded and you build
-nothing.
+The proof, measured on the same 32-step tool-using agent across Claude Haiku 4.5, OpenAI
+gpt-5.4-mini, and Gemini 3.5-flash, all at full strength. With context editing off, Claude carries
+about 35,000 tokens of context by the end of the run. Turn it on, one beta header, and the same
+agent carries about 15,000. Context editing clears stale tool results in place. OpenAI's version
+summarizes them and loses detail. Gemini has no in-place trim at all, so it carries about 33,000.
+Claude is the only one that ships in-place clearing as a managed API feature.
 
 {repo_link}
 
-`make compare` runs the fair benchmark on your keys. `make demo` shows context editing holding the
-context flat (peak around 3k tokens instead of 36k) while the agent stays correct. Real numbers,
-measured, not asserted by me.
+`make compare` runs the whole fair fight on your own keys, about a dollar and two minutes.
+`make demo` shows the context dropping. Every number is measured, not asserted by me.
 
-Build it on Claude Code or the Agent SDK and it is one flag away. Reply if you want a hand wiring it
-in.
+Honest, because you can check it: Claude is not the cheapest. OpenAI's cheap model costs less,
+though it got the count wrong on this run, and the README shows exactly where Claude loses. The
+reason to build on Claude is the bounded context with no eviction logic, not the price.
+
+Build it on Claude Code or the Agent SDK. It is one flag. Reply if you want a hand wiring it in.
 
 Go build,
 
@@ -37,10 +37,13 @@ Building with Claude
 
 ### Why it is built this way (not part of the email)
 
-- **It leads with the loss.** A founder who has tried all three deletes a "we are cheaper" email on
-  sight, because they can check. Opening with "OpenAI was cheaper" buys the right to be believed on
-  the next sentence.
-- **One verified differentiator, reproducible.** Context editing survived a hard skeptic pass as the
-  only managed-API in-place clearing primitive, and a founder turns it on in one line.
-- **No overclaim.** Not "Claude is cheaper" (false), not "Claude Code is better" (it is parity with
-  Codex). Just the one thing only we ship, with the run-it-yourself proof.
+- **It opens with the so-what, then the one number Claude wins.** A bounded, fast agent with no
+  eviction code, proved by 35k down to 15k of carried context (true context, cached tokens included,
+  the metric we corrected mid-build, see docs/FINDINGS.md).
+- **The workload, cost, and time are stated up front.** A 32-step agent, three named models, about a
+  dollar and two minutes to reproduce, before the reader commits.
+- **It is honest about price and correctness in the next breath.** OpenAI is cheaper, the trimmed run
+  can miscount, and the repo says both. That honesty is what makes the context number believable.
+- **No overclaim.** Not "Claude is cheaper" (false), not "Claude Code is better" (parity with Codex),
+  not "6x less context" (that was a metric confound). Just the in-place primitive only Claude ships,
+  with the run-it-yourself proof.
