@@ -1,139 +1,155 @@
 # claude-competitive-engine
 
 A repeatable engine that finds where the Claude Developer Platform genuinely beats OpenAI and Google,
-proves it with fair cross-vendor benchmarks you can reproduce on your own keys, refuses to overclaim,
-and emits a founder email per edge. The platforms ship every month, so it re-runs the whole search
-each time rather than caching a winner. It reports honestly, including where Claude loses.
+proves each edge with a fair cross-vendor benchmark you reproduce on your own keys, refuses to
+overclaim, and drafts the founder email. Do not trust the pitch, re-run it.
 
-## How it works
+## The mechanism: a $0 weekly live-docs sweep that finds the edge and drafts the email
 
-1. **Sweep** the whole platform and the competitor docs, live, and diff against the last run. `make
-   edges` fetches every doc in `engine/sources_registry.py` with a stdlib conditional GET, diffs the
-   result against `landscape/landscape.json`, ranks by value times genuine lead, and writes the new
-   landscape, a dated changelog, and a dated brief (`briefs/`), all for zero credits. A blocked fetch
-   is recorded as status unknown, never as competitor-absence, so the loop cannot manufacture a lead.
-2. **Rank** every genuine differentiator by value to a founder times how clearly Claude leads, after a
-   competitor-parity check that drops anything a rival already matches.
-3. **Benchmark** the top edges fairly, cross-vendor, with every number read off the real API.
-4. **Scrutinize** every outbound claim with an adversarial panel. It has caught its own overclaims
-   (a context-editing local minimum, a citations strawman, a "no competitor ships it" absolute).
-5. **Emit** a founder email and a product-team email, per edge.
+The platforms ship every month, so a winner you found last quarter is parity this quarter. This engine
+does not cache a winner. Every week it re-runs the whole search:
 
-## The edges
+```bash
+make edges
+```
 
-Each edge is isolated in `edges/<edge>/` with its own `demo.py`, committed receipt (`sample.txt`),
-`FOUNDER_EMAIL.md`, `PRODUCT_EMAIL.md`, and `README.md`, so we can compare them and pick a winner.
+`make edges` fetches every doc in `engine/sources_registry.py` (Claude, OpenAI, and Gemini) with a
+stdlib conditional GET, diffs each page against the last run in `landscape/landscape.json`, ranks the
+genuine differentiators by value to a founder times how clearly Claude still leads, and writes the
+refreshed `landscape/landscape.json`, a dated changelog, and a dated brief in `briefs/`. No API call,
+no benchmark, no spend. It is $0.
 
-| edge | what it is | status | the measured finding |
-|---|---|---|---|
-| [programmatic-tool-calling](edges/programmatic-tool-calling/) | Claude writes one sandbox script that calls your tools in a loop and filters results before they reach context | GA | ~28% fewer billed input tokens on a 240-row fan-out task, and the code answers correctly where the in-context model fails (`make ptc`) |
-| [citations](edges/citations/) | a per-character verifiable source pointer into the user's own document, free of output tokens | GA | the pointer resolves in-API, guaranteed, with zero resolver code (`make citations`) |
-| [context-editing](edges/context-editing/) | in-place clearing that keeps a long agent under the context window | beta | editing off fails 3/3 on a heavy chain, editing on finishes 3/3 (`make longhorizon`) |
+Two honesty rules are wired into the code, not the prose. A blocked or unreadable fetch is recorded as
+status `unknown`, never as competitor-absence, so the loop cannot manufacture a Claude lead from a
+failed download. And a Claude-ahead ranking stands only when every relevant competitor source actually
+fetched this run. When the sweep surfaces a fresh edge, `make draft` turns the measured receipt into a
+founder email. That whole chain (fetch, diff, rank, draft) is measurement and drafting, so it runs
+unattended on a weekly cadence. The boundary is fixed in `engine/gate.py`: nothing in the cadence
+sends mail, spends past a cap, or pushes anywhere.
 
-Honest ranking: programmatic tool calling is the sharpest (a cost cut a founder feels, no named
-competitor equivalent), citations is the cleanest near-binary (only Claude returns a char-level
-document pointer, though Gemini File Search now does page-level), and context-editing is the thinnest
-(OpenAI ships comparable compaction, and it is beta). The full sourced reasoning is in `briefs/`.
+This is the headline. What follows is what the sweep currently ranks at the top, each one proven.
 
-Programmatic tool calling is THE anchor, so
-[`edges/programmatic-tool-calling/FOUNDER_EMAIL.md`](edges/programmatic-tool-calling/FOUNDER_EMAIL.md)
-is the single canonical Deliverable-2 founder email, the one that ships. The citations and
-context-editing emails stay in the repo as supporting content: they show the same engine applied to
-the other two edges and back the honest ranking above.
+## The featured edges, with the one command that reproduces each
 
-## Run it on your own tool
+### Programmatic tool calling: about 28% fewer billed input tokens on a fan-out agent (`make ptc`)
 
-The anchor edge ships as a forkable app, so you do not have to trust the receipt, you reproduce it on
-your own tool. Edit ONE file, [`app/yourtool.py`](app/yourtool.py): paste your Messages-API tool dict
-and the Python that runs it. Then `make app` runs the same fan-out task twice over your tool, plain
-tool use vs programmatic tool calling, and prints your own before/after billed-input table, the dollar
-delta at the model's input price, and an upfront cost line before it spends anything. Out of the box it
-ships the worked region_sales example, so `make app-check` gives you a real number before you change a
-line, and asserts the invariant (programmatic mode bills fewer input tokens AND answers correctly).
+If your agent calls a tool many times over data it then crunches (expense checks across a team,
+rollups across regions or accounts, log or trace triage), every tool result flows into the model's
+context and you pay input tokens for all of it, even the rows the model only sums and throws away.
+Claude has a GA feature for this. Add `allowed_callers: ["code_execution_20260120"]` to a tool and
+Claude writes one sandbox script that calls your tool in a loop, filters there, and returns only the
+answer. The bulky outputs go to the sandbox, not the model.
 
-On the shipped example on Sonnet 4.6, measured: plain tool use billed 9,451 input tokens, programmatic
-billed 6,817, a 28% reduction, both answering correctly, for about six cents. The win is fan-out
-shaped, so keep your task fan-out shaped when you swap your tool in. The app and the
-[`make ptc`](edges/programmatic-tool-calling/) receipt share one audited token counter
+Measured on the same fan-out task two ways, same model (Sonnet 4.6), same answer required: across 4
+regions of 60 sales rows each (240 rows), find the highest-revenue region.
+
+| mode | billed input tokens | answer |
+|---|--:|:--:|
+| plain tool use | 9,451 | wrong (the model summed 240 rows in its head) |
+| programmatic | 6,828 | east (the sandbox computed it) |
+
+A 28% input-token cut, and the code answered correctly where the in-context model did not. The win is
+fan-out shaped: on a sequential single-call task the live doc reports it is flat to about 8% more
+expensive, so this is for tool-heavy agents. No competitor keeps your own custom-tool outputs out of
+context the way `allowed_callers` does. `make ptc`, about six cents on Sonnet.
+
+### Citations: a guaranteed char-level pointer into your user's own document (`make citations`)
+
+For a product built over a user's own documents (contracts, clinical notes, financial filings, support
+docs), the trust layer is the click-through to the exact sentence a claim came from. Turn on
+`citations: {"enabled": true}` per document and Claude returns each claim with a character range plus
+the verbatim quote, extracted and guaranteed to resolve by the API, free of output tokens, with zero
+resolver code on your side. Only Claude returns a per-character document pointer. The honest baseline
+without it is to ask the model for the quote and resolve it yourself with `str.find`, which returns -1
+the moment the model paraphrases, and you own and pay for that code. `make citations`, about six cents.
+
+## Run it on your own tool: watch your own bill drop
+
+You do not have to trust the receipt. The programmatic-tool-calling edge ships as a forkable app, so
+you reproduce the bill-cut on your own tool. Edit ONE file, [`app/yourtool.py`](app/yourtool.py): paste
+your Messages-API tool dict and the Python that runs it. Then:
+
+```bash
+make app
+```
+
+runs the same fan-out task twice over your tool, plain tool use vs programmatic, and prints your own
+before/after billed-input table, the dollar delta at the model's input price, and an upfront cost line
+before it spends anything. Out of the box it ships the worked region_sales example, so `make app-check`
+gives you a real number before you change a line and asserts the invariant (programmatic mode bills
+fewer input tokens AND answers correctly).
+
+On the shipped example on Sonnet 4.6, measured live: plain tool use billed 9,451 input tokens,
+programmatic billed 6,828, a 28% reduction, both correct, for about six cents. Keep your task fan-out
+shaped when you swap your tool in. The app and the `make ptc` receipt share one audited token counter
 ([`engine/demonstrators/token_core.py`](engine/demonstrators/token_core.py)), so the app's number and
 the edge's number come from the same code.
 
-## The credibility layer: Claude is not the cheapest, and we prove it
-
-No edge is cost or speed, because a fair benchmark showed Claude does not win them. The same 32-step
-tool agent, all three at full strength:
-
-| platform | cost | time | correct |
-|---|--:|--:|:--:|
-| OpenAI gpt-5.4-mini | **$0.046** | **42.5s** | no (9 vs 11) |
-| Gemini gemini-3.5-flash | $0.374 | 42.6s | yes (11) |
-| Claude Haiku 4.5 (context editing on) | $0.124 | 58.4s | no (10 vs 11) |
-| Claude Haiku 4.5 (off) | $0.120 | 50.1s | yes (11) |
-
-OpenAI is cheapest and fastest. We report it exactly as it ran (`make compare`), which is the point:
-this is the credibility layer, not the pitch. There is also an independent second signal, METR's task
-time-horizon, where the top released Claude model runs the longest autonomous jobs of any model (about
-1.9x the next best), though our own cross-vendor long run is a tie at affordable scale (`make
-longhorizon-compare`). Sourced in [`briefs/2026-06-17-agentic-landscape.md`](briefs/2026-06-17-agentic-landscape.md).
-
-## Where Claude loses (the honest other direction)
-
-Raw price and speed, the coding-agent leaderboards (GPT-5.5 leads Terminal-Bench and BrowseComp),
-cache retention (Gemini arbitrary TTL, OpenAI 24h, vs Claude 5m/1h), and the per-edge gaps in each
-`edges/<edge>/PRODUCT_EMAIL.md`. Honesty runs both ways.
-
-## Run it
+## Fork and run
 
 ```bash
-git clone <this-repo> && cd claude-competitive-engine   # public URL lands on publish; <this-repo> is the placeholder until then
-make setup && make compare-deps   # core deps, then the OpenAI + Gemini SDKs, into the same venv
-cp .env.example .env              # paste your Anthropic, OpenAI, and Gemini keys
-make ptc                          # the sharpest edge, on your own keys (needs ANTHROPIC_API_KEY)
-make citations                    # the cleanest edge, about six cents (needs all three keys)
-make longhorizon                  # the context-editing edge (needs ANTHROPIC_API_KEY)
-make compare                      # the credibility table, all three arms (needs all three keys; the Gemini row degrades gracefully if its key or quota is missing)
+git clone <this-repo> && cd claude-competitive-engine   # the public URL lands on publish; <this-repo> is the placeholder until then
+make setup                        # the venv and the one dependency (anthropic)
+cp .env.example .env              # paste your ANTHROPIC_API_KEY
+make edges                        # the $0 weekly sweep: find the edges, no key needed
+make ptc                          # the sharpest edge, about six cents (needs ANTHROPIC_API_KEY)
+make app-check                    # the forkable app on the shipped example, then edit app/yourtool.py
 ```
 
-## This is an engine, not a one-off
+For the citations edge and the full cross-vendor credibility benchmark, add the optional OpenAI and
+Gemini SDKs and keys: `make compare-deps`, then paste `OPENAI_API_KEY` and `GEMINI_API_KEY` into
+`.env`, then `make citations`.
+
+## Beneath the headline
+
+The credibility under the two featured wins, kept honest and below the fold:
+
+- **The full ranking and the parity edges.** The sweep also tracks edges where a competitor matches
+  Claude (context editing against OpenAI compaction, for one). They stay in the ranking as parity, not
+  pitched as wins. Each is isolated in `edges/<edge>/` with its own demo, committed receipt, and notes.
+  The sourced reasoning is in [`briefs/`](briefs/).
+- **The cost honesty layer.** No edge here is raw price or speed, because a fair best-to-best benchmark
+  (`make compare`) showed Claude is not the cheapest or fastest on a plain tool agent. The engine
+  reports that plainly rather than hiding it, which is what makes the two wins above trustworthy. The
+  losing and parity cells stay in the brief.
+- **Every number is a receipt.** Prices live once in [`common/models.py`](common/models.py), verified
+  in [`docs/VERIFIED_FACTS.md`](docs/VERIFIED_FACTS.md). Costs come from the API `usage` object. Beta
+  features are labeled beta. Competitor claims trace to the competitor's own dated docs. A cost-claim
+  gate (`make check-claims`) fails if a quoted figure drifts from its committed receipt, and `make
+  cite` grounds every shipped price through Claude's own Citations API into
+  [`docs/CITED_FACTS.md`](docs/CITED_FACTS.md).
+
+## The full command surface
 
 ```
-make edges               # the cheap discovery loop: fetch the live docs, diff against the last run, rank, write the landscape, changelog, and brief (no API call, no benchmark spend, $0)
-make scan                # the committed seed and fallback edges, the live landscape when one is present
-make verify              # a skeptic pass that refutes the overstated ones
-make ptc                 # the programmatic-tool-calling edge benchmark
-make citations           # the citations edge benchmark
-make longhorizon         # the context-editing edge benchmark
-make compare             # the credibility table, all three arms (needs all three keys)
-make sweep               # the variant sweep that makes the compare result trustworthy
-make longhorizon-compare # the cross-vendor long task (a tie at affordable scale, honestly)
+make edges               # the $0 weekly sweep: fetch the live docs, diff, rank, write the landscape, changelog, and brief (no API call)
+make ptc                 # the programmatic-tool-calling edge benchmark (about six cents)
+make citations           # the citations edge benchmark (needs all three keys, about six cents)
+make app                 # the forkable bill-cut app on your own tool (app/yourtool.py)
+make app-check           # the app self-test on the shipped example
 make draft               # the founder email, from the verified anchor
-make alert               # the product-team email, when a competitor is ahead
+make compare             # the cross-vendor credibility table, all three arms (needs all three keys)
+make scan                # the committed seed and fallback edges, no API call
+make verify              # the skeptic pass that refutes the overstated ones
 make cite                # ground every shipped price and fact through Claude's own Citations API
+make check-claims        # the cost-claim gate
+make ci                  # the full offline gate chain, the same one CI runs ($0)
 ```
 
-Re-run it any week. It is packaged as a skill ([`SKILL.md`](SKILL.md)) so a founder can run the same
-analysis themselves: do not trust the pitch, reproduce it.
-
-## Every number is a receipt
-
-Prices live once in [`common/models.py`](common/models.py), verified in
-[`docs/VERIFIED_FACTS.md`](docs/VERIFIED_FACTS.md). Costs come from the API `usage` object. Beta
-features are labeled beta. Competitor claims trace to the competitor's own docs, dated, in the briefs.
-Nothing is quoted from memory. A cost-claim gate (`make check-claims`) fails if a quoted figure drifts
-from its committed receipt. And we eat our own dog food: `make cite` grounds every shipped price and
-platform fact through Claude's own Citations API into [`docs/CITED_FACTS.md`](docs/CITED_FACTS.md),
-each backed by a guaranteed-valid verbatim quote located by the very feature this repo pitches.
+It is packaged as a skill ([`SKILL.md`](SKILL.md)) so a founder can re-run the same analysis any week.
+The canonical founder email is at [`FOUNDER_EMAIL_SUBMISSION.md`](FOUNDER_EMAIL_SUBMISSION.md).
 
 ## Layout
 
 ```
-edges/<edge>/   demo.py, sample.txt, FOUNDER_EMAIL.md, PRODUCT_EMAIL.md, README.md, one per edge
-engine/         shared: the cross-vendor arms (openai/gemini), compare, sweep_edges, scan, verify, drafters
-common/         shared: the verified model + price registry, the cost math, the client
+app/            the forkable bill-cut app: yourtool.py (the one edit surface) + billcut.py
+edges/<edge>/   demo.py, sample.txt, README.md, one per edge
+engine/         the cross-vendor arms, compare, sweep_edges, scan, verify, drafters, the audited token counter
+common/         the verified model + price registry, the cost math, the client
 landscape/      the committed diff baseline (landscape.json) and the dated changelog the sweep writes
 briefs/         the dated, sourced competitive sweeps
-docs/           VERIFIED_FACTS.md and FINDINGS.md
-scripts/        the deslop and cost-claim gates
+docs/           VERIFIED_FACTS.md, CITED_FACTS.md, FINDINGS.md
+scripts/        the deslop, cost-claim, and docs-vs-code gates
 ```
 
 MIT licensed. Re-run it any week. The edge moves, and so does this.
