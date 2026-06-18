@@ -15,4 +15,8 @@ jobs:
       - name: cost-claim gate (citations cost matches the committed receipt)
         run: python scripts/cost_claim_check.py
       - name: compile check
-        run: python -m compileall common engine scripts run.py
+        run: python -m compileall common engine scripts tests run.py
+      - name: offline tests (the gate boundary, no key, no network)
+        run: |
+          pip install pytest
+          python -m pytest

@@ -4,4 +4,14 @@ __pycache__/
 *.pyc
 .DS_Store
 memories/
+
+# data/ is transient per-run scratch (benchmark receipts, last_*.json). It is
+# rewritten every run, so it stays out of git.
 data/
+
+# state/ and landscape/ are the durable spine and MUST be committed. The diff
+# baseline (landscape/landscape.json) and the coverage ledger (state/coverage.jsonl)
+# have to survive a clone, or the "diff against the last run" and "never repeat an
+# edge" premises break on a fresh checkout. They are NOT under data/, on purpose.
+!state/
+!landscape/

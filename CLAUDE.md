@@ -217,9 +217,42 @@ When a fair run shows a competitor cheaper, faster, or better, that is signal, n
 engine writes an internal product-team email with the reproduction bundle, the same way it writes
 the founder email when Claude wins. Honesty runs in both directions.
 
+## The cadence runs on its own, and the gate is the boundary
+This is a recurring engine, not a one-shot. On a cadence (a weekly cheap sweep, an optional monthly
+deep run) it sweeps the live docs, diffs against the last run, ranks by value times genuine lead,
+drafts a fresh email for the newest uncovered edge, and writes the brief, the changelog, and the
+coverage ledger. That whole chain is measurement and drafting, so it runs unattended. The boundary is
+fixed in code in [`engine/gate.py`](engine/gate.py) and `engine.gate.audit()` proves nothing crossed
+it on a schedule.
+- **ALWAYS, unattended.** Fetch the docs, diff, rank, draft into the inert `state/outbox/`, write the
+  brief and the CHANGELOG, update the coverage ledger. All reversible, all internal, nothing leaves
+  the repo and nothing spends credits. The sweep is stdlib HTTP fetches, so the discovery loop needs
+  no key and costs nothing.
+- **ASK, waits for you.** Run a credit-spending benchmark (the PTC grid, compare, longhorizon,
+  citations), scaffold or refresh an `edges/<key>/` bundle, raise the per-run spend cap. These change
+  the repo or the bill, so they run only on an explicit token, never twice for the same edge without a
+  fresh one.
+- **NEVER on a schedule, by design.** Send mail in your name, post in public, push a remote, or spend
+  past the cap. The boundary is the absence of the capability in the unattended path, not a flag that
+  could be flipped. The outbox holds inert files and no send transport is wired into the cadence.
+
+A blocked or failed doc fetch is recorded as status `unknown`, never as competitor-absence, so the
+engine can never manufacture a false Claude lead. The losing and parity cells stay in the ranking.
+The offline gate test in `tests/test_gate.py` asserts `audit()` flags any outward or non-always action
+and runs in CI with no key and no network.
+
+## State survives a clone, data does not
+There are two state roots, and the split matters. `data/` is gitignored transient scratch (per-run
+benchmark receipts, the last run's JSON), rewritten every run. `state/` and `landscape/` are committed
+and durable. The diff baseline (`landscape/landscape.json`) and the coverage ledger
+(`state/coverage.jsonl`) must survive a clone, or "diff against the last run" and "never repeat an edge
+to the same reader" break on a fresh checkout. Anything that must persist across runs lives under
+`state/` or `landscape/`, never under gitignored `data/`. See [`state/README.md`](state/README.md).
+
 ## One command, one dependency
 The core runs with a single `make` target and nothing but `anthropic` installed. The OpenAI
 comparison adds exactly one optional dependency (`openai`), declared in `requirements-compare.txt`.
+The offline tests add `pytest`, a dev-only dependency the CI installs.
 
 ## Clean prose
 No em-dashes or en-dashes, no semicolons in prose, no buzzwords. Say the thing plainly.
