@@ -80,6 +80,7 @@ make sweep               # the variant sweep that makes the compare result trust
 make longhorizon-compare # the cross-vendor long task (a tie at affordable scale, honestly)
 make draft               # the founder email, from the verified anchor
 make alert               # the product-team email, when a competitor is ahead
+make cite                # ground every shipped price and fact through Claude's own Citations API
 ```
 
 Re-run it any week. It is packaged as a skill ([`SKILL.md`](SKILL.md)) so a founder can run the same
@@ -91,7 +92,9 @@ Prices live once in [`common/models.py`](common/models.py), verified in
 [`docs/VERIFIED_FACTS.md`](docs/VERIFIED_FACTS.md). Costs come from the API `usage` object. Beta
 features are labeled beta. Competitor claims trace to the competitor's own docs, dated, in the briefs.
 Nothing is quoted from memory. A cost-claim gate (`make check-claims`) fails if a quoted figure drifts
-from its committed receipt.
+from its committed receipt. And we eat our own dog food: `make cite` grounds every shipped price and
+platform fact through Claude's own Citations API into [`docs/CITED_FACTS.md`](docs/CITED_FACTS.md),
+each backed by a guaranteed-valid verbatim quote located by the very feature this repo pitches.
 
 ## Layout
 

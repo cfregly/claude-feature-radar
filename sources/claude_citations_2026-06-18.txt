@@ -1,0 +1,14 @@
+Source: https://platform.claude.com/docs/en/build-with-claude/citations
+Snapshot fetched 2026-06-18. Verbatim excerpts for citation grounding.
+
+All active models support citations, with the exception of Haiku 3.
+
+To use citations, set citations.enabled=true on each of your documents. The canonical request uses anthropic-version 2023-06-01 with no anthropic-beta header.
+
+Comparison with prompt-based approaches. In comparison with prompt-based citations solutions, the citations feature has the following advantages. Cost savings: if your prompt-based approach asks Claude to output direct quotes, you may see cost savings due to the fact that cited_text does not count towards your output tokens. Better citation reliability: because citations are parsed into the respective response formats and cited_text is extracted, citations are guaranteed to contain valid pointers to the provided documents.
+
+Token costs. Enabling citations incurs a slight increase in input tokens due to system prompt additions and document chunking. The cited_text field is provided for convenience and does not count towards output tokens. When passed back in subsequent conversation turns, cited_text is also not counted towards input tokens.
+
+Citations and Structured Outputs are incompatible. If you enable citations on any user-provided document and also include the output_config.format parameter, the API will return a 400 error.
+
+For plain text documents, citations include the character index range, which is 0-indexed. For PDFs, citations include the page number range, which is 1-indexed.

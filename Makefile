@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps ptc citations citations-quick demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert scan verify draft check-claims deslop gif clean
+.PHONY: setup compare-deps ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert scan verify draft check-claims deslop gif clean
 
 PY := .venv/bin/python
 
@@ -21,6 +21,9 @@ citations: ## EDGE: verifiable citations vs the DIY str.find baseline, all three
 
 citations-quick: ## a 3-question, cents-scale smoke of the citations edge
 	$(PY) edges/citations/demo.py --quick
+
+cite: ## ground every shipped price and fact through Claude's own Citations API (writes docs/CITED_FACTS.md, cents)
+	$(PY) -m engine.cite_facts
 
 demo: ## the main event: a long agent, with and without the managed features (about $0.90)
 	$(PY) run.py demo

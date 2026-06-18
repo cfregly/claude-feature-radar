@@ -1,0 +1,14 @@
+Source: https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
+Snapshot fetched 2026-06-18. Verbatim excerpts for citation grounding.
+
+Programmatic tool calling allows Claude to write code that calls your tools programmatically within a code execution container, rather than requiring round trips through the model for each tool invocation. This reduces latency for multi-tool workflows and decreases token consumption by allowing Claude to filter or process data before it reaches the model's context window.
+
+On agentic search benchmarks like BrowseComp and DeepSearchQA, which test multi-step web research and complex information retrieval, adding programmatic tool calling on top of basic search tools improved performance by an average of 11% while using 24% fewer input tokens.
+
+This feature requires the code execution tool to be enabled.
+
+This feature is not eligible for Zero Data Retention (ZDR). Data is retained according to the feature's standard retention policy.
+
+Programmatic tool calling requires code_execution_20260120, which is supported on the following models: Claude Opus 4.8, Claude Opus 4.7, Claude Opus 4.6, Claude Sonnet 4.6, Claude Opus 4.5, Claude Sonnet 4.5.
+
+The request includes the code execution tool and adds the allowed_callers field to a tool definition. To enable programmatic calling, add the allowed_callers field with the value code_execution_20260120 to your tool definition.

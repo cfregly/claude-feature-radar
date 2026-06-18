@@ -1,0 +1,16 @@
+Source: https://platform.claude.com/docs/en/about-claude/pricing
+Snapshot fetched 2026-06-18. Verbatim excerpts for citation grounding.
+
+Model pricing (per MTok, million tokens). Base Input Tokens, 5m Cache Writes, 1h Cache Writes, Cache Hits and Refreshes, Output Tokens.
+
+Claude Opus 4.8: Base Input Tokens $5 / MTok. 5m Cache Writes $6.25 / MTok. 1h Cache Writes $10 / MTok. Cache Hits and Refreshes $0.50 / MTok. Output Tokens $25 / MTok.
+
+Claude Sonnet 4.6: Base Input Tokens $3 / MTok. 5m Cache Writes $3.75 / MTok. 1h Cache Writes $6 / MTok. Cache Hits and Refreshes $0.30 / MTok. Output Tokens $15 / MTok.
+
+Claude Haiku 4.5: Base Input Tokens $1 / MTok. 5m Cache Writes $1.25 / MTok. 1h Cache Writes $2 / MTok. Cache Hits and Refreshes $0.10 / MTok. Output Tokens $5 / MTok.
+
+Prompt caching pricing multipliers relative to base input token rates. A 5-minute cache write costs 1.25x base input price. A 1-hour cache write costs 2x base input price. A cache read (hit) costs 0.1x base input price. A cache hit costs 10% of the standard input price.
+
+The Batch API allows asynchronous processing of large volumes of requests with a 50% discount on both input and output tokens.
+
+Code execution tool pricing. Code execution is free when used with web search or web fetch. When used without these tools, code execution is billed by execution time. Execution time has a minimum of 5 minutes. Each organization receives 1,550 free hours of usage per month. Additional usage beyond 1,550 hours is billed at $0.05 per hour, per container.
