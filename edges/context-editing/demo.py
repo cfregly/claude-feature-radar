@@ -269,7 +269,7 @@ def main():
     }
     (repo_root() / "data").mkdir(exist_ok=True)
     (repo_root() / "data" / "last_longhorizon.json").write_text(json.dumps(out, indent=2))
-    print(f"  wrote receipts to data/last_longhorizon.json\n")
+    print("  (per-turn detail cached in gitignored data/last_longhorizon.json; this printout is the receipt)\n")
 
 
 if __name__ == "__main__":

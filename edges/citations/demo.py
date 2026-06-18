@@ -330,7 +330,7 @@ def main():
            "summaries": summaries}
     (repo_root() / "data").mkdir(exist_ok=True)
     (repo_root() / "data" / "last_citations.json").write_text(json.dumps(out, indent=2))
-    print("  wrote receipts to data/last_citations.json\n")
+    print("  (per-turn detail cached in gitignored data/last_citations.json; this printout is the receipt)\n")
 
 
 if __name__ == "__main__":

@@ -234,7 +234,7 @@ def main():
            "pct_input_reduction": round(pct, 1), "mode_a_correct": a_correct, "mode_b_correct": b_correct}
     (repo_root() / "data").mkdir(exist_ok=True)
     (repo_root() / "data" / "last_ptc.json").write_text(json.dumps(out, indent=2))
-    print("  wrote receipts to data/last_ptc.json\n")
+    print("  (per-turn detail cached in gitignored data/last_ptc.json; this printout is the receipt)\n")
 
     if not (b_correct and fewer):
         raise SystemExit("PTC invariant failed: mode B (the code) must answer correctly AND bill fewer input tokens.")
