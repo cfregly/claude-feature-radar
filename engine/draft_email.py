@@ -39,7 +39,7 @@ SYSTEM = (
 def main():
     client = get_client()
     prompt = (
-        f"Write a short cold email to a new YC batch from the Claude Evangelist for Startups. "
+        f"Write a short cold email to a new YC batch from a founder who builds with Claude. "
         f"Anchor on this gap: {CHOSEN}\n\n"
         f"The measured proof to cite: {_receipt()}\n\n"
         f"The reader has tried all three big model platforms. Get them to clone a repo and run a "
