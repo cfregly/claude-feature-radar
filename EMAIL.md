@@ -10,7 +10,7 @@ Hey {first_name},
 
 If you are building over your users' own documents (contracts, charts, tickets, research, support docs), the thing that makes it shippable is a citation that links to the exact source sentence and is guaranteed to be real, not a quote the model might have paraphrased.
 
-Claude ships a GA feature for this called Citations. Turn it on per document, and Claude returns each claim with a structured pointer (a character range for text, a page range for a PDF) plus the verbatim quote, extracted by the API. Two things you do not get anywhere else: the pointer is guaranteed to resolve (the API extracts it, so it cannot point at the wrong text), and the quote is free of output tokens.
+Claude ships a GA feature for this called Citations. Turn it on per document, and Claude returns each claim with a structured pointer (a character range for text, a page range for a PDF) plus the verbatim quote, extracted by the API. Two things you do not get anywhere else: the API extracts the quote from the source, so the quote it returns is guaranteed to be the real verbatim source text and not a paraphrase the model invented, and that quote is free of output tokens.
 
 I measured it honestly, including the part that is not flattering. The realistic way to do this without the feature is to ask the model for the verbatim quote and resolve it yourself with `source.find(quote)`. Over 8 questions on a set of documents:
 

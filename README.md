@@ -14,8 +14,9 @@ monthly and a hard-coded claim rots in weeks.
 **What you get, measured.** A verifiable citation into your user's own document that the API
 guarantees, with zero resolver code and the quote free of output tokens. Claude's Citations feature
 (GA, no beta header) returns each claim with a char or page pointer plus the verbatim quote,
-extracted by the API so it cannot point at the wrong text. No competitor ships a document-pointer
-primitive, so without it you build the resolver yourself. Here is the honest comparison:
+extracted by the API so the quote is guaranteed to be the real verbatim source text, not a paraphrase.
+No competitor ships a document-pointer primitive, so without it you build the resolver yourself. Here
+is the honest comparison:
 
 ```bash
 git clone <this-repo> && cd claude-competitive-engine
