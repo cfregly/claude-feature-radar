@@ -41,6 +41,23 @@ is the single canonical Deliverable-2 founder email, the one that ships. The cit
 context-editing emails stay in the repo as supporting content: they show the same engine applied to
 the other two edges and back the honest ranking above.
 
+## Run it on your own tool
+
+The anchor edge ships as a forkable app, so you do not have to trust the receipt, you reproduce it on
+your own tool. Edit ONE file, [`app/yourtool.py`](app/yourtool.py): paste your Messages-API tool dict
+and the Python that runs it. Then `make app` runs the same fan-out task twice over your tool, plain
+tool use vs programmatic tool calling, and prints your own before/after billed-input table, the dollar
+delta at the model's input price, and an upfront cost line before it spends anything. Out of the box it
+ships the worked region_sales example, so `make app-check` gives you a real number before you change a
+line, and asserts the invariant (programmatic mode bills fewer input tokens AND answers correctly).
+
+On the shipped example on Sonnet 4.6, measured: plain tool use billed 9,451 input tokens, programmatic
+billed 6,817, a 28% reduction, both answering correctly, for about six cents. The win is fan-out
+shaped, so keep your task fan-out shaped when you swap your tool in. The app and the
+[`make ptc`](edges/programmatic-tool-calling/) receipt share one audited token counter
+([`engine/demonstrators/token_core.py`](engine/demonstrators/token_core.py)), so the app's number and
+the edge's number come from the same code.
+
 ## The credibility layer: Claude is not the cheapest, and we prove it
 
 No edge is cost or speed, because a fair benchmark showed Claude does not win them. The same 32-step

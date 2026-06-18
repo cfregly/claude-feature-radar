@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges scan verify verify-live draft check-claims check-docs core-imports test ci deslop gif clean
+.PHONY: setup compare-deps app app-check ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges scan verify verify-live draft check-claims check-docs core-imports test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -12,6 +12,12 @@ setup: ## create the venv and install the one dependency
 compare-deps: ## install the OpenAI + Gemini SDKs into the SAME venv, for compare/sweep
 	$(PY) -m pip install --quiet -r requirements-compare.txt
 	@echo "Compare deps installed into .venv. Now paste OPENAI_API_KEY and GEMINI_API_KEY into .env."
+
+app: ## FORKABLE APP: run the fan-out task over your own tool (app/yourtool.py), print your before/after token bill (needs ANTHROPIC_API_KEY, about $0.06)
+	$(PY) -m app.billcut
+
+app-check: ## the app self-test: run the shipped example and assert the PTC invariant (Mode B bills fewer input tokens AND answers correctly) before you trust it on your own tool (about $0.06)
+	$(PY) -m app.billcut --check
 
 ptc: ## EDGE: programmatic tool calling, the input-token receipt on a fan-out task (needs ANTHROPIC_API_KEY, about $0.06)
 	$(PY) edges/programmatic-tool-calling/demo.py

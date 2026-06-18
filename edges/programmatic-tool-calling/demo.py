@@ -40,19 +40,18 @@ import hashlib
 import json
 import random
 import re
-import time
 
 from common.client import fmt_usd, get_client, load_env, repo_root
 from common.models import get
 from common.pricing import cost_usd
 from engine.demonstrators.base import Arm, BaseDemonstrator, CostEstimate, Verdict
 from engine.demonstrators.registry import register
+from engine.demonstrators.token_core import run_mode
 
 REGIONS = ["north", "south", "east", "pacific"]
 PRODUCTS = ["widget", "gadget", "sprocket", "gizmo", "doohickey", "flange", "valve", "bracket"]
 ROWS_PER_REGION = 60
 
-CODE_EXEC_TOOL = {"type": "code_execution_20260120", "name": "code_execution"}
 QUERY_TOOL = {
     "name": "query_region_sales",
     "description": (
@@ -107,77 +106,20 @@ def parse_winner(text: str):
     return w if w in REGIONS else None
 
 
-def _billed_input(u) -> int:
-    """Every input bucket the model was billed for, apples to apples."""
-    inp = getattr(u, "input_tokens", 0) or 0
-    cr = getattr(u, "cache_read_input_tokens", 0) or 0
-    cc = getattr(u, "cache_creation", None)
-    if cc is not None:
-        cw = (getattr(cc, "ephemeral_5m_input_tokens", 0) or 0) + (getattr(cc, "ephemeral_1h_input_tokens", 0) or 0)
-    else:
-        cw = getattr(u, "cache_creation_input_tokens", 0) or 0
-    return inp + cr + cw
+def run_ptc(client, model_key, *, programmatic):
+    """The PTC A/B run for this edge, on top of the one audited engine in token_core.run_mode.
 
-
-def run_mode(client, model_key, *, programmatic, max_turns=8):
-    model = get(model_key).id
-    tool = dict(QUERY_TOOL)
-    if programmatic:
-        tool["allowed_callers"] = ["code_execution_20260120"]
-        tools = [CODE_EXEC_TOOL, tool]
-    else:
-        tools = [tool]
-
-    messages = [{"role": "user", "content": QUESTION}]
-    container = None
-    billed_input = output_tokens = turns = tool_calls = 0
-    cost = 0.0
-    final_text = ""
-    t0 = time.perf_counter()
-    for _ in range(max_turns):
-        # A generous per-request timeout: a code-execution turn can legitimately take a minute, but if
-        # the container expires mid-run the call can hang, so we fail fast instead of grinding.
-        kwargs = dict(model=model, max_tokens=4096, tools=tools, messages=messages, timeout=180.0)
-        if container:
-            kwargs["container"] = container
-        resp = client.messages.create(**kwargs)
-        turns += 1
-        billed_input += _billed_input(resp.usage)
-        output_tokens += getattr(resp.usage, "output_tokens", 0) or 0
-        cost += cost_usd(model_key, resp.usage)
-        if getattr(resp, "container", None):
-            container = resp.container.id
-        _ntu = sum(1 for b in resp.content if getattr(b, "type", None) == "tool_use")
-        _ncode = sum(1 for b in resp.content if getattr(b, "type", None) == "server_tool_use")
-        print(f"      [{'B' if programmatic else 'A'}] turn {turns}: stop={resp.stop_reason} "
-              f"tool_use={_ntu} code={_ncode} billed={billed_input:,} {time.perf_counter() - t0:.0f}s",
-              flush=True)
-        text = "".join(b.text for b in resp.content if getattr(b, "type", None) == "text")
-        if text.strip():
-            final_text = text
-        if resp.stop_reason != "tool_use":
-            break
-        # Echo the assistant content back, but drop code_execution_tool_result blocks: the server
-        # holds that state in the container, and re-sending them fails validation. This matches the
-        # doc's continuation shape (text + server_tool_use + tool_use only).
-        asst = [b.model_dump(exclude_unset=True) for b in resp.content
-                if getattr(b, "type", None) != "code_execution_tool_result"]
-        messages.append({"role": "assistant", "content": asst})
-        results = []
-        for block in resp.content:
-            if getattr(block, "type", None) == "tool_use":  # our custom tool (direct or from code)
-                tool_calls += 1
-                rows = region_sales(block.input.get("region", ""))
-                results.append({"type": "tool_result", "tool_use_id": block.id,
-                                "content": json.dumps(rows)})
-        if not results:
-            break
-        messages.append({"role": "user", "content": results})
-    return {
-        "billed_input": billed_input, "output_tokens": output_tokens, "cost": cost,
-        "turns": turns, "tool_calls": tool_calls, "answer": parse_winner(final_text),
-        "time": time.perf_counter() - t0,
-    }
+    run_mode does the request loop and the apples-to-apples billed-input count (one counter, shared
+    with the forkable app). This thin wrapper supplies the edge's own tool, question, and a region
+    parameter for region_sales, then maps the model's final text to the parsed winner this edge scores.
+    """
+    r = run_mode(
+        client, get(model_key).id, QUERY_TOOL,
+        lambda region="": region_sales(region), QUESTION,
+        programmatic=programmatic, cost_fn=lambda u: cost_usd(model_key, u),
+    )
+    r["answer"] = parse_winner(r["answer"])
+    return r
 
 
 # --------------------------------------------------------------- the Demonstrator interface
@@ -201,8 +143,8 @@ class PTCDemonstrator(BaseDemonstrator):
         client = spec.get("client") or get_client()
         model_key = spec.get("model") or (self.fair_comparison(edge).get("claude_config") or {}).get("model", "sonnet")
         winner = spec.get("winner") or true_winner()[0]
-        a_run = run_mode(client, model_key, programmatic=False)   # Mode A: plain tool use (the A/B baseline)
-        b_run = run_mode(client, model_key, programmatic=True)    # Mode B: PTC (the Claude arm)
+        a_run = run_ptc(client, model_key, programmatic=False)   # Mode A: plain tool use (the A/B baseline)
+        b_run = run_ptc(client, model_key, programmatic=True)    # Mode B: PTC (the Claude arm)
         pct = (1 - b_run["billed_input"] / a_run["billed_input"]) * 100 if a_run["billed_input"] else 0.0
         return Arm(
             provider="claude", model=get(model_key).id, text=str(b_run["answer"]),
@@ -279,11 +221,11 @@ def main():
     print(f"  Same task and same model ({label}) both ways, the final answer must match or we fail.\n")
 
     print("  running Mode A (plain tool use, every row through context) ...", flush=True)
-    a_run = run_mode(client, a.model, programmatic=False)
+    a_run = run_ptc(client, a.model, programmatic=False)
     print(f"    Mode A done: {a_run['turns']} round-trips, {a_run['billed_input']:,} billed input tokens, "
           f"answer {a_run['answer']}.", flush=True)
     print("  running Mode B (programmatic, rows filtered in the sandbox) ...", flush=True)
-    b_run = run_mode(client, a.model, programmatic=True)
+    b_run = run_ptc(client, a.model, programmatic=True)
     print(f"    Mode B done: {b_run['turns']} round-trips, {b_run['billed_input']:,} billed input tokens, "
           f"answer {b_run['answer']}.\n", flush=True)
 
