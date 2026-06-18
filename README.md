@@ -7,46 +7,47 @@ guaranteed-valid pointer into your user's own document, against the workaround t
 force you into. It re-checks every claim against the live docs each run, because the platforms ship
 monthly and a hard-coded claim rots in weeks.
 
-![Citations demo: Claude resolves 8 of 8 source pointers, the prompt-for-quotes workaround resolves 0 of 8 on OpenAI, Gemini resolves 7 of 8 but at 148x the output tokens](docs/demo.gif)
+![Citations demo: every approach resolves 8 of 8 on clean text, but only Claude resolves the pointer in the API, guaranteed and free of output tokens, with no resolver code to write](docs/demo.gif)
 
-*The committed receipt from a real `make citations` run. The grader is mechanical: does each returned
-offset land on the exact source text. You run the same thing on your own keys.*
+*The committed receipt from a real `make citations` run. You run the same thing on your own keys.*
 
-**What you get, measured.** A product that cites your user's own documents with a pointer that
-resolves, every time. Claude's Citations feature (GA, no beta header) returns each claim with a
-char or page pointer plus the verbatim quote, extracted by the API so it is guaranteed to resolve,
-and the quote is free of output tokens. The workaround you would build without it (prompt the model
-for a quote and offsets) is the only option on OpenAI and Google. Here is what that costs you:
+**What you get, measured.** A verifiable citation into your user's own document that the API
+guarantees, with zero resolver code and the quote free of output tokens. Claude's Citations feature
+(GA, no beta header) returns each claim with a char or page pointer plus the verbatim quote,
+extracted by the API so it cannot point at the wrong text. No competitor ships a document-pointer
+primitive, so without it you build the resolver yourself. Here is the honest comparison:
 
 ```bash
 git clone <this-repo> && cd claude-competitive-engine
 make setup && make compare-deps   # core deps, then the OpenAI + Gemini SDKs, all into the same venv
 cp .env.example .env              # paste your Anthropic, OpenAI, and Gemini keys (the file says where)
-make citations                    # the verifiable-pointer benchmark on your own keys, about thirty cents
+make citations                    # the verifiable-pointer benchmark on your own keys, about six cents
 ```
 
-## The measured proof (we do not assert)
+## The measured proof (honest, including the part that is not flattering)
 
-The same 8 questions over a set of your own documents, four ways. The grader checks one thing per
-citation: does `source[start:end]` equal the quoted text. A pointer that resolves is one a user can
-click and trust. A pointer that does not is a hallucinated citation.
+The same 8 questions over a set of your own documents. The realistic DIY path without the feature is
+to ask the model for the verbatim quote and resolve it yourself with `source.find(quote)`, not to ask
+the model for a character offset (a tokenizer cannot count characters, and an earlier version of this
+benchmark that did was a strawman a scrutiny panel caught). The grader checks that each citation
+resolves to the real source text.
 
-| approach | pointer resolves | quotes verbatim | output tokens | cost |
-|---|:--:|:--:|--:|--:|
-| **Claude Haiku 4.5 + Citations** | **8/8** (guaranteed) | 8/8 | 308 | $0.011 |
-| Claude Haiku 4.5, prompt-for-quotes | 0/8 | 8/8 | 715 | $0.007 |
-| OpenAI gpt-5.4-mini, prompt-for-quotes | 0/8 | 8/8 | 448 | $0.005 |
-| Gemini gemini-3.5-flash, prompt-for-quotes | 7/8 | 8/8 | 45,630 | $0.416 |
+| approach | resolves | who resolves it | quote free of output tokens | output tokens | cost |
+|---|:--:|:--:|:--:|--:|--:|
+| **Claude Haiku 4.5 + Citations** | **8/8** (guaranteed) | the API | yes | 308 | $0.011 |
+| Claude Haiku 4.5, DIY str.find | 8/8 | your code | no | 586 | $0.006 |
+| OpenAI gpt-5.4-mini, DIY str.find | 8/8 | your code | no | 391 | $0.004 |
+| Gemini gemini-3.5-flash, DIY str.find | 8/8 | your code | no | 3,466 | $0.036 |
 
-**The honest read.** The quoted text is correct everywhere (8/8 verbatim), so the differentiator is
-the pointer. The prompt-for-quotes workaround returns offsets that point nowhere: 0/8 on OpenAI, and
-0/8 even on Claude without the feature, so you cannot link to or verify them. Gemini can resolve 7/8,
-but only by burning 45,630 output tokens against Claude's 308 (about 148x) and $0.42 against $0.011
-(about 37x), because it brute-forces the character count with reasoning. Among the approaches that
-actually resolve a pointer, Claude's Citations is the only one at 8/8 and by far the cheapest.
-**Citations is not the cheapest arm in raw dollars** (it adds input tokens for chunking), so we never
-claim "cheaper," only that the quotes are free of output tokens and that it is the only resolving
-approach you would actually ship. Full receipt in [`sample_citations.txt`](sample_citations.txt).
+**The honest read.** On clean text the DIY bolt-on resolves just as well (8/8), because the model
+quotes verbatim and `find` locates it. So the edge is not "the others cannot cite." The edge is
+narrower and real: Claude resolves the pointer in the API, guaranteed by construction (the DIY `find`
+returns nothing the moment the model paraphrases, which it will on a messy real PDF), the quote is
+free of output tokens (308 versus 586), and you write zero resolver code. **Citations is not the
+cheapest arm in raw dollars** (it adds input tokens for chunking, so it cost more than the OpenAI DIY
+path here), so we never claim "cheaper." The win is the guarantee, the zero code, and the fact that
+no competitor ships the primitive at all. Full receipt in
+[`sample_citations.txt`](sample_citations.txt).
 
 ## Why it is a real edge, not a rigged demo
 
@@ -68,9 +69,12 @@ the neutral referee rather than a vendor chart, the top released Claude model ru
 autonomous jobs of any model, about 1.9x the next best before reliability drops to half (Claude about
 12 hours, Gemini 3.1 Pro about 6.4, GPT-5.2 about 5.9). Claude does not lead the headline coding
 boards, so this is the one place "finishes long jobs" survives a skeptic on neutral data. The sourced
-reconciliation is in [`briefs/2026-06-17-agentic-landscape.md`](briefs/2026-06-17-agentic-landscape.md),
-and `make longhorizon` is the runnable Claude-side proof (a long agent that finishes when its context
-is bounded and fails when it is not).
+reconciliation is in [`briefs/2026-06-17-agentic-landscape.md`](briefs/2026-06-17-agentic-landscape.md).
+Be honest about scale: `make longhorizon-compare` runs the same heavy task across all three vendors,
+and at 8 reports of 40k tokens every one finishes correctly (a tie, Claude just carries the least
+context). The METR gap opens only at much longer horizons than a cheap demo reaches, which is exactly
+why the independent referee, not our own short run, is the evidence. `make longhorizon` is the
+runnable Claude-side view of the bounding mechanism.
 
 ## The credibility layer: Claude is not the cheapest, and we prove it
 
@@ -97,9 +101,10 @@ apples-to-apples in [`docs/FINDINGS.md`](docs/FINDINGS.md).
 ```
 make scan        # the ranked, verified gaps from the live-docs sweep
 make verify      # a skeptic pass that refutes the overstated ones
-make citations   # THE ANCHOR: the verifiable-pointer benchmark, all three vendors
-make compare     # the fair cost/speed/correctness benchmark (the credibility layer)
-make longhorizon # the runnable long-horizon proof
+make citations         # THE ANCHOR: the verifiable-pointer benchmark, all three vendors
+make compare           # the fair cost/speed/correctness benchmark (the credibility layer)
+make longhorizon       # the Claude-side bounding mechanism
+make longhorizon-compare # the cross-vendor long task (a tie at affordable scale, honestly)
 make draft       # the founder email, from the verified anchor
 make alert       # the product-team email, when a competitor is ahead
 ```

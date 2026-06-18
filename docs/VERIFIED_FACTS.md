@@ -39,9 +39,14 @@ Source: [citations](https://platform.claude.com/docs/en/build-with-claude/citati
 - Incompatible with Structured Outputs: enabling citations on a user document together with
   `output_config.format` returns a 400.
 - Verified live by [`../engine/citations.py`](../engine/citations.py): over 8 questions on 3 plain
-  text documents, every returned `char_location` satisfied `source[start:end] == cited_text` (8/8),
-  while the prompt-for-quotes baseline resolved 0/8 on Claude and on OpenAI gpt-5.4-mini, and Gemini
-  gemini-3.5-flash resolved 7/8 at 45,630 output tokens versus Claude's 308. Receipt:
+  text documents, every returned `char_location` satisfied `source[start:end] == cited_text` (8/8).
+  The honest baseline is the DIY path (ask the model for the verbatim quote, resolve it yourself with
+  `source.find(quote)`), which also resolves 8/8 on clean text on Claude, OpenAI gpt-5.4-mini, and
+  Gemini gemini-3.5-flash. The measured edge is that Claude does the resolving in-API (guaranteed,
+  the DIY find returns -1 the moment the model paraphrases), the quote is free of output tokens (308
+  versus 586 on the Claude DIY arm), and no competitor ships the primitive. An earlier version of
+  this benchmark asked the models to emit the character offset and scored that 0/8, which a scrutiny
+  panel correctly flagged as a strawman (a tokenizer cannot count characters). Receipt:
   [`../sample_citations.txt`](../sample_citations.txt).
 
 ### Competitor citation surfaces (the parity check)

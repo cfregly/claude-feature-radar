@@ -21,10 +21,12 @@ DIFFERENTIATORS = [
         "claim": "Document-grounded citations: a guaranteed-valid char/page pointer into the user's "
                  "own document, with the verbatim quote extracted by the API, free of output tokens.",
         "why": "OpenAI and Google only annotate web-search URLs. Neither exposes a pointer into a "
-               "user-supplied document. GA, no beta header. Measured (make citations): Claude "
-               "resolves 8/8 pointers to the exact source text, the prompt-for-quotes workaround "
-               "resolves 0/8 on OpenAI and on Claude without the feature, and the one competitor "
-               "that resolves (Gemini, 7/8) burns 148x the output tokens to brute-force the offsets.",
+               "user-supplied document. GA, no beta header. Measured (make citations): on clean text "
+               "the DIY path (model quote + your own str.find) resolves 8/8 on every vendor, so the "
+               "edge is not that they cannot cite. The edge is that Claude resolves it in-API, "
+               "guaranteed by construction (DIY find breaks the moment the model paraphrases), free "
+               "of output tokens (308 vs 586), with zero resolver code, and no competitor ships the "
+               "primitive at all.",
     },
     {
         "key": "long-horizon-autonomy", "axis": "reliability", "rank": 2,
@@ -68,12 +70,14 @@ CHOSEN = (
     "Citations: a GA, document-grounded source pointer (char index for text, page for PDF) into the "
     "user's OWN document, with the verbatim quote extracted by the API and free of output tokens. No "
     "competitor exposes a pointer into a user-supplied document, they only cite web URLs. Measured: "
-    "Claude resolves 8/8 pointers to the exact source text by construction, the prompt-for-quotes "
-    "workaround resolves 0/8 on OpenAI and on Claude without the feature, and the only competitor "
-    "that resolves at all (Gemini) costs 37x more to brute-force the offsets. This is the trust layer "
+    "on clean text the DIY path (model quote + your own str.find) resolves 8/8 on every vendor, so "
+    "the honest edge is not that the others cannot cite. It is that only Claude resolves it in-API, "
+    "guaranteed by construction (the DIY find breaks the moment the model paraphrases), free of output "
+    "tokens, with zero resolver code, and no competitor ships the primitive. This is the trust layer "
     "for any product built over the user's own documents. Second pillar: Claude has the longest "
     "autonomous task horizon of any released model on METR's independent referee, about 1.9x the next "
-    "best, for the founder building agents that must finish long jobs."
+    "best. On a short job every frontier model finishes (our cross-vendor longhorizon run is a tie), "
+    "so the gap only shows on the long ones, where the independent referee puts Claude first."
 )
 
 

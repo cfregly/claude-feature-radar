@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps citations citations-quick demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert scan verify draft deslop gif clean
+.PHONY: setup compare-deps citations citations-quick demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert scan verify draft check-claims deslop gif clean
 
 PY := .venv/bin/python
 
@@ -13,7 +13,7 @@ compare-deps: ## install the OpenAI + Gemini SDKs into the SAME venv, for compar
 	$(PY) -m pip install --quiet -r requirements-compare.txt
 	@echo "Compare deps installed into .venv. Now paste OPENAI_API_KEY and GEMINI_API_KEY into .env."
 
-citations: ## THE ANCHOR: verifiable source citations vs prompt-for-quotes, all three vendors (needs compare-deps + 3 keys, about $0.30)
+citations: ## THE ANCHOR: verifiable citations vs the DIY str.find baseline, all three vendors (needs compare-deps + 3 keys, about $0.06)
 	$(PY) run.py citations
 
 citations-quick: ## a 3-question, cents-scale smoke of the citations anchor
@@ -55,7 +55,10 @@ verify: ## the skeptic pass: ask Claude to break each candidate, keep what survi
 draft: ## draft the founder email from the measured receipt
 	$(PY) run.py draft
 
-deslop: ## check the prose for em-dashes, en-dashes, and semicolons
+check-claims: ## verify the citations reproduction cost still matches the summed receipt
+	$(PY) scripts/cost_claim_check.py
+
+deslop: check-claims ## prose gate (em-dashes, en-dashes, semicolons) plus the citations cost-claim gate
 	$(PY) scripts/deslop_check.py
 
 gif: ## regenerate docs/demo.gif from demo.tape (needs vhs, ffmpeg, ttyd)
