@@ -1,5 +1,11 @@
 """The Gemini arm: the same long-horizon chain agent on Google Gemini, best config.
 
+This is the STATEFUL multi-turn chain agent the legacy long-horizon comparison drives (compare,
+sweep, longhorizon_compare). A Demonstrator's single-call Gemini arm goes instead through the
+provider-blind layer (common/runner.py call() plus engine/providers/gemini_provider.py), which probes
+access and never fakes a row. New demonstrators use that layer; this chain agent stays the backend
+for the legacy comparison so the committed receipts do not move.
+
 Uses the google-genai SDK with Gemini's best long-agent setup:
   - implicit prompt caching (automatic, on by default), so the re-sent prefix is cheap.
   - full context carried. Gemini has no server-side context compaction or in-place clearing on

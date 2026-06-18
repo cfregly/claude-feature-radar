@@ -25,6 +25,7 @@ class Model:
     min_cache_tokens: int
     effort_levels: tuple[str, ...]   # () means the model has no effort knob
     thinking_mode: str               # "adaptive" | "manual" | "none"
+    provider: str = "anthropic"      # "anthropic" | "openai" | "gemini"
 
 
 # Verified 2026-06-17 against docs.claude.com (pricing, effort, adaptive-thinking) and a live call.
@@ -61,6 +62,59 @@ MODELS: dict[str, Model] = {
         effort_levels=("low", "medium", "high", "xhigh", "max"),
         thinking_mode="adaptive",          # always on; may be access-gated on a given key
     ),
+    # OpenAI and Gemini comparison models, merged from ship-on-claude common/models.py so every
+    # demonstrator's competitor arm reads one verified price table. Prices verified 2026-06-17 against
+    # the providers' live pricing pages (developers.openai.com, ai.google.dev), the same date and
+    # values the engine's edges/citations receipt already shipped. These rows only run when the
+    # matching key is set, and the cross-vendor runner pulls the SDK lazily, so the one-dependency core
+    # is untouched. The cache fields are 0 because those providers bill no separate cache tier, and
+    # effort is the harness label sent straight through (OpenAI reasoning_effort, Gemini thinking_level,
+    # both take low/medium/high). "minimal" is excluded: OpenAI rejects it with a 400.
+    "gpt-nano": Model(
+        key="gpt-nano", id="gpt-5.4-nano", label="GPT-5.4 nano", tier="fast", provider="openai",
+        input_per_mtok=0.20, output_per_mtok=1.25,
+        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.0,
+        context_window=400_000, min_cache_tokens=0,
+        effort_levels=("low", "medium", "high"), thinking_mode="none",
+    ),
+    "gpt-mid": Model(
+        key="gpt-mid", id="gpt-5.4", label="GPT-5.4", tier="balanced", provider="openai",
+        input_per_mtok=2.50, output_per_mtok=15.0,
+        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.0,
+        context_window=1_050_000, min_cache_tokens=0,
+        effort_levels=("low", "medium", "high"), thinking_mode="none",
+    ),
+    "gpt-top": Model(
+        key="gpt-top", id="gpt-5.5", label="GPT-5.5", tier="frontier", provider="openai",
+        input_per_mtok=5.0, output_per_mtok=30.0,
+        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.0,
+        context_window=1_050_000, min_cache_tokens=0,
+        effort_levels=("low", "medium", "high"), thinking_mode="none",
+    ),
+    "gem-lite": Model(
+        key="gem-lite", id="gemini-3.1-flash-lite", label="Gemini 3.1 Flash-Lite", tier="fast",
+        provider="gemini",
+        input_per_mtok=0.25, output_per_mtok=1.50,
+        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.0,
+        context_window=1_000_000, min_cache_tokens=0,
+        effort_levels=("low", "medium", "high"), thinking_mode="none",
+    ),
+    "gem-flash": Model(
+        key="gem-flash", id="gemini-3.5-flash", label="Gemini 3.5 Flash", tier="balanced",
+        provider="gemini",
+        input_per_mtok=1.50, output_per_mtok=9.0,
+        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.0,
+        context_window=1_000_000, min_cache_tokens=0,
+        effort_levels=("low", "medium", "high"), thinking_mode="none",
+    ),
+    "gem-pro": Model(
+        key="gem-pro", id="gemini-3.1-pro-preview", label="Gemini 3.1 Pro", tier="frontier",
+        provider="gemini",
+        input_per_mtok=2.0, output_per_mtok=12.0,
+        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.0,
+        context_window=1_000_000, min_cache_tokens=0,
+        effort_levels=("low", "medium", "high"), thinking_mode="none",
+    ),
 }
 
 
@@ -72,3 +126,32 @@ def get(key_or_id: str) -> Model:
         if m.id == key_or_id:
             return m
     raise KeyError(f"unknown model: {key_or_id!r} (known: {list(MODELS)})")
+
+
+def supports_effort(key_or_id: str) -> bool:
+    return bool(get(key_or_id).effort_levels)
+
+
+def supports_effort_level(key_or_id: str, level: str) -> bool:
+    return level in get(key_or_id).effort_levels
+
+
+def thinking_param(key_or_id: str):
+    """The thinking config to send for this model, or None to omit it."""
+    return {"type": "adaptive"} if get(key_or_id).thinking_mode == "adaptive" else None
+
+
+def request_kwargs(key_or_id: str, effort: str | None = None, adaptive_thinking: bool = False) -> dict:
+    """Build valid messages.create() kwargs for a Claude model, dropping knobs the model rejects.
+
+    The function that keeps a request from 400ing: it omits effort on models without it (Haiku), and
+    only sends adaptive thinking where it is supported. Merged from ship-on-claude common/models.py so
+    every demonstrator's Claude arm builds its request the same way.
+    """
+    m = get(key_or_id)
+    kw: dict = {"model": m.id}
+    if effort is not None and supports_effort_level(m.key, effort):
+        kw["output_config"] = {"effort": effort}
+    if adaptive_thinking and m.thinking_mode == "adaptive":
+        kw["thinking"] = {"type": "adaptive"}
+    return kw

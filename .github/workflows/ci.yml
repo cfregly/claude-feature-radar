@@ -14,9 +14,15 @@ jobs:
         run: python scripts/deslop_check.py
       - name: cost-claim gate (citations cost matches the committed receipt)
         run: python scripts/cost_claim_check.py
+      - name: docs-vs-code gate (no make/run.py/model-id/header drift)
+        run: python scripts/check_docs.py
       - name: compile check
         run: python -m compileall common engine scripts tests run.py
-      - name: offline tests (the gate boundary, no key, no network)
+      - name: one-dependency check (the core imports with anthropic alone, SDKs blocked)
+        run: |
+          pip install anthropic
+          python scripts/check_core_imports.py
+      - name: offline tests (the gate boundary, the shared infra, no key, no network)
         run: |
           pip install pytest
           python -m pytest

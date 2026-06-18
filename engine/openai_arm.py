@@ -1,5 +1,12 @@
 """The OpenAI arm: the same long-horizon chain agent on OpenAI's LATEST API, best config.
 
+This is the STATEFUL multi-turn chain agent (server-stored conversation, compaction, the tool loop)
+that engine/compare.py, engine/sweep.py, and engine/longhorizon_compare.py drive. It is a different
+shape from the single-call competitor arm a Demonstrator runs: a Demonstrator's OpenAI arm goes
+through the provider-blind layer (common/runner.py call() plus engine/providers/openai_provider.py),
+which probes access and never fakes a row. New demonstrators use that layer; this chain agent stays
+the backend for the legacy long-horizon comparison so the committed receipts do not move.
+
 Uses the Responses API (not Chat Completions) with every best-feature ON, so the fight is fair:
   - server-side compaction ON (context_management compaction), so OpenAI trims its carried
     context the same way Claude's context editing does. The threshold is matched to the Claude
