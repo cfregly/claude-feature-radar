@@ -1,0 +1,15 @@
+
+  Long-horizon cross-vendor head-to-head. The same 8-report chain, each report
+  about 40,000 tokens, each platform at its best long-agent config. Claude uses
+  context editing + the memory tool, OpenAI uses summarizing compaction, Gemini carries the
+  full context on its 1M window. Estimated a few dollars and a few minutes.
+
+  Cross-vendor head-to-head, one run. True URGENT count: 3.
+  platform                               finished answer correct  peak ctx      cost
+  ----------------------------------------------------------------------------------
+  Claude Haiku 4.5 (editing + memory)         yes      3     yes    34,760   $0.3766
+  OpenAI gpt-5.4-mini (compaction)            yes      3     yes    54,140   $0.1069
+  Gemini gemini-3.5-flash (full context)      yes      3     yes   230,588   $0.6659
+
+  wrote receipts to data/last_longhorizon_compare.json
+

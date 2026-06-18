@@ -4,29 +4,28 @@ Paste into a Google Doc or your sending tool. Plain text, one link.
 
 ---
 
-**Subject:** Claude cites the exact sentence in your user's own doc, and the pointer resolves 8/8. The DIY workaround: 0/8.
+**Subject:** Claude hands you a guaranteed, verifiable citation into your user's own doc in one field. Nobody else ships the primitive.
 
 Hey {first_name},
 
-If you are building anything over your users' own documents (contracts, charts, tickets, research papers, support docs), the thing that makes it shippable is trust: every claim links back to the exact sentence in the source, and that link actually works.
+If you are building over your users' own documents (contracts, charts, tickets, research, support docs), the thing that makes it shippable is a citation that links to the exact source sentence and is guaranteed to be real, not a quote the model might have paraphrased.
 
-Claude ships a GA feature for this called Citations. You turn it on per document, and Claude returns each claim with a structured pointer (a character range for text, a page range for a PDF) plus the verbatim quote, extracted by the API so the pointer is guaranteed to resolve. The quote does not count toward your output tokens.
+Claude ships a GA feature for this called Citations. Turn it on per document, and Claude returns each claim with a structured pointer (a character range for text, a page range for a PDF) plus the verbatim quote, extracted by the API. Two things you do not get anywhere else: the pointer is guaranteed to resolve (the API extracts it, so it cannot point at the wrong text), and the quote is free of output tokens.
 
-I measured it the only way that counts. Across 8 questions over a set of documents, does each returned offset land on the exact source text?
+I measured it honestly, including the part that is not flattering. The realistic way to do this without the feature is to ask the model for the verbatim quote and resolve it yourself with `source.find(quote)`. Over 8 questions on a set of documents:
 
-- Claude with Citations: 8 of 8 resolve, guaranteed, quotes free of output tokens.
-- The prompt-for-quotes approach you would build without it: 0 of 8 resolve on Claude, 0 of 8 on OpenAI. The quoted text was correct, but the offsets pointed nowhere, so you cannot link to or verify them.
-- Gemini resolved 7 of 8, but only by burning 45,630 output tokens against Claude's 308 (about 148x) and $0.42 against $0.011 (about 37x), because it has to brute-force the character count with reasoning.
+- Claude with Citations: 8 of 8 resolve, the API does the resolving and guarantees it, zero resolver code, and the quote costs zero output tokens (308 output tokens total).
+- The DIY path on Claude, OpenAI, and Gemini: also 8 of 8, because on clean text the model quotes verbatim and `find` locates it. But you own that code, you pay output tokens for every quote (586 on Claude, 391 on OpenAI, 3,466 on Gemini), and `find` returns nothing the moment the model paraphrases instead of quoting, which it will on a real messy PDF.
 
-No competitor exposes a pointer into your own document. OpenAI and Google only cite web-search URLs. So this is a real gap, not a benchmark I rigged: the cheap workaround gives you zero usable citations, and the only competitor that resolves at all costs 37x more to do it.
+So I am not going to tell you the competitors cannot cite. On clean text the DIY bolt-on works. The honest edge is narrower and real: Claude is the only platform that gives you the pointer as a primitive, guaranteed and free of output tokens, with no resolver code to write or maintain and no silent failure when the model paraphrases. OpenAI and Google only cite web-search URLs, never a pointer into the document you uploaded.
 
 {repo_link}
 
-Run it yourself: `make setup`, then `make compare-deps`, then `cp .env.example .env` and paste three keys (Anthropic, OpenAI, Gemini, the file says where each goes), then `make citations`. About thirty cents and a couple of minutes, every number read off the real API.
+Run it yourself: `make setup`, then `make compare-deps`, then `cp .env.example .env` and paste three keys (Anthropic, OpenAI, Gemini, the file says where each goes), then `make citations`. About six cents and a couple of minutes, every number read off the real API.
 
-One honest caveat I will not hide: Citations cannot be combined with Structured Outputs on the same document (the API returns a 400), so if you need strict JSON and citations together, you pick one.
+Two honest caveats I will not hide. Citations is not the cheapest arm in raw dollars (it adds input tokens for chunking, so on this small corpus it cost more than the OpenAI DIY path), and it cannot be combined with Structured Outputs on the same document (the API returns a 400). The win is the guarantee and zero code, not a cheaper bill.
 
-If you are building long-running agents, a second reason to look: on METR's independent task time-horizon, the neutral referee rather than a vendor chart, Claude runs the longest autonomous jobs of any released model, about 1.9x the next best before reliability drops to half. Claude is not the cheapest or the fastest per token, and it does not top every coding board. But it finishes the longest jobs, and it is the only one that cites your user's own documents with a pointer that resolves.
+If you are building long-running agents, a second reason: on METR's independent task time-horizon, the neutral referee rather than a vendor chart, Claude runs the longest autonomous jobs of any released model, about 1.9x the next best before reliability drops to half. On a short job every frontier model finishes, so that gap only shows on the long ones, but it is the one place an independent referee puts Claude first.
 
 It is one field on the API: `citations: {"enabled": true}`. Reply if you want a hand wiring it in.
 
@@ -39,16 +38,15 @@ Building with Claude
 
 ### Why it is built this way (not part of the email)
 
-- **The hook is measured, cross-vendor, and ungameable.** The grader checks one thing per citation:
-  does `source[start:end]` equal the quoted text. 8/8 on Claude, 0/8 on the workaround, from
-  `make citations`, not asserted. The full receipt is `sample_citations.txt`.
-- **It states the honest cost.** Citations is not the cheapest arm in raw dollars (it adds input
-  tokens for chunking), so the email never claims "cheaper." It claims what the receipt shows: the
-  quotes are free of output tokens, and among the approaches that actually resolve a pointer, Claude
-  is the only one at 8/8 and 37x cheaper than the one competitor that resolves.
-- **It carries the one real caveat** (incompatible with Structured Outputs) instead of hiding it.
-- **The second pillar is independent, not a vendor chart.** METR is the neutral referee, and the
-  email says plainly where Claude does not lead (cost, speed, coding boards) so the one place it does
-  lead is credible.
-- **No overclaim.** Not "best model," not "cheapest," not "wins every benchmark." A GA primitive no
-  competitor ships, measured, plus an independent long-horizon result.
+- **The hook does not overclaim.** An earlier version of this benchmark asked the competitor models
+  to emit the character offset themselves, scored that 0/8, and called it a competitor failure. A
+  scrutiny panel caught it: a tokenizer cannot count characters, and no founder would build it that
+  way. The honest baseline is model-quote plus your own `str.find`, which resolves 8/8 on clean text.
+  The email now states that plainly and rests on the edge that survives: the guaranteed in-API
+  pointer, free of output tokens, that no competitor ships.
+- **It states the real cost.** Citations cost more than the OpenAI DIY path on this corpus, so the
+  email says so rather than claiming "cheaper."
+- **The numbers are receipts.** 8/8, the output-token counts, and the six-cent reproduction cost all
+  come from `make citations` (`sample_citations.txt`), not from memory.
+- **The second pillar is independent and honestly scoped.** METR is the neutral referee, and the
+  email says plainly that the gap only appears on long jobs, not short ones.
