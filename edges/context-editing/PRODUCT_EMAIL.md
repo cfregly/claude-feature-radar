@@ -16,9 +16,9 @@ editing-on agent finished 3 of 3 correctly with context held near 34k. That is a
 But as a competitive edge it is thin, and we should not oversell it.
 
 1. **OpenAI is close or ahead.** OpenAI ships server-side compaction with an explicit
-   `/responses/compact` endpoint that bounds context as well. Theirs summarizes the old turns (lossy)
-   where ours clears in place (no summary loss), so the honest distinction is the clearing semantics,
-   not a capability they lack.
+   `/responses/compact` endpoint that bounds context as well. Theirs compacts old turns server-side
+   (their doc says "rather than traditional summarization") where ours clears stale tool results in
+   place, so the honest distinction is the clearing semantics, not a capability they lack.
 
 2. **It is beta.** Context editing rides the `context-management-2025-06-27` beta header. We cannot
    call it GA in an outbound email.

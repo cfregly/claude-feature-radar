@@ -29,8 +29,8 @@ on a job short enough to finish either way it can cost more. The value is that a
 all.
 
 And the part I will not hide: this is the one edge where a competitor is close. The other major
-platforms ship server-side compaction that bounds context too (it summarizes the old turns rather
-than clearing them in place), and on a job at moderate scale all three big platforms finish, our
+platforms ship server-side compaction that bounds context too (it compacts old turns server-side
+rather than clearing them in place), and on a job at moderate scale all three big platforms finish, our
 cross-vendor run is a
 tie. So this is a reliability lever for the long tail of your hardest jobs, not a headline win.
 
