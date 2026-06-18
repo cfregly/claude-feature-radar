@@ -7,7 +7,11 @@ each time rather than caching a winner. It reports honestly, including where Cla
 
 ## How it works
 
-1. **Sweep** the whole platform and the competitor docs, live, and write a dated brief (`briefs/`).
+1. **Sweep** the whole platform and the competitor docs, live, and diff against the last run. `make
+   edges` fetches every doc in `engine/sources_registry.py` with a stdlib conditional GET, diffs the
+   result against `landscape/landscape.json`, ranks by value times genuine lead, and writes the new
+   landscape, a dated changelog, and a dated brief (`briefs/`), all for zero credits. A blocked fetch
+   is recorded as status unknown, never as competitor-absence, so the loop cannot manufacture a lead.
 2. **Rank** every genuine differentiator by value to a founder times how clearly Claude leads, after a
    competitor-parity check that drops anything a rival already matches.
 3. **Benchmark** the top edges fairly, cross-vendor, with every number read off the real API.
@@ -76,7 +80,8 @@ make compare                      # the credibility table, all three arms (needs
 ## This is an engine, not a one-off
 
 ```
-make scan                # the ranked, verified edges from the live-docs sweep
+make edges               # the cheap discovery loop: fetch the live docs, diff against the last run, rank, write the landscape, changelog, and brief (no API call, no benchmark spend, $0)
+make scan                # the committed seed and fallback edges, the live landscape when one is present
 make verify              # a skeptic pass that refutes the overstated ones
 make ptc                 # the programmatic-tool-calling edge benchmark
 make citations           # the citations edge benchmark
@@ -106,8 +111,9 @@ each backed by a guaranteed-valid verbatim quote located by the very feature thi
 
 ```
 edges/<edge>/   demo.py, sample.txt, FOUNDER_EMAIL.md, PRODUCT_EMAIL.md, README.md, one per edge
-engine/         shared: the cross-vendor arms (openai/gemini), compare, sweep, scan, verify, drafters
+engine/         shared: the cross-vendor arms (openai/gemini), compare, sweep_edges, scan, verify, drafters
 common/         shared: the verified model + price registry, the cost math, the client
+landscape/      the committed diff baseline (landscape.json) and the dated changelog the sweep writes
 briefs/         the dated, sourced competitive sweeps
 docs/           VERIFIED_FACTS.md and FINDINGS.md
 scripts/        the deslop and cost-claim gates

@@ -2,6 +2,7 @@
 """One entry point for the engine. Use the Makefile, or:
 
     python run.py demo [--quick|--full]   the runnable proof for the current gap
+    python run.py edges                    sweep the live docs, diff, rank, persist (no API call, $0)
     python run.py scan                     the candidate gaps, grounded in both sides' docs
     python run.py verify                   the skeptic pass: keep only what survives
     python run.py draft                    draft the founder email from the measured receipt
@@ -30,6 +31,8 @@ def main():
         from engine.product_alert import main as m; m()
     elif cmd == "sweep":
         from engine.sweep import main as m; m()
+    elif cmd == "edges":
+        from engine.sweep_edges import main as m; m()
     elif cmd == "scan":
         from engine.scan import main as m; m()
     elif cmd == "verify":

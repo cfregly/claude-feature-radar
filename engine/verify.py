@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from common.client import get_client
 from common.models import get
-from engine.scan import DIFFERENTIATORS
+from engine.scan import current_edges
 
 SYSTEM = (
     "You are a skeptical startup CTO who has shipped on OpenAI, Google Gemini, and Anthropic "
@@ -23,7 +23,7 @@ def main():
     client = get_client()
     body = "\n\n".join(
         f"key: {c['key']}\nclaim Claude is ahead: {c['claim']}\nwhy: {c['why']}"
-        for c in DIFFERENTIATORS
+        for c in current_edges()  # the freshly ranked landscape edges, the seed on a fresh checkout
     )
     msg = client.messages.create(
         model=get("haiku").id,

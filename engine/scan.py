@@ -1,10 +1,15 @@
-"""scan: the verified competitive picture, the data layer of the engine.
+"""scan: the verified competitive picture, the seed and fallback layer of the engine.
 
 Holds what the 2026-06-17 audit found after a skeptic refuted every claim and a live competitor
 parity check dropped anything OpenAI or Google already matches: what is genuinely Claude-ahead, what
 is parity or refuted, and where Claude is behind. Competitors are named here because it is sourced,
-dated evidence. Founder-facing text anonymizes them. Re-run the audit to refresh, the surface moves
-monthly.
+dated evidence. Founder-facing text anonymizes them.
+
+These constants are now the committed SEED and FALLBACK, not the live source of truth. The live
+fetch-diff-rank loop in engine/sweep_edges.py (run with `make edges`) overwrites
+landscape/landscape.json every run, and current_edges() below reads that landscape when it is
+present, falling back to these constants on a fresh checkout that has not swept yet. The surface
+moves monthly, so re-run the sweep, do not cache a winner.
 
 Sources:
   briefs/2026-06-17-platform-edge.md       the whole-platform capability sweep
@@ -12,6 +17,9 @@ Sources:
 """
 
 from __future__ import annotations
+
+import json
+import pathlib
 
 # Survived the skeptic AND the competitor-parity check as genuinely Claude-ahead, ranked by
 # value to a founder times how clearly Claude leads.
@@ -86,6 +94,80 @@ CHOSEN = (
     "best, though our own cross-vendor long run is a tie at affordable scale. Each edge has its own "
     "folder under edges/ with its demo, receipt, and emails. Re-run the sweep, do not cache a winner."
 )
+
+
+def _landscape_path() -> pathlib.Path:
+    return pathlib.Path(__file__).resolve().parent.parent / "landscape" / "landscape.json"
+
+
+# The live sweep keys a source by its short doc slug (ptc, context_editing), while the seed
+# DIFFERENTIATORS key by the built-edge folder name (programmatic-tool-calling, long-horizon-autonomy).
+# This alias map resolves a live key to its seed so a built edge carries the vetted, measured claim
+# and why, not a bare placeholder line.
+_SEED_KEY_ALIAS = {
+    "ptc": "programmatic-tool-calling",
+    "citations": "citations",
+    "context_editing": "long-horizon-autonomy",
+}
+
+
+def _seed_for(live_key: str) -> dict | None:
+    by_key = {d["key"]: d for d in DIFFERENTIATORS}
+    for cand in (live_key, _SEED_KEY_ALIAS.get(live_key), live_key.replace("_", "-")):
+        if cand and cand in by_key:
+            return by_key[cand]
+    return None
+
+
+def current_edges() -> list[dict]:
+    """The live ranked edges when a sweep has run, the committed seed constants otherwise.
+
+    Reads landscape/landscape.json (written by engine/sweep_edges.py) and returns its genuine-lead
+    edges (lead_score > 0) sorted high to low, mapped to the {key, axis, claim, why, rank} shape the
+    rest of the engine consumes. On a fresh checkout with no sweep yet, or an unreadable landscape, it
+    falls back to the committed DIFFERENTIATORS seed so verify and draft never break. Parity and
+    behind cells (lead_score 0) are excluded from this leads list, the same honesty cut the sweep
+    makes: they stay in the landscape but are never pitched."""
+    f = _landscape_path()
+    if not f.exists():
+        return list(DIFFERENTIATORS)
+    try:
+        land = json.loads(f.read_text())
+    except (json.JSONDecodeError, OSError):
+        return list(DIFFERENTIATORS)
+    leads = [e for e in land.get("edges", []) if e.get("lead_score", 0) > 0]
+    if not leads:
+        return list(DIFFERENTIATORS)
+    out = []
+    for i, e in enumerate(leads, 1):
+        # Map the live edge to the consumer shape. Reuse the rich seed claim/why when the key matches
+        # a built edge (the live extractor's evidence_quote is a heuristic line, the seed prose is the
+        # vetted claim), otherwise build a plain claim/why from the live evidence so a brand-new edge
+        # still flows through. The evidence_quote always carries the live grounding.
+        seed = _seed_for(e["key"])
+        out.append({
+            "key": e["key"], "axis": e.get("axis", "unknown"), "rank": i,
+            "claim": seed["claim"] if seed else f"{e['key']} ({e.get('verdict','claude-ahead')}).",
+            "why": seed["why"] if seed else (e.get("evidence_quote") or ""),
+            "verdict": e.get("verdict", "claude-ahead"), "score": e.get("score"),
+            "evidence_quote": e.get("evidence_quote", ""), "source_url": e.get("source_url"),
+        })
+    return out
+
+
+def current_anchor() -> str:
+    """The anchor text for the founder email: the CHOSEN seed paragraph when the live top edge is one
+    of the three built edges (the vetted, measured prose), else a plain pointer to the live top edge.
+    Keeps the drafter grounded in a measured receipt and never invents a number for a new edge."""
+    edges = current_edges()
+    if not edges:
+        return CHOSEN
+    top = edges[0]
+    if _seed_for(top["key"]) is not None:
+        return CHOSEN
+    return (f"The newest ranked edge this run is {top['key']} on the {top['axis']} axis "
+            f"({top.get('verdict','claude-ahead')}). No measured receipt is built for it yet, so this "
+            f"anchor carries the live doc evidence only: {top.get('why','')}".strip())
 
 
 def main():

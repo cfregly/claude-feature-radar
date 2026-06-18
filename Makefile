@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert scan verify draft check-claims deslop gif clean
+.PHONY: setup compare-deps ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges scan verify draft check-claims deslop gif clean
 
 PY := .venv/bin/python
 
@@ -51,6 +51,9 @@ alert: ## if a competitor won the last compare, draft the internal product-team 
 
 sweep: ## trust-the-result variant sweep (caching on/off x managed/baseline, vs OpenAI)
 	$(PY) run.py sweep
+
+edges: ## the cheap discovery loop: sweep the live docs, diff against the last run, rank, write the landscape + changelog + brief (NO API call, NO benchmark spend, $0)
+	$(PY) run.py edges
 
 scan: ## print the candidate gaps, grounded in both sides' docs (no API call)
 	$(PY) run.py scan

@@ -241,6 +241,26 @@ engine can never manufacture a false Claude lead. The losing and parity cells st
 The offline gate test in `tests/test_gate.py` asserts `audit()` flags any outward or non-always action
 and runs in CI with no key and no network.
 
+## The discovery loop is stdlib fetch, diff, rank, persist, for $0
+`make edges` (`engine/sweep_edges.py`) is the cheap heart of the cadence. It fetches every URL in the
+committed `engine/sources_registry.py` with a stdlib `urllib` conditional GET (ETag and Last-Modified,
+no new dependency), writes a dated `sources/<vendor>_<key>_<date>.txt` in the same header format
+`engine/cite_facts.py` consumes, normalizes each page to a best-effort capability record, diffs against
+`landscape/landscape.json`, ranks by value times genuine lead, and persists three tracked artifacts:
+the overwritten `landscape/landscape.json` baseline, a `landscape/CHANGELOG-<date>.md` delta, and a
+regenerated `briefs/<date>-edge-landscape.md`. No model call, no benchmark, no spend. The optional
+Claude `--normalize` pass on changed pages only is deferred, so the default loop stays $0.
+- The deterministic normalizer is best-effort, and it is honest about its limits. A maturity it cannot
+  read off the feature line is recorded `unverified`, never asserted `ga` off page navigation, and an
+  `unverified` maturity on either side is parity, never a manufactured behind. The raw snapshot is
+  always kept so `cite_facts.py` grounds the real claim. An absence-of-evidence lead (`lead_score` 2)
+  stands only when every relevant competitor source actually fetched. If one did not, the edge is held
+  `never-evaluated`, not pitched.
+- `engine/scan.py`'s constants are now the committed seed and fallback, not the live truth.
+  `scan.current_edges()` reads `landscape/landscape.json` when present and falls back to the constants
+  on a fresh checkout, and `verify.py` and `draft_email.py` read it so the skeptic pass and the
+  drafter follow the live ranking. A built edge still carries its vetted, measured seed claim.
+
 ## State survives a clone, data does not
 There are two state roots, and the split matters. `data/` is gitignored transient scratch (per-run
 benchmark receipts, the last run's JSON), rewritten every run. `state/` and `landscape/` are committed

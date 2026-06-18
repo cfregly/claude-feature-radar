@@ -10,7 +10,7 @@ import json
 
 from common.client import get_client, repo_root
 from common.models import get
-from engine.scan import CHOSEN
+from engine.scan import current_anchor
 
 
 def _receipt() -> str:
@@ -40,7 +40,7 @@ def main():
     client = get_client()
     prompt = (
         f"Write a short cold email to a new YC batch from a founder who builds with Claude. "
-        f"Anchor on this gap: {CHOSEN}\n\n"
+        f"Anchor on this gap: {current_anchor()}\n\n"
         f"The measured proof to cite: {_receipt()}\n\n"
         f"The reader has tried all three big model platforms. Get them to clone a repo and run a "
         f"two-minute demo on their own key. Give a subject line and a body. Use {{repo_link}} as "
