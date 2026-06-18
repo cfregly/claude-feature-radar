@@ -108,6 +108,36 @@ These are why the output is trusted. Break one and the trust is gone.
     the search surfaced this run. Name the feature, then show what the founder gets on that workload,
     measured against the competitor at its best. A feature name is not a value.
 
+12. **The public surface shows only wins, in the founder's language.** Rules 4 and 6 (both-directions
+    honesty, lead with the worth) govern the internal analysis and the reviewer. The founder-facing
+    surface, meaning the emails, the briefs, and the landing README, shows only verified Claude wins and
+    never exposes a Claude negative. No "Claude got it wrong" baseline, no "where Claude loses". Reframe
+    any benefit with an unflattering flip side in the positive (exact totals because the math runs in
+    code). Speak the founder's language: explain every term (fan out, tool use, rollups, allowed_callers,
+    rows to code), lead with the value a founder prices (cost, speed, reliability, accuracy), write cost
+    as a dollar figure like $0.06, label every table column plainly with the key number where a quick
+    scan expects it, keep it warm, and review it cold as a founder with five seconds. The founder-facing
+    checklist, read cold as a busy YC founder with five seconds: open with a warm personal note to the YC
+    founder then get to the point, state the problem in their terms (dollars, latency, maintenance) before
+    the feature as the solution, show the real minimal code in Python with the changed lines marked,
+    include the current official doc link verified live, label table columns as with-the-feature versus
+    without-it with each cell explained, abbreviate the value ("28% cheaper"), never imply a Claude
+    negative even softly, keep the voice that of a friend and fellow builder not a salesperson, and give
+    one reproduce path of one or two commands with the cost as a dollar figure. Keep it crisp (cut every
+    word that does not earn its place, warm but never awkward, proper grammar), make the
+    run-it-on-your-own-data path explicit (the one file to edit and the one command to re-run), and sign
+    as the real sender (name, team, company), with the signature in the email only and never inside the
+    public briefs repo. Do not editorialize about feature maturity in a founder email, so mention beta or
+    a required header only when the founder must set it, and for a GA feature do not say "it is GA" at all. The
+    subject line must clear spam filters, so use no money-and-urgency trigger words (cut, save, free, cheap,
+    discount, guarantee, a dollar sign) and keep it warm, personal, and specific to the feature, a genuine note
+    to the reader, for example "Congrats on YC! A cool Claude feature to help you build". Write in the
+    first person as the sender who represents Anthropic ("we measured", not "Anthropic measures"), and
+    open with a concrete line, not vague filler. Use a startup-native example for a startup audience
+    (plan limits, usage, churn, signups, logs, MRR), not a generic enterprise one, and carry that single
+    example through the problem, the code, the table, and the tool name.
+    Every word fights for its place, so cut anything that does not earn its spot, the same standard the deck's pitch linter enforces.
+
 ## The steps
 
 ### 1. Audit the live docs (sweep the whole platform surface for the global edge)

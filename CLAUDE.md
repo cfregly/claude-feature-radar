@@ -286,3 +286,31 @@ not a swipe.
 ## Keep it forkable
 Cloned and edited by a stranger. No secrets in git (`.env` is ignored), no machine-specific
 paths, no references to anything outside this repo.
+
+## The public surface shows only wins, the internal analysis stays honest both ways
+
+The both-directions honesty in this file (surface where Claude ties or loses, write the product-team alert) governs the internal analysis and the reviewer, not the founder-facing surface. Public assets, meaning the founder emails, the briefs, and the landing README a founder clones, show only verified Claude wins and never expose a Claude negative. No "Claude got it wrong" baseline, no "where Claude loses on price or speed". Reframe any benefit that has an unflattering flip side as the positive, so programmatic tool calling gives exact totals because the math runs in code, never "the model got it wrong without it". The losing and parity cells stay in the internal brief and the product alert, never in the founder's inbox.
+
+Speak the founder's language on every founder-facing word. Explain every term a founder would not parse on a glance (fan out, tool use, rollups, allowed_callers, rows to code). Lead with the value a founder prices, which is cost, speed, reliability, and accuracy. Write cost as a concrete dollar figure like $0.06. Label every table column in plain terms with the key number where a quick scan expects it, and keep it warm. The founder emails are saved as .md, here in the engine repo under emails/, and are never committed to the public briefs repo.
+
+## Founder email and brief checklist (every email, every brief, the README CTA landing)
+
+A founder-facing piece is not done until it passes this, read cold as a busy YC founder with five seconds to spare:
+- Open warm and personal to the reader, who is a YC founder. A quick genuine congrats, then get to the point, adapted to the specific feature.
+- State the PROBLEM first in the founder's own terms (what it costs them in dollars, latency, or maintenance), then present the feature as the SOLUTION.
+- Show the real, minimal CODE that makes the difference, in Python, with the one or two changed lines marked. Code-forward beats prose.
+- Include the current official documentation link, fetched and verified live per the grounding rule, the latest URL.
+- Label every table column in the reader's terms (with the feature versus without it, the abbreviation defined on first use), and make every cell say what it means.
+- Abbreviate the value plainly. Write "28% cheaper", not "6,828 which is 28% lower".
+- Never imply a Claude negative, even softly. A line like "your totals come out exact every time" implies they might not today, which is a Claude negative, so cut it.
+- Voice: warm, concise, scannable, casual and punchy, a friend and fellow builder, never sleazy sales or marketing.
+- One reproduce path, one or two commands, about a minute, the cost as a dollar figure like $0.06.
+- Deslop-clean, and run the gate before it ships.
+- Crisp over chatty. Cut every word that does not earn its place. Warm and casual is good, but never at the expense of clean grammar or smooth reading. Read it aloud, and if a line is awkward, fix it.
+- Make the run-it-on-your-own-data path explicit: name the one file to edit and the one command to re-run, never a vague "swap in your tool".
+- Sign the email as the real sender, with name, team, and company, for example Chris Fregly, Applied AI, Startups team at Anthropic. The signature lives in the email only, never committed inside the public briefs repo.
+- Do not editorialize about a feature's maturity. Mention beta or a required beta header only when the founder must act on it (they have to set the header). For a GA feature, never write "it is GA" or "no beta header", it is noise. Get to the value.
+- The subject line must clear spam filters: no money-and-urgency trigger words (cut, save, free, cheap, discount, guarantee, a dollar sign). Keep the subject warm, personal, and specific to the feature, a genuine note to the reader, for example "Congrats on YC! A cool Claude feature to help you build".
+- Write in the first person as the sender, who represents Anthropic. It is "we measured" or "on our benchmarks", never "Anthropic measures" in the third person. Open with a plain, concrete line (a "quick tip"), never a vague filler like "quick one".
+- The reader is a startup founder (a YC batch), so use a startup-native example (plan limits, usage metering, churn, signups, logs, MRR, cohorts), never a generic enterprise scenario like employee expenses. Carry one example all the way through: the problem, the code, the table, and the tool name all use the same scenario.
+- Every word fights for its place. Cut anything that does not earn its spot, the same standard the deck's pitch linter holds. If a word or a line can come out without losing meaning or punch, it comes out.
