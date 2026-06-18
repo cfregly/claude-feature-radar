@@ -1,0 +1,10 @@
+Source: https://developers.openai.com/api/docs/guides/compaction
+Snapshot fetched 2026-06-18. Verbatim excerpts for citation grounding.
+
+The returned compaction item carries forward key prior state and reasoning into the next run using fewer tokens.
+
+The returned compacted window includes an encrypted compaction item that carries forward key prior state and reasoning using fewer tokens.
+
+Compaction is enabled via the context_management parameter, which automatically triggers server-side compaction when the rendered token count exceeds the configured compact_threshold. A standalone, stateless /responses/compact endpoint provides explicit compaction control for long-running workflows.
+
+The compaction mechanism preserves essential conversational state in an encrypted format rather than human-readable summaries.

@@ -1,0 +1,8 @@
+Source: https://ai.google.dev/gemini-api/docs/file-search
+Snapshot fetched 2026-06-18. Verbatim excerpts for citation grounding.
+
+When you use File Search, the model's response may include citations that specify which parts of your uploaded documents were used to generate the answer.
+
+When you use File Search with documents that have pages (such as PDFs), the model's response may include the page number where the information was found. You can access this information through the page_number attribute of the retrieved_context.
+
+The grounding metadata provides access to retrieved chunks through grounding_metadata.grounding_chunks, where each chunk contains a retrieved_context with the referenced text and associated metadata.
