@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup demo demo-quick demo-full longhorizon longhorizon-smoke compare alert scan verify draft deslop gif clean
+.PHONY: setup compare-deps demo demo-quick demo-full longhorizon longhorizon-smoke compare alert scan verify draft deslop gif clean
 
 PY := .venv/bin/python
 
@@ -8,6 +8,10 @@ setup: ## create the venv and install the one dependency
 	$(PY) -m pip install --quiet --upgrade pip
 	$(PY) -m pip install --quiet -r requirements.txt
 	@echo "Setup done. Now: cp .env.example .env and paste your ANTHROPIC_API_KEY."
+
+compare-deps: ## install the OpenAI + Gemini SDKs into the SAME venv, for compare/sweep
+	$(PY) -m pip install --quiet -r requirements-compare.txt
+	@echo "Compare deps installed into .venv. Now paste OPENAI_API_KEY and GEMINI_API_KEY into .env."
 
 demo: ## the main event: a long agent, with and without the managed features (about $0.90)
 	$(PY) run.py demo

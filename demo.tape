@@ -1,6 +1,9 @@
 # VHS tape for the README recording (https://github.com/charmbracelet/vhs).
-# Regenerate with:  make gif    (needs vhs, ffmpeg, and ttyd installed, plus both keys in .env)
-# It records the cross-platform comparison on the quick preset, so the gif is a real live run.
+# Regenerate with:  make gif    (needs vhs and ffmpeg installed).
+# It replays the committed receipt from a real fair run (sample_compare.txt), so the gif always
+# shows the full honest three-way table. A live run makes real API calls that take minutes and
+# rate-limit, too slow and nondeterministic for a clean recording. To record a fresh live run
+# instead, swap the cat for:  .venv/bin/python run.py compare    (needs all three keys).
 
 Output docs/demo.gif
 
@@ -9,6 +12,9 @@ Set Width 1320
 Set Height 940
 Set Padding 16
 
-Type ".venv/bin/python run.py compare --quick"
+Type "# the fair three-way benchmark, the committed receipt from a real run on real keys:"
 Enter
-Sleep 55s
+Sleep 1.5s
+Type "cat sample_compare.txt"
+Enter
+Sleep 12s

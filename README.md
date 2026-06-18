@@ -6,6 +6,11 @@ Claude), and then shows the one agent primitive Claude ships that the others do 
 the claim against the live docs every run, because the platforms ship monthly and a hard-coded claim
 rots in weeks.
 
+![The fair three-way benchmark: OpenAI cheapest but wrong, Gemini correct but priciest, Claude correct and carrying the least context](docs/demo.gif)
+
+*The committed receipt from a real `make compare` run. Carried context counts cached tokens on every
+side, apples to apples. You run the same thing on your own keys.*
+
 **What you get, measured.** A long agent that stays bounded, with no eviction code to write. On the
 same 32-step tool-using agent at a 20k trim threshold, context editing drops Claude's carried context
 (cached tokens included) from about 35,000 tokens to about 15,000. It clears stale tool results in
@@ -16,9 +21,9 @@ bounded context, not a cheaper bill. The fair benchmark is below, and you run it
 
 ```bash
 git clone <this-repo> && cd claude-competitive-engine
-make setup && pip install -r requirements-compare.txt
-cp .env.example .env     # paste your Anthropic, OpenAI, and Gemini keys (the file says where)
-make compare             # the fair three-way fight on your own keys, about a dollar
+make setup && make compare-deps   # core deps, then the OpenAI + Gemini SDKs, all into the same venv
+cp .env.example .env              # paste your Anthropic, OpenAI, and Gemini keys (the file says where)
+make compare                      # the fair three-way fight on your own keys, about a dollar
 ```
 
 Built on the Claude API and the Agent SDK.
@@ -70,11 +75,11 @@ and no eviction logic to build, not a cheaper bill. The other verified Claude-ah
 
 ```bash
 git clone <this-repo> && cd claude-competitive-engine
-make setup                              # venv + anthropic
-pip install -r requirements-compare.txt # openai + google-genai, for the comparison
-cp .env.example .env                    # paste the three keys (the file says where each goes)
-make compare                            # the fair head-to-head on your keys, about a dollar
-make demo                               # context editing holding the context flat
+make setup            # venv + anthropic
+make compare-deps     # openai + google-genai, into the SAME venv (for the comparison)
+cp .env.example .env  # paste the three keys (the file says where each goes)
+make compare          # the fair head-to-head on your keys, about a dollar
+make demo             # context editing holding the context flat
 ```
 
 ## This is an engine, not a one-off
