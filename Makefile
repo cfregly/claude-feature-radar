@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges scan verify verify-live validate agentic agentic-smoke eval eval-smoke eval-judge retention retention-live draft check-claims check-docs core-imports test ci deslop gif clean
+.PHONY: setup compare-deps ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges scan verify verify-live validate agentic agentic-smoke eval eval-smoke eval-judge retention retention-live cost draft check-claims check-docs core-imports test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -87,6 +87,9 @@ retention: ## EDGE retention_resume: the doc-grounded retention/bundle parity re
 
 retention-live: ## OPT-IN: the live Managed Agents kill-and-resume (start, resume, negative control, steer; beta, needs ANTHROPIC_API_KEY, spends a small bounded amount)
 	$(PY) engine/demonstrators/retention_resume.py --live
+
+cost: ## EDGE cost: the pure pricing-model edge over swept dated prices, both win and lose regimes with the crossover named (NO API call, NO key, $0)
+	$(PY) engine/demonstrators/cost_model.py
 
 draft: ## draft the founder email from the measured receipt
 	$(PY) run.py draft

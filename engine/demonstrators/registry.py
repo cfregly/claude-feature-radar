@@ -33,6 +33,7 @@ _DEMO_MODULES = (
     "engine.demonstrators.agentic_grading",
     "engine.demonstrators.eval_quality",
     "engine.demonstrators.retention_resume",
+    "engine.demonstrators.cost_model",
 )
 
 
