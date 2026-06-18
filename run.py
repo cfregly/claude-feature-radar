@@ -3,6 +3,9 @@
 
     python run.py demo [--quick|--full]   the runnable proof for the current gap
     python run.py edges                    sweep the live docs, diff, rank, persist (no API call, $0)
+    python run.py cadence [--dry-run]      the unattended engine: sweep, dispatch, draft to outbox ($0)
+    python run.py coverage                 per-demoKind, what is built vs adapt vs build (no API call)
+    python run.py managed [--apply]        the Tier-2 monthly resumable runtime (wired, $0 without --apply)
     python run.py scan                     the candidate gaps, grounded in both sides' docs
     python run.py verify                   the skeptic pass: keep only what survives
     python run.py draft                    draft the founder email from the measured receipt
@@ -33,6 +36,14 @@ def main():
         from engine.sweep import main as m; m()
     elif cmd == "edges":
         from engine.sweep_edges import main as m; m()
+    elif cmd == "cadence":
+        from engine.cadence import main as m; raise SystemExit(m())
+    elif cmd == "coverage":
+        from engine.coverage import main as m; raise SystemExit(m())
+    elif cmd == "managed":
+        from engine.managed import main as m; raise SystemExit(m())
+    elif cmd in ("other", "parity-gated"):
+        from engine.demonstrators.other_parity_gated import main as m; raise SystemExit(m())
     elif cmd in ("agentic", "agentic-grading"):
         from engine.demonstrators.agentic_grading import main as m; m()
     elif cmd in ("eval", "eval-quality"):

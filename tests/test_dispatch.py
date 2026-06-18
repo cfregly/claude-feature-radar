@@ -83,13 +83,25 @@ def test_dispatch_routes_a_built_edge_with_a_surfaced_estimate():
     assert r.estimate.command == "make ptc"
 
 
-def test_dispatch_files_a_build_stub_for_an_unmapped_kind():
-    # A kind with no registered demonstrator returns an ASK stub naming what to build, not a crash.
-    edge = {"key": "brand_new", "axis": "observability", "demoKind": "other"}
+def test_dispatch_files_a_build_stub_for_an_off_taxonomy_kind():
+    # A kind not in the canonical taxonomy has no registered demonstrator, so dispatch returns an ASK
+    # stub naming what to build, not a crash.
+    edge = {"key": "brand_new", "axis": "observability", "demoKind": "not_a_real_kind"}
     r = dispatch(edge)
     assert r.demonstrator is None
     assert r.gate == "ask"
     assert "build a demonstrator" in (r.ask_stub or "")
+
+
+def test_dispatch_holds_an_unchecked_other_candidate_with_a_precondition_stub():
+    # The "other" kind now HAS a demonstrator (the parity-gated one), so an unchecked candidate is
+    # DECLINED pending its parity check: an ASK stub that holds the edge, never pitched, never a crash.
+    register_all()
+    edge = {"key": "fallback_credit", "axis": "correctness", "demoKind": "other"}
+    r = dispatch(edge)
+    assert r.demonstrator is None            # declined: held until the parity check passes
+    assert r.gate == "ask"
+    assert "precondition is unmet" in (r.ask_stub or "")
 
 
 def test_dispatch_stamps_the_resolved_kind_onto_an_unstamped_edge():

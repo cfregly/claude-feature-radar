@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges scan verify verify-live validate agentic agentic-smoke eval eval-smoke eval-judge retention retention-live cost draft check-claims check-docs core-imports test ci deslop gif clean
+.PHONY: setup compare-deps ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges cadence coverage managed parity-gated scan verify verify-live validate agentic agentic-smoke eval eval-smoke eval-judge retention retention-live cost draft check-claims check-docs core-imports test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -54,6 +54,18 @@ sweep: ## trust-the-result variant sweep (caching on/off x managed/baseline, vs 
 
 edges: ## the cheap discovery loop: sweep the live docs, diff against the last run, rank, write the landscape + changelog + brief (NO API call, NO benchmark spend, $0)
 	$(PY) run.py edges
+
+cadence: ## the unattended engine: sweep, rank, dispatch by demoKind, draft the newest uncovered lead to the inert outbox, update coverage, write the run manifest, audit the boundary (NO benchmark spend, NO send, $0)
+	$(PY) run.py cadence --dry-run
+
+coverage: ## per-demoKind coverage: what is built vs adapt vs build, and the gaps the engine surfaces about itself (NO API call, $0)
+	$(PY) run.py coverage
+
+managed: ## the Tier-2 monthly resumable Managed Agents runtime, wired but not run (prints the boundary, $0; --apply runs a live session and spends a small bounded amount)
+	$(PY) run.py managed
+
+parity-gated: ## the long-tail parity-gated candidates (fallback credit, cache_miss_reason, Claude Code build velocity), each HELD until its parity check survives (NO API call, $0)
+	$(PY) run.py other
 
 scan: ## print the candidate gaps, grounded in both sides' docs (no API call)
 	$(PY) run.py scan
