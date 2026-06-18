@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup demo demo-quick demo-full compare alert scan verify draft deslop gif clean
+.PHONY: setup demo demo-quick demo-full longhorizon longhorizon-smoke compare alert scan verify draft deslop gif clean
 
 PY := .venv/bin/python
 
@@ -17,6 +17,12 @@ demo-quick: ## a 10-document version that just shows the curve bend (about $0.10
 
 demo-full: ## a 45-document version with a more dramatic curve
 	$(PY) run.py demo --full
+
+longhorizon: ## the regime where context editing pays off: unbounded crashes at the window, edited finishes (about $1 to $2)
+	$(PY) run.py longhorizon
+
+longhorizon-smoke: ## a cheap run that exercises the harness without reaching the window (cents)
+	$(PY) run.py longhorizon --smoke
 
 compare: ## OpenAI vs Claude on the same long agent, both best config (needs openai + OPENAI_API_KEY)
 	$(PY) run.py compare

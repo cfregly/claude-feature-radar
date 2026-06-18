@@ -6,11 +6,13 @@ Claude), and then shows the one agent primitive Claude ships that the others do 
 the claim against the live docs every run, because the platforms ship monthly and a hard-coded claim
 rots in weeks.
 
-**What you get, measured.** A long agent that stays bounded and fast, with no eviction code to write.
-On the same 32-step tool-using agent, context editing drops Claude's carried context (cached tokens
-included) from about 35,000 tokens to about 15,000. It clears stale tool results in place, the one
-primitive only Claude ships. OpenAI's compaction summarizes them instead, and Gemini does not trim
-at all, so it carries about 33,000. The fair benchmark is right below, and you run it in one command.
+**What you get, measured.** A long agent that stays bounded, with no eviction code to write. On the
+same 32-step tool-using agent at a 20k trim threshold, context editing drops Claude's carried context
+(cached tokens included) from about 35,000 tokens to about 15,000. It clears stale tool results in
+place, the one primitive only Claude ships. OpenAI's compaction summarizes them instead, and Gemini's
+in-place trim is realtime-API only, so it carries about 33,000. It is not a free win: editing on ran
+slower and cost a few percent more than off (clearing invalidates the cache), so you are buying
+bounded context, not a cheaper bill. The fair benchmark is below, and you run it yourself.
 
 ```bash
 git clone <this-repo> && cd claude-competitive-engine

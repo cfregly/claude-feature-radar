@@ -30,6 +30,8 @@ import re
 import tempfile
 import time
 
+import anthropic
+
 from common.client import get_client, repo_root
 from common.models import get
 from common.pricing import cost_breakdown
@@ -121,6 +123,21 @@ def parse_answer(text: str):
     return int(m.group(1)) if m else None
 
 
+def _overflow_info(err) -> tuple[bool, int | None]:
+    """Classify a 400 as a context-window overflow, and pull the attempted token count if present.
+
+    The API rejects a request whose input exceeds the model's context window with a message like
+    `prompt is too long: 207123 tokens > 200000 maximum`. Returns (is_overflow, attempted_tokens).
+    A non-overflow 400 returns (False, None) so the caller re-raises it.
+    """
+    msg = str(err).lower()
+    is_overflow = any(k in msg for k in ("too long", "maximum", "context window", "exceed"))
+    if not is_overflow:
+        return False, None
+    m = re.search(r"(\d[\d,]*)\s*tokens", msg)
+    return True, (int(m.group(1).replace(",", "")) if m else None)
+
+
 def _mark_cache(messages):
     """Keep exactly one rolling cache breakpoint on the last block, so the whole prefix caches.
 
@@ -141,8 +158,16 @@ def _mark_cache(messages):
         c[-1]["cache_control"] = {"type": "ephemeral"}
 
 
-def run_agent(client, model_key, docs, start, *, managed, caching=True, trigger, keep, max_turns):
-    """Run the chain audit once on Claude, caching ON. Returns (records, final_text)."""
+def run_agent(client, model_key, docs, start, *, managed, caching=True, trigger, keep, max_turns,
+              stop_on_overflow=False):
+    """Run the chain audit once on Claude, caching ON. Returns (records, final_text).
+
+    ``stop_on_overflow`` makes the context-window error a measured event instead of a crash: when
+    the carried context grows past the model's window and the API rejects the request, the run
+    records a ``crashed`` turn (with the attempted token count the API reported) and stops. That
+    lets a caller compare an unbounded agent that dies at the wall against a bounded one that
+    finishes. Off by default, so existing callers are unaffected.
+    """
     model = get(model_key)
     messages = [{"role": "user", "content": task_prompt(start, managed)}]
     tools = [READ_TOOL] + ([MEMORY_TOOL] if managed else [])
@@ -170,9 +195,22 @@ def run_agent(client, model_key, docs, start, *, managed, caching=True, trigger,
         if caching:
             _mark_cache(messages)  # best-config: cache the growing prefix
         t0 = time.perf_counter()
-        msg = client.messages.create(
-            model=model.id, max_tokens=1024, messages=messages, tools=tools, **kw_extra,
-        )
+        try:
+            msg = client.messages.create(
+                model=model.id, max_tokens=1024, messages=messages, tools=tools, **kw_extra,
+            )
+        except anthropic.BadRequestError as e:
+            is_overflow, attempted = _overflow_info(e)
+            if stop_on_overflow and is_overflow:
+                records.append({
+                    "turn": turn, "crashed": True, "error": str(e)[:200],
+                    "attempted_tokens": attempted,
+                    "input_tokens": 0, "cache_read": 0, "ctx": attempted or 0,
+                    "output_tokens": 0, "cost": 0.0,
+                    "latency_s": round(time.perf_counter() - t0, 3), "cleared": 0,
+                })
+                break
+            raise
         dt = time.perf_counter() - t0
         u = msg.usage
         _in = getattr(u, "input_tokens", 0) or 0

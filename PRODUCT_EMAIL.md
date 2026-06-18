@@ -13,18 +13,22 @@ I ran a fair best-to-best benchmark and a skeptic-checked capability audit of Cl
 and Gemini. The repo reproduces all of it. Here is the honest other direction, where they are ahead.
 
 1. **Price.** On a fair 32-step agent benchmark, OpenAI gpt-5.4-mini was cheaper than Claude Haiku
-   4.5 (about $0.05 versus $0.12 to $0.15), and a stronger OpenAI model answers correctly. We do not
-   win the headline cost comparison, and a founder who ranks cost first will see that.
+   4.5 (about $0.033 with compaction and caching, the README headline, versus Claude's $0.121
+   baseline with caching), and a stronger OpenAI model answers correctly. We do not win the headline
+   cost comparison, and a founder who ranks cost first will see that.
 
 2. **Prompt-cache retention.** Gemini explicit caching takes an arbitrary TTL and OpenAI offers a
    24-hour retention tier, while Claude is fixed at 5 minutes or 1 hour.
 
-3. **Secure MCP tunnel.** OpenAI's went GA on 2026-05-27, ahead of Claude's beta.
+3. **Secure MCP tunnel.** OpenAI's went GA recently, ahead of Claude's beta. Verify the exact date
+   against OpenAI's changelog before quoting it.
 
-4. **Long-context billing.** GPT-5.5 has a larger context ceiling (with a surcharge band above about
-   272k tokens), and Gemini's arbitrary-TTL caching over its 1M window is more flexible than ours.
+4. **Long-context billing.** GPT-5.5 has a larger context ceiling with a long-context surcharge band,
+   and Gemini's arbitrary-TTL caching over its 1M window is more flexible than ours. Verify the exact
+   band against OpenAI's pricing page before quoting it.
 
-To reproduce: clone the repo, run `make compare` and `make sweep` for the benchmark, and read
+To reproduce: clone, `make setup`, install the compare deps, paste three keys (Anthropic, OpenAI,
+Gemini) into `.env`, then `make compare` and `make sweep`, and read
 `briefs/2026-06-17-verified-picture.md` for the sourced audit. Every number is measured on real
 calls, and the confounds we had to fix are in `docs/FINDINGS.md`.
 

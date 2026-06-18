@@ -22,6 +22,8 @@ def main():
     sys.argv = [sys.argv[0]] + sys.argv[2:]  # pass the rest through to the subcommand
     if cmd == "demo":
         from engine.demo import main as m; m()
+    elif cmd in ("longhorizon", "long"):
+        from engine.longhorizon import main as m; m()
     elif cmd == "compare":
         from engine.compare import main as m; m()
     elif cmd == "alert":

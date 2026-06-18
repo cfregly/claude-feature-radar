@@ -8,25 +8,26 @@ Paste into a Google Doc or your sending tool. Plain text, one link.
 
 Hey {first_name},
 
-What you get: a long agent that stays bounded and fast, with zero eviction code to write.
+You get a long agent that stays bounded, with no eviction code to write.
 
-The proof, measured on the same 32-step tool-using agent across Claude Haiku 4.5, OpenAI
-gpt-5.4-mini, and Gemini 3.5-flash, all at full strength. With context editing off, Claude carries
-about 35,000 tokens of context by the end of the run. Turn it on, one beta header, and the same
-agent carries about 15,000. Context editing clears stale tool results in place. OpenAI's version
-summarizes them and loses detail. Gemini has no in-place trim at all, so it carries about 33,000.
-Claude is the only one that ships in-place clearing as a managed API feature.
+Measured on the same 32-step agent across Claude Haiku 4.5, OpenAI gpt-5.4-mini, and Gemini
+3.5-flash, all at full strength, at a 20k trim threshold: turning context editing on drops Claude's
+carried context from about 35k tokens to about 15k. It clears stale tool results in place. OpenAI's
+server-side version summarizes them and loses detail, and its in-place trim is client-side, so you
+wire it in yourself. Gemini's in-place trim is realtime-API only, so on this agent it carries about
+33k. Claude is the only one that ships in-place clearing on the standard tool-use path.
+
+It is not free. Clearing rewrites the cached prefix, so on this run it cost a few percent more and
+ran a little slower than leaving editing off. You are buying bounded context, not a cheaper bill.
 
 {repo_link}
 
-`make compare` runs the whole fair fight on your own keys, about a dollar and two minutes.
-`make demo` shows the context dropping. Every number is measured, not asserted by me.
+Reproduce it on your own keys: `make setup`, install the compare deps, paste three keys (Anthropic,
+OpenAI, Gemini) into `.env`, then `make compare`. About a dollar and a few minutes, every number
+measured. And honestly, Claude is not the cheapest: OpenAI's cheap model costs less (it miscounted on
+this run), and the README says where Claude loses.
 
-Honest, because you can check it: Claude is not the cheapest. OpenAI's cheap model costs less,
-though it got the count wrong on this run, and the README shows exactly where Claude loses. The
-reason to build on Claude is the bounded context with no eviction logic, not the price.
-
-Build it on Claude Code or the Agent SDK. It is one flag. Reply if you want a hand wiring it in.
+It is one flag on the Agent SDK, or in Claude Code. Reply if you want a hand wiring it in.
 
 Go build,
 
@@ -37,13 +38,14 @@ Building with Claude
 
 ### Why it is built this way (not part of the email)
 
-- **It opens with the so-what, then the one number Claude wins.** A bounded, fast agent with no
-  eviction code, proved by 35k down to 15k of carried context (true context, cached tokens included,
-  the metric we corrected mid-build, see docs/FINDINGS.md).
-- **The workload, cost, and time are stated up front.** A 32-step agent, three named models, about a
-  dollar and two minutes to reproduce, before the reader commits.
-- **It is honest about price and correctness in the next breath.** OpenAI is cheaper, the trimmed run
-  can miscount, and the repo says both. That honesty is what makes the context number believable.
+- **It opens with the so-what, then the one number Claude wins.** A bounded agent with no eviction
+  code, proved by about 35k down to about 15k of carried context (true context, cached tokens
+  included, the metric we corrected mid-build, see docs/FINDINGS.md). The figure is tied to this
+  agent and a 20k trim threshold, not sold as a fixed property of the flag.
+- **It discloses the cost of the flag.** Context editing ran slower and cost a few percent more than
+  leaving it off, because clearing invalidates the cache. We say so, because the panel checks it.
+- **The workload, cost, and reproduction steps are up front**, including the three keys, so a cold
+  clone does not hit a missing-key error.
 - **No overclaim.** Not "Claude is cheaper" (false), not "Claude Code is better" (parity with Codex),
-  not "6x less context" (that was a metric confound). Just the in-place primitive only Claude ships,
-  with the run-it-yourself proof.
+  not "fast" (editing on is slower), not "6x less context" (a metric confound). Just the in-place
+  primitive only Claude ships, with the run-it-yourself proof.
