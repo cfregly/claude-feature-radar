@@ -88,7 +88,7 @@ def run_gemini_agent(docs, start, *, model=DEFAULT_GEMINI_MODEL, max_turns):
         tools=[READ_TOOL_GEMINI],
         automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
     )
-    contents = [types.Content(role="user", parts=[types.Part(text=task_prompt(start, managed=False))])]
+    contents = [types.Content(role="user", parts=[types.Part(text=task_prompt(start, memory=False))])]
     records, final_text = [], ""
     for turn in range(max_turns):
         t0 = time.perf_counter()

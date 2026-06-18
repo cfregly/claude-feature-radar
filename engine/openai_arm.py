@@ -74,7 +74,7 @@ def run_openai_agent(docs, start, *, model=DEFAULT_OPENAI_MODEL, compact_thresho
     client = _client()
     cm = [{"type": "compaction", "compact_threshold": compact_threshold}] if compact_threshold else None
     prev_id = None
-    pending = [{"role": "user", "content": task_prompt(start, managed=False)}]
+    pending = [{"role": "user", "content": task_prompt(start, memory=False)}]
     records, final_text = [], ""
     for turn in range(max_turns):
         kwargs = dict(model=model, tools=[READ_TOOL_OAI], store=True, input=pending)

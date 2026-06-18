@@ -64,26 +64,33 @@ def main():
 
     oai_r, oai_t, oai_model = run_openai_agent(
         docs, start, model=a.openai_model, compact_threshold=trig, max_turns=cfg["max_turns"])
-    cm_r, cm_t = run_agent(client, a.claude_model, docs, start, managed=True,
+    cm_r, cm_t = run_agent(client, a.claude_model, docs, start, memory=True, editing=True,
                            trigger=trig, keep=cfg["keep"], max_turns=cfg["max_turns"])
-    cb_r, cb_t = run_agent(client, a.claude_model, docs, start, managed=False,
+    cb_r, cb_t = run_agent(client, a.claude_model, docs, start, memory=False, editing=False,
                            trigger=trig, keep=cfg["keep"], max_turns=cfg["max_turns"])
 
-    # Gemini degrades gracefully: a free-tier key can trip 429 on a long run.
-    gem_row = None
+    # Named stats per arm, so inserting Gemini never shifts which numbers belong to which platform.
+    # This is the bug the scrutiny panel caught: positional rows once stored Gemini's cost and peak
+    # under the Claude key in last_compare.json. Address every arm by name from here on.
+    oai_s, cm_s, cb_s = _roll(oai_r), _roll(cm_r), _roll(cb_r)
+    oai_ans, cm_ans, cb_ans = parse_answer(oai_t), parse_answer(cm_t), parse_answer(cb_t)
+
+    # Gemini degrades gracefully: a key without paid-tier quota can trip 429 on a long run.
+    gem = None
     try:
         gem_r, gem_t, gem_model = run_gemini_agent(docs, start, model=a.gemini_model,
                                                    max_turns=cfg["max_turns"])
-        gem_row = (f"Gemini {gem_model}", _roll(gem_r), parse_answer(gem_t))
+        gem = {"model": gem_model, "answer": parse_answer(gem_t), **_roll(gem_r), "records": gem_r}
     except Exception as e:  # noqa: BLE001
         print(f"  (Gemini skipped, quota or load: {str(e)[:70]})")
 
-    rows = [(f"OpenAI {oai_model}", _roll(oai_r), parse_answer(oai_t))]
-    if gem_row:
-        rows.append(gem_row)
+    rows = [(f"OpenAI {oai_model}", oai_s, oai_ans)]
+    if gem:
+        gem_s = {k: gem[k] for k in ("cost", "time", "peak", "turns", "cache_read")}
+        rows.append((f"Gemini {gem['model']}", gem_s, gem["answer"]))
     rows += [
-        (f"{label} (best)", _roll(cm_r), parse_answer(cm_t)),
-        (f"{label} (baseline)", _roll(cb_r), parse_answer(cb_t)),
+        (f"{label} (context editing on)", cm_s, cm_ans),
+        (f"{label} (off)", cb_s, cb_ans),
     ]
 
     print("  outcomes a founder pays for")
@@ -93,9 +100,9 @@ def main():
         ok = "yes" if ans == gold else "no"
         print(f"  {name:<26}{s['cost']:>11.5f}{s['time']:>9.1f}{s['peak']:>10,}{str(ans):>8}{ok:>9}")
 
-    # Headline: best config vs best config (OpenAI vs Claude managed), both at equal correctness.
-    oai_s, cm_s = rows[0][1], rows[1][1]
-    oai_ok, cm_ok = rows[0][2] == gold, rows[1][2] == gold
+    # Headline: OpenAI best vs Claude editing-on, addressed by name (never by row position, which
+    # shifts when the Gemini row is present).
+    oai_ok, cm_ok = oai_ans == gold, cm_ans == gold
     print()
     print("  Verdict (OpenAI best vs Claude best, the fair head-to-head):")
     if oai_ok and cm_ok:
@@ -114,11 +121,12 @@ def main():
 
     out = {
         "config": cfg, "gold": gold, "trim_threshold": trig,
-        "openai": {"model": oai_model, "answer": rows[0][2], **oai_s, "records": oai_r},
-        "claude_best": {"model": get(a.claude_model).id, "answer": rows[1][2], **cm_s, "records": cm_r},
-        "claude_baseline": {"model": get(a.claude_model).id, "answer": rows[2][2], **rows[2][1],
-                            "records": cb_r},
+        "openai": {"model": oai_model, "answer": oai_ans, **oai_s, "records": oai_r},
+        "claude_best": {"model": get(a.claude_model).id, "answer": cm_ans, **cm_s, "records": cm_r},
+        "claude_baseline": {"model": get(a.claude_model).id, "answer": cb_ans, **cb_s, "records": cb_r},
     }
+    if gem:
+        out["gemini"] = gem  # a real, separately-keyed Gemini arm, never folded into a Claude key
     (repo_root() / "data").mkdir(exist_ok=True)
     (repo_root() / "data" / "last_compare.json").write_text(json.dumps(out, indent=2))
     print("  wrote receipts to data/last_compare.json\n")

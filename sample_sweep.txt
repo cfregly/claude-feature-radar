@@ -3,18 +3,18 @@
 
   variant                                     cost$  time s    peak   cacheR  ans  ok
   -----------------------------------------------------------------------------------
-  OpenAI gpt-5.4-mini (cache only)           0.0593    46.2  27,545  393,216    8   N
-  OpenAI gpt-5.4-mini (compaction+cache)     0.0372    31.0  19,331  228,352   10   N
-  Claude Haiku 4.5 managed, cache on         0.1443    83.1   3,041  417,561   11   Y
-  Claude Haiku 4.5 managed, cache off        0.5393    86.0  16,548        0   11   Y
-  Claude Haiku 4.5 baseline, cache on        0.1212    57.4   3,973  555,789   11   Y
-  Claude Haiku 4.5 baseline, cache off       0.6166    57.5  35,936        0   11   Y
+  OpenAI gpt-5.4-mini (cache only)           0.0507    33.0  27,545  406,016    9   N
+  OpenAI gpt-5.4-mini (compaction+cache)     0.0366    33.4  19,331  249,344    9   N
+  Claude Haiku 4.5 managed, cache on         0.1454    75.3  16,446  419,545   11   Y
+  Claude Haiku 4.5 managed, cache off        0.5077    82.1  16,427        0   11   Y
+  Claude Haiku 4.5 baseline, cache on        0.1238    61.7  36,060  560,627   11   Y
+  Claude Haiku 4.5 baseline, cache off       0.6166    52.0  35,940        0   11   Y
 
   Honest reading:
-  - Caching and context editing fight. Managed costs less with caching ON ($0.1443) than OFF ($0.5393), because clearing rewrites the cached prefix. Managed cache reads: 417,561.
-  - On the untrimmed baseline, caching works: $0.1212 on vs $0.6166 off (80% cheaper, cache reads 555,789).
-  - OpenAI best: $0.0593, 46.2s, answer 8 (WRONG).
-  - Cheapest CORRECT variant: Claude Haiku 4.5 baseline, cache on at $0.1212.
+  - Caching and context editing fight. Managed costs less with caching ON ($0.1454) than OFF ($0.5077), because clearing rewrites the cached prefix. Managed cache reads: 419,545.
+  - On the untrimmed baseline, caching works: $0.1238 on vs $0.6166 off (80% cheaper, cache reads 560,627).
+  - OpenAI best: $0.0507, 33.0s, answer 9 (WRONG).
+  - Cheapest CORRECT variant: Claude Haiku 4.5 baseline, cache on at $0.1238.
 
   wrote receipts to data/last_sweep.json
 

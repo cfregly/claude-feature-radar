@@ -66,8 +66,8 @@ def main():
                  "caching": True, "s": _roll(r), "ans": parse_answer(t)})
     for managed in (True, False):
         for caching in (True, False):
-            r, t = run_agent(client, a.claude_model, docs, start, managed=managed, caching=caching,
-                             trigger=trig, keep=keep, max_turns=mt)
+            r, t = run_agent(client, a.claude_model, docs, start, memory=managed, editing=managed,
+                             caching=caching, trigger=trig, keep=keep, max_turns=mt)
             kind = "managed" if managed else "baseline"
             rows.append({"name": f"{label} {kind}, cache {'on' if caching else 'off'}",
                          "kind": kind, "caching": caching, "s": _roll(r), "ans": parse_answer(t)})

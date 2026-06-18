@@ -1,35 +1,37 @@
-"""longhorizon: the regime where Claude's managed context earns its cost, measured.
+"""longhorizon: the isolated, measured value of context editing.
 
-The honest problem this fixes. The demo's short presets (a few dozen small documents) keep the
-carried context far below the model's window, so bounding it changes nothing a founder pays for,
-and the cache-rewrite penalty even makes the managed run cost slightly MORE (see the sweep's
-honest reading). That is a true result on a short task, and it is the wrong task. "Held context at
-3k instead of 36k while staying correct" is a mechanism, not a value: at that size there is no
-cost, speed, correctness, or reliability difference to show.
+The honest problem this fixes, twice over.
 
-What this measures instead. The SAME chain agent, run long. Each tool returns a large payload (a
-realistic big file or API response), so the carried context grows fast. The only difference
-between the two runs is Claude's managed context: context editing (clear stale tool results to
-bound the window) plus the memory tool (carry the running count across the clears). Then the two
-arms diverge on the things a founder actually pays for, and the failure shows up in one of two ways
-depending on how heavy the job is:
+First trap: the demo's short presets keep the carried context far below the window, so bounding it
+changes nothing a founder pays for, and the cache-rewrite penalty even makes the managed run cost
+slightly MORE. "Held context at 3k instead of 36k" is a mechanism, not a value.
 
-  correctness : at realistic payload sizes the unbounded agent SILENTLY DEGRADES. Once its context
-                passes ~150k tokens it loses the thread, stops reading early, and returns a WRONG
-                answer. The edited agent reads the whole chain and answers correctly. (the default)
-  reliability : push the payloads bigger and the unbounded agent fails loudly instead: it exceeds
-                the context window and the API rejects the request. (try a large --doc-tokens)
+Second trap (the one the verifier caught): an earlier version of this file compared a "managed" arm
+(memory tool + context editing + a strategy prompt) against a naive arm (none of those) and credited
+context editing for the correct answer. That A/B moved four variables at once, so it could not
+attribute anything. The correct answer comes from the MEMORY TOOL (a durable count file), not from
+context editing.
 
-Caching is ON in both arms (table stakes), so this is the honest net effect of managed context on
-top of caching, in the regime where long agents live. The win measured here is a correct answer and
-a bounded context, NOT a cheaper bill: at this length the edited run costs MORE total, because the
-unbounded run quits early and wrong and because clearing rewrites the cached prefix. The point is
-that on a long enough job the unbounded agent cannot finish correctly at any price.
+So this runs a clean isolation. BOTH arms get the memory tool and the identical prompt and caching.
+The ONLY variable is context editing. That isolates exactly one thing:
 
-Window and pricing come from common/models.py, verified in docs/VERIFIED_FACTS.md. Every number is
-read off the real usage object the API returns. Carried context is input + cache_read + cache_write
-(all three input buckets), the fix that stopped the per-turn context from reading as ~1 on a
-post-clear or cold turn.
+  context editing -> RELIABILITY. With large tool payloads the editing-OFF arm's context climbs to
+  the model's window and the API rejects the request: the agent cannot finish at any price. The
+  editing-ON arm holds context flat and finishes. Same model, same prompt, same memory tool, one
+  flag. The window error is purely a function of context size, so this difference is caused by
+  context editing and nothing else.
+
+Correctness is held constant by design (the memory tool is on in both), so this file does NOT claim
+context editing makes the answer correct. It claims context editing makes the long run survivable.
+The memory tool is the primitive that makes the count correct, a separate axis.
+
+At small payloads both arms finish and both answer correctly (run with --smoke to see it): there the
+value of context editing has not yet appeared, which is the point. It appears when the job is heavy
+enough to reach the window.
+
+Window and pricing come from common/models.py, verified in docs/VERIFIED_FACTS.md. Carried context is
+input + cache_read + cache_write (all three input buckets). Every number is read off the real usage
+object the API returns.
 """
 
 from __future__ import annotations
@@ -42,12 +44,12 @@ from common.client import fmt_usd, get_client, repo_root
 from common.models import get
 from engine.demo import build_chain, parse_answer, run_agent
 
-# doc_tokens is deliberately large so the carried context reaches the degradation regime in a
-# handful of reads. The default lands in the silent-degradation case (a wrong answer); a much
-# larger --doc-tokens lands in the hard window-crash case. trigger/keep bound the managed arm.
+# The default uses large payloads so the editing-OFF arm reaches the window and the API errors. The
+# smoke is small, so both arms finish (and both answer correctly): it shows that context editing does
+# not change the answer, only whether a heavy run survives.
 PRESETS = {
-    "default": dict(docs=24, doc_tokens=22000, trigger=30000, keep=2, max_turns=70),
-    "smoke":   dict(docs=6,  doc_tokens=1200,  trigger=4000,  keep=2, max_turns=14),
+    "default": dict(docs=8, doc_tokens=40000, trigger=45000, keep=1, max_turns=40),
+    "smoke":   dict(docs=6, doc_tokens=1200,  trigger=4000,  keep=2, max_turns=16),
 }
 
 
@@ -80,79 +82,79 @@ def _col(rec, key, width, fmt):
     return format(rec[key], fmt).rjust(width)
 
 
-def print_report(model, n_docs, doc_tokens, base_rec, base_ans, man_rec, man_ans, gold, wall_s):
+def print_report(model, n_docs, doc_tokens, off_rec, off_ans, on_rec, on_ans, gold, wall_s):
     window = model.context_window
     label = model.label
-    crash = _crash(base_rec)
-    base, man = _roll(base_rec), _roll(man_rec)
-    live_base = _live(base_rec)
-    base_ok, man_ok = base_ans == gold, man_ans == gold
+    crash = _crash(off_rec)
+    off, on = _roll(off_rec), _roll(on_rec)
+    live_off = _live(off_rec)
+    off_ok, on_ok = off_ans == gold, on_ans == gold
 
-    print(f"\n  Long-horizon chain audit on {label}. Caching ON in both runs.")
+    print(f"\n  Long-horizon chain audit on {label}. The isolated value of context editing.")
     print(f"  Workload: a chain of {n_docs} incident reports, each about {doc_tokens:,} tokens (a")
-    print(f"  realistic large tool payload). The agent reads them one at a time, in order, and counts")
-    print(f"  the URGENT ones. The only difference between the runs is Claude's managed context:")
-    print(f"  context editing (bound the window) plus the memory tool (keep the count across clears).")
-    print(f"  {label} context window: {window:,} tokens. True URGENT count: {gold}.\n")
+    print(f"  realistic large tool payload, e.g. a big log or trace). The agent reads them one at a")
+    print(f"  time and counts the URGENT ones.")
+    print(f"  ISOLATION: both runs are identical, same model, same prompt, the MEMORY TOOL ON in both,")
+    print(f"  caching ON in both. The ONLY variable is context editing, so any difference below is")
+    print(f"  caused by context editing alone. {label} window: {window:,} tokens. True count: {gold}.\n")
 
     print("  WHAT YOU GET")
     if crash:
         att = crash.get("attempted_tokens")
         att_s = f"{att:,}" if att else "more than the window of"
-        print(f"    Unbounded agent : CRASHED at step {crash['turn']}. Input {att_s} tokens exceeded the")
-        print(f"                      {window:,} window, the API rejected the request, no answer.")
-    elif not base_ok:
-        reads = max(len(live_base) - 1, 1)
-        peak_k = (live_base[-1]['ctx'] // 1000) if live_base else 0
-        print(f"    Unbounded agent : WRONG answer {base_ans} (the true count is {gold}). It lost the")
-        print(f"                      thread once context passed ~{peak_k}k tokens, gave up after about")
-        print(f"                      {reads} of {n_docs} reports, and miscounted. A silent failure you ship.")
+        print(f"    Editing OFF : CRASHED at step {crash['turn']}. Input {att_s} tokens exceeded the")
+        print(f"                  {window:,} window, the API rejected the request, the run cannot finish.")
+        e_ok = "correct" if on_ok else f"WRONG, expected {gold}"
+        print(f"    Editing ON  : finished all {n_docs} reports, answer {on_ans} ({e_ok}), context held flat")
+        print(f"                  at ~{on['peak_ctx'] // 1000}k tokens. {fmt_usd(on['total_cost'])}, {on['total_time']:.0f}s.")
+        print()
+        print(f"    The value, measured and isolated: context editing is what lets the long run FINISH.")
+        print(f"    Identical setup, one flag. Without it the API errors at the window; with it the agent")
+        print(f"    completes. That is a reliability win caused by context editing, not by the memory tool.")
     else:
-        print(f"    Unbounded agent : answer {base_ans} (correct) at peak {base['peak_ctx']:,} tokens. This")
-        print(f"                      size did not break it; raise --docs / --doc-tokens to push it.")
-
-    e_ok = "correct" if man_ok else f"WRONG, expected {gold}"
-    print(f"    Context-edited  : answer {man_ans} ({e_ok}). Held context flat at ~{man['peak_ctx'] // 1000}k")
-    print(f"                      tokens, read all {n_docs} reports, counted via the memory file. "
-          f"{fmt_usd(man['total_cost'])}, {man['total_time']:.0f}s.")
-    print()
-    if crash and man_ok:
-        print(f"    The value, measured: the agent that DIES at step {crash['turn']} instead runs to the end")
-        print(f"    and returns the right answer, for {fmt_usd(man['total_cost'])}.")
-    elif (not base_ok) and man_ok:
-        print(f"    The value, measured: the SAME model gets this long job WRONG on its own ({base_ans}) and")
-        print(f"    RIGHT with Claude's managed context ({man_ans}), for {fmt_usd(man['total_cost'])}.")
+        o_ok = "correct" if off_ok else f"WRONG, expected {gold}"
+        e_ok = "correct" if on_ok else f"WRONG, expected {gold}"
+        print(f"    Editing OFF : finished, answer {off_ans} ({o_ok}), peak context {off['peak_ctx']:,} tokens.")
+        print(f"    Editing ON  : finished, answer {on_ans} ({e_ok}), peak context {on['peak_ctx']:,} tokens.")
+        print()
+        print(f"    At this payload size the editing-OFF run did not reach the {window:,} window, so both")
+        print(f"    arms finish and (because the memory tool is on in both) both answer correctly. Context")
+        print(f"    editing's value has not appeared yet: it shows up only when the job is heavy enough to")
+        print(f"    hit the window. Raise --doc-tokens to see the editing-OFF arm crash.")
     print()
 
-    print("  THE DIVERGENCE (per turn, caching ON in both)")
-    print("  step | unbounded ctx | edited ctx | unbnd $/turn | edit $/turn | unbnd s | edit s")
-    print("  -----+---------------+------------+--------------+-------------+---------+-------")
-    for i in range(max(len(base_rec), len(man_rec))):
-        b = base_rec[i] if i < len(base_rec) else None
-        m = man_rec[i] if i < len(man_rec) else None
-        print(f"  {i:>4} | {_col(b,'ctx',13,',')} | {_col(m,'ctx',10,',')} | "
-              f"{_col(b,'cost',12,'.5f')} | {_col(m,'cost',11,'.5f')} | "
-              f"{_col(b,'latency_s',7,'.1f')} | {_col(m,'latency_s',6,'.1f')}")
+    print("  THE DIVERGENCE (per turn, memory + caching ON in both, only context editing differs)")
+    print("  step | editOFF ctx | editON ctx | OFF $/turn | ON $/turn | OFF s | ON s")
+    print("  -----+-------------+------------+------------+-----------+-------+-----")
+    for i in range(max(len(off_rec), len(on_rec))):
+        b = off_rec[i] if i < len(off_rec) else None
+        m = on_rec[i] if i < len(on_rec) else None
+        print(f"  {i:>4} | {_col(b,'ctx',11,',')} | {_col(m,'ctx',10,',')} | "
+              f"{_col(b,'cost',10,'.5f')} | {_col(m,'cost',9,'.5f')} | "
+              f"{_col(b,'latency_s',5,'.1f')} | {_col(m,'latency_s',4,'.1f')}")
     print()
 
-    if len(live_base) >= 2:
-        first, last = live_base[0], live_base[-1]
+    if len(live_off) >= 2:
+        first, last = live_off[0], live_off[-1]
         ratio = last["cost"] / max(first["cost"], 1e-9)
-        print("  WHY IT FAILS UNMANAGED")
-        print(f"    The unbounded arm's carried context climbed {first['ctx']:,} -> {last['ctx']:,} tokens")
-        print(f"    and its per-turn cost climbed {ratio:.0f}x ({first['cost']:.5f} -> {last['cost']:.5f}).")
-        print(f"    The edited arm held context near {man['peak_ctx']:,} tokens with a flat per-turn cost.")
-        if not crash:
-            print(f"    Pushed harder (a longer chain or bigger payloads) the unbounded arm stops failing")
-            print(f"    silently and fails loudly: it exceeds the {window:,} window and the API errors.")
+        print("  WHY IT FAILS WITHOUT EDITING")
+        print(f"    The editing-OFF context climbed {first['ctx']:,} -> {last['ctx']:,} tokens and its")
+        print(f"    per-turn cost climbed {ratio:.0f}x ({first['cost']:.5f} -> {last['cost']:.5f}). The")
+        print(f"    editing-ON arm held context near {on['peak_ctx']:,} tokens at a flat per-turn cost.")
         print()
 
-    print(f"  HONEST COST: the edited run cost {fmt_usd(man['total_cost'])} total, MORE than the unbounded")
-    print(f"  run's {fmt_usd(base['total_cost'])}, because the unbounded run quit early (and wrong) and")
-    print(f"  because clearing rewrites the cached prefix. The win here is a correct answer and a bounded")
-    print(f"  context, not a cheaper bill. On a long enough job the unbounded arm cannot finish at all.")
+    print("  WHERE CORRECTNESS COMES FROM (the honest split)")
+    print("    The MEMORY TOOL (on in both arms) is what makes the count correct: the agent tallies into")
+    print("    a durable file instead of an in-context count. CONTEXT EDITING is what makes the long run")
+    print("    survivable: it bounds the window so the agent never hits the wall. Two primitives, two")
+    print("    jobs. This benchmark isolates context editing only.")
     print()
-    total = base["total_cost"] + man["total_cost"]
+
+    print(f"  HONEST COST: context editing is not a cheaper bill. Clearing rewrites the cached prefix,")
+    print(f"  so on a job short enough to finish either way the editing-ON run can cost MORE. Its value")
+    print(f"  is that a heavy job finishes at all. The editing-ON run here cost {fmt_usd(on['total_cost'])}.")
+    print()
+    total = off["total_cost"] + on["total_cost"]
     print(f"  Reproduce: `make longhorizon` on {label}, your own key. This run cost {fmt_usd(total)} total")
     print(f"  and took {wall_s:.0f}s wall.\n")
 
@@ -166,14 +168,14 @@ def _render_from_receipt():
     cfg = d["config"]
     print("\n  (re-rendered from data/last_longhorizon.json, no API call)")
     print_report(model, cfg["docs"], cfg["doc_tokens"],
-                 d["unbounded"]["records"], d["unbounded"]["answer"],
-                 d["edited"]["records"], d["edited"]["answer"], d["gold"], d.get("wall_s", 0.0))
+                 d["editing_off"]["records"], d["editing_off"]["answer"],
+                 d["editing_on"]["records"], d["editing_on"]["answer"], d["gold"], d.get("wall_s", 0.0))
 
 
 def main():
-    p = argparse.ArgumentParser(description="Long-horizon agent: unmanaged degrades or crashes, managed finishes.")
+    p = argparse.ArgumentParser(description="Long-horizon agent: isolate context editing (memory ON in both arms).")
     p.add_argument("--model", default="haiku", help="model key: haiku | sonnet | opus")
-    p.add_argument("--smoke", action="store_true", help="cheap, does not reach the degradation regime")
+    p.add_argument("--smoke", action="store_true", help="small payloads: both arms finish, shows answer parity")
     p.add_argument("--from-receipt", action="store_true", help="re-print the last run's receipt, no API call")
     p.add_argument("--docs", type=int)
     p.add_argument("--doc-tokens", type=int)
@@ -192,11 +194,10 @@ def main():
             cfg[k] = getattr(a, k)
 
     model = get(a.model)
-    print(f"\n  Long-horizon benchmark on {model.label}. Two runs of a {cfg['docs']}-report chain,")
-    print(f"  each report about {cfg['doc_tokens']:,} tokens. The unbounded run is expected to lose")
-    print(f"  the thread (a wrong answer) or, on heavier payloads, exceed the {model.context_window:,}")
-    print(f"  window. Estimated about $1 to $2 and a couple of minutes on Haiku. The measured cost and")
-    print(f"  time are printed and saved when it finishes.")
+    print(f"\n  Long-horizon benchmark on {model.label}. The same {cfg['docs']}-report chain run twice,")
+    print(f"  each report about {cfg['doc_tokens']:,} tokens, memory tool ON in both, only context editing")
+    print(f"  toggled. The editing-OFF arm is expected to exceed the {model.context_window:,} window.")
+    print(f"  Estimated about $1 and a couple of minutes on Haiku. Measured cost and time printed below.")
 
     client = get_client()
     docs, start = build_chain(cfg["docs"], cfg["doc_tokens"])
@@ -204,19 +205,19 @@ def main():
     common = dict(trigger=cfg["trigger"], keep=cfg["keep"], max_turns=cfg["max_turns"])
 
     t0 = time.perf_counter()
-    base_rec, base_text = run_agent(client, a.model, docs, start, managed=False,
-                                    stop_on_overflow=True, **common)
-    man_rec, man_text = run_agent(client, a.model, docs, start, managed=True, **common)
+    off_rec, off_text = run_agent(client, a.model, docs, start, memory=True, editing=False,
+                                  stop_on_overflow=True, **common)
+    on_rec, on_text = run_agent(client, a.model, docs, start, memory=True, editing=True, **common)
     wall_s = time.perf_counter() - t0
 
-    base_ans, man_ans = parse_answer(base_text), parse_answer(man_text)
-    print_report(model, cfg["docs"], cfg["doc_tokens"], base_rec, base_ans, man_rec, man_ans, gold, wall_s)
+    off_ans, on_ans = parse_answer(off_text), parse_answer(on_text)
+    print_report(model, cfg["docs"], cfg["doc_tokens"], off_rec, off_ans, on_rec, on_ans, gold, wall_s)
 
     out = {
         "model": model.id, "config": cfg, "window": model.context_window,
         "gold": gold, "wall_s": round(wall_s, 1),
-        "unbounded": {"records": base_rec, "answer": base_ans, **_roll(base_rec)},
-        "edited": {"records": man_rec, "answer": man_ans, **_roll(man_rec)},
+        "editing_off": {"records": off_rec, "answer": off_ans, **_roll(off_rec)},
+        "editing_on": {"records": on_rec, "answer": on_ans, **_roll(on_rec)},
     }
     (repo_root() / "data").mkdir(exist_ok=True)
     (repo_root() / "data" / "last_longhorizon.json").write_text(json.dumps(out, indent=2))

@@ -83,7 +83,7 @@ READ_TOOL = {
 MEMORY_TOOL = {"type": "memory_20250818", "name": "memory"}
 
 
-def task_prompt(start: int, managed: bool) -> str:
+def task_prompt(start: int, memory: bool) -> str:
     base = (
         f"You are auditing a chain of incident reports. Start by reading report {start} with the "
         f"read_document tool. Each report ends with the id of the next report to read. Follow that "
@@ -96,12 +96,17 @@ def task_prompt(start: int, managed: bool) -> str:
         " Then reply with a single line in the form `Answer: N`, where you replace N with the "
         "integer count of URGENT reports (for example `Answer: 7`). Output nothing else."
     )
-    if managed:
+    # The strategy prompt is tied to the memory tool, NOT to context editing, so that two arms which
+    # differ only in context editing get the identical prompt. This is what lets the benchmark
+    # isolate context editing as the single variable. The memory tool is what makes the count
+    # correct (a durable file instead of an in-context tally); context editing only bounds the
+    # window. Keeping them on separate flags is the whole point.
+    if memory:
         return base + (
-            " Your context window is trimmed automatically as you work, so do not rely on "
-            "remembering earlier reports. The first time you see an URGENT report, create a memory "
-            "file at `/memories/urgent.txt` and add its id. For each later URGENT report, append "
-            "its id. When you reach `done`, view `/memories/urgent.txt` and count the ids."
+            " Do not rely on remembering earlier reports. The first time you see an URGENT report, "
+            "create a memory file at `/memories/urgent.txt` and add its id. For each later URGENT "
+            "report, append its id. When you reach `done`, view `/memories/urgent.txt` and count "
+            "the ids."
         ) + answer
     return base + " When you reach `done`," + answer
 
@@ -158,24 +163,30 @@ def _mark_cache(messages):
         c[-1]["cache_control"] = {"type": "ephemeral"}
 
 
-def run_agent(client, model_key, docs, start, *, managed, caching=True, trigger, keep, max_turns,
-              stop_on_overflow=False):
+def run_agent(client, model_key, docs, start, *, memory, editing, caching=True, trigger, keep,
+              max_turns, stop_on_overflow=False):
     """Run the chain audit once on Claude, caching ON. Returns (records, final_text).
+
+    ``memory`` and ``editing`` are SEPARATE flags on purpose, so a benchmark can toggle exactly one
+    and attribute the result. The memory tool (plus the strategy prompt) is what makes the count
+    correct; context editing is what bounds the carried context. ``managed`` used to bundle both,
+    which made the win impossible to attribute (see docs/FINDINGS.md). Keep them independent.
 
     ``stop_on_overflow`` makes the context-window error a measured event instead of a crash: when
     the carried context grows past the model's window and the API rejects the request, the run
     records a ``crashed`` turn (with the attempted token count the API reported) and stops. That
     lets a caller compare an unbounded agent that dies at the wall against a bounded one that
-    finishes. Off by default, so existing callers are unaffected.
+    finishes.
     """
     model = get(model_key)
-    messages = [{"role": "user", "content": task_prompt(start, managed)}]
-    tools = [READ_TOOL] + ([MEMORY_TOOL] if managed else [])
+    messages = [{"role": "user", "content": task_prompt(start, memory)}]
+    tools = [READ_TOOL] + ([MEMORY_TOOL] if memory else [])
 
     kw_extra = {}
     mem = None
-    if managed:
+    if memory:
         mem = MemoryBackend(tempfile.mkdtemp(prefix="cce_mem_"))
+    if editing:
         kw_extra["extra_headers"] = {"anthropic-beta": BETA_HEADER}
         # context editing: clear stale tool results in place once the context crosses the trigger,
         # keep the most recent `keep` tool uses, and never clear the memory calls.
@@ -330,8 +341,8 @@ def main():
     common = dict(trigger=cfg["trigger"], keep=cfg["keep"], max_turns=cfg["max_turns"])
 
     t0 = time.perf_counter()
-    base_rec, base_text = run_agent(client, a.model, docs, start, managed=False, **common)
-    man_rec, man_text = run_agent(client, a.model, docs, start, managed=True, **common)
+    base_rec, base_text = run_agent(client, a.model, docs, start, memory=False, editing=False, **common)
+    man_rec, man_text = run_agent(client, a.model, docs, start, memory=True, editing=True, **common)
     elapsed = time.perf_counter() - t0
 
     base_ans, man_ans = parse_answer(base_text), parse_answer(man_text)
