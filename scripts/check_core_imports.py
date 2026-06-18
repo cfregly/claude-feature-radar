@@ -45,7 +45,7 @@ def main() -> int:
         "engine.sources_registry", "engine.cadence", "engine.coverage", "engine.managed",
         "engine.demonstrators", "engine.demonstrators.base", "engine.demonstrators.registry",
         "engine.demonstrators.shared.sandbox", "engine.demonstrators.shared.platform",
-        "engine.demonstrators.shared.spec", "engine.demonstrators.agentic_grading",
+        "engine.demonstrators.agentic_grading",
         "engine.demonstrators.eval_quality", "engine.demonstrators.retention_resume",
         "engine.demonstrators.cost_model", "engine.demonstrators.other_parity_gated",
         "engine.providers.openai_provider", "engine.providers.gemini_provider",

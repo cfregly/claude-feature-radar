@@ -16,7 +16,7 @@ What this measures, honestly. The SAME fan-out task two ways, on the same model,
 final-answer assertion so the comparison cannot be gamed:
 
   Mode A (plain tool use)   Claude calls query_region_sales(region) directly, once per region, so
-                            every region's ~50 rows flow through the model context and are billed.
+                            every region's ~60 rows flow through the model context and are billed.
   Mode B (programmatic)     Claude writes one script that loops the regions, calls the tool from
                             code, sums in the sandbox, and returns only the winner. The rows go to
                             the sandbox, not the model.
@@ -57,7 +57,7 @@ QUERY_TOOL = {
     "description": (
         "Return the full list of sales order records for one region. Each call returns a JSON array "
         "of objects, each with keys order_id (string), product (string), units (integer), and "
-        "revenue (number, USD). About 50 records per region."
+        "revenue (number, USD). About 60 records per region."
     ),
     "input_schema": {
         "type": "object",
@@ -68,7 +68,7 @@ QUERY_TOOL = {
 
 
 def region_sales(region: str):
-    """Deterministic ~50 rows for a region, so the true winner is fixed and reproducible."""
+    """Deterministic ~60 rows for a region, so the true winner is fixed and reproducible."""
     seed = int(hashlib.sha256(region.encode()).hexdigest()[:8], 16)
     rng = random.Random(seed)
     rows = []

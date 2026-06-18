@@ -27,7 +27,6 @@ from common import runner as R
 from engine.demonstrators.base import Arm
 from engine.demonstrators.shared import platform as P
 from engine.demonstrators.shared import sandbox as S
-from engine.demonstrators.shared import spec as SP
 
 
 # ----- the merged cross-vendor model registry -----
@@ -264,33 +263,3 @@ def test_platform_marks_a_feature_once_and_recaps():
 def test_platform_summary_is_none_when_nothing_fired():
     P.reset()
     assert P.summary().endswith("none")
-
-
-# ----- the program.md spec parser -----
-
-def test_spec_parses_a_written_program(tmp_path):
-    prog = tmp_path / "program.md"
-    prog.write_text(
-        "models: claude-haiku-4-5 and claude-opus-4-8\n"
-        "temperature in [0.1, 0.9]\n"
-        "max_tokens in [512, 4096]\n"
-        "- spend: 1.50\n- iterations: 5\n- wall clock: 30\n"
-    )
-    s = SP.load(prog)
-    assert s.models == ["claude-haiku-4-5", "claude-opus-4-8"]
-    assert s.temperature == (0.1, 0.9)
-    assert s.max_tokens == (512, 4096)
-    assert s.budget == {"dollars": 1.5, "iterations": 5, "minutes": 30.0}
-
-
-def test_spec_falls_back_on_a_missing_file(tmp_path):
-    s = SP.load(tmp_path / "does_not_exist.md")
-    assert s.models == SP.DEFAULT_MODELS
-    assert s.budget == SP.DEFAULT_BUDGET
-
-
-def test_spec_template_parses_clean():
-    # The shipped template must parse to three Claude tiers and a real budget, no stray ids.
-    s = SP.load()
-    assert s.models == ["claude-haiku-4-5", "claude-sonnet-4-6", "claude-opus-4-8"]
-    assert s.budget["dollars"] > 0

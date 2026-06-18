@@ -74,6 +74,6 @@ Claude-only capability, which the audit finds.
 
 ## The current benchmark result
 
-The latest run is in [`../sample_sweep.txt`](../sample_sweep.txt) and `../data/last_sweep.json`,
+The latest run is in `../data/last_sweep.json`,
 re-run with `make sweep`. Read it, do not quote it from here, because it changes as the platforms
 ship.

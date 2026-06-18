@@ -137,7 +137,7 @@ make ci                  # the full offline gate chain, the same one CI runs ($0
 ```
 
 It is packaged as a skill ([`SKILL.md`](SKILL.md)) so a founder can re-run the same analysis any week.
-The canonical founder email is at [`FOUNDER_EMAIL_SUBMISSION.md`](FOUNDER_EMAIL_SUBMISSION.md).
+The canonical founder email is at [`FOUNDER_EMAIL.md`](FOUNDER_EMAIL.md).
 
 ## Layout
 

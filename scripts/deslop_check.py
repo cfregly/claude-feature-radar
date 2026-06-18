@@ -17,7 +17,6 @@ def _targets():
     docs = [ROOT / d for d in DOCS]
     docs += sorted((ROOT / "briefs").glob("*.md"))
     docs += sorted((ROOT / "edges").glob("*/*.md"))  # per-edge FOUNDER_EMAIL, PRODUCT_EMAIL, README
-    docs += sorted((ROOT / "engine" / "demonstrators" / "shared").glob("*.md"))  # the program.md spec template
     return docs
 
 

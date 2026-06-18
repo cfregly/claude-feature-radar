@@ -1,6 +1,6 @@
 """sources_registry: the committed list of doc, changelog, and pricing URLs the sweep fetches.
 
-Every URL here is one the four committed briefs already name in their Sources sections (the master
+Every URL here is one the committed briefs already name in their Sources sections (the master
 brief's "Live docs (fetched 2026-06-18)" line and the per-brief source footers). Lifting them into
 code means the weekly sweep fetches the exact pages the hand-authored landscape was built from, so a
 fetched fact stays citable by the same engine/cite_facts.py path and the diff tracks the real surface.

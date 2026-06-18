@@ -2,11 +2,11 @@
 
 The package holds the Demonstrator protocol and the standard dataclasses (engine/demonstrators/base.py),
 the registry and dispatcher (engine/demonstrators/registry.py), and one demonstrator module per
-demoKind. The three built edges (PTC, Citations, context editing) implement the interface in
-edges/<key>/demo.py and register here.
+demoKind. Three edges (programmatic tool calling, citations, context editing) ship a runnable
+edges/<key>/demo.py; the rest (agentic grading, eval quality, cost model, retention/resume, and the
+parity-gated long tail) live as modules under engine/demonstrators/. All register here.
 
-The shared/ subpackage carries the backends every demonstrator plugs into, lifted from the A and B
-harnesses in Phase 3: the no-Docker sandbox executor (shared/sandbox.py), the per-demo platform
-telemetry (shared/platform.py), and the program.md spec parser for budgeted kinds (shared/spec.py).
-The cross-vendor competitor arm runs through common/runner.py call() and engine/providers/.
+The shared/ subpackage carries the backends every demonstrator plugs into: the no-Docker sandbox
+executor (shared/sandbox.py) and the per-demo platform telemetry (shared/platform.py). The
+cross-vendor competitor arm runs through common/runner.py call() and engine/providers/.
 """
