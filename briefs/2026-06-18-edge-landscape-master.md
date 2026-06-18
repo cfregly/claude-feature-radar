@@ -190,7 +190,7 @@ credit, cache diagnostics) need a parity check before any claim.
 ## Sources
 
 Briefs reconciled:
-/Users/admin/dev/anthropic/takehome-experiments/claude-competitive-engine/briefs/2026-06-17-platform-edge.md,
+/briefs/2026-06-17-platform-edge.md,
 /briefs/2026-06-17-agentic-landscape.md, /briefs/2026-06-17-sharpest-edge.md,
 /briefs/2026-06-17-verified-picture.md.
 
