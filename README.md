@@ -78,7 +78,7 @@ make citations    # about $0.06, needs ANTHROPIC_API_KEY
 
 Feature references, fetched 2026-06-18:
 - Citations docs: https://platform.claude.com/docs/en/build-with-claude/citations
-- Citations cookbook (runnable): https://platform.claude.com/cookbook/misc/using_citations
+- Citations cookbook (runnable): https://platform.claude.com/cookbook/misc-using-citations
 
 ## Fork and run
 
