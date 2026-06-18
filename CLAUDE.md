@@ -25,6 +25,14 @@ The traps that already bit this repo, all caught in `docs/FINDINGS.md`:
   echoed literally by some models.
 When a number cannot be made apples to apples, say so and drop it. Credibility is the whole asset.
 
+## Carried context is every input bucket, not input plus cache_read
+True carried context on Claude is `input_tokens + cache_read_input_tokens + cache_creation_input_tokens`,
+the write bucket included. The three are disjoint and sum to the prompt the model actually processed.
+Counting only input plus cache_read reads the context as about 1 token on a cold turn or the turn
+right after context editing clears, because almost the whole prefix is a write then, which silently
+undercounts the context exactly when a long-horizon claim depends on it. The per-turn `ctx` in
+[`engine/demo.py`](engine/demo.py) sums all three. See [`docs/VERIFIED_FACTS.md`](docs/VERIFIED_FACTS.md).
+
 ## Ground every Claude and competitor claim
 Every claim about a Claude feature, parameter, price, or limit traces to a page on
 docs.claude.com, cited in `docs/VERIFIED_FACTS.md`. Every claim about a competitor traces to
@@ -55,10 +63,50 @@ receipt, exactly what ran, what it cost, how long it took, and why.
 ## Lead with what the result is worth to the reader
 Every result this repo puts in front of a reader (the benchmark table, the founder email, the
 README, the product note) says what it means for that reader before it says how it was made. A
-number is not a finding. "OpenAI ran this agent cheaper, and Claude held its context flat at about
-3k tokens with no eviction code to write" is a finding, because the reader can see what they get.
-Lead with the so-what: what the reader can now do, decide, build, or stop building. If a result
-carries no worth to the reader, cut it or say plainly why it still matters to them.
+number is not a finding, and a mechanism is not a value. "Claude held its context flat at 3k tokens
+instead of 36k" is a mechanism: it says what the feature does, not what the reader gets. "With the
+memory tool and the prompt held constant in both runs and only context editing toggled, the
+editing-off agent crashed at the 200k context window and the editing-on agent finished the same job
+for about thirty-five cents" is a finding, because the reader can see what they get. Lead with the
+so-what: what the reader can now do, decide, build, or stop building. If a result carries no worth to
+the reader, cut it.
+
+## A mechanism is not a value, and a feature is measured where it bites
+The trap this repo fell into, and the critique that fixed it: it showed context editing holding a
+short agent at 3k tokens instead of 36k and called that the benefit. Holding context smaller is a
+MECHANISM. The value is a measured change in what a founder pays for, cost, speed, correctness, or
+reliability, and at that size there was none (the window is 200k to 1M), with the meter even showing
+the managed run cost slightly MORE because clearing rewrites the cached prefix. The claim had no
+so-what and should never have shipped.
+- State the value as a measured number, or do not claim it.
+- Measure the feature in the regime where it bites. A feature that only pays off at scale is
+  measured at scale. The fix, [`engine/longhorizon.py`](engine/longhorizon.py), runs the agent with
+  large payloads until the carried context exceeds the window, where context editing has a real,
+  measured effect (the run finishes instead of the API erroring), not asserted from a mechanism.
+- Isolate one variable, or you cannot attribute the win. The first version of that benchmark moved
+  four things at once (the memory tool, context editing, a beta header, and a strategy-bearing
+  prompt) and credited context editing for a correct answer that the memory tool actually produced.
+  A confounded A/B measures the bundle, not the feature. Hold everything else constant and toggle
+  exactly the one feature whose value you claim. Here the memory tool and the prompt are on in both
+  arms and only context editing differs, so the reliability win is attributable to it alone.
+
+## Find the global edge, not a local minimum
+The deeper trap, the one that produced the mechanism above: the engine locked onto the first thing it
+could measure as Claude-only (context editing) on a toy task (count the URGENT reports in a chain),
+and a toy collapses every model to a cost-and-speed race Claude does not win, so the only thing left
+standing was a plumbing primitive that, run honestly, miscounted. That is a local minimum. The edge
+is global, and it can come from anywhere on the platform.
+- Search the WHOLE surface. The anchor can be any capability across the Claude Developer Platform: an
+  API primitive (prompt caching, the Batch API, the memory tool, code execution, citations, extended
+  thinking, the 1M-token window), the Agent SDK, Agent Skills, MCP, Claude Code, or an economics
+  lever. Do not stop at the first measurable Claude-only feature.
+- Rank by value times genuine lead. Score every differentiator by how much a founder building a
+  product cares, times how clearly Claude leads after the live competitor-parity check, and anchor on
+  the global maximum, not the easiest thing to measure. Drop anything a competitor already matches.
+- Pick the task that exercises the edge. A toy task hides the edge and surfaces a cost-and-speed race
+  instead. Choose a real job where the edge decides the outcome, then measure it.
+- The edge moves. Re-run the whole search as the platform ships monthly. Today's global maximum is
+  next quarter's parity, so the engine searches every time, it does not cache a winner.
 
 ## Put the workload, cost, and time on every outbound surface
 The internal receipt is recorded above. What ships to a reader carries the same facts, up front, in

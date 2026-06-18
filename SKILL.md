@@ -58,18 +58,42 @@ These are why the output is trusted. Break one and the trust is gone.
 7. **Apples to apples, or the number does not ship.** Every cross-vendor number counts the same thing
    on every side, verified. Claude's `input_tokens` excludes cached tokens (cache_read is separate),
    while OpenAI's `input_tokens` and Gemini's `prompt_token_count` include them, so carried context is
-   input plus cache_read on Claude and the total field on the others. Pull every price live, report the
-   caching config, and run the competitor's stronger model before a quality claim. When a number
-   cannot be made comparable, drop it. Credibility is the whole asset.
+   input plus cache_read plus cache_creation on Claude (all three input buckets) and the total field on
+   the others. Pull every price live, report the caching config, and run the competitor's stronger
+   model before a quality claim. When a number cannot be made comparable, drop it. Credibility is the
+   whole asset.
+8. **A mechanism is not a value, a feature is measured where it bites, and one variable moves at a
+   time.** Naming what a feature does (held context at 3k instead of 36k) is a mechanism, not a value.
+   The value is a measured change in cost, speed, correctness, or reliability, shown in the regime
+   where the feature pays off, with everything else held constant so the win is attributable. A
+   feature that only helps at scale is measured at scale: `engine/longhorizon.py` holds the memory
+   tool and the prompt constant in both arms and toggles ONLY context editing, so the result (editing
+   off crashes at the window, editing on finishes) is attributable to context editing alone. The
+   earlier version moved four variables at once and wrongly credited context editing for a correct
+   answer the memory tool produced. State the measured value, isolate the variable, or do not claim it.
+9. **Find the global edge, not a local minimum.** The anchor can be any capability across the whole
+   Claude Developer Platform: an API primitive (prompt caching, the Batch API, the memory tool, code
+   execution, citations, extended thinking, the 1M-token window), the Agent SDK, Agent Skills, MCP,
+   Claude Code, or an economics lever. Do not lock onto the first measurable Claude-only feature, that
+   is a local minimum. Survey the entire surface, rank every genuine differentiator by value to a
+   founder times how clearly Claude leads after the competitor-parity check, and anchor on the global
+   maximum. Then pick the task that EXERCISES that edge: a toy task collapses every model to a
+   cost-and-speed race Claude may lose, so the benchmark must be a real job where the edge decides the
+   outcome. Re-run the whole search every time, the platform ships monthly and the edge moves.
 
 ## The steps
 
-### 1. Audit the live docs (what is genuinely Claude-only, and what Claude lacks)
-For each candidate Claude capability, fetch the current Claude doc, the current OpenAI doc, and the
-current Gemini doc, and classify it: claude-only, claude-ahead, parity, or behind. Run a skeptic
-pass that tries to refute every claude-only claim by finding the competitor's equivalent. Keep only
-what survives. This produces two lists: Claude's genuine differentiators and Claude's genuine gaps.
-Map each to the founder priority stack: cost, speed, then reduced maintenance and heavy lifting.
+### 1. Audit the live docs (sweep the whole platform surface for the global edge)
+Sweep the ENTIRE Claude Developer Platform, not a fixed feature list: the Messages API primitives
+(prompt caching, the Batch API, the memory tool, code execution, citations, extended thinking, the
+1M-token window), the Agent SDK, Agent Skills, MCP, Claude Code, and the economics levers. For each
+candidate, fetch the current Claude doc, the current OpenAI doc, and the current Gemini doc, and
+classify it: claude-only, claude-ahead, parity, or behind. Run a skeptic pass that tries to refute
+every claude-only claim by finding the competitor's equivalent, and drop anything a competitor
+already matches. Then RANK what survives by value to a founder times how clearly Claude leads, and
+carry the global maximum forward as the anchor, not the first thing that was easy to measure. This
+produces two lists: Claude's genuine differentiators, ranked, and Claude's genuine gaps. Map each to
+the founder priority stack: cost, speed, then reduced maintenance and heavy lifting.
 
 ### 2. Benchmark best to best
 Run the same long-horizon agent on each platform at full strength and measure the outcomes a
@@ -78,6 +102,7 @@ founder pays for: total cost, wall-clock time, and correctness.
 ```
 make compare    # OpenAI (Responses + compaction + caching) vs Claude (context editing + memory + caching)
 make sweep      # the same, across the knobs that matter, so the result is trusted not assumed
+make longhorizon # the regime where managed context pays off: unmanaged degrades or crashes, managed finishes
 ```
 
 ### 3. Synthesize the honest picture
@@ -118,6 +143,7 @@ your own task by editing the chain builder and the prompt in `engine/demo.py`.
 ```
 engine/scan.py / verify.py    candidate gaps and the skeptic pass
 engine/demo.py                the Claude arm (chain agent, context editing + memory + caching)
+engine/longhorizon.py         the long-horizon proof: unmanaged degrades or crashes, managed finishes
 engine/openai_arm.py          the OpenAI arm (Responses API, compaction + caching, latest)
 engine/compare.py             OpenAI vs Claude, best to best, outcomes a founder pays for
 engine/sweep.py               the variant sweep that makes the result trustworthy
