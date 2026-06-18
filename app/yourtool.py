@@ -1,5 +1,16 @@
 """yourtool: THE single file you edit to run the bill-cut on your own tool.
 
+HOW TO RUN THIS ON YOUR OWN TOOL (3 steps):
+  1. Replace TOOL_SPEC below with your own Messages-API tool dict (the same dict you already pass in
+     tools=[...]): name, description, input_schema.
+  2. Replace call(...) with the function that actually runs your tool. Its keyword arguments match
+     input_schema's properties, and it returns whatever the model would normally get back (a list,
+     dict, or string).
+  3. Set QUESTION and EXAMPLE_INPUTS to your own fan-out task, the prompt that makes the model call
+     your tool many times.
+Then run `make app` to see your own before and after token count. The shipped example (region_sales)
+runs out of the box, so `make app-check` works before you change anything.
+
 Replace the two things below with your own tool and you are done:
 
   TOOL_SPEC   a Messages-API tool dict: name, description, input_schema. The exact dict you already
