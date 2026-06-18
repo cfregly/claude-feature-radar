@@ -58,9 +58,9 @@ SYSTEM = (
 
 
 def _client():
-    import anthropic  # lazy: pulled only on a live run, never at core import
+    from common.client import managed_client  # lazy: the SDK is pulled only on a live run
 
-    return anthropic.Anthropic()  # reads ANTHROPIC_API_KEY, sets the managed-agents beta automatically
+    return managed_client()
 
 
 def _run1_task() -> str:

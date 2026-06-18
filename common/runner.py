@@ -29,12 +29,6 @@ from common.models import get
 from common.pricing import CostBreakdown, cost_breakdown
 
 
-def get_client():
-    """An Anthropic client, with the engine's env loader and the same key error message."""
-    from common.client import get_client as _impl
-    return _impl()
-
-
 def get_openai_client():
     """An OpenAI client, or None when OPENAI_API_KEY is unset, so the default run stays Claude only."""
     load_env()
@@ -191,6 +185,3 @@ def to_arm(result: Result, *, provider: str | None = None, metric: dict | None =
         note=note,
     )
 
-
-def fmt_usd(x: float) -> str:
-    return f"${x:,.6f}" if x < 0.01 else f"${x:,.4f}"

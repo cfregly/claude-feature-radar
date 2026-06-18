@@ -493,7 +493,8 @@ def solve_one(record, inst, model_key, client, *, rounds=ROUNDS, effort=EFFORT,
 def _clients():
     """The Anthropic / OpenAI / Gemini clients, each None when its key is absent (so its arm is
     ran=False, never faked). Lazy through the runner so an absent key needs no SDK."""
-    from common.runner import get_client, get_gemini_client, get_openai_client
+    from common.client import get_client
+    from common.runner import get_gemini_client, get_openai_client
     return {"anthropic": get_client(), "openai": get_openai_client(), "gemini": get_gemini_client()}
 
 
@@ -695,7 +696,7 @@ register(AgenticGradingDemonstrator())
 # --------------------------------------------------------------------------- the CLI receipt
 
 def _print_receipt(run: dict) -> None:
-    from common.runner import fmt_usd
+    from common.client import fmt_usd
     from common.models import get
     tally = run["tally"]
     n = run["n_instances"]

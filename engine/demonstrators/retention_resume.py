@@ -223,9 +223,9 @@ def _drain(stream, max_events: int, seen_ids: set | None = None) -> dict:
 
 
 def _client():
-    import anthropic  # lazy: the SDK is pulled only on the opt-in live path, never at core import
+    from common.client import managed_client  # lazy: the SDK is pulled only on the opt-in live path
 
-    return anthropic.Anthropic()  # reads ANTHROPIC_API_KEY, sets the managed-agents beta automatically
+    return managed_client()
 
 
 def _persisted_session_id() -> str:

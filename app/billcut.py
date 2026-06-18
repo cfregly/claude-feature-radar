@@ -44,6 +44,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from common.models import get  # noqa: E402  the verified id + price registry, anthropic-free
 from common.pricing import cost_usd  # noqa: E402  real usage object -> real dollars, anthropic-free
 from engine.demonstrators.token_core import run_mode  # noqa: E402  the ONE audited counter + run loop
+from common.client import fmt_usd  # noqa: E402  the one shared dollar formatter
 
 from app import yourtool  # noqa: E402  the single edit surface
 
@@ -51,9 +52,6 @@ from app import yourtool  # noqa: E402  the single edit surface
 # (verified 2026-06-18 against the live doc). The app exposes the two a founder would pick.
 PTC_MODELS = {"sonnet": "claude-sonnet-4-6", "opus": "claude-opus-4-8"}
 
-
-def fmt_usd(x: float) -> str:
-    return f"${x:,.6f}" if x < 0.01 else f"${x:,.4f}"
 
 
 def run_billcut(client, model_key: str, *, progress: bool = True) -> dict:

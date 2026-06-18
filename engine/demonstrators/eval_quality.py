@@ -461,7 +461,8 @@ class GridRun:
 def _clients():
     """The Anthropic / OpenAI / Gemini clients, each None when its key is absent. Lazy through the
     runner so an absent key needs no SDK."""
-    from common.runner import get_client, get_gemini_client, get_openai_client
+    from common.client import get_client
+    from common.runner import get_gemini_client, get_openai_client
     return {"anthropic": get_client(), "openai": get_openai_client(), "gemini": get_gemini_client()}
 
 
@@ -518,7 +519,7 @@ def recommend(run: GridRun) -> list:
     ran = [c for c in run.cells if c.ran]
     if not ran:
         return ["No cells produced a result, so there is nothing to recommend."]
-    from common.runner import fmt_usd
+    from common.client import fmt_usd
 
     lines = []
     gradeable = [c for c in ran if c.by_split["test"].graded > 0]
@@ -736,7 +737,7 @@ register(EvalQualityDemonstrator())
 
 def _print_grid(run: GridRun) -> None:
     from common.models import get
-    from common.runner import fmt_usd
+    from common.client import fmt_usd
 
     ran = sorted((c for c in run.cells if c.ran),
                  key=lambda c: (-c.by_split["test"].accuracy, -c.accuracy, c.total_cost))

@@ -42,3 +42,9 @@ def get_client() -> Anthropic:
 
 def fmt_usd(x: float) -> str:
     return f"${x:,.6f}" if x < 0.01 else f"${x:,.4f}"
+
+
+def managed_client() -> Anthropic:
+    """An Anthropic client for the Managed Agents live paths. The SDK sets the managed-agents beta
+    header automatically, so the construction lives here once and both live runtimes share it."""
+    return Anthropic()
