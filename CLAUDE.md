@@ -77,7 +77,7 @@ number is not a finding, and a mechanism is not a value. "Claude held its contex
 instead of 36k" is a mechanism: it says what the feature does, not what the reader gets. "With the
 memory tool and the prompt held constant in both runs and only context editing toggled, the
 editing-off agent crashed at the 200k context window and the editing-on agent finished the same job
-for about thirty-five cents" is a finding, because the reader can see what they get. Lead with the
+for $0.35" is a finding, because the reader can see what they get. Lead with the
 so-what: what the reader can now do, decide, build, or stop building. If a result carries no worth to
 the reader, cut it.
 

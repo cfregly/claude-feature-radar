@@ -33,6 +33,6 @@ the founder email does not lean on, because they are where we are exposed.
    correctness gap on easy documents. We should say that plainly so a skeptic does not catch us.
 
 To reproduce: `make setup`, `make compare-deps`, paste three keys into `.env`, then `make citations`,
-about six cents. The receipt is `edges/citations/sample.txt`.
+$0.06. The receipt is `edges/citations/sample.txt`.
 
 {your_name}

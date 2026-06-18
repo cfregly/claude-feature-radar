@@ -43,7 +43,7 @@ cannot be combined with Structured Outputs on the same document (the API returns
 git clone <this-repo> && cd claude-competitive-engine
 make setup && make compare-deps   # core deps, then the OpenAI + Gemini SDKs, into the same venv
 cp .env.example .env              # paste your Anthropic, OpenAI, and Gemini keys
-make citations                    # this edge, on your own keys, about six cents
+make citations                    # this edge, on your own keys, $0.06
 # or directly: python edges/citations/demo.py
 ```
 

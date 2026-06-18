@@ -9,7 +9,7 @@ value here disagrees with the code, the code is wrong.
 
 Pricing is per million tokens (MTok), verified against
 [the pricing page](https://platform.claude.com/docs/en/about-claude/pricing). The demo uses Haiku
-4.5 because it is the cheapest, so a founder reproducing the run spends about ninety cents.
+4.5 because it is the cheapest, so a founder reproducing the run spends $0.90.
 
 | Model | API id | Input | Output | Cache read | Context |
 |---|---|--:|--:|--:|--:|
@@ -111,7 +111,7 @@ Source: [context editing](https://platform.claude.com/docs/en/build-with-claude/
   finished correctly 3 of 3. One captured editing-OFF run climbed from 1,816 to 187,471 carried tokens
   (per-turn cost up 24.7x) and then exceeded the window, so the API rejected the request (measured:
   `prompt is too long: 203056 tokens > 200000 maximum`). Editing ON held context flat near 34k and
-  answered correctly (3 of a true 3) for about thirty-five cents. The win is reliability, caused by
+  answered correctly (3 of a true 3) for $0.35. The win is reliability, caused by
   context editing alone. Correctness is held constant by the memory tool, which is on in both arms, so
   it is the memory tool, not context editing, that makes the count correct. Receipt in
   [`../edges/context-editing/sample.txt`](../edges/context-editing/sample.txt).

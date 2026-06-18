@@ -9,7 +9,7 @@ before quoting any of it, because this surface moves monthly.
 
 On a fair benchmark, Claude does not win on cost, speed, or correctness. OpenAI is cheaper, and the
 cheap-tier correctness gap was a model-quality artifact (a stronger competitor model is correct).
-Claude Code is best-in-class but at parity with OpenAI Codex and Google Antigravity. The
+Claude Code is strong but at parity with OpenAI Codex and Google Antigravity. The
 managed-agent runtime is parity. So the reason to build on Claude is not price, and not the IDE. It
 is a small set of agent primitives the others do not ship.
 

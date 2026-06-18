@@ -1,4 +1,4 @@
-Subject: Congrats on YC! 🎉 A cool Claude feature to help you build
+Subject: Congrats on YC! A cool Claude feature to help you build
 
 Hey {first_name},
 
@@ -45,6 +45,6 @@ To run it on your own tool, open [yourtool.py]({repo_url}/blob/main/ptc/yourtool
 
 More: the [PTC cookbook](https://platform.claude.com/cookbook/tool-use-programmatic-tool-calling-ptc) is a runnable notebook.
 
-Happy building! 🚀
+Happy building!
 Chris Fregly
 Applied AI, Startups @ Anthropic

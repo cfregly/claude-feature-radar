@@ -22,7 +22,7 @@ in both arms), on a chain of 8 reports at about 40,000 tokens each, run three ti
   `203,056 tokens > 200,000`) and the API rejected the request. Once it lost the count and answered
   wrong. Either way, the agent cannot finish the job.
 - Context editing ON: finished 3 of 3 with the correct answer, context held flat near 34,000 tokens,
-  about 35 cents per run.
+  $0.35 per run.
 
 Two honest things. It is beta, and it is not a cheaper bill: clearing rewrites the cached prefix, so
 on a job short enough to finish either way it can cost more. The value is that a heavy job finishes at
@@ -37,7 +37,7 @@ tie. So this is a reliability lever for the long tail of your hardest jobs, not 
 {repo_link}
 
 Run it yourself: `make setup`, then `cp .env.example .env` and paste your Anthropic key, then `python
-edges/context-editing/demo.py` for one off+on pair, about sixty-five cents on Haiku. The failure is
+edges/context-editing/demo.py` for one off+on pair, $0.65 on Haiku. The failure is
 not deterministic, so the committed receipt runs it three times (`make longhorizon`, about two
 dollars). Every number off the real API.
 

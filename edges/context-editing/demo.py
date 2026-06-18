@@ -130,7 +130,7 @@ def print_report(model, n_docs, doc_tokens, off_rec, off_ans, on_rec, on_ans, go
         if off_ok:
             print(f"    Here the editing-OFF run stayed under the {window:,} window and answered correctly, so")
             print(f"    context editing's value did not appear this run. It appears when the context grows")
-            print(f"    enough to hit the window or derail the count (see the robustness summary, --repeat).")
+            print(f"    enough to hit the window or derail the count (see the reliability summary, --repeat).")
         else:
             print(f"    Here the editing-OFF run did not crash but lost the count in its bloated context and")
             print(f"    answered WRONG, while editing-ON (identical but for the flag) answered correctly. The")
@@ -179,12 +179,12 @@ def _classify(rec, ans, gold):
     return "correct" if ans == gold else "wrong"
 
 
-def print_robustness(n, off_outcomes, on_outcomes, on_peak):
+def print_reliability(n, off_outcomes, on_outcomes, on_peak):
     oc_crash = off_outcomes.count("crashed")
     oc_wrong = off_outcomes.count("wrong")
     oc_ok = off_outcomes.count("correct")
     on_ok = on_outcomes.count("correct")
-    print(f"  ROBUSTNESS ({n} runs of the same setup, only context editing toggled)")
+    print(f"  RELIABILITY ({n} runs of the same setup, only context editing toggled)")
     print(f"    editing OFF: {oc_crash + oc_wrong}/{n} FAILED ({oc_crash} crashed at the window, "
           f"{oc_wrong} returned a wrong answer), {oc_ok}/{n} correct.")
     print(f"    editing ON : {on_ok}/{n} finished with the correct answer, context bounded near "
@@ -376,7 +376,7 @@ def main():
     off_rec, off_ans, on_rec, on_ans, first_wall = first
     print_report(model, cfg["docs"], cfg["doc_tokens"], off_rec, off_ans, on_rec, on_ans, gold, first_wall)
     if n > 1:
-        print_robustness(n, off_outcomes, on_outcomes, _roll(on_rec)["peak_ctx"])
+        print_reliability(n, off_outcomes, on_outcomes, _roll(on_rec)["peak_ctx"])
 
     out = {
         "model": model.id, "config": cfg, "window": model.context_window,

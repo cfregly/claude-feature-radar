@@ -50,7 +50,7 @@ The verdict can never be claude-ahead by construction: no competitor arm runs, s
 holds the verdict at parity. The opt-in `make retention-live` runs a real kill-and-resume with a
 negative control, but its verdict is within-Claude (a continuity and bundle proof), never a head-to-head
 lead. Related correction in the same pass: context editing versus server-side compaction is also parity
-(both vendors ship GA server-side compaction, Claude additionally ships beta in-place editing), so the
+(both vendors ship GA server-side compaction, Claude also ships beta in-place editing), so the
 long-horizon LEADERSHIP claim should anchor on the independent METR time-horizon, not context editing.
 
 To reproduce: `make retention` (no key, no spend, the dated comparison) or `make retention-live`

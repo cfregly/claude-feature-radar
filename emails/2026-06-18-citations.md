@@ -1,4 +1,4 @@
-Subject: Congrats on YC! 🎉 A cool Claude feature for answering over your users' docs
+Subject: Congrats on YC! A cool Claude feature for answering over your users' docs
 
 Hey {first_name},
 
@@ -38,6 +38,6 @@ To run it on your own docs, drop your `.txt` files into [citations/docs/]({repo_
 
 More: the [Citations cookbook](https://platform.claude.com/cookbook/misc-using-citations) is a runnable notebook over text, PDFs, and custom content.
 
-Happy building! 🚀
+Happy building!
 Chris Fregly
 Applied AI, Startups @ Anthropic

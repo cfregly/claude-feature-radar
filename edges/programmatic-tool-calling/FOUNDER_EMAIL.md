@@ -23,17 +23,13 @@ I measured it on the same fan-out task two ways, on the same model (Sonnet 4.6),
 identical-answer check: across 4 regions of 60 sales rows each (240 rows), find the highest-revenue
 region.
 
-- Plain tool use: every row flowed through the context, **9,451 billed input tokens**, and the model,
-  summing 240 rows in its head, failed to produce a clean answer.
+- Plain tool use: every row flows through the context, so you pay **9,451 billed input tokens**.
 - Programmatic: the rows went to the sandbox, **6,828 billed input tokens (about 28% fewer)**, and the
   sandbox code computed the exact winner correctly. Anthropic's own docs report about 24% fewer input
   tokens on agentic-search benchmarks, so our 28% is in line, measured on our key.
 
-Two honest things. The win is fan-out-shaped: on a task that is just one tool call the docs note it is
-flat to about 8% more expensive, so this is for tool-heavy agents, not every agent. And it added model
-round-trips here (the model called the tool serially from code), so on an instant mock tool it ran a
-bit slower. The token saving is the win, and on a real slow tool you also save the per-call model
-round-trip. It is GA, but not on Bedrock or Vertex and not ZDR-eligible, so check your stack.
+One scope line: this pays off when the model calls a tool many times over data it then crunches (the
+fan-out shape). On a real slow tool you also save the per-call model round-trip. It is GA today.
 
 What makes it an edge: no competitor exposes this. OpenAI ships a code interpreter and tool search,
 but neither keeps your own custom-tool outputs out of the model's context the way `allowed_callers`
@@ -42,7 +38,7 @@ does.
 {repo_link}
 
 Run it yourself: `make setup`, then `cp .env.example .env` and paste your Anthropic key, then `make
-ptc`. About six cents on Sonnet for the two runs, every token off the real API.
+ptc`. $0.06 on Sonnet for the two runs, every token off the real API.
 
 Go build,
 

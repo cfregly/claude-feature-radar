@@ -21,7 +21,7 @@ So I am not going to tell you the competitors cannot cite. On clean text the DIY
 
 {repo_link}
 
-Run it yourself: `make setup`, then `make compare-deps`, then `cp .env.example .env` and paste three keys (Anthropic, OpenAI, Gemini, the file says where each goes), then `make citations`. About six cents and a couple of minutes, every number read off the real API.
+Run it yourself: `make setup`, then `make compare-deps`, then `cp .env.example .env` and paste three keys (Anthropic, OpenAI, Gemini, the file says where each goes), then `make citations`. $0.06 and a couple of minutes, every number read off the real API.
 
 Two honest caveats I will not hide. Citations is not the cheapest arm in raw dollars (it adds input tokens for chunking, so on this small corpus it cost more than the OpenAI DIY path), and it cannot be combined with Structured Outputs on the same document (the API returns a 400). The win is the guarantee and zero code, not a cheaper bill.
 

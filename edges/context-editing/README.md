@@ -39,8 +39,8 @@ constant by the memory tool (on in both arms). Full receipt in [`sample.txt`](sa
 git clone <this-repo> && cd claude-competitive-engine
 make setup
 cp .env.example .env   # paste your Anthropic key
-make longhorizon       # this edge, 3 runs for robustness, about two dollars on Haiku
-# or one off+on pair (about 65 cents): python edges/context-editing/demo.py
+make longhorizon       # this edge, 3 runs for reliability, about two dollars on Haiku
+# or one off+on pair ($0.65): python edges/context-editing/demo.py
 ```
 
 See [`FOUNDER_EMAIL.md`](FOUNDER_EMAIL.md) and [`PRODUCT_EMAIL.md`](PRODUCT_EMAIL.md).

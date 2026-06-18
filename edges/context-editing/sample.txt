@@ -61,7 +61,7 @@
   Reproduce: `make longhorizon` on Claude Haiku 4.5, your own key. This run cost $0.6417 total
   and took 36s wall.
 
-  ROBUSTNESS (3 runs of the same setup, only context editing toggled)
+  RELIABILITY (3 runs of the same setup, only context editing toggled)
     editing OFF: 3/3 FAILED (2 crashed at the window, 1 returned a wrong answer), 0/3 correct.
     editing ON : 3/3 finished with the correct answer, context bounded near ~34k tokens.
     The failure mode varies (a crash or a wrong answer), but unbounded context failed every

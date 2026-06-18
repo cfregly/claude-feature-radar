@@ -19,7 +19,7 @@ the bill and a clear line where it loses. I would rather you see both than the h
 
 The first shape is a big reused prefix on bursty, recurring traffic: a system prompt plus a large
 reference document that you cache and read every few minutes, with gaps. Claude charges a flat one-time
-cache write plus reads at a tenth of base input, and crucially no per-hour storage fee. Model a 50k-token
+cache write plus reads at a tenth of base input, and no per-hour storage fee. Model a 50k-token
 prefix read a dozen times across an eight-hour window and Claude's bill is about $0.48. The same prefix on
 Gemini's explicit cache is about $2.02, because Gemini meters per-hour storage on the cached tokens for
 the whole window whether you read them or not. The line where this flips: at high QPS the tenth-of-base
