@@ -205,7 +205,7 @@ def run_agent(client, model_key, docs, start, *, managed, caching=True, trigger,
                 records.append({
                     "turn": turn, "crashed": True, "error": str(e)[:200],
                     "attempted_tokens": attempted,
-                    "input_tokens": 0, "cache_read": 0, "ctx": attempted or 0,
+                    "input_tokens": 0, "cache_read": 0, "cache_write": 0, "ctx": attempted or 0,
                     "output_tokens": 0, "cost": 0.0,
                     "latency_s": round(time.perf_counter() - t0, 3), "cleared": 0,
                 })
@@ -215,11 +215,23 @@ def run_agent(client, model_key, docs, start, *, managed, caching=True, trigger,
         u = msg.usage
         _in = getattr(u, "input_tokens", 0) or 0
         _cr = getattr(u, "cache_read_input_tokens", 0) or 0
+        # cache_creation is a THIRD, disjoint input bucket (tokens written to cache this turn). On a
+        # cold turn or the turn right after context editing clears, almost the whole prefix is a
+        # write, so input_tokens drops to ~1 and cache_read is 0. Carried context is all three input
+        # buckets summed, not input + cache_read. Omitting the write bucket undercounts the context
+        # exactly when it matters most (cold and post-clear). See docs/VERIFIED_FACTS.md.
+        cc = getattr(u, "cache_creation", None)
+        if cc is not None:
+            _cw = (getattr(cc, "ephemeral_5m_input_tokens", 0) or 0) + \
+                  (getattr(cc, "ephemeral_1h_input_tokens", 0) or 0)
+        else:
+            _cw = getattr(u, "cache_creation_input_tokens", 0) or 0
         records.append({
             "turn": turn,
             "input_tokens": _in,
             "cache_read": _cr,
-            "ctx": _in + _cr,  # true carried context: Claude reports cached separately from input_tokens
+            "cache_write": _cw,
+            "ctx": _in + _cr + _cw,  # true carried context = every input bucket the model processed
             "output_tokens": getattr(u, "output_tokens", 0) or 0,
             "cost": cost_breakdown(model.key, u).total,
             "latency_s": dt,

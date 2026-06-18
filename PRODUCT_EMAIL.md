@@ -13,8 +13,8 @@ I ran a fair best-to-best benchmark and a skeptic-checked capability audit of Cl
 and Gemini. The repo reproduces all of it. Here is the honest other direction, where they are ahead.
 
 1. **Price.** On a fair 32-step agent benchmark, OpenAI gpt-5.4-mini was cheaper than Claude Haiku
-   4.5 (about $0.033 with compaction and caching, the README headline, versus Claude's $0.121
-   baseline with caching), and a stronger OpenAI model answers correctly. We do not win the headline
+   4.5 (about $0.033 with compaction and caching versus Claude's $0.131 with context editing on, or
+   $0.121 with it off), and a stronger OpenAI model answers correctly. We do not win the headline
    cost comparison, and a founder who ranks cost first will see that.
 
 2. **Prompt-cache retention.** Gemini explicit caching takes an arbitrary TTL and OpenAI offers a
