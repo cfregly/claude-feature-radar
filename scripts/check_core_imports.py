@@ -21,7 +21,9 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 # The optional comparison SDKs. Block them so any core module that imports one at load fails loudly.
-BLOCKED = ("openai", "google", "google.genai")
+# datasets and swebench are the agentic_grading demonstrator's optional grading deps: they must be
+# lazy-imported inside the demonstrator, never at the core import path, so they are blocked here too.
+BLOCKED = ("openai", "google", "google.genai", "datasets", "swebench")
 
 
 class _Blocker:
@@ -43,7 +45,7 @@ def main() -> int:
         "engine.sources_registry",
         "engine.demonstrators", "engine.demonstrators.base", "engine.demonstrators.registry",
         "engine.demonstrators.shared.sandbox", "engine.demonstrators.shared.platform",
-        "engine.demonstrators.shared.spec",
+        "engine.demonstrators.shared.spec", "engine.demonstrators.agentic_grading",
         "engine.providers.openai_provider", "engine.providers.gemini_provider",
     ]
     failed = []
@@ -57,7 +59,8 @@ def main() -> int:
     try:
         from engine.demonstrators.registry import register_all
         reg = register_all()
-        for kind in ("token_accounting", "grounding_resolution", "long_horizon_survival"):
+        for kind in ("token_accounting", "grounding_resolution", "long_horizon_survival",
+                     "agentic_grading"):
             if kind not in reg:
                 failed.append(f"built demonstrator for '{kind}' did not register with SDKs blocked")
     except Exception as e:  # noqa: BLE001

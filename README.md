@@ -29,6 +29,7 @@ Each edge is isolated in `edges/<edge>/` with its own `demo.py`, committed recei
 | [programmatic-tool-calling](edges/programmatic-tool-calling/) | Claude writes one sandbox script that calls your tools in a loop and filters results before they reach context | GA | ~28% fewer billed input tokens on a 240-row fan-out task, and the code answers correctly where the in-context model fails (`make ptc`) |
 | [citations](edges/citations/) | a per-character verifiable source pointer into the user's own document, free of output tokens | GA | the pointer resolves in-API, guaranteed, with zero resolver code (`make citations`) |
 | [context-editing](edges/context-editing/) | in-place clearing that keeps a long agent under the context window | beta | editing off fails 3/3 on a heavy chain, editing on finishes 3/3 (`make longhorizon`) |
+| [agentic-coding](edges/agentic-coding/) | a real SWE-bench repo-repair head-to-head, symmetric multi-turn loop, local no-Docker grading | GA | on this slice GPT-5.5 resolved 4/4 and every Claude tier 2/4, so this run is claude-behind and ships the product-team note (`make agentic`) |
 
 Honest ranking: programmatic tool calling is the sharpest (a cost cut a founder feels, no named
 competitor equivalent), citations is the cleanest near-binary (only Claude returns a char-level
@@ -61,9 +62,10 @@ longhorizon-compare`). Sourced in [`briefs/2026-06-17-agentic-landscape.md`](bri
 
 ## Where Claude loses (the honest other direction)
 
-Raw price and speed, the coding-agent leaderboards (GPT-5.5 leads Terminal-Bench and BrowseComp),
-cache retention (Gemini arbitrary TTL, OpenAI 24h, vs Claude 5m/1h), and the per-edge gaps in each
-`edges/<edge>/PRODUCT_EMAIL.md`. Honesty runs both ways.
+Raw price and speed, the coding-agent leaderboards (GPT-5.5 leads Terminal-Bench and BrowseComp), our
+own agentic SWE-bench slice (GPT-5.5 resolved both hard pylint instances 4/4 where every Claude tier
+got 2/4, run symmetrically, `make agentic`), cache retention (Gemini arbitrary TTL, OpenAI 24h, vs
+Claude 5m/1h), and the per-edge gaps in each `edges/<edge>/PRODUCT_EMAIL.md`. Honesty runs both ways.
 
 ## Run it
 
@@ -86,6 +88,8 @@ make verify              # a skeptic pass that refutes the overstated ones
 make ptc                 # the programmatic-tool-calling edge benchmark
 make citations           # the citations edge benchmark
 make longhorizon         # the context-editing edge benchmark
+make validate            # prove the local no-Docker SWE-bench grader against the human gold patches (no model spend)
+make agentic             # the SWE-bench repo-repair head-to-head, symmetric multi-turn loop, local no-Docker grading (about $4-5)
 make compare             # the credibility table, all three arms (needs all three keys)
 make sweep               # the variant sweep that makes the compare result trustworthy
 make longhorizon-compare # the cross-vendor long task (a tie at affordable scale, honestly)

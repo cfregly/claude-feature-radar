@@ -1,0 +1,49 @@
+
+  agentic_grading: does the model resolve a real repo-repair slice when it can iterate against the
+  real tests? The SAME multi-turn loop and grader for every provider (the symmetric loop). Local
+  no-Docker grading: each instance's pinned env is rebuilt in a uv venv and scored with the swebench
+  package's OWN parser, so the resolved verdict is the same code the public leaderboard uses.
+
+  First, the grader is proven (make validate): every human GOLD patch resolves in the local env.
+    reproduces          pallets__flask-5014          <15 min fix
+    reproduces          pylint-dev__pylint-4970      1-4 hours
+    reproduces          pylint-dev__pylint-4551      1-4 hours
+    reproduces          pylint-dev__pylint-8898      1-4 hours
+  4/4 instances reproduce locally, so a model patch gets a real verdict, not a false negative.
+
+  The head-to-head (make agentic): 4 instances x 6 models, up to 3 rounds each, effort=medium.
+  Every provider saw the SAME accumulated multi-turn history (the original loop sent the full history
+  only to Claude; this port forwards it to OpenAI and Gemini too, removing the confound).
+
+  model                       resolved   rounds landed        cost
+  ----------------------------------------------------------------
+  GPT-5.5                   4/4                1,2,3,3     $1.3219
+  Claude Sonnet 4.6         2/4                    1,2     $0.6305
+  Claude Opus 4.8           2/4                    1,3     $1.1527
+  GPT-5.4                   2/4                    1,2     $0.5886
+  Gemini 3.1 Pro            2/4                    1,2     $0.9531
+  Gemini 3.5 Flash          2/4                    1,2     $0.8131
+
+  total spend this run: $5.4599 (read off each usage object)
+
+  Which instances each model resolved:
+    pallets__flask-5014       solved by all 6 models (easy, <15 min)
+    pylint-dev__pylint-4970   solved by all 6 models (easy)
+    pylint-dev__pylint-4551   solved by GPT-5.5 only (hard, 1-4 hours)
+    pylint-dev__pylint-8898   solved by GPT-5.5 only (hard, 1-4 hours)
+
+  Honest reading (this run is claude-behind, so it ships as the product-team note, not a founder pitch):
+  - The two easy instances tie the whole field at 6/6, so they decide nothing.
+  - The two HARD pylint instances (rated 1-4 hours to fix by hand) are where the slice separates, and
+    on this run GPT-5.5 resolved BOTH and no Claude model resolved either. Opus and Sonnet tied the
+    rest of the field at 2/4.
+  - This is the OPPOSITE of an earlier asymmetric run where Claude led. The fix is the point: when the
+    SAME accumulated history is forwarded to every provider (not just Claude), GPT-5.5 separates here.
+    The engine reports that plainly. A rigged win would have hidden it.
+  - Scope: a small pure-Python slice (flask, pylint) that corroborates the public SWE-bench Verified
+    leaderboard's SHAPE, not a 500-instance reproduction. The result can shift with the model versions,
+    the round budget, the effort label, and the instances chosen. Re-run on your own keys to confirm.
+
+  Reproduce: make setup && make compare-deps (installs openai, google-genai, datasets, swebench), uv on
+  PATH, paste three keys into .env, then `make validate` (proves the grader, no model spend) and
+  `make agentic` (the head-to-head, about $4-5, this run was $5.46). Every number off the usage object.

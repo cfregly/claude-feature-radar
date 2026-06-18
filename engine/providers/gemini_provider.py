@@ -82,8 +82,29 @@ def _is_truncated(resp) -> bool:
     return "MAX_TOKENS" in (name or "") or "MAX_TOKENS" in str(reason)
 
 
-def call_gemini(client, prompt: str, effort: str | None, model_id: str, max_tokens: int) -> dict:
+def _to_contents(prompt, types) -> object:
+    """Normalize the prompt argument into the Gemini ``contents`` value.
+
+    Accepts either a plain string (one user turn, passed straight through) or a full multi-turn
+    ``messages`` list ([{"role": "user"|"assistant", "content": "..."}, ...]). The list form is what a
+    symmetric agentic loop forwards, so Gemini sees the SAME accumulated history Claude does, never
+    just the last turn. Gemini's role vocabulary is "user" and "model", so an "assistant" turn maps to
+    "model".
+    """
+    if isinstance(prompt, str):
+        return prompt
+    out = []
+    for m in prompt:
+        role = "model" if m["role"] == "assistant" else "user"
+        out.append(types.Content(role=role, parts=[types.Part(text=m["content"])]))
+    return out
+
+
+def call_gemini(client, prompt, effort: str | None, model_id: str, max_tokens: int) -> dict:
     """One timed Gemini call. Returns text, token counts, latency, and a truncation flag.
+
+    ``prompt`` is either a string (one user turn) or a full multi-turn messages list, so the same
+    helper serves a one-shot call and a symmetric agentic loop that forwards the whole history.
 
     effort, when set, is passed as the Gemini 3.x thinking_level ("minimal" | "low" | "medium" |
     "high"). When None, no thinking_config is sent and the model uses its default. max_tokens caps the
@@ -103,7 +124,7 @@ def call_gemini(client, prompt: str, effort: str | None, model_id: str, max_toke
     )
 
     start = time.perf_counter()
-    resp = client.models.generate_content(model=model_id, contents=prompt, config=config)
+    resp = client.models.generate_content(model=model_id, contents=_to_contents(prompt, types), config=config)
     latency = time.perf_counter() - start
 
     usage = getattr(resp, "usage_metadata", None)

@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges scan verify verify-live draft check-claims check-docs core-imports test ci deslop gif clean
+.PHONY: setup compare-deps ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges scan verify verify-live validate agentic agentic-smoke draft check-claims check-docs core-imports test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -63,6 +63,15 @@ verify: ## the skeptic pass: ask Claude to break each candidate, keep what survi
 
 verify-live: ## live-claim re-prover: re-check the model access, knobs, and prices against real calls (spends cents)
 	$(PY) scripts/verify_live.py
+
+validate: ## EDGE agentic_grading: prove the local no-Docker grader by resolving every human gold patch (needs compare-deps + uv on PATH, $0 model spend)
+	$(PY) engine/demonstrators/agentic_grading.py --validate
+
+agentic: ## EDGE: SWE-bench repo-repair head-to-head, symmetric multi-turn loop, local no-Docker grading (needs compare-deps + uv + keys, about $4-5)
+	$(PY) engine/demonstrators/agentic_grading.py
+
+agentic-smoke: ## a 1-instance, Claude-only smoke of the agentic grader (cents)
+	$(PY) engine/demonstrators/agentic_grading.py --limit 1 --models opus
 
 draft: ## draft the founder email from the measured receipt
 	$(PY) run.py draft

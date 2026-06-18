@@ -33,6 +33,8 @@ def main():
         from engine.sweep import main as m; m()
     elif cmd == "edges":
         from engine.sweep_edges import main as m; m()
+    elif cmd in ("agentic", "agentic-grading"):
+        from engine.demonstrators.agentic_grading import main as m; m()
     elif cmd == "scan":
         from engine.scan import main as m; m()
     elif cmd == "verify":

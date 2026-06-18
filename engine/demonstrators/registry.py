@@ -30,6 +30,7 @@ _DEMO_MODULES = (
     "edges.programmatic-tool-calling.demo",
     "edges.citations.demo",
     "edges.context-editing.demo",
+    "engine.demonstrators.agentic_grading",
 )
 
 
