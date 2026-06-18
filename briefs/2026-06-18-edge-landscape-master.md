@@ -200,7 +200,7 @@ Live docs (fetched 2026-06-18): platform.claude.com/docs/en/build-with-claude/ci
 ai.google.dev/gemini-api/docs/file-search and /changelog. OpenAI: developers.openai.com Code Interpreter,
 function-calling, and Responses-API guides.
 
-Built edges verified in the repo: engine/citations.py with data/last_citations.json (make
+Built edges verified in the repo: edges/citations/demo.py with data/last_citations.json (make
 citations), the PTC two-run receipt in engine/ with data/last_ptc.json (make ptc), the
 context-editing long-horizon receipt engine/longhorizon_compare.py with data/last_longhorizon.json
 (make longhorizon), and the METR repo-repair harness behind the agentic brief.

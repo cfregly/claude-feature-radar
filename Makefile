@@ -43,7 +43,7 @@ longhorizon-smoke: ## a cheap run that exercises the context-editing harness wit
 longhorizon-compare: ## cross-vendor head-to-head on the long task: Claude editing+memory vs OpenAI compaction vs Gemini (needs compare-deps + 3 keys, about $3)
 	$(PY) run.py longhorizon-compare --repeat 3
 
-compare: ## OpenAI vs Claude on the same long agent, both best config (needs openai + OPENAI_API_KEY)
+compare: ## the credibility table: OpenAI vs Gemini vs Claude on the same long agent, all best config (needs compare-deps + ANTHROPIC + OPENAI + GEMINI keys; the Gemini row degrades gracefully if its key or quota is missing)
 	$(PY) run.py compare
 
 alert: ## if a competitor won the last compare, draft the internal product-team note

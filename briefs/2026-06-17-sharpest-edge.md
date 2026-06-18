@@ -122,7 +122,7 @@ Scored on drama times measurability times genuine Claude lead times founder valu
   population.
 - **Status.** GA, no beta header. Already proven on our key.
 - **Source.** https://platform.claude.com/docs/en/build-with-claude/citations and the repo's
-  `engine/citations.py` plus `data/last_citations.json`.
+  `edges/citations/demo.py` plus `data/last_citations.json`.
 
 ### 3. Effort plus adaptive thinking (supporting, not a headline)
 
@@ -237,7 +237,7 @@ round-trips collapsed to 1.
   https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
   (re-fetched 2026-06-17)
 - Citations: https://platform.claude.com/docs/en/build-with-claude/citations and repo
-  `engine/citations.py`, `data/last_citations.json`
+  `edges/citations/demo.py`, `data/last_citations.json`
 - Effort: https://platform.claude.com/docs/en/build-with-claude/effort
 - Agent SDK and Claude Code: https://code.claude.com/docs/en/agent-sdk/overview and
   https://code.claude.com/docs/en/github-actions

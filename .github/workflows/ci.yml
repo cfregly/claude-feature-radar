@@ -1,0 +1,18 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: deslop gate (em-dashes, en-dashes, semicolons)
+        run: python scripts/deslop_check.py
+      - name: cost-claim gate (citations cost matches the committed receipt)
+        run: python scripts/cost_claim_check.py
+      - name: compile check
+        run: python -m compileall common engine scripts run.py

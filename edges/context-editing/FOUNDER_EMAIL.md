@@ -37,9 +37,9 @@ tie. So this is a reliability lever for the long tail of your hardest jobs, not 
 {repo_link}
 
 Run it yourself: `make setup`, then `cp .env.example .env` and paste your Anthropic key, then `python
-edges/context-editing/demo.py` for one off+on pair, about sixty-five cents on Haiku. The committed
-receipt runs it three times for robustness (`make longhorizon`, about two dollars). Every number off
-the real API.
+edges/context-editing/demo.py` for one off+on pair, about sixty-five cents on Haiku. The failure is
+not deterministic, so the committed receipt runs it three times (`make longhorizon`, about two
+dollars). Every number off the real API.
 
 Go build,
 

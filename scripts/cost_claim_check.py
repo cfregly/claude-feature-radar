@@ -9,7 +9,7 @@ which can silently rot the way the stale "about thirty cents" did:
 
 This gate re-sums the committed receipt and checks both layers against it.
 
-Source of truth is the COMMITTED receipt, sample_citations.txt, because that is what the README
+Source of truth is the COMMITTED receipt, edges/citations/sample.txt, because that is what the README
 table and the prose ship from. data/last_citations.json is gitignored scratch from the last local
 run (possibly a quick smoke or a run not yet promoted to the committed snapshot), so it never
 decides pass or fail. When it diverges from the committed receipt the gate prints a non-fatal note,
@@ -152,7 +152,7 @@ def main():
 
     if failures:
         print("cost-claim gate: FAIL")
-        print(f"  committed receipt sample_citations.txt: total {want_dollars}, {len(arms)} arms")
+        print(f"  committed receipt edges/citations/sample.txt: total {want_dollars}, {len(arms)} arms")
         for f in failures:
             print(f"  {f}")
     else:
@@ -167,7 +167,7 @@ def main():
         if abs(live - cents) > TOLERANCE_CENTS:
             print(f"  note: data/last_citations.json (last local run) sums to ${live / 100:.2f}, "
                   f"the committed receipt is {want_dollars}.")
-            print("  if the newer run is the one to ship, refresh sample_citations.txt, the README "
+            print("  if the newer run is the one to ship, refresh edges/citations/sample.txt, the README "
                   "table, and the three claim sites together, then re-run this gate.")
 
     if failures:

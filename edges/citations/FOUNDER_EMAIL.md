@@ -48,6 +48,6 @@ Building with Claude
 - **It states the real cost.** Citations cost more than the OpenAI DIY path on this corpus, so the
   email says so rather than claiming "cheaper."
 - **The numbers are receipts.** 8/8, the output-token counts, and the six-cent reproduction cost all
-  come from `make citations` (`sample_citations.txt`), not from memory.
+  come from `make citations` (`edges/citations/sample.txt`), not from memory.
 - **The second pillar is independent and honestly scoped.** METR is the neutral referee, and the
   email says plainly that the gap only appears on long jobs, not short ones.

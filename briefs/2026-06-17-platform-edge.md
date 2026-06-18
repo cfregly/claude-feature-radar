@@ -180,7 +180,7 @@ while every DIY arm pays output tokens for each quote, and the founder writes ze
 cost half is honest too: Citations is not the cheapest arm in raw dollars, because it adds input
 tokens for chunking, so the demo never claims "cheaper." It reproduces for a few cents in a couple of
 minutes, every per-arm output-token count and dollar figure read off the live `usage` object and
-written to the receipt in `../sample_citations.txt`.
+written to the receipt in `../edges/citations/sample.txt`.
 
 What ships in the email: "Across 8 questions, every Claude citation resolved to the verbatim source
 sentence, with the API doing the resolving and the quote free of output tokens. The DIY str.find

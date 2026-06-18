@@ -38,7 +38,7 @@ Source: [citations](https://platform.claude.com/docs/en/build-with-claude/citati
   guaranteed to contain valid pointers to the provided documents."
 - Incompatible with Structured Outputs: enabling citations on a user document together with
   `output_config.format` returns a 400.
-- Verified live by [`../engine/citations.py`](../engine/citations.py): over 8 questions on 3 plain
+- Verified live by [`../edges/citations/demo.py`](../edges/citations/demo.py): over 8 questions on 3 plain
   text documents, every returned `char_location` satisfied `source[start:end] == cited_text` (8/8).
   The honest baseline is the DIY path (ask the model for the verbatim quote, resolve it yourself with
   `source.find(quote)`), which also resolves 8/8 on clean text on Claude, OpenAI gpt-5.4-mini, and
@@ -48,7 +48,7 @@ Source: [citations](https://platform.claude.com/docs/en/build-with-claude/citati
 guarantees. An earlier version of
   this benchmark asked the models to emit the character offset and scored that 0/8, which a scrutiny
   panel correctly flagged as a strawman (a tokenizer cannot count characters). Receipt:
-  [`../sample_citations.txt`](../sample_citations.txt).
+  [`../edges/citations/sample.txt`](../edges/citations/sample.txt).
 
 ### Competitor citation surfaces (the parity check)
 - OpenAI emits `url_citation` annotations from its web-search tool, not a pointer into a
@@ -104,7 +104,7 @@ Source: [context editing](https://platform.claude.com/docs/en/build-with-claude/
   edit on versus a climbing one with it off) is the proof it engaged, and it is what the longhorizon
   receipt shows.
 - The value of context editing is measured, isolated to one variable, in
-  [`../engine/longhorizon.py`](../engine/longhorizon.py): the same 8-report chain of about 40k-token
+  [`../edges/context-editing/demo.py`](../edges/context-editing/demo.py): the same 8-report chain of about 40k-token
   payloads run twice, the memory tool ON in both arms and the identical prompt in both, with only
   context editing toggled. The failure is not deterministic, so it is run three times (`--repeat 3`):
   editing OFF failed 3 of 3 (2 crashed at the 200,000 window, 1 returned a wrong count), editing ON
@@ -114,7 +114,7 @@ Source: [context editing](https://platform.claude.com/docs/en/build-with-claude/
   answered correctly (3 of a true 3) for about thirty-five cents. The win is reliability, caused by
   context editing alone. Correctness is held constant by the memory tool, which is on in both arms, so
   it is the memory tool, not context editing, that makes the count correct. Receipt in
-  [`../sample_longhorizon.txt`](../sample_longhorizon.txt).
+  [`../edges/context-editing/sample.txt`](../edges/context-editing/sample.txt).
 
 ## The memory tool (the second anchor feature)
 

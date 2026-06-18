@@ -31,6 +31,12 @@ competitor equivalent), citations is the cleanest near-binary (only Claude retur
 document pointer, though Gemini File Search now does page-level), and context-editing is the thinnest
 (OpenAI ships comparable compaction, and it is beta). The full sourced reasoning is in `briefs/`.
 
+Programmatic tool calling is THE anchor, so
+[`edges/programmatic-tool-calling/FOUNDER_EMAIL.md`](edges/programmatic-tool-calling/FOUNDER_EMAIL.md)
+is the single canonical Deliverable-2 founder email, the one that ships. The citations and
+context-editing emails stay in the repo as supporting content: they show the same engine applied to
+the other two edges and back the honest ranking above.
+
 ## The credibility layer: Claude is not the cheapest, and we prove it
 
 No edge is cost or speed, because a fair benchmark showed Claude does not win them. The same 32-step
@@ -58,13 +64,13 @@ cache retention (Gemini arbitrary TTL, OpenAI 24h, vs Claude 5m/1h), and the per
 ## Run it
 
 ```bash
-git clone <this-repo> && cd claude-competitive-engine
+git clone <this-repo> && cd claude-competitive-engine   # public URL lands on publish; <this-repo> is the placeholder until then
 make setup && make compare-deps   # core deps, then the OpenAI + Gemini SDKs, into the same venv
 cp .env.example .env              # paste your Anthropic, OpenAI, and Gemini keys
-make ptc                          # the sharpest edge, on your own keys
-make citations                    # the cleanest edge, about six cents
-make longhorizon                  # the context-editing edge
-make compare                      # the fair cost/speed/correctness benchmark (credibility layer)
+make ptc                          # the sharpest edge, on your own keys (needs ANTHROPIC_API_KEY)
+make citations                    # the cleanest edge, about six cents (needs all three keys)
+make longhorizon                  # the context-editing edge (needs ANTHROPIC_API_KEY)
+make compare                      # the credibility table, all three arms (needs all three keys; the Gemini row degrades gracefully if its key or quota is missing)
 ```
 
 ## This is an engine, not a one-off
@@ -75,7 +81,7 @@ make verify              # a skeptic pass that refutes the overstated ones
 make ptc                 # the programmatic-tool-calling edge benchmark
 make citations           # the citations edge benchmark
 make longhorizon         # the context-editing edge benchmark
-make compare             # the fair cost/speed benchmark (the credibility layer)
+make compare             # the credibility table, all three arms (needs all three keys)
 make sweep               # the variant sweep that makes the compare result trustworthy
 make longhorizon-compare # the cross-vendor long task (a tie at affordable scale, honestly)
 make draft               # the founder email, from the verified anchor

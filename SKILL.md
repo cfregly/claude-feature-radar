@@ -69,7 +69,7 @@ These are why the output is trusted. Break one and the trust is gone.
    time.** Naming what a feature does (held context at 3k instead of 36k) is a mechanism, not a value.
    The value is a measured change in cost, speed, correctness, or reliability, shown in the regime
    where the feature pays off, with everything else held constant so the win is attributable. A
-   feature that only helps at scale is measured at scale: `engine/longhorizon.py` holds the memory
+   feature that only helps at scale is measured at scale: `edges/context-editing/demo.py` holds the memory
    tool and the prompt constant in both arms and toggles ONLY context editing, so the result (editing
    off crashes at the window, editing on finishes) is attributable to context editing alone. The
    earlier version moved four variables at once and wrongly credited context editing for a correct
@@ -170,7 +170,7 @@ your own task by editing the chain builder and the prompt in `engine/demo.py`.
 ```
 engine/scan.py / verify.py    candidate gaps and the skeptic pass
 engine/demo.py                the Claude arm (chain agent, context editing + memory + caching)
-engine/longhorizon.py         the long-horizon proof: unmanaged degrades or crashes, managed finishes
+edges/context-editing/demo.py the long-horizon proof: unmanaged degrades or crashes, managed finishes
 engine/openai_arm.py          the OpenAI arm (Responses API, compaction + caching, latest)
 engine/compare.py             OpenAI vs Claude, best to best, outcomes a founder pays for
 engine/sweep.py               the variant sweep that makes the result trustworthy

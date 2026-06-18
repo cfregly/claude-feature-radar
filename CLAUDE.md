@@ -90,7 +90,7 @@ the managed run cost slightly MORE because clearing rewrites the cached prefix. 
 so-what and should never have shipped.
 - State the value as a measured number, or do not claim it.
 - Measure the feature in the regime where it bites. A feature that only pays off at scale is
-  measured at scale. The fix, [`engine/longhorizon.py`](engine/longhorizon.py), runs the agent with
+  measured at scale. The fix, [`edges/context-editing/demo.py`](edges/context-editing/demo.py), runs the agent with
   large payloads until the carried context exceeds the window, where context editing has a real,
   measured effect (the run finishes instead of the API erroring), not asserted from a mechanism.
 - Isolate one variable, or you cannot attribute the win. The first version of that benchmark moved
