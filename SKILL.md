@@ -79,7 +79,12 @@ These are why the output is trusted. Break one and the trust is gone.
    founder times how clearly Claude leads after the competitor-parity check, and anchor on the global
    maximum. Then pick the task that EXERCISES that edge: a toy task collapses every model to a
    cost-and-speed race Claude may lose, so the benchmark must be a real job where the edge decides the
-   outcome. Re-run the whole search every time, the platform ships monthly and the edge moves.
+   outcome. Re-run the whole search every time, the platform ships monthly and the edge moves. Search
+   and rank BEFORE you build, never anchor on the first measurable thing. Any genuine value-add is a
+   valid anchor even if narrow, provided it is measured on an axis a founder pays for (cost, speed,
+   reliability, long-running, correctness) AGAINST the competitor at its best, not just against Claude
+   without the feature. A feature-on-versus-off result is a within-Claude value-add until the
+   cross-vendor arm is run, so label it as exactly that.
 
 ## The steps
 

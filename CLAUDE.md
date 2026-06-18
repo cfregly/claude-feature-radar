@@ -107,6 +107,20 @@ is global, and it can come from anywhere on the platform.
   instead. Choose a real job where the edge decides the outcome, then measure it.
 - The edge moves. Re-run the whole search as the platform ships monthly. Today's global maximum is
   next quarter's parity, so the engine searches every time, it does not cache a winner.
+- Search and rank FIRST, then build. Sweep the surface and rank by value times lead before you build
+  a benchmark or write a line of the email, never anchor on the first thing you can measure and rank
+  afterward.
+- Any genuine, measured value-add is a valid anchor, even a narrow one. A specific task type is fine
+  to highlight when the edge is real on an axis a founder pays for (cost, speed, reliability,
+  long-running, correctness). Do not dismiss a niche win for being niche, and do not inflate a
+  broad-sounding claim that does not measure. The ranking sets the emphasis, it does not gate whether
+  a real edge may be used.
+- Measure the edge against the COMPETITOR, not just against Claude without the feature. "Claude with
+  the feature beats Claude without it" proves the feature does something, it does not prove a
+  competitive edge. An edge is real only when it is measured head-to-head against OpenAI and Gemini at
+  their best on the same task, or grounded in a capability they verifiably do not ship. A
+  feature-on-versus-off result is a within-Claude value-add, label it as exactly that until the
+  cross-vendor arm is run.
 
 ## Put the workload, cost, and time on every outbound surface
 The internal receipt is recorded above. What ships to a reader carries the same facts, up front, in

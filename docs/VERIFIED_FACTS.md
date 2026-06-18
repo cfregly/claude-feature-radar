@@ -20,7 +20,50 @@ Pricing is per million tokens (MTok), verified against
 The full table, including the cache-write tiers, lives in
 [`../common/models.py`](../common/models.py).
 
-## Context editing (the first anchor feature)
+## Citations (the anchor feature)
+
+Source: [citations](https://platform.claude.com/docs/en/build-with-claude/citations), re-fetched
+2026-06-17. GA, no beta header. Supported on all active models except Haiku 3. ZDR-eligible.
+
+- Request: a `document` content block with `"citations": {"enabled": true}`. The source is
+  `{"type": "text", "media_type": "text/plain", "data": ...}` for plain text, a base64/url/file PDF,
+  or `{"type": "content", "content": [...]}` for custom chunks. Citations must be enabled on all or
+  none of the documents in a request.
+- Response: text blocks, each optionally carrying a `citations` list. For plain text each citation is
+  `{"type": "char_location", "cited_text", "document_index", "start_char_index" (0-indexed),
+  "end_char_index" (exclusive)}`. PDFs use `page_location` with 1-indexed `start_page_number` /
+  `end_page_number`. Custom content uses `content_block_location` with block indices.
+- Doc verbatim: the `cited_text` field "does not count towards output tokens" and (passed back on
+  later turns) "is also not counted towards input tokens". The docs also state citations "are
+  guaranteed to contain valid pointers to the provided documents."
+- Incompatible with Structured Outputs: enabling citations on a user document together with
+  `output_config.format` returns a 400.
+- Verified live by [`../engine/citations.py`](../engine/citations.py): over 8 questions on 3 plain
+  text documents, every returned `char_location` satisfied `source[start:end] == cited_text` (8/8),
+  while the prompt-for-quotes baseline resolved 0/8 on Claude and on OpenAI gpt-5.4-mini, and Gemini
+  gemini-3.5-flash resolved 7/8 at 45,630 output tokens versus Claude's 308. Receipt:
+  [`../sample_citations.txt`](../sample_citations.txt).
+
+### Competitor citation surfaces (the parity check)
+- OpenAI emits `url_citation` annotations from its web-search tool, not a pointer into a
+  user-supplied document.
+- Gemini returns web grounding metadata, also web-URL based, not a char/page pointer into an uploaded
+  document.
+- Neither exposes a document-grounded char/page citation primitive as of 2026-06-17. Sourced in
+  [`../briefs/2026-06-17-platform-edge.md`](../briefs/2026-06-17-platform-edge.md).
+
+## Long-horizon autonomy (the second pillar)
+
+Source: METR task time-horizon, [metr.org/time-horizons](https://metr.org/time-horizons/), data file
+pulled 2026-06-17 (page updated 2026-05-08). On the 50% task time-horizon, the top released Claude
+model carries the only `is_sota` flag at about 12 hours, versus Gemini 3.1 Pro about 6.4 hours and
+GPT-5.2 about 5.9 hours, roughly 1.9x the best non-Claude model. METR is an independent referee, not
+a vendor. Claude does NOT lead the headline coding boards (SWE-bench Verified is a 79.2% ceiling tie,
+GPT-5.5 leads both Terminal-Bench tracks), so this is the only long-horizon claim that survives a
+skeptic on neutral data. Full reconciliation, with every source and date, in
+[`../briefs/2026-06-17-agentic-landscape.md`](../briefs/2026-06-17-agentic-landscape.md).
+
+## Context editing (a demoted within-Claude value-add)
 
 Source: [context editing](https://platform.claude.com/docs/en/build-with-claude/context-editing).
 
@@ -44,9 +87,22 @@ Source: [context editing](https://platform.claude.com/docs/en/build-with-claude/
 
 - It clears the oldest tool results once the trigger is crossed, keeping the most recent `keep`
   tool-use pairs. It clears in place, it does not summarize.
-- Verified live by [`../engine/demo.py`](../engine/demo.py): with this edit on, per-turn input
-  tokens plateau near the trigger instead of climbing with the transcript. Without it, on the same
-  task, they climb linearly to 35,206 by turn 32. That divergence is the proof it engaged.
+- It clears in place, it does not summarize. With the edit on, per-turn input tokens plateau near the
+  trigger instead of climbing with the transcript. That divergence (a flat per-turn context with the
+  edit on versus a climbing one with it off) is the proof it engaged, and it is what the longhorizon
+  receipt shows.
+- The value of context editing is measured, isolated to one variable, in
+  [`../engine/longhorizon.py`](../engine/longhorizon.py): the same 8-report chain of about 40k-token
+  payloads run twice, the memory tool ON in both arms and the identical prompt in both, with only
+  context editing toggled. The failure is not deterministic, so it is run three times (`--repeat 3`):
+  editing OFF failed 3 of 3 (2 crashed at the 200,000 window, 1 returned a wrong count), editing ON
+  finished correctly 3 of 3. One captured editing-OFF run climbed from 1,816 to 187,471 carried tokens
+  (per-turn cost up 24.7x) and then exceeded the window, so the API rejected the request (measured:
+  `prompt is too long: 203056 tokens > 200000 maximum`). Editing ON held context flat near 34k and
+  answered correctly (3 of a true 3) for about thirty-five cents. The win is reliability, caused by
+  context editing alone. Correctness is held constant by the memory tool, which is on in both arms, so
+  it is the memory tool, not context editing, that makes the count correct. Receipt in
+  [`../sample_longhorizon.txt`](../sample_longhorizon.txt).
 
 ## The memory tool (the second anchor feature)
 
@@ -75,9 +131,14 @@ dollar figure in this repo is those counts times the verified rates above.
 
 ## Token fields differ across vendors (apples to apples)
 
-Carried context must count the same tokens on every side. Claude's `input_tokens` EXCLUDES cached
-tokens (they are in `cache_read_input_tokens`), so the true carried context on Claude is
-`input_tokens + cache_read_input_tokens`. OpenAI's `input_tokens` and Gemini's `prompt_token_count`
+Carried context must count the same tokens on every side. Claude splits its input into three
+disjoint buckets: `input_tokens` (uncached), `cache_read_input_tokens` (read from cache), and
+`cache_creation_input_tokens` (written to cache this turn). They sum to the prompt the model actually
+processed, so the true carried context on Claude is all three:
+`input_tokens + cache_read_input_tokens + cache_creation_input_tokens`. Counting only the first two
+undercounts badly on a cold turn or the turn right after context editing clears, where almost the
+whole prefix is a write, so `input_tokens` drops to about 1 and `cache_read` is 0 (measured, see the
+longhorizon receipt). OpenAI's `input_tokens` and Gemini's `prompt_token_count`
 already INCLUDE cached tokens, so those fields are the carried context as is. The benchmark records a
 `ctx` field per turn that applies this per vendor, and the peak-context column uses it. Comparing raw
 `input_tokens` across vendors would understate Claude's context, the confound recorded in

@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps citations citations-quick demo demo-quick demo-full longhorizon longhorizon-smoke compare alert scan verify draft deslop gif clean
+.PHONY: setup compare-deps citations citations-quick demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert scan verify draft deslop gif clean
 
 PY := .venv/bin/python
 
@@ -33,6 +33,9 @@ longhorizon: ## context editing isolated, 3 runs: unbounded fails 3/3 (crash or 
 
 longhorizon-smoke: ## a cheap run that exercises the harness without reaching the window (cents)
 	$(PY) run.py longhorizon --smoke
+
+longhorizon-compare: ## cross-vendor head-to-head on the long task: Claude editing+memory vs OpenAI compaction vs Gemini (needs compare-deps + 3 keys, about $3)
+	$(PY) run.py longhorizon-compare --repeat 3
 
 compare: ## OpenAI vs Claude on the same long agent, both best config (needs openai + OPENAI_API_KEY)
 	$(PY) run.py compare

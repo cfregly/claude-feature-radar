@@ -3,43 +3,50 @@
   each report about 40,000 tokens, memory tool ON in both, only context editing
   toggled. The editing-OFF arm is expected to exceed the 200,000 window.
   Estimated about $1 and a couple of minutes on Haiku. Measured cost and time printed below.
+  run 1/3: editing OFF -> crashed, editing ON -> correct
+  run 2/3: editing OFF -> wrong, editing ON -> correct
+  run 3/3: editing OFF -> crashed, editing ON -> correct
 
   Long-horizon chain audit on Claude Haiku 4.5. The isolated value of context editing.
   Workload: a chain of 8 incident reports, each about 40,000 tokens (a
   realistic large tool payload, e.g. a big log or trace). The agent reads them one at a
   time and counts the URGENT ones.
-  ISOLATION: both runs are identical, same model, same prompt, the MEMORY TOOL ON in both,
-  caching ON in both. The ONLY variable is context editing, so any difference below is
-  caused by context editing alone. Claude Haiku 4.5 window: 200,000 tokens. True count: 3.
+  ISOLATION: both runs send the model the same request, same model, same prompt, the MEMORY
+  TOOL ON in both, caching ON in both. The only thing that changes what the model receives is
+  context editing, so any difference below is caused by context editing alone. (The editing-
+  off arm also records its expected window error as a measured event, which the model never
+  sees.) Claude Haiku 4.5 window: 200,000 tokens. True count: 3.
 
   WHAT YOU GET
-    Editing OFF : finished, answer 2 (WRONG, expected 3), peak context 156,558 tokens.
-    Editing ON  : finished, answer 3 (correct), peak context 34,109 tokens.
+    Editing OFF : CRASHED at step 8. Input 203,056 tokens exceeded the
+                  200,000 window, the API rejected the request, the run cannot finish.
+    Editing ON  : finished all 8 reports, answer 3 (correct), context held flat
+                  at ~34k tokens. $0.3513, 19s.
 
-    At this payload size the editing-OFF run did not reach the 200,000 window, so both
-    arms finish and (because the memory tool is on in both) both answer correctly. Context
-    editing's value has not appeared yet: it shows up only when the job is heavy enough to
-    hit the window. Raise --doc-tokens to see the editing-OFF arm crash.
+    The value, measured and isolated: context editing is what lets the long run FINISH.
+    Identical setup, one flag. Without it the API errors at the window; with it the agent
+    completes. That is a reliability win caused by context editing, not by the memory tool.
 
   THE DIVERGENCE (per turn, memory + caching ON in both, only context editing differs)
   step | editOFF ctx | editON ctx | OFF $/turn | ON $/turn | OFF s | ON s
   -----+-------------+------------+------------+-----------+-------+-----
-     0 |       1,816 |      1,816 |    0.00225 |   0.00226 |   0.9 |  1.1
-     1 |       1,924 |      1,926 |    0.00225 |   0.00227 |   0.9 |  0.9
-     2 |      32,793 |     32,862 |    0.04156 |   0.04183 |   2.2 |  2.3
-     3 |      32,931 |     33,094 |    0.00377 |   0.04168 |   1.1 |  1.3
-     4 |      63,796 |     33,179 |    0.04223 |   0.04235 |   1.8 |  2.4
-     5 |      94,671 |     33,431 |    0.04564 |   0.04210 |   3.2 |  1.6
-     6 |      94,822 |     33,515 |    0.00997 |   0.04227 |   1.2 |  1.7
-     7 |     125,687 |     33,613 |    0.04841 |   0.04240 |   2.0 |  1.7
-     8 |     156,558 |     33,712 |    0.05134 |   0.04303 |   2.3 |  2.2
-     9 |             |     33,966 |            |   0.04295 |       |  1.9
-    10 |             |     34,109 |            |   0.00367 |       |  1.6
+     0 |       1,816 |      1,816 |    0.00225 |   0.00224 |   1.1 |  0.9
+     1 |       1,925 |      1,922 |    0.00228 |   0.00226 |   1.0 |  0.8
+     2 |      32,800 |     32,857 |    0.04176 |   0.04159 |   2.1 |  1.9
+     3 |      63,816 |     32,986 |    0.04241 |   0.00382 |   1.6 |  1.0
+     4 |      94,690 |     33,067 |    0.04585 |   0.04172 |   2.2 |  2.3
+     5 |     125,721 |     33,168 |    0.04861 |   0.04230 |   1.7 |  1.9
+     6 |     156,593 |     33,413 |    0.05154 |   0.04206 |   1.8 |  1.6
+     7 |     187,471 |     33,494 |    0.05567 |   0.04227 |   5.0 |  1.6
+     8 |    203,056! |     33,597 |      CRASH |   0.04290 | CRASH |  2.5
+     9 |             |     33,856 |            |   0.04320 |       |  2.1
+    10 |             |     34,107 |            |   0.04316 |       |  1.7
+    11 |             |     34,256 |            |   0.00380 |       |  1.1
 
   WHY IT FAILS WITHOUT EDITING
-    The editing-OFF context climbed 1,816 -> 156,558 tokens and its
-    per-turn cost climbed 23x (0.00225 -> 0.05134). The
-    editing-ON arm held context near 34,109 tokens at a flat per-turn cost.
+    The editing-OFF context climbed 1,816 -> 187,471 tokens and its
+    per-turn cost climbed 24.7x (0.00225 -> 0.05567). The
+    editing-ON arm held context near 34,256 tokens at a flat per-turn cost.
 
   WHERE CORRECTNESS COMES FROM (the honest split)
     The MEMORY TOOL (on in both arms) is what makes the count correct: the agent tallies into
@@ -49,10 +56,16 @@
 
   HONEST COST: context editing is not a cheaper bill. Clearing rewrites the cached prefix,
   so on a job short enough to finish either way the editing-ON run can cost MORE. Its value
-  is that a heavy job finishes at all. The editing-ON run here cost $0.3468.
+  is that a heavy job finishes at all. The editing-ON run here cost $0.3513.
 
-  Reproduce: `make longhorizon` on Claude Haiku 4.5, your own key. This run cost $0.5942 total
-  and took 34s wall.
+  Reproduce: `make longhorizon` on Claude Haiku 4.5, your own key. This run cost $0.6417 total
+  and took 36s wall.
+
+  ROBUSTNESS (3 runs of the same setup, only context editing toggled)
+    editing OFF: 3/3 FAILED (2 crashed at the window, 1 returned a wrong answer), 0/3 correct.
+    editing ON : 3/3 finished with the correct answer, context bounded near ~34k tokens.
+    The failure mode varies (a crash or a wrong answer), but unbounded context failed every
+    run pushed this far, and context editing succeeded every run. Small N, stated plainly.
 
   wrote receipts to data/last_longhorizon.json
 

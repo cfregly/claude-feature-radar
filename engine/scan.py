@@ -1,75 +1,96 @@
 """scan: the verified competitive picture, the data layer of the engine.
 
-Holds what the 2026-06-17 audit found after a skeptic refuted every claim: what is genuinely
-Claude-ahead, what is parity or refuted, and where Claude is behind. Competitors are named here
-because it is sourced evidence. Founder-facing text anonymizes them. Re-run the audit to refresh.
+Holds what the 2026-06-17 audit found after a skeptic refuted every claim and a live competitor
+parity check dropped anything OpenAI or Google already matches: what is genuinely Claude-ahead, what
+is parity or refuted, and where Claude is behind. Competitors are named here because it is sourced,
+dated evidence. Founder-facing text anonymizes them. Re-run the audit to refresh, the surface moves
+monthly.
 
-Source: briefs/2026-06-17-verified-picture.md
+Sources:
+  briefs/2026-06-17-platform-edge.md       the whole-platform capability sweep
+  briefs/2026-06-17-agentic-landscape.md   the agentic and long-horizon leaderboards
 """
 
 from __future__ import annotations
 
-# Survived the skeptic as genuinely Claude-ahead.
+# Survived the skeptic AND the competitor-parity check as genuinely Claude-ahead, ranked by
+# value to a founder times how clearly Claude leads.
 DIFFERENTIATORS = [
     {
-        "key": "context-editing", "axis": "cost/context",
-        "claim": "Server-side in-place clearing of stale tool results (clear_tool_uses_20250919).",
-        "why": "OpenAI's trimmer is client-side, its compaction summarizes, Gemini's is "
-               "realtime-only. Only Claude ships in-place clearing as a managed API feature. It "
-               "bounds context, it is not a raw cost win when caching is on.",
+        "key": "citations", "axis": "reliability", "rank": 1,
+        "claim": "Document-grounded citations: a guaranteed-valid char/page pointer into the user's "
+                 "own document, with the verbatim quote extracted by the API, free of output tokens.",
+        "why": "OpenAI and Google only annotate web-search URLs. Neither exposes a pointer into a "
+               "user-supplied document. GA, no beta header. Measured (make citations): Claude "
+               "resolves 8/8 pointers to the exact source text, the prompt-for-quotes workaround "
+               "resolves 0/8 on OpenAI and on Claude without the feature, and the one competitor "
+               "that resolves (Gemini, 7/8) burns 148x the output tokens to brute-force the offsets.",
     },
     {
-        "key": "self-hosted-sandbox", "axis": "maintenance",
-        "claim": "Managed agent loop on Anthropic, tool execution on your own infrastructure.",
-        "why": "No competitor ships this exact hybrid (others host everything or you host "
-               "everything). Beta.",
+        "key": "long-horizon-autonomy", "axis": "reliability", "rank": 2,
+        "claim": "Longest autonomous task horizon of any released model on the independent referee.",
+        "why": "METR's 50% task time-horizon (neutral, not a vendor): the top released Claude model "
+               "is the only one flagged top, about 1.9x the best non-Claude before reliability falls "
+               "to 50% (Claude about 12 hr, Gemini 3.1 Pro about 6.4 hr, GPT-5.2 about 5.9 hr). "
+               "Claude does NOT lead the headline coding boards, so this is the dimension where "
+               "'finishes long jobs' survives a skeptic on neutral data.",
     },
     {
-        "key": "memory-tool", "axis": "developer-experience",
-        "claim": "A memory tool the model itself drives over durable files.",
-        "why": "Only Anthropic has model-driven plus read-write plus durable files plus "
-               "cross-session as an API primitive. Architecture-shape lead, beta.",
+        "key": "programmatic-tool-calling", "axis": "cost", "rank": 3,
+        "claim": "The model writes sandbox code that calls the developer's own function tools and "
+                 "keeps bulky tool outputs out of context.",
+        "why": "No named OpenAI or Google equivalent (absence of evidence, not a head-to-head loss). "
+               "Anthropic's own measurement is a 37% input-token cut on complex tasks. BETA on the "
+               "live pages, and the 37% is not reproduced on our key, so it does not anchor an email.",
     },
 ]
 
-# Refuted or parity. Do NOT pitch these.
+# Refuted, parity, or behind after the live check. Do NOT pitch these as a Claude lead.
 PARITY = [
-    {"note": "Claude Code is parity with OpenAI Codex and Google Antigravity."},
-    {"note": "Hosted agent runtime is parity (OpenAI Responses loop, Google Vertex Agent Engine)."},
-    {"note": "Dreaming (async memory consolidation): parity (Codex Memories plus Vertex Memory Bank)."},
-    {"note": "Outcomes (rubric self-grade plus retry): refuted (Google Jules' critic plus Vertex)."},
+    {"note": "SWE-bench Verified: a ceiling tie at 79.2 percent, no clean three-way, no 90+ is real."},
+    {"note": "Terminal-Bench 2.0 and 2.1: GPT-5.5 leads or ties at the top."},
+    {"note": "Context editing: beta, and OpenAI's /responses/compact endpoint is arguably ahead."},
+    {"note": "Prompt caching, Batch, Files API, Structured Outputs, Skills, MCP: all matched."},
+    {"note": "1M-token window: matched or exceeded by Gemini on raw size."},
+    {"note": "Computer use, extended thinking, PDF and vision: all beta or matched."},
 ]
 
 # Where Claude is behind. Feeds the product-team email.
 GAPS = [
-    {"note": "OpenAI is cheaper on the fair benchmark."},
+    {"note": "OpenAI is cheaper per token on the fair cost/speed benchmark (and faster)."},
+    {"note": "Terminal-Bench coding-agent leaderboards: GPT-5.5 ahead."},
+    {"note": "BrowseComp agentic web search: GPT-5.5 Pro leads at about 90 percent."},
     {"note": "Cache retention: Gemini arbitrary TTL, OpenAI 24h, vs Claude fixed 5m or 1h."},
-    {"note": "OpenAI's Secure MCP Tunnel went GA 2026-05-27, ahead of Claude's beta."},
-    {"note": "Long-context billing: GPT-5.5 larger ceiling, Gemini arbitrary-TTL caching over 1M."},
+    {"note": "Citations cannot be combined with Structured Outputs (the API returns a 400)."},
 ]
 
 CHOSEN = (
-    "context editing (clear_tool_uses_20250919): server-side, in-place clearing of stale tool "
-    "results, the only managed-API in-place clearing primitive. It bounds a long tool-heavy "
-    "agent's context with one beta header, without you building eviction logic. Honest scope: it "
-    "bounds context, it is not a cheaper bill when caching is on."
+    "Citations: a GA, document-grounded source pointer (char index for text, page for PDF) into the "
+    "user's OWN document, with the verbatim quote extracted by the API and free of output tokens. No "
+    "competitor exposes a pointer into a user-supplied document, they only cite web URLs. Measured: "
+    "Claude resolves 8/8 pointers to the exact source text by construction, the prompt-for-quotes "
+    "workaround resolves 0/8 on OpenAI and on Claude without the feature, and the only competitor "
+    "that resolves at all (Gemini) costs 37x more to brute-force the offsets. This is the trust layer "
+    "for any product built over the user's own documents. Second pillar: Claude has the longest "
+    "autonomous task horizon of any released model on METR's independent referee, about 1.9x the next "
+    "best, for the founder building agents that must finish long jobs."
 )
 
 
 def main():
-    print("\n  Verified competitive picture, 2026-06-17 (every claim skeptic-refuted)\n")
-    print("  Claude-ahead (survived the skeptic):")
+    print("\n  Verified competitive picture, 2026-06-17 (skeptic-refuted + live parity check)\n")
+    print("  Claude-ahead (survived the skeptic and the parity check), ranked:")
     for d in DIFFERENTIATORS:
-        print(f"    + [{d['axis']}] {d['claim']}")
+        print(f"    {d['rank']}. [{d['axis']}] {d['claim']}")
         print(f"        {d['why']}")
-    print("\n  Parity or refuted (do not pitch):")
+    print("\n  Parity or refuted (do not pitch as a lead):")
     for p in PARITY:
         print(f"    = {p['note']}")
     print("\n  Where Claude is behind (the product email):")
     for g in GAPS:
         print(f"    - {g['note']}")
     print(f"\n  Anchor for the founder email:\n    {CHOSEN}")
-    print("\n  Source: briefs/2026-06-17-verified-picture.md\n")
+    print("\n  Sources: briefs/2026-06-17-platform-edge.md, briefs/2026-06-17-agentic-landscape.md\n")
 
 
 if __name__ == "__main__":

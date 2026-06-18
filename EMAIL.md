@@ -4,38 +4,31 @@ Paste into a Google Doc or your sending tool. Plain text, one link.
 
 ---
 
-**Subject:** A 32-step tool agent carries ~35k tokens of context. On Claude, one flag (clear at 20k, keep 3) holds it near 15k.
+**Subject:** Claude cites the exact sentence in your user's own doc, and the pointer resolves 8/8. The DIY workaround: 0/8.
 
 Hey {first_name},
 
-You get a long agent that stays bounded, with no eviction code to write.
+If you are building anything over your users' own documents (contracts, charts, tickets, research papers, support docs), the thing that makes it shippable is trust: every claim links back to the exact sentence in the source, and that link actually works.
 
-Measured on the same 32-step agent across Claude Haiku 4.5, OpenAI gpt-5.4-mini, and Gemini
-3.5-flash, all at full strength, with carried context counted the same way on every side (input plus
-cached tokens, apples to apples). Turning on context editing (clear at a 20k threshold, keep the last
-3 tool results) drops Claude's carried context from about 35k tokens to about 15k. It clears stale
-tool results in place. OpenAI's server-side compaction also trims, to about 19k, but by summarizing
-(lossy). OpenAI does ship real in-place tool-output trimming, but client-side, so you wire it into
-your own process. Gemini's in-place trim is realtime-API only, so it carries about 33k, and it was
-the priciest arm here, about $0.41 or 3x Claude. Claude is the only one that ships in-place clearing
-as a managed feature on the standard tool-use path.
+Claude ships a GA feature for this called Citations. You turn it on per document, and Claude returns each claim with a structured pointer (a character range for text, a page range for a PDF) plus the verbatim quote, extracted by the API so the pointer is guaranteed to resolve. The quote does not count toward your output tokens.
 
-It is not free. On this run, editing on ran about 44% slower (63.5s vs 44.2s) and cost about 8% more
-than leaving it off, because clearing invalidates the cache. You are buying bounded context, not a
-cheaper or faster bill.
+I measured it the only way that counts. Across 8 questions over a set of documents, does each returned offset land on the exact source text?
+
+- Claude with Citations: 8 of 8 resolve, guaranteed, quotes free of output tokens.
+- The prompt-for-quotes approach you would build without it: 0 of 8 resolve on Claude, 0 of 8 on OpenAI. The quoted text was correct, but the offsets pointed nowhere, so you cannot link to or verify them.
+- Gemini resolved 7 of 8, but only by burning 45,630 output tokens against Claude's 308 (about 148x) and $0.42 against $0.011 (about 37x), because it has to brute-force the character count with reasoning.
+
+No competitor exposes a pointer into your own document. OpenAI and Google only cite web-search URLs. So this is a real gap, not a benchmark I rigged: the cheap workaround gives you zero usable citations, and the only competitor that resolves at all costs 37x more to do it.
 
 {repo_link}
 
-Reproduce it: `make setup`, then `make compare-deps` (installs the OpenAI and Gemini SDKs into the
-same venv), then `cp .env.example .env` and paste three keys (Anthropic, OpenAI, Gemini, the file
-says where each goes), then `make compare`. About a dollar and a few minutes, every number measured.
-The Gemini row needs a paid-tier Gemini key, or it is skipped on quota.
+Run it yourself: `make setup`, then `make compare-deps`, then `cp .env.example .env` and paste three keys (Anthropic, OpenAI, Gemini, the file says where each goes), then `make citations`. About thirty cents and a couple of minutes, every number read off the real API.
 
-And honestly, Claude is not the cheapest: OpenAI's cheap model is cheaper here ($0.033 versus
-Claude's $0.131 with editing on, $0.121 off). It also miscounted at the cheap tier, but its stronger
-model answers correctly, so that is a model-tier gap, not a Claude win.
+One honest caveat I will not hide: Citations cannot be combined with Structured Outputs on the same document (the API returns a 400), so if you need strict JSON and citations together, you pick one.
 
-It is one flag on the Agent SDK or the API. Reply if you want a hand wiring it in.
+If you are building long-running agents, a second reason to look: on METR's independent task time-horizon, the neutral referee rather than a vendor chart, Claude runs the longest autonomous jobs of any released model, about 1.9x the next best before reliability drops to half. Claude is not the cheapest or the fastest per token, and it does not top every coding board. But it finishes the longest jobs, and it is the only one that cites your user's own documents with a pointer that resolves.
+
+It is one field on the API: `citations: {"enabled": true}`. Reply if you want a hand wiring it in.
 
 Go build,
 
@@ -46,14 +39,16 @@ Building with Claude
 
 ### Why it is built this way (not part of the email)
 
-- **The subject attributes 35k to the benchmark, not the reader's agent**, and ties the 15k to the
-  actual trim config (clear at 20k, keep 3) in the subject line itself, because 15k is a tuned
-  setting, not a property of the flag alone.
-- **It states the real downside, measured.** Editing on ran about 44% slower and cost about 8% more
-  (63.5s vs 44.2s, $0.131 vs $0.121). Calling that "about 40%" rounds the one honest-downside number
-  toward zero, the nudge the panel caught, so we quote the real 44%.
-- **The price and the miscount are separated**, with the model-tier caveat from FINDINGS #5: the
-  cheap-tier miss disappears one tier up.
-- **The reproduction is runnable from the email alone**, the exact commands and the three keys.
-- **No overclaim.** Not cheaper, not faster, not "Claude Code is better" (parity with Codex), not
-  "6x less context" (a metric confound). Just the in-place primitive only Claude ships.
+- **The hook is measured, cross-vendor, and ungameable.** The grader checks one thing per citation:
+  does `source[start:end]` equal the quoted text. 8/8 on Claude, 0/8 on the workaround, from
+  `make citations`, not asserted. The full receipt is `sample_citations.txt`.
+- **It states the honest cost.** Citations is not the cheapest arm in raw dollars (it adds input
+  tokens for chunking), so the email never claims "cheaper." It claims what the receipt shows: the
+  quotes are free of output tokens, and among the approaches that actually resolve a pointer, Claude
+  is the only one at 8/8 and 37x cheaper than the one competitor that resolves.
+- **It carries the one real caveat** (incompatible with Structured Outputs) instead of hiding it.
+- **The second pillar is independent, not a vendor chart.** METR is the neutral referee, and the
+  email says plainly where Claude does not lead (cost, speed, coding boards) so the one place it does
+  lead is credible.
+- **No overclaim.** Not "best model," not "cheapest," not "wins every benchmark." A GA primitive no
+  competitor ships, measured, plus an independent long-horizon result.

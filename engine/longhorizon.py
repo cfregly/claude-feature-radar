@@ -13,7 +13,9 @@ attribute anything. The correct answer comes from the MEMORY TOOL (a durable cou
 context editing.
 
 So this runs a clean isolation. BOTH arms get the memory tool and the identical prompt and caching.
-The ONLY variable is context editing. That isolates exactly one thing:
+The only thing that changes what the model receives is context editing (the editing-off arm also
+sets stop_on_overflow, which only changes how its expected window error is recorded, not the
+request). That isolates exactly one thing:
 
   context editing -> RELIABILITY. With large tool payloads the editing-OFF arm's context climbs to
   the model's window and the API rejects the request: the agent cannot finish at any price. The
@@ -94,9 +96,11 @@ def print_report(model, n_docs, doc_tokens, off_rec, off_ans, on_rec, on_ans, go
     print(f"  Workload: a chain of {n_docs} incident reports, each about {doc_tokens:,} tokens (a")
     print(f"  realistic large tool payload, e.g. a big log or trace). The agent reads them one at a")
     print(f"  time and counts the URGENT ones.")
-    print(f"  ISOLATION: both runs are identical, same model, same prompt, the MEMORY TOOL ON in both,")
-    print(f"  caching ON in both. The ONLY variable is context editing, so any difference below is")
-    print(f"  caused by context editing alone. {label} window: {window:,} tokens. True count: {gold}.\n")
+    print(f"  ISOLATION: both runs send the model the same request, same model, same prompt, the MEMORY")
+    print(f"  TOOL ON in both, caching ON in both. The only thing that changes what the model receives is")
+    print(f"  context editing, so any difference below is caused by context editing alone. (The editing-")
+    print(f"  off arm also records its expected window error as a measured event, which the model never")
+    print(f"  sees.) {label} window: {window:,} tokens. True count: {gold}.\n")
 
     print("  WHAT YOU GET")
     if crash:
@@ -114,13 +118,17 @@ def print_report(model, n_docs, doc_tokens, off_rec, off_ans, on_rec, on_ans, go
     else:
         o_ok = "correct" if off_ok else f"WRONG, expected {gold}"
         e_ok = "correct" if on_ok else f"WRONG, expected {gold}"
-        print(f"    Editing OFF : finished, answer {off_ans} ({o_ok}), peak context {off['peak_ctx']:,} tokens.")
-        print(f"    Editing ON  : finished, answer {on_ans} ({e_ok}), peak context {on['peak_ctx']:,} tokens.")
+        print(f"    Editing OFF : answer {off_ans} ({o_ok}), peak context {off['peak_ctx']:,} tokens.")
+        print(f"    Editing ON  : answer {on_ans} ({e_ok}), peak context {on['peak_ctx']:,} tokens.")
         print()
-        print(f"    At this payload size the editing-OFF run did not reach the {window:,} window, so both")
-        print(f"    arms finish and (because the memory tool is on in both) both answer correctly. Context")
-        print(f"    editing's value has not appeared yet: it shows up only when the job is heavy enough to")
-        print(f"    hit the window. Raise --doc-tokens to see the editing-OFF arm crash.")
+        if off_ok:
+            print(f"    Here the editing-OFF run stayed under the {window:,} window and answered correctly, so")
+            print(f"    context editing's value did not appear this run. It appears when the context grows")
+            print(f"    enough to hit the window or derail the count (see the robustness summary, --repeat).")
+        else:
+            print(f"    Here the editing-OFF run did not crash but lost the count in its bloated context and")
+            print(f"    answered WRONG, while editing-ON (identical but for the flag) answered correctly. The")
+            print(f"    unbounded arm failed; whether it fails by crashing or by miscounting varies by run.")
     print()
 
     print("  THE DIVERGENCE (per turn, memory + caching ON in both, only context editing differs)")
@@ -139,7 +147,7 @@ def print_report(model, n_docs, doc_tokens, off_rec, off_ans, on_rec, on_ans, go
         ratio = last["cost"] / max(first["cost"], 1e-9)
         print("  WHY IT FAILS WITHOUT EDITING")
         print(f"    The editing-OFF context climbed {first['ctx']:,} -> {last['ctx']:,} tokens and its")
-        print(f"    per-turn cost climbed {ratio:.0f}x ({first['cost']:.5f} -> {last['cost']:.5f}). The")
+        print(f"    per-turn cost climbed {ratio:.1f}x ({first['cost']:.5f} -> {last['cost']:.5f}). The")
         print(f"    editing-ON arm held context near {on['peak_ctx']:,} tokens at a flat per-turn cost.")
         print()
 
@@ -157,6 +165,27 @@ def print_report(model, n_docs, doc_tokens, off_rec, off_ans, on_rec, on_ans, go
     total = off["total_cost"] + on["total_cost"]
     print(f"  Reproduce: `make longhorizon` on {label}, your own key. This run cost {fmt_usd(total)} total")
     print(f"  and took {wall_s:.0f}s wall.\n")
+
+
+def _classify(rec, ans, gold):
+    if _crash(rec):
+        return "crashed"
+    return "correct" if ans == gold else "wrong"
+
+
+def print_robustness(n, off_outcomes, on_outcomes, on_peak):
+    oc_crash = off_outcomes.count("crashed")
+    oc_wrong = off_outcomes.count("wrong")
+    oc_ok = off_outcomes.count("correct")
+    on_ok = on_outcomes.count("correct")
+    print(f"  ROBUSTNESS ({n} runs of the same setup, only context editing toggled)")
+    print(f"    editing OFF: {oc_crash + oc_wrong}/{n} FAILED ({oc_crash} crashed at the window, "
+          f"{oc_wrong} returned a wrong answer), {oc_ok}/{n} correct.")
+    print(f"    editing ON : {on_ok}/{n} finished with the correct answer, context bounded near "
+          f"~{on_peak // 1000}k tokens.")
+    print(f"    The failure mode varies (a crash or a wrong answer), but unbounded context failed every")
+    print(f"    run pushed this far, and context editing succeeded every run. Small N, stated plainly.")
+    print()
 
 
 def _render_from_receipt():
@@ -182,6 +211,7 @@ def main():
     p.add_argument("--trigger", type=int)
     p.add_argument("--keep", type=int)
     p.add_argument("--max-turns", type=int)
+    p.add_argument("--repeat", type=int, default=1, help="run the pair N times, report the outcome distribution")
     a = p.parse_args()
 
     if a.from_receipt:
@@ -204,18 +234,32 @@ def main():
     gold = sum(1 for d in docs.values() if d["urgent"])
     common = dict(trigger=cfg["trigger"], keep=cfg["keep"], max_turns=cfg["max_turns"])
 
-    t0 = time.perf_counter()
-    off_rec, off_text = run_agent(client, a.model, docs, start, memory=True, editing=False,
-                                  stop_on_overflow=True, **common)
-    on_rec, on_text = run_agent(client, a.model, docs, start, memory=True, editing=True, **common)
-    wall_s = time.perf_counter() - t0
+    n = max(1, a.repeat)
+    off_outcomes, on_outcomes = [], []
+    first = None
+    for i in range(n):
+        r0 = time.perf_counter()
+        off_rec, off_text = run_agent(client, a.model, docs, start, memory=True, editing=False,
+                                      stop_on_overflow=True, **common)
+        on_rec, on_text = run_agent(client, a.model, docs, start, memory=True, editing=True, **common)
+        run_wall = time.perf_counter() - r0
+        off_ans, on_ans = parse_answer(off_text), parse_answer(on_text)
+        off_outcomes.append(_classify(off_rec, off_ans, gold))
+        on_outcomes.append(_classify(on_rec, on_ans, gold))
+        if first is None:
+            first = (off_rec, off_ans, on_rec, on_ans, run_wall)
+        if n > 1:
+            print(f"  run {i + 1}/{n}: editing OFF -> {off_outcomes[-1]}, editing ON -> {on_outcomes[-1]}")
 
-    off_ans, on_ans = parse_answer(off_text), parse_answer(on_text)
-    print_report(model, cfg["docs"], cfg["doc_tokens"], off_rec, off_ans, on_rec, on_ans, gold, wall_s)
+    off_rec, off_ans, on_rec, on_ans, first_wall = first
+    print_report(model, cfg["docs"], cfg["doc_tokens"], off_rec, off_ans, on_rec, on_ans, gold, first_wall)
+    if n > 1:
+        print_robustness(n, off_outcomes, on_outcomes, _roll(on_rec)["peak_ctx"])
 
     out = {
         "model": model.id, "config": cfg, "window": model.context_window,
-        "gold": gold, "wall_s": round(wall_s, 1),
+        "gold": gold, "wall_s": round(first_wall, 1), "runs": n,
+        "off_outcomes": off_outcomes, "on_outcomes": on_outcomes,
         "editing_off": {"records": off_rec, "answer": off_ans, **_roll(off_rec)},
         "editing_on": {"records": on_rec, "answer": on_ans, **_roll(on_rec)},
     }

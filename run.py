@@ -24,6 +24,8 @@ def main():
         from engine.demo import main as m; m()
     elif cmd in ("longhorizon", "long"):
         from engine.longhorizon import main as m; m()
+    elif cmd in ("longhorizon-compare", "lhc"):
+        from engine.longhorizon_compare import main as m; m()
     elif cmd in ("citations", "cite"):
         from engine.citations import main as m; m()
     elif cmd == "compare":
