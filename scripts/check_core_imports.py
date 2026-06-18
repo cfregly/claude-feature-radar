@@ -46,7 +46,7 @@ def main() -> int:
         "engine.demonstrators", "engine.demonstrators.base", "engine.demonstrators.registry",
         "engine.demonstrators.shared.sandbox", "engine.demonstrators.shared.platform",
         "engine.demonstrators.shared.spec", "engine.demonstrators.agentic_grading",
-        "engine.demonstrators.eval_quality",
+        "engine.demonstrators.eval_quality", "engine.demonstrators.retention_resume",
         "engine.providers.openai_provider", "engine.providers.gemini_provider",
     ]
     failed = []
@@ -61,7 +61,7 @@ def main() -> int:
         from engine.demonstrators.registry import register_all
         reg = register_all()
         for kind in ("token_accounting", "grounding_resolution", "long_horizon_survival",
-                     "agentic_grading", "eval_quality"):
+                     "agentic_grading", "eval_quality", "retention_resume"):
             if kind not in reg:
                 failed.append(f"built demonstrator for '{kind}' did not register with SDKs blocked")
     except Exception as e:  # noqa: BLE001

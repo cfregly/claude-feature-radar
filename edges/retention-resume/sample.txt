@@ -1,0 +1,29 @@
+
+  retention_resume: durable kill-and-resume is doc-grounded PARITY across all three
+  vendors. The Claude win is the managed-harness bundle and the time axis, labeled beta.
+
+  === Durable kill-and-resume: doc-grounded parity, with a bundle + time-axis win ===
+
+  Capability verdict: PARITY. durable kill-and-resume is table stakes across Claude, OpenAI, and Gemini.
+  Durable kill-and-resume is table stakes, so this is never pitched as a Claude-only edge.
+
+  vendor   durable-resume mechanism (best surface)                       time axis
+  --------------------------------------------------------------------------------------------------------------
+  Claude   Managed Agents sessions (beta), stateful by design, resume... no 30-day TTL and no idle handle cap o...
+           maturity: beta (managed-agents-2026-04-01, enabled by default, SDK sets the header)
+           source: https://platform.claude.com/docs/en/managed-agents/overview (2026-06-18)
+  OpenAI   Responses API Conversations object (GA), used across sessi... conversation items have no 30-day TTL;...
+           maturity: GA
+           source: https://developers.openai.com/api/docs/guides/conversation-state (2026-06-18)
+  Gemini   Live API session resumption via SessionResumptionConfig: c... resumption handle valid for about 2 ho...
+           maturity: GA (Live API)
+           source: https://ai.google.dev/gemini-api/docs/live-session (2026-06-18)
+
+  The Claude win (labeled beta):
+    The managed-harness bundle is the genuine edge, labeled beta: an Anthropic-hosted or self-hosted sandbox plus the agent loop plus a persistent filesystem plus conversation history plus built-in compaction in one product, so the founder builds no agent loop, no sandbox, and no tool-execution layer. The capability of surviving a kill and resuming is parity across all three vendors; the bundle and the time axis are the win.
+
+  Beta header: managed-agents-2026-04-01 (the SDK sets it automatically, enabled by default).
+  State stays server-side, so Managed Agents is not ZDR- or HIPAA-BAA-eligible.
+
+  No Managed Agents spend on this default path. The live kill-and-resume is opt-in:
+    make retention-live   (start, resume, negative control, steer; spends a small amount)

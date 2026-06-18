@@ -32,6 +32,7 @@ _DEMO_MODULES = (
     "edges.context-editing.demo",
     "engine.demonstrators.agentic_grading",
     "engine.demonstrators.eval_quality",
+    "engine.demonstrators.retention_resume",
 )
 
 

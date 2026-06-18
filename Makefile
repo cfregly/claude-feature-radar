@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges scan verify verify-live validate agentic agentic-smoke eval eval-smoke eval-judge draft check-claims check-docs core-imports test ci deslop gif clean
+.PHONY: setup compare-deps ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges scan verify verify-live validate agentic agentic-smoke eval eval-smoke eval-judge retention retention-live draft check-claims check-docs core-imports test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -81,6 +81,12 @@ eval-smoke: ## a cents-scale Claude-only smoke of the eval grid (Haiku + Sonnet,
 
 eval-judge: ## the eval grid with the cross-model judge panel on (the too-trusting-grader cross-check)
 	$(PY) engine/demonstrators/eval_quality.py --judge
+
+retention: ## EDGE retention_resume: the doc-grounded retention/bundle parity receipt across 3 vendors (NO key, NO Managed Agents spend, $0)
+	$(PY) engine/demonstrators/retention_resume.py
+
+retention-live: ## OPT-IN: the live Managed Agents kill-and-resume (start, resume, negative control, steer; beta, needs ANTHROPIC_API_KEY, spends a small bounded amount)
+	$(PY) engine/demonstrators/retention_resume.py --live
 
 draft: ## draft the founder email from the measured receipt
 	$(PY) run.py draft
