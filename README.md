@@ -131,7 +131,7 @@ Nothing is quoted from memory.
 ## Layout
 
 ```
-engine/citations.py   THE ANCHOR: verifiable source pointers vs prompt-for-quotes, all three vendors
+engine/citations.py   THE ANCHOR: verifiable source pointers vs the DIY str.find baseline, all three vendors
 engine/compare.py     the fair cost/speed/correctness benchmark (the credibility layer)
 engine/sweep.py       the variant sweep that makes the compare result trustworthy
 engine/longhorizon.py the runnable long-horizon proof

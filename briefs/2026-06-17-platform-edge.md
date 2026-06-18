@@ -42,9 +42,10 @@ column even if it is useful.
   exact sentence, is trustworthy in a way a paraphrased citation never is. This is the whole product
   for a contract-review, clinical-summary, financial-research, or support-over-docs startup.
 - Margin bonus: `cited_text` does not count toward output tokens, and when passed back on later turns
-  it does not count toward input tokens either. A prompt-based approach that asks Claude to quote
-  pays output tokens for every quote. So Citations is both more reliable and cheaper than the
-  prompt-for-quotes baseline a founder would otherwise build.
+  it does not count toward input tokens either. The DIY str.find baseline a founder would otherwise
+  build (ask the model for the verbatim quote, then resolve it with `source.find`) pays output tokens
+  for every quote. Citations is not cheaper in raw dollars (it adds input tokens for chunking), so the
+  edge is the in-API guarantee, the quote free of output tokens, and zero resolver code, not a lower bill.
 - Status: GA. No beta header. All active models except Haiku 3. ZDR-eligible. Incompatible with
   Structured Outputs (a 400 if both are set on a user document), which is the one caveat to carry.
 - Source: https://platform.claude.com/docs/en/build-with-claude/citations (re-fetched 2026-06-17).
@@ -145,41 +146,54 @@ founder's own key with a machine-checkable assertion plus a margin receipt.
 One-liner a founder feels: Claude can point to the exact sentence in your own document that backs
 every claim it makes, and the quote is free.
 
-## The proof we build and run on the founder's own key
+## The proof we build and run on the founder's own keys
 
-A founder will not take a doc page on faith, so we ship a one-command demo that proves both halves of
-the claim, the reliability half and the cost half, on their own Anthropic key.
+A founder will not take a doc page on faith, so we ship a one-command demo (`make citations`) that
+proves both halves of the claim, the reliability half and the cost half, on their own keys.
 
-Task: a small document-question-answering job over a set of real source documents (a few plain-text
-docs and one multi-page PDF, all shipped in the bundle). Ask Claude a handful of questions whose
-answers live in specific sentences and pages of those documents.
+Task: a document-question-answering job over a small corpus of plain-text "your own documents" (an
+Acme SLA, a data-protection policy, and billing terms, all shipped in the bundle). Eight questions
+whose answers live in specific sentences of those documents.
 
-Run two arms on `claude-opus-4-8`, identical prompt and documents, toggling exactly one thing:
-- Arm A, citations on: `citations.enabled=true` on every document.
-- Arm B, the prompt-for-quotes baseline: citations off, and the prompt asks Claude to quote its
-  source verbatim, which is what a founder builds without this feature.
+Run four arms over the same 8 questions and the same documents:
+- Claude Haiku 4.5 with Citations: `citations.enabled=true` on every document, so the API returns
+  each answer with a char-range pointer and the verbatim `cited_text` it extracted.
+- Claude Haiku 4.5, the DIY str.find baseline: citations off, the prompt asks the model to quote its
+  source verbatim, and the harness resolves each quote with `source.find`. This is what a founder
+  builds without the feature.
+- OpenAI gpt-5.4-mini and Gemini gemini-3.5-flash, the same DIY str.find baseline, because that is
+  the only option those platforms give you (neither ships a document-pointer primitive).
 
-Two machine-checkable receipts, computed from real API responses, not self-reports:
-- Reliability: for every citation Arm A returns, assert its char/page/block range resolves to the
-  exact `cited_text` substring in the source document. The pass rate is the number that ships, and
-  the assertion is the grader, so the model cannot game it. Then check Arm B's quoted strings against
-  the sources and count how many are paraphrased, truncated, or wrong, which is the failure mode the
-  feature removes.
-- Cost: read `usage` on both arms. Show that Arm A's `cited_text` adds zero output tokens while Arm
-  B pays output tokens for every quoted span, and report the dollar delta from the live price table.
+One machine-checkable grader, computed from real API responses, not self-reports: for the Citations
+arm, assert each returned char range satisfies `source[start:end] == cited_text`. For the DIY arms,
+assert `source.find(quote)` locates the quoted text in the source. The pass rate is the number that
+ships and the assertion is the grader, so the model cannot game it.
 
-What ships in the email: "Across N questions, every Claude citation resolved to the verbatim source
-sentence, the prompt-for-quotes baseline got K of N quotes exactly right, and citations cost zero
-extra output tokens versus the baseline. Here is the one command to reproduce it on your key, the
-dollar cost, and the wall-clock time."
+The honest result, the part that is not flattering: on this clean corpus every arm resolves 8/8,
+because the model quotes verbatim and `find` locates it. So the edge is not "the others cannot cite."
+The edge is narrower and real, and the demo states it that way: Citations does the resolving inside
+the API, guaranteed by construction (the DIY `find` returns -1 the moment the model paraphrases, which
+a clean corpus never triggers but a messy real PDF will), the verbatim quote is free of output tokens
+while every DIY arm pays output tokens for each quote, and the founder writes zero resolver code. The
+cost half is honest too: Citations is not the cheapest arm in raw dollars, because it adds input
+tokens for chunking, so the demo never claims "cheaper." It reproduces for a few cents in a couple of
+minutes, every per-arm output-token count and dollar figure read off the live `usage` object and
+written to the receipt in `../sample_citations.txt`.
+
+What ships in the email: "Across 8 questions, every Claude citation resolved to the verbatim source
+sentence, with the API doing the resolving and the quote free of output tokens. The DIY str.find
+baseline resolves just as well on clean text, but the founder owns that resolver code, pays output
+tokens for every quote, and gets nothing back the moment the model paraphrases. Here is the one
+command to reproduce it on your keys, the dollar cost, and the wall-clock time."
 
 Why this is the right test: the success gate is a substring match against the source (a grader the
 model cannot game, not a rubric), it exercises the edge directly (verifiable grounding over the
-user's own documents, not a single API call), it is reproducible from one command on the founder's
-own key, and it states its cost and time up front. The competitor arm is honest too: OpenAI and
-Gemini can answer the same questions, but neither returns a char/page/block pointer into the
-user-supplied document with a guaranteed-valid verbatim quote, which is the gap the demo makes
-visible. We can show that side by side as dated evidence in the README, not in the email hero.
+user's own documents, not a single API call), it runs the competitors at full strength on the same
+task rather than handicapping them, it is reproducible from one command on the founder's own keys, and
+it states its cost and time up front. The competitor arms are honest: OpenAI and Gemini answer the
+same questions and resolve their quotes on clean text, but neither returns a char or page pointer into
+the user-supplied document with a guaranteed-valid verbatim quote, which is the gap the demo makes
+visible. We show that side by side as dated evidence in the README, not in the email hero.
 
 ## Caveats that must travel with any quote from this brief
 
@@ -187,9 +201,11 @@ visible. We can show that side by side as dated evidence in the README, not in t
   and citations on the same user document cannot have both in one call (the API returns a 400). Say
   this plainly if the founder's product needs both.
 - The competitor "no equivalent" findings for Citations, programmatic tool calling, and the Claude
-  Code PR loop came from competitor docs, not from runs on competitor keys. They are well-sourced but
-  not lab-reproduced. Treat them as absence-of-evidence, strong but not a head-to-head win, until the
-  cross-vendor demo runs on real OpenAI and Google keys.
+  Code PR loop came from competitor docs, not from a lab proof of absence. The citations demo now runs
+  the DIY str.find baseline on real OpenAI gpt-5.4-mini and Gemini gemini-3.5-flash keys, which shows
+  what a founder gets without the primitive, but running a baseline cannot prove the primitive is
+  absent, so the "no document-pointer primitive" finding stays doc-sourced. Treat these as
+  absence-of-evidence, strong but not a head-to-head win.
 - Programmatic tool calling is beta on the live pages today (`advanced-tool-use-2025-11-20`,
   `code-execution-2025-08-25`, beta namespace). One source asserts code execution went GA in early
   2026, but the live docs still show beta-namespace usage, so do not call it GA in an outbound email
