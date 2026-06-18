@@ -42,7 +42,7 @@ does.
 {repo_link}
 
 Run it yourself: `make setup`, then `cp .env.example .env` and paste your Anthropic key, then `make
-ptc`. About twenty cents on Sonnet, every token off the real API.
+ptc`. About six cents on Sonnet for the two runs, every token off the real API.
 
 Go build,
 

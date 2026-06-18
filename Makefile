@@ -13,7 +13,7 @@ compare-deps: ## install the OpenAI + Gemini SDKs into the SAME venv, for compar
 	$(PY) -m pip install --quiet -r requirements-compare.txt
 	@echo "Compare deps installed into .venv. Now paste OPENAI_API_KEY and GEMINI_API_KEY into .env."
 
-ptc: ## EDGE: programmatic tool calling, the input-token receipt on a fan-out task (needs ANTHROPIC_API_KEY, about $0.20)
+ptc: ## EDGE: programmatic tool calling, the input-token receipt on a fan-out task (needs ANTHROPIC_API_KEY, about $0.06)
 	$(PY) edges/programmatic-tool-calling/demo.py
 
 citations: ## EDGE: verifiable citations vs the DIY str.find baseline, all three vendors (needs compare-deps + 3 keys, about $0.06)

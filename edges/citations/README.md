@@ -17,9 +17,9 @@ each citation resolves to the real source text:
 | approach | resolves | who resolves it | quote free of output tokens | output tokens | cost |
 |---|:--:|:--:|:--:|--:|--:|
 | **Claude Haiku 4.5 + Citations** | **8/8** (guaranteed) | the API | yes | 308 | $0.011 |
-| Claude Haiku 4.5, DIY str.find | 8/8 | your code | no | 586 | $0.006 |
-| OpenAI gpt-5.4-mini, DIY str.find | 8/8 | your code | no | 391 | $0.004 |
-| Gemini gemini-3.5-flash, DIY str.find | 8/8 | your code | no | 3,466 | $0.036 |
+| Claude Haiku 4.5, DIY str.find | 8/8 | your code | no | 563 | $0.006 |
+| OpenAI gpt-5.4-mini, DIY str.find | 8/8 | your code | no | 392 | $0.004 |
+| Gemini gemini-3.5-flash, DIY str.find | 8/8 | your code | no | 3,654 | $0.037 |
 
 **The honest read.** On clean text the DIY bolt-on resolves just as well. The edge is not "the others
 cannot cite." It is that Claude resolves the pointer in the API, guaranteed by construction (the DIY

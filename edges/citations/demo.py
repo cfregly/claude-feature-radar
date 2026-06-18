@@ -23,9 +23,10 @@ and resolve it yourself with `source.find(quote)`. So that is the baseline here:
 
 The honest finding: on clean text the DIY path resolves about as well as Citations, because the
 quotes come back verbatim. The edge is not "they cannot do it." The edge is that Claude does it FOR
-you, guaranteed, with the quote free of output tokens and zero resolver code, and no competitor ships
-the primitive at all. Every number is read off the real usage object. The OpenAI and Gemini arms
-degrade gracefully if their key or SDK is absent.
+you, guaranteed, with the quote free of output tokens and zero resolver code, and only Claude ships a
+per-character document pointer (Gemini File Search is page-level and still preview, OpenAI cites its
+own output). Every number is read off the real usage object. The OpenAI and Gemini arms degrade
+gracefully if their key or SDK is absent.
 """
 
 from __future__ import annotations
@@ -284,8 +285,9 @@ def main():
     label = get(a.claude_model).label
 
     print(f"\n  Verifiable source citations: {len(CORPUS)} of your own documents, {n} questions.")
-    print(f"  Claude Citations is GA, no beta header. No competitor ships a document-pointer primitive,")
-    print(f"  so the honest baseline is the DIY path: ask the model for the verbatim quote, then resolve")
+    print(f"  Claude Citations is GA, no beta header. Only Claude ships a per-character document pointer")
+    print(f"  (Gemini File Search is page-level and still preview, OpenAI cites its own output), and the")
+    print(f"  honest baseline without it is the DIY path: ask the model for the verbatim quote, then resolve")
     print(f"  it yourself with str.find. The grader checks that the quote resolves to the real source.\n")
 
     summaries = []
@@ -321,7 +323,8 @@ def main():
               f"for the quotes.")
     print("  - On clean text the DIY path resolves about as well, so the edge is not 'they cannot do it.'")
     print("    The edge is that Claude does it FOR you, guaranteed, free of output tokens, zero code, and")
-    print("    no competitor ships the primitive at all (they cite web URLs, not your document).\n")
+    print("    only Claude ships a per-character document pointer (Gemini File Search is page-level and")
+    print("    still preview, OpenAI cites its own output).\n")
 
     out = {"corpus_titles": [d["title"] for d in CORPUS], "questions": questions,
            "summaries": summaries}

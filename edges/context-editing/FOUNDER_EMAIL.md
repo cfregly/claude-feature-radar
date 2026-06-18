@@ -36,7 +36,7 @@ tie. So this is a reliability lever for the long tail of your hardest jobs, not 
 {repo_link}
 
 Run it yourself: `make setup`, then `cp .env.example .env` and paste your Anthropic key, then `make
-longhorizon`. About a dollar on Haiku, every number off the real API.
+longhorizon`. About sixty-five cents for the 3-run pass on Haiku, every number off the real API.
 
 Go build,
 
