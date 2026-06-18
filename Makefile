@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps app app-check ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges scan verify verify-live draft check-claims check-docs core-imports test ci deslop gif clean
+.PHONY: setup compare-deps app app-check ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges cadence coverage managed parity-gated scan verify verify-live validate agentic agentic-smoke eval eval-smoke eval-judge retention retention-live cost draft check-claims check-docs core-imports test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -61,6 +61,18 @@ sweep: ## trust-the-result variant sweep (caching on/off x managed/baseline, vs 
 edges: ## the cheap discovery loop: sweep the live docs, diff against the last run, rank, write the landscape + changelog + brief (NO API call, NO benchmark spend, $0)
 	$(PY) run.py edges
 
+cadence: ## the unattended engine: sweep, rank, dispatch by demoKind, draft the newest uncovered lead to the inert outbox, update coverage, write the run manifest, audit the boundary (NO benchmark spend, NO send, $0)
+	$(PY) run.py cadence --dry-run
+
+coverage: ## per-demoKind coverage: what is built vs adapt vs build, and the gaps the engine surfaces about itself (NO API call, $0)
+	$(PY) run.py coverage
+
+managed: ## the Tier-2 monthly resumable Managed Agents runtime, wired but not run (prints the boundary, $0; --apply runs a live session and spends a small bounded amount)
+	$(PY) run.py managed
+
+parity-gated: ## the long-tail parity-gated candidates (fallback credit, cache_miss_reason, Claude Code build velocity), each HELD until its parity check survives (NO API call, $0)
+	$(PY) run.py other
+
 scan: ## print the candidate gaps, grounded in both sides' docs (no API call)
 	$(PY) run.py scan
 
@@ -69,6 +81,33 @@ verify: ## the skeptic pass: ask Claude to break each candidate, keep what survi
 
 verify-live: ## live-claim re-prover: re-check the model access, knobs, and prices against real calls (spends cents)
 	$(PY) scripts/verify_live.py
+
+validate: ## EDGE agentic_grading: prove the local no-Docker grader by resolving every human gold patch (needs compare-deps + uv on PATH, $0 model spend)
+	$(PY) engine/demonstrators/agentic_grading.py --validate
+
+agentic: ## EDGE: SWE-bench repo-repair head-to-head, symmetric multi-turn loop, local no-Docker grading (needs compare-deps + uv + keys, about $4-5)
+	$(PY) engine/demonstrators/agentic_grading.py
+
+agentic-smoke: ## a 1-instance, Claude-only smoke of the agentic grader (cents)
+	$(PY) engine/demonstrators/agentic_grading.py --limit 1 --models opus
+
+eval: ## EDGE eval_quality: the cost x effort grid on a labeled slice, held-out test split, all providers (needs compare-deps + keys, about $3-4)
+	$(PY) engine/demonstrators/eval_quality.py
+
+eval-smoke: ## a cents-scale Claude-only smoke of the eval grid (Haiku + Sonnet, low effort)
+	$(PY) engine/demonstrators/eval_quality.py --models haiku,sonnet --efforts low
+
+eval-judge: ## the eval grid with the cross-model judge panel on (the too-trusting-grader cross-check)
+	$(PY) engine/demonstrators/eval_quality.py --judge
+
+retention: ## EDGE retention_resume: the doc-grounded retention/bundle parity receipt across 3 vendors (NO key, NO Managed Agents spend, $0)
+	$(PY) engine/demonstrators/retention_resume.py
+
+retention-live: ## OPT-IN: the live Managed Agents kill-and-resume (start, resume, negative control, steer; beta, needs ANTHROPIC_API_KEY, spends a small bounded amount)
+	$(PY) engine/demonstrators/retention_resume.py --live
+
+cost: ## EDGE cost: the pure pricing-model edge over swept dated prices, both win and lose regimes with the crossover named (NO API call, NO key, $0)
+	$(PY) engine/demonstrators/cost_model.py
 
 draft: ## draft the founder email from the measured receipt
 	$(PY) run.py draft

@@ -6,3 +6,11 @@
 # Install with: make compare-deps  (installs these into the same .venv that make compare runs in).
 openai>=2.0
 google-genai>=2.0
+
+# The agentic_grading demonstrator's local no-Docker SWE-bench grader (make validate / make agentic).
+# datasets pulls SWE-bench Verified from HuggingFace at run time (the repo never vendors the dataset),
+# and swebench supplies the per-instance env recipe and the official grading parser. Both are imported
+# lazily INSIDE engine/demonstrators/agentic_grading.py, so the one-dependency core never loads them
+# (scripts/check_core_imports.py blocks them to prove it). uv must also be on PATH for the grader.
+datasets>=2.0
+swebench>=2.0

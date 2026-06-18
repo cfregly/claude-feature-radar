@@ -50,8 +50,25 @@ def get_openai_client():
     return OpenAI()
 
 
-def call_openai(client, prompt: str, effort: str | None, model_id: str, max_tokens: int) -> dict:
+def _to_input(prompt) -> list:
+    """Normalize the prompt argument into the Responses-API ``input`` list.
+
+    Accepts either a plain string (one user turn) or a full multi-turn ``messages`` list
+    ([{"role": "user"|"assistant", "content": "..."}, ...]). The list form is what a symmetric
+    agentic loop forwards, so OpenAI sees the SAME accumulated history Claude does, never just the
+    last turn. The Responses API takes role/content items directly, so a Claude-shaped messages list
+    maps across with no translation.
+    """
+    if isinstance(prompt, str):
+        return [{"role": "user", "content": prompt}]
+    return [{"role": m["role"], "content": m["content"]} for m in prompt]
+
+
+def call_openai(client, prompt, effort: str | None, model_id: str, max_tokens: int) -> dict:
     """One timed call. Returns the harness receipt for this response.
+
+    ``prompt`` is either a string (one user turn) or a full multi-turn messages list, so the same
+    helper serves a one-shot call and a symmetric agentic loop that forwards the whole history.
 
     The returned dict is exactly: text, input_tokens, output_tokens, latency_s, truncated.
     output_tokens already includes any reasoning tokens, the way the API reports it. When the response
@@ -60,7 +77,7 @@ def call_openai(client, prompt: str, effort: str | None, model_id: str, max_toke
     """
     request: dict = {
         "model": model_id,
-        "input": [{"role": "user", "content": prompt}],
+        "input": _to_input(prompt),
         "max_output_tokens": max_tokens,
     }
     if effort is not None:

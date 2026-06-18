@@ -30,6 +30,11 @@ _DEMO_MODULES = (
     "edges.programmatic-tool-calling.demo",
     "edges.citations.demo",
     "edges.context-editing.demo",
+    "engine.demonstrators.agentic_grading",
+    "engine.demonstrators.eval_quality",
+    "engine.demonstrators.retention_resume",
+    "engine.demonstrators.cost_model",
+    "engine.demonstrators.other_parity_gated",
 )
 
 

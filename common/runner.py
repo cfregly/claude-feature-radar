@@ -147,13 +147,17 @@ def _result_from_provider(m, r) -> Result:
 def _call_openai(client, m, messages, max_tokens, effort) -> Result:
     from engine.providers.openai_provider import call_openai
     eff = effort if (effort is None or effort in m.effort_levels) else None
-    return _result_from_provider(m, call_openai(client, messages[-1]["content"], eff, m.id, max_tokens))
+    # Forward the FULL messages list, not just the last turn. A multi-turn agentic loop must hand
+    # every provider the same accumulated history Claude gets, or it measures a one-shot OpenAI against
+    # a multi-turn Claude (a confound). A single-turn caller passes a one-element list, unchanged.
+    return _result_from_provider(m, call_openai(client, messages, eff, m.id, max_tokens))
 
 
 def _call_gemini(client, m, messages, max_tokens, effort) -> Result:
     from engine.providers.gemini_provider import call_gemini
     eff = effort if (effort is None or effort in m.effort_levels) else None
-    return _result_from_provider(m, call_gemini(client, messages[-1]["content"], eff, m.id, max_tokens))
+    # Forward the FULL messages list (the symmetric-loop fix), the same as the OpenAI path above.
+    return _result_from_provider(m, call_gemini(client, messages, eff, m.id, max_tokens))
 
 
 def to_arm(result: Result, *, provider: str | None = None, metric: dict | None = None, note: str = ""):

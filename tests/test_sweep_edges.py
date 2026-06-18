@@ -234,15 +234,30 @@ def test_route_dispatches_a_built_edge_to_its_demonstrator():
     assert out[0]["estimate"]["command"] == "make ptc"
 
 
-def test_route_files_build_stub_for_a_new_key():
-    # A genuinely new key whose guessed kind has no registered demonstrator files a build-a-demonstrator
-    # ASK stub that names the kind, rather than crashing.
+def test_route_files_an_ask_stub_for_a_new_held_key():
+    # A genuinely new key guesses its kind from the axis. An observability axis guesses the "other"
+    # kind, whose parity-gated demonstrator DECLINES an unchecked candidate (the parity check has not
+    # passed), so route files a precondition-unmet ASK stub that HOLDS the edge rather than crashing or
+    # pitching it. Either an unmapped-kind "build a demonstrator" stub or a declined precondition stub is
+    # the held, never-pitched state the test protects.
     ranked = [{"key": "brand_new_edge", "lead_score": 2, "axis": "observability"}]
     out = se.route(ranked, covered=set())
     assert out[0]["gate"] == "ask"
     assert out[0]["action"] == "ask-build-demonstrator"
     assert out[0]["demonstrator"] is None
-    assert "build a demonstrator" in out[0]["note"]
+    note = out[0]["note"] or ""
+    assert "build a demonstrator" in note or "precondition is unmet" in note  # held, never pitched
+
+
+def test_route_files_build_stub_for_an_off_taxonomy_kind():
+    # A kind that is not in the canonical taxonomy at all has no registered demonstrator, so route files
+    # the "build a demonstrator for kind X" stub naming it, rather than crashing.
+    ranked = [{"key": "weird_edge", "lead_score": 2, "axis": "cost", "demoKind": "not_a_real_kind"}]
+    out = se.route(ranked, covered=set())
+    assert out[0]["gate"] == "ask"
+    assert out[0]["action"] == "ask-build-demonstrator"
+    assert out[0]["demonstrator"] is None
+    assert "build a demonstrator" in (out[0]["note"] or "")
 
 
 def test_route_never_routes_a_parity_edge():
