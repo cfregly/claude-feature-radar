@@ -22,6 +22,12 @@ def main():
     sys.argv = [sys.argv[0]] + sys.argv[2:]  # pass the rest through to the subcommand
     if cmd == "demo":
         from engine.demo import main as m; m()
+    elif cmd == "compare":
+        from engine.compare import main as m; m()
+    elif cmd == "alert":
+        from engine.product_alert import main as m; m()
+    elif cmd == "sweep":
+        from engine.sweep import main as m; m()
     elif cmd == "scan":
         from engine.scan import main as m; m()
     elif cmd == "verify":

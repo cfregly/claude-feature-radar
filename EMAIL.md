@@ -4,28 +4,29 @@ Paste into a Google Doc or your sending tool. Plain text, one link.
 
 ---
 
-**Subject:** Your agent is quietly overpaying. Two-minute proof.
+**Subject:** OpenAI was cheaper in my benchmark. I still build on Claude. Here is why.
 
 Hey {first_name},
 
-You shipped an agent. It works. Then it runs 40 steps and the bill makes you wince. That is the
-whole transcript getting re-sent every turn, so step one gets billed 40 times over.
+Straight up, because you have already tried all three: I ran the same agent on Claude and OpenAI, a
+fair fight, both at full strength. OpenAI came out cheaper. The benchmark is in the repo so you can
+run it on your own keys and check. We do not cheat, and the README says where we lose.
 
-Claude fixes that with two settings and no extra infra. I put it in a tiny repo you run on your
-own key:
+So why build on Claude? Not price. The reason is the agent primitives the others do not ship. The
+sharpest one for anyone building tool-heavy agents is context editing. It clears stale tool results
+out of your context server-side, in place, with one header. OpenAI either summarizes them and loses
+detail, or makes you wire the eviction logic yourself. Gemini's version is realtime-only. Claude is
+the only one that ships it as a managed API feature, so a long agent stays bounded and you build
+nothing.
 
 {repo_link}
 
-Same agent, same answer, run twice. Plain run, the cost climbs every step. Claude run with context
-editing plus a memory tool, the cost stays flat and lands at half the price on a 32-step task. The
-longer your agent runs, the wider that gap gets.
+`make compare` runs the fair benchmark on your keys. `make demo` shows context editing holding the
+context flat (peak around 3k tokens instead of 36k) while the agent stays correct. Real numbers,
+measured, not asserted by me.
 
-`make setup`, paste your key, `make demo`. Every number is measured live, not asserted by me.
-
-Honest bit: both features are beta and the other platforms keep shipping, so the repo re-checks
-the claim and tells you the day it stops being true.
-
-Building something agentic? Hit reply. I will get you credits and a second set of eyes.
+Build it on Claude Code or the Agent SDK and it is one flag away. Reply if you want a hand wiring it
+in.
 
 Go build,
 
@@ -36,7 +37,10 @@ Building with Claude
 
 ### Why it is built this way (not part of the email)
 
-- **One claim, one proof, one link.** A founder who has tried all three platforms deletes a
-  feature list. They will run a two-minute thing that proves a number on their own key.
-- **No competitor named.** The sourced, named comparison is one click away in the repo's brief.
-- **The honest caveat earns the rest.** Saying it is beta and can move is what makes it land.
+- **It leads with the loss.** A founder who has tried all three deletes a "we are cheaper" email on
+  sight, because they can check. Opening with "OpenAI was cheaper" buys the right to be believed on
+  the next sentence.
+- **One verified differentiator, reproducible.** Context editing survived a hard skeptic pass as the
+  only managed-API in-place clearing primitive, and a founder turns it on in one line.
+- **No overclaim.** Not "Claude is cheaper" (false), not "Claude Code is better" (it is parity with
+  Codex). Just the one thing only we ship, with the run-it-yourself proof.

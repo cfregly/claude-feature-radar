@@ -1,0 +1,5 @@
+# Optional. Only needed for the cross-platform comparison (make compare / make sweep).
+# The core Claude demo (make demo) needs only anthropic.
+# Install with: pip install -r requirements-compare.txt
+openai>=2.0
+google-genai>=2.0

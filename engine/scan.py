@@ -1,78 +1,75 @@
-"""scan: the candidate capability gaps, each grounded in both sides' own docs.
+"""scan: the verified competitive picture, the data layer of the engine.
 
-The data layer of the engine. It holds the gaps the 2026-06-17 scan surfaced: what Claude has,
-what the competitors have, and the verdict from the skeptic pass (engine/verify.py). The committed
-snapshot is what the README and the brief are built on. Re-running against live docs refreshes it.
+Holds what the 2026-06-17 audit found after a skeptic refuted every claim: what is genuinely
+Claude-ahead, what is parity or refuted, and where Claude is behind. Competitors are named here
+because it is sourced evidence. Founder-facing text anonymizes them. Re-run the audit to refresh.
 
-Competitors are named here because this is sourced evidence. Founder-facing text anonymizes them.
+Source: briefs/2026-06-17-verified-picture.md
 """
 
 from __future__ import annotations
 
-CANDIDATES = [
+# Survived the skeptic as genuinely Claude-ahead.
+DIFFERENTIATORS = [
     {
-        "key": "managed-runtime",
-        "claim": "Only Claude has a managed agent runtime.",
-        "claude": "Claude Managed Agents (beta): hosted loop, sandbox, sessions, tools.",
-        "competitors": "OpenAI Responses API runs the loop server-side. Google Agent Engine has "
-                       "been GA since 2025.",
-        "verdict": "killed",
-        "why": "Both competitors ship a hosted agent runtime. Nothing exclusive here.",
+        "key": "context-editing", "axis": "cost/context",
+        "claim": "Server-side in-place clearing of stale tool results (clear_tool_uses_20250919).",
+        "why": "OpenAI's trimmer is client-side, its compaction summarizes, Gemini's is "
+               "realtime-only. Only Claude ships in-place clearing as a managed API feature. It "
+               "bounds context, it is not a raw cost win when caching is on.",
     },
     {
-        "key": "agent-memory",
-        "claim": "Only Claude has agent memory.",
-        "claude": "A memory tool the model itself drives (memory_20250818), plus hosted stores.",
-        "competitors": "Google Memory Bank is a managed memory service (GA 2025-12-16). OpenAI has "
-                       "conversation persistence and a client-side SDK pattern, no managed service.",
-        "verdict": "survives-narrow",
-        "why": "The gap is shape, not existence: Claude's memory is a tool the model drives. State "
-               "it that way, never as 'they have no memory'.",
+        "key": "self-hosted-sandbox", "axis": "maintenance",
+        "claim": "Managed agent loop on Anthropic, tool execution on your own infrastructure.",
+        "why": "No competitor ships this exact hybrid (others host everything or you host "
+               "everything). Beta.",
     },
     {
-        "key": "context-management",
-        "claim": "Only Claude does server-side context management.",
-        "claude": "Context editing clears stale tool results in place, server-side. Claude also "
-                  "offers compaction, so it is the only one with both.",
-        "competitors": "OpenAI has server-side compaction (summarize). Google has a client-side "
-                       "ADK compaction toggle, nothing managed.",
-        "verdict": "survives-narrow",
-        "why": "The gap is mechanism: in-place clearing of tool results, distinct from "
-               "summarize-and-replace. Do not claim a wholesale gap against OpenAI.",
-    },
-    {
-        "key": "self-improvement",
-        "claim": "Claude agents learn and improve from past runs.",
-        "claude": "Memory plus edited plans. Not weight-level learning.",
-        "competitors": "Same everywhere: retrieval plus memory, no weight-level continual learning.",
-        "verdict": "killed",
-        "why": "Nobody ships autonomous self-improvement. Easiest claim to puncture.",
+        "key": "memory-tool", "axis": "developer-experience",
+        "claim": "A memory tool the model itself drives over durable files.",
+        "why": "Only Anthropic has model-driven plus read-write plus durable files plus "
+               "cross-session as an API primitive. Architecture-shape lead, beta.",
     },
 ]
 
-# What the two surviving-narrow dimensions combine into, and what the demo proves.
+# Refuted or parity. Do NOT pitch these.
+PARITY = [
+    {"note": "Claude Code is parity with OpenAI Codex and Google Antigravity."},
+    {"note": "Hosted agent runtime is parity (OpenAI Responses loop, Google Vertex Agent Engine)."},
+    {"note": "Dreaming (async memory consolidation): parity (Codex Memories plus Vertex Memory Bank)."},
+    {"note": "Outcomes (rubric self-grade plus retry): refuted (Google Jules' critic plus Vertex)."},
+]
+
+# Where Claude is behind. Feeds the product-team email.
+GAPS = [
+    {"note": "OpenAI is cheaper on the fair benchmark."},
+    {"note": "Cache retention: Gemini arbitrary TTL, OpenAI 24h, vs Claude fixed 5m or 1h."},
+    {"note": "OpenAI's Secure MCP Tunnel went GA 2026-05-27, ahead of Claude's beta."},
+    {"note": "Long-context billing: GPT-5.5 larger ceiling, Gemini arbitrary-TTL caching over 1M."},
+]
+
 CHOSEN = (
-    "the pair: a memory tool the model drives, plus in-place server-side context editing. "
-    "Together they hold a long agent's per-turn cost roughly flat while keeping it correct."
+    "context editing (clear_tool_uses_20250919): server-side, in-place clearing of stale tool "
+    "results, the only managed-API in-place clearing primitive. It bounds a long tool-heavy "
+    "agent's context with one beta header, without you building eviction logic. Honest scope: it "
+    "bounds context, it is not a cheaper bill when caching is on."
 )
 
 
-def survivors():
-    return [c for c in CANDIDATES if c["verdict"].startswith("survives")]
-
-
 def main():
-    print("\n  Candidate gaps, 2026-06-17 scan (competitors named here, anonymized for founders)\n")
-    for c in CANDIDATES:
-        mark = "KILLED  " if c["verdict"] == "killed" else "SURVIVES"
-        print(f"  [{mark}] {c['claim']}")
-        print(f"            Claude:      {c['claude']}")
-        print(f"            Competitors: {c['competitors']}")
-        print(f"            Verdict:     {c['why']}\n")
-    print("  Chosen anchor:")
-    print(f"    {CHOSEN}\n")
-    print("  Proof:   engine/demo.py")
-    print("  Sources: briefs/2026-06-17-context-editing-and-memory.md\n")
+    print("\n  Verified competitive picture, 2026-06-17 (every claim skeptic-refuted)\n")
+    print("  Claude-ahead (survived the skeptic):")
+    for d in DIFFERENTIATORS:
+        print(f"    + [{d['axis']}] {d['claim']}")
+        print(f"        {d['why']}")
+    print("\n  Parity or refuted (do not pitch):")
+    for p in PARITY:
+        print(f"    = {p['note']}")
+    print("\n  Where Claude is behind (the product email):")
+    for g in GAPS:
+        print(f"    - {g['note']}")
+    print(f"\n  Anchor for the founder email:\n    {CHOSEN}")
+    print("\n  Source: briefs/2026-06-17-verified-picture.md\n")
 
 
 if __name__ == "__main__":

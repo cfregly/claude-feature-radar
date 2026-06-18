@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from common.client import get_client
 from common.models import get
-from engine.scan import CANDIDATES
+from engine.scan import DIFFERENTIATORS
 
 SYSTEM = (
     "You are a skeptical startup CTO who has shipped on OpenAI, Google Gemini, and Anthropic "
@@ -22,9 +22,8 @@ SYSTEM = (
 def main():
     client = get_client()
     body = "\n\n".join(
-        f"key: {c['key']}\nclaim: {c['claim']}\nClaude: {c['claude']}\n"
-        f"competitors: {c['competitors']}"
-        for c in CANDIDATES
+        f"key: {c['key']}\nclaim Claude is ahead: {c['claim']}\nwhy: {c['why']}"
+        for c in DIFFERENTIATORS
     )
     msg = client.messages.create(
         model=get("haiku").id,

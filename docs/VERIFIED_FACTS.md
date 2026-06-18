@@ -73,10 +73,30 @@ object the API returns: `input_tokens`, `output_tokens`, `cache_read_input_token
 `cache_creation_input_tokens` (and the `cache_creation` 5m/1h split when caching runs). Every
 dollar figure in this repo is those counts times the verified rates above.
 
+## OpenAI comparison (the compare module)
+
+The cross-platform view ([`../engine/compare.py`](../engine/compare.py),
+[`../engine/openai_arm.py`](../engine/openai_arm.py)) runs on OpenAI's Chat Completions API,
+verified 2026-06-17 against developers.openai.com.
+
+- Models and prices per 1M tokens, from the pricing page: `gpt-5.4-mini` is $0.75 input, $0.075
+  cached input, $4.50 output. `gpt-5.4-nano` is $0.20 / $0.02 / $1.25. The older `gpt-4o-mini` and
+  `gpt-5-mini` are no longer listed.
+- The tool-use loop is `client.chat.completions.create(model, messages, tools, parallel_tool_calls=False)`.
+  `parallel_tool_calls=False` forces one step per turn, matching the Claude run.
+- Cost reads from `response.usage`: `prompt_tokens` (input, includes cached), `completion_tokens`
+  (output), and `prompt_tokens_details.cached_tokens` (the cached subset, billed at the cached rate).
+- OpenAI has no in-place context editing and no model-driven memory tool on Chat Completions. Its
+  server-side context lever is compaction on the Responses API, which summarizes. Sources:
+  [function calling](https://developers.openai.com/api/docs/guides/function-calling),
+  [compaction](https://developers.openai.com/api/docs/guides/compaction).
+- `openai` is an optional dependency ([`../requirements-compare.txt`](../requirements-compare.txt)),
+  needed only for the comparison.
+
 ## What is not verified, and is therefore not quoted
 
 - A "roughly 84% context reduction" figure for context editing circulates online but was not found
   on the current doc page. This repo measures its own reduction instead of quoting that number.
 - Competitor capabilities are cited from the competitors' own docs in
-  [`../briefs/2026-06-17-context-editing-and-memory.md`](../briefs/2026-06-17-context-editing-and-memory.md),
+  [`../briefs/2026-06-17-verified-picture.md`](../briefs/2026-06-17-verified-picture.md),
   dated 2026-06-17. They move monthly. Re-run the scan before reusing them.

@@ -1,0 +1,18 @@
+
+  Same 32-report chain audit, both platforms at full strength.
+  OpenAI gpt-5.4-mini (Responses, compaction+caching)  vs  Claude Haiku 4.5 (context editing+memory+caching)
+  Both trim carried context at ~20,000 tokens. True URGENT count: 11
+
+  (Gemini skipped, quota or load: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is cur)
+  outcomes a founder pays for
+  platform                    cost(USD)  time(s)  peak ctx  answer  correct
+  -------------------------------------------------------------------------
+  OpenAI gpt-5.4-mini           0.04565     40.4    19,331       9       no
+  Claude Haiku 4.5 (best)       0.15255     81.0     3,035      11      yes
+  Claude Haiku 4.5 (baseline)    0.12306     55.4     3,989      11      yes
+
+  Verdict (OpenAI best vs Claude best, the fair head-to-head):
+  - correctness differs (OpenAI WRONG, Claude ok). Report correctness first, cost second.
+
+  wrote receipts to data/last_compare.json
+

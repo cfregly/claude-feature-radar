@@ -9,7 +9,8 @@ import sys
 
 BANNED = {"—": "em-dash", "–": "en-dash", ";": "semicolon"}
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DOCS = ["README.md", "CLAUDE.md", "EMAIL.md", "docs/VERIFIED_FACTS.md"]
+DOCS = ["README.md", "CLAUDE.md", "EMAIL.md", "SKILL.md", "PRODUCT_EMAIL.md",
+        "docs/VERIFIED_FACTS.md", "docs/FINDINGS.md"]
 
 
 def _targets():

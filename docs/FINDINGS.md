@@ -1,0 +1,60 @@
+# Findings: the knobs, the confounds, and why we sweep before we trust
+
+A fair cross-platform agent benchmark has many knobs, and several of them quietly decide the
+result. These are the ones we found the hard way. Every one would have produced a false claim if we
+had trusted a single run.
+
+## 1. Prompt ambiguity (the "Answer: K" confound)
+
+The task asked the agent to "reply with exactly `Answer: K`", meaning K as a placeholder for the
+count. gpt-5.4-mini sometimes echoed the literal `K`, while Claude substituted the number, so the
+correctness column read "Claude right, OpenAI wrong" for a reason that had nothing to do with the
+platforms. Fix: an unambiguous format, "reply with `Answer: N`, replace N with the integer count,
+for example `Answer: 7`". After the fix, all platforms returned the number. Lesson: a benchmark
+prompt must be unambiguous, or it measures prompt-following, not the thing you think it measures.
+
+## 2. Caching and context editing fight (the cost confound)
+
+On Claude, prompt caching reads the stable prefix cheaply, but context editing clears stale tool
+results in place, which rewrites that prefix and invalidates the cache. Measured on a 32-step chain:
+the baseline with caching pulled hundreds of thousands of cache-read tokens, while the managed run
+(context editing on) pulled far fewer, because clearing kept breaking the cache. So context editing
+is NOT a cost win when caching is on. It is a context-size and context-limit tool. Lesson: a feature
+that helps one metric (carried tokens) can hurt another (dollars), and you only see it by toggling
+caching on AND off.
+
+## 3. Compaction can lose the thread (the correctness confound)
+
+OpenAI's server-side compaction summarizes older turns. On a sequential chain task that can
+summarize away the state the agent needs to continue (the next pointer, the running count), so the
+agent stops early or miscounts. But its other best config, no compaction with caching only, carries
+the full context cheaply. Lesson: "use the competitor's best feature" is not one config, it is a
+few, and you have to try each to find the competitor's real best.
+
+## 4. Cross-vendor numbers are not directly comparable
+
+Different tokenizers, different model tiers, different pricing. Compare the shape and the outcomes
+(cost, time, correctness), name the model tier, and let a founder swap in their own task.
+
+## 5. The correctness edge was a model-tier artifact
+
+On a 32-step chain, Claude Haiku 4.5 returned the right count while OpenAI gpt-5.4-mini undercounted
+(8 and 10 vs 11). It was tempting to call that "Claude is more reliable." It is not. OpenAI's
+stronger model, gpt-5.4, returned the correct 11 on the same task. So the gap was Haiku 4.5 beating
+gpt-5.4-mini at the cheap tier, not a platform property, and it disappears one tier up. Lesson:
+before any correctness claim, run the competitor's stronger model too. A cheap-tier win is a
+model-tier win, not a platform win.
+
+## What the benchmark is for
+
+Run fairly and exhaustively, the benchmark does not hand Claude a clean cost, speed, or correctness
+win on a generic agent task. OpenAI is cheaper, and the cheap-tier correctness edge is a model
+artifact. That is the honest result, and it is exactly why the benchmark is a credibility tool, a
+fair fight a founder can run on their own keys, and not the sales pitch. The pull is a genuinely
+Claude-only capability, which the audit finds.
+
+## The current benchmark result
+
+The latest run is in [`../sample_sweep.txt`](../sample_sweep.txt) and `../data/last_sweep.json`,
+re-run with `make sweep`. Read it, do not quote it from here, because it changes as the platforms
+ship.
