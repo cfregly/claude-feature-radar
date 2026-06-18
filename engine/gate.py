@@ -71,16 +71,27 @@ NEVER_ACTIONS = [
 ]
 
 
-def audit(did: list[dict]) -> list[str]:
+def audit(did: list[dict], routing: list[dict] | None = None) -> list[str]:
     """The check that makes autonomy accountable: nothing that changes your repo,
     your spend, or the world may appear in the unattended work. Returns the
-    violations. An empty list means the boundary held."""
+    violations. An empty list means the boundary held.
+
+    The estimate-surfaced check: a routing decision that proposes spending a credit
+    (gate ask, a demonstrator that runs an arm) must carry a surfaced cost estimate,
+    because no demonstrator may spend until its estimate is shown and approved. A
+    proposed ask-run with estimate_surfaced False is a boundary violation: the cadence
+    would be queuing a spend the human never saw a number for. A $0 demonstrator (gate
+    always) needs no estimate, it spends nothing."""
     out: list[str] = []
     for a in did:
         if a.get("outward"):
             out.append(f"outward action ran unattended: {a['id']}")
         if a.get("gate") != ALWAYS:
             out.append(f"non-always action ran unattended: {a['id']} ({a.get('gate')})")
+    for r in (routing or []):
+        if r.get("gate") == ASK and r.get("demonstrator") and not r.get("estimate_surfaced"):
+            out.append(f"spend proposed without a surfaced estimate: {r.get('key')} "
+                       f"({r.get('demonstrator')})")
     return out
 
 

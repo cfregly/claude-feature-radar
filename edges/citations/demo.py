@@ -44,6 +44,8 @@ import time
 from common.client import fmt_usd, get_client, load_env, repo_root
 from common.models import get
 from common.pricing import cost_usd
+from engine.demonstrators.base import Arm, BaseDemonstrator, CostEstimate, Verdict
+from engine.demonstrators.registry import register
 
 # A small corpus of plain-text "your own documents", the RAG shape: short internal docs with
 # specific, citable facts. Plain text so a citation is a character range we can resolve exactly.
@@ -268,6 +270,110 @@ def _roll(name, rows, n, primitive=False):
         "cost": sum(r["cost"] for r in rows),
         "time": sum(r["latency_s"] for r in rows),
     }
+
+
+# --------------------------------------------------------------- the Demonstrator interface
+#
+# grounding_resolution: Claude returns a guaranteed-valid, output-token-free, character-level source
+# pointer into the user's own document, where the DIY path on any vendor must str.find and breaks on
+# paraphrase. The Claude arm is Citations; the competitor arms are the DIY paths (Claude DIY, OpenAI
+# DIY, Gemini DIY), each access-probed and never faked. The same machine gate runs on every arm: a
+# Citations pointer must satisfy source[start:end]==cited_text, a DIY quote must satisfy
+# source.find(quote)!=-1. The honest verdict: on clean text the DIY arms resolve about as well, so the
+# edge is a within-Claude value-add (the in-API guarantee, the free quote, char granularity), not a
+# capability the others lack. The base honesty contract keeps it from over-claiming a head-to-head win.
+
+def _arm_from_summary(provider, model_id, s, ran=True, note=""):
+    return Arm(provider=provider, model=model_id, ran=ran,
+               output_tokens=s["output_tokens"], cost_usd=s["cost"], latency_s=s["time"],
+               metric={"resolved": s["resolved"], "questions": s["questions"],
+                       "resolver": s["resolver"], "quote_free": s["quote_free"],
+                       "primitive": s.get("primitive", False)}, note=note)
+
+
+class CitationsDemonstrator(BaseDemonstrator):
+    demo_kind = "grounding_resolution"
+
+    def estimate(self, edge, spec):
+        n = 3 if spec.get("quick") else len(QUESTIONS)
+        return CostEstimate(usd=0.06, wall_clock_s=120.0, command="make citations",
+                            note=f"{n} questions x up to four arms; OpenAI/Gemini arms run only with their keys")
+
+    def _questions(self, spec):
+        return QUESTIONS[:3] if spec.get("quick") else QUESTIONS
+
+    def run_claude_arm(self, edge, spec):
+        client = spec.get("client") or get_client()
+        model_key = spec.get("claude_model", "haiku")
+        qs = self._questions(spec)
+        rows = run_claude_citations(client, model_key, CORPUS, qs)
+        s = _roll("Claude + Citations (the primitive)", rows, len(qs), primitive=True)
+        return _arm_from_summary("claude", get(model_key).id, s,
+                                 note="Citations: the API resolves the pointer and guarantees it, the quote is free of output tokens")
+
+    def run_competitor_arms(self, edge, spec):
+        client = spec.get("client") or get_client()
+        model_key = spec.get("claude_model", "haiku")
+        qs = self._questions(spec)
+        arms = []
+        # The realistic DIY baseline on Claude itself: the path a founder builds WITHOUT the feature.
+        cd = _roll("Claude DIY (model quote + your str.find)", run_claude_diy(client, model_key, CORPUS, qs), len(qs))
+        arms.append(_arm_from_summary("claude", get(model_key).id, cd,
+                                      note="DIY: model returns a verbatim quote, your own str.find resolves it"))
+        # OpenAI and Gemini DIY arms, each access-probed: a missing key or SDK is ran=False, never faked.
+        for provider, runner, model in [
+            ("openai", run_openai_diy, spec.get("openai_model", "gpt-5.4-mini")),
+            ("gemini", run_gemini_diy, spec.get("gemini_model", "gemini-3.5-flash")),
+        ]:
+            try:
+                s = _roll(f"{provider} DIY", runner(CORPUS, qs, model), len(qs))
+                arms.append(_arm_from_summary(provider, model, s))
+            except SystemExit as e:
+                arms.append(Arm(provider=provider, model=model, ran=False, note=str(e)[:120]))
+            except Exception as e:  # noqa: BLE001
+                arms.append(Arm(provider=provider, model=model, ran=False, note=str(e)[:120]))
+        return arms
+
+    def score(self, claude, competitors, spec):
+        # The SAME machine gate on every arm: resolve rate, by construction for Citations, by str.find
+        # for the DIY arms. On clean text the DIY arms resolve about as well, so the honest verdict is a
+        # within-Claude value-add, not a head-to-head capability win. The pass condition is that the
+        # primitive resolves every question it cited.
+        n = claude.metric.get("questions", 0)
+        passed = n > 0 and claude.metric.get("resolved", 0) == n
+        ran = [a for a in competitors if a.ran]
+        diy_match = ran and all(a.metric.get("resolved", 0) == n for a in ran)
+        verdict = "within-claude-only" if (passed and diy_match) else ("claude-ahead" if passed else "never-evaluated")
+        return Verdict(
+            verdict=verdict, passed=passed,
+            metric={"claude_resolved": f"{claude.metric.get('resolved')}/{n}",
+                    "claude_output_tokens": claude.output_tokens,
+                    "diy_arms_also_resolve": bool(diy_match),
+                    "competitor_output_tokens": {a.provider: a.output_tokens for a in ran}},
+            note="Citations resolves every cited question and is free of output tokens; on clean text "
+                 "the DIY arms also resolve, so the edge is the in-API guarantee, the free quote, and "
+                 "char granularity, a within-Claude value-add, not a capability the others lack",
+        )
+
+    def receipt(self, edge, claude, competitors, verdict, spec):
+        return self.build_receipt(
+            edge, claude, competitors, verdict, spec,
+            workload={
+                "task_shape": f"{len(self._questions(spec))} questions over {len(CORPUS)} plain-text user documents",
+                "model": claude.model, "features_on": ["citations.enabled"],
+                "assumptions": "clean plain text resolves on every arm; the edge is the in-API "
+                               "guarantee, the free quote, and char granularity, not a missing "
+                               "competitor capability; Citations is incompatible with Structured Outputs (400)",
+            },
+            grounding=[{"claim": "citations are guaranteed to contain valid pointers; cited_text does not count toward output tokens",
+                        "source_url": "https://platform.claude.com/docs/en/build-with-claude/citations",
+                        "date": "2026-06-18"}],
+            fairness={"best_to_best": "the DIY arms run each vendor's latest model at full strength",
+                      "isolate": "same documents and questions on every arm; only the resolve mechanism differs"},
+        )
+
+
+register(CitationsDemonstrator())
 
 
 def main():

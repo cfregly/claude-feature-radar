@@ -45,6 +45,8 @@ import time
 from common.client import fmt_usd, get_client, load_env, repo_root
 from common.models import get
 from common.pricing import cost_usd
+from engine.demonstrators.base import Arm, BaseDemonstrator, CostEstimate, Verdict
+from engine.demonstrators.registry import register
 
 REGIONS = ["north", "south", "east", "pacific"]
 PRODUCTS = ["widget", "gadget", "sprocket", "gizmo", "doohickey", "flange", "valve", "bracket"]
@@ -176,6 +178,89 @@ def run_mode(client, model_key, *, programmatic, max_turns=8):
         "turns": turns, "tool_calls": tool_calls, "answer": parse_winner(final_text),
         "time": time.perf_counter() - t0,
     }
+
+
+# --------------------------------------------------------------- the Demonstrator interface
+#
+# token_accounting: PTC bills fewer input tokens for the same correct answer than the naive path,
+# counted apples-to-apples. The Claude arm is Mode B (PTC), and its A/B baseline (Mode A, plain tool
+# use) rides in the arm's metric. There is no head-to-head competitor arm: no named OpenAI or Google
+# surface keeps a developer's OWN custom-tool OUTPUTS out of context, so the competitor side is a
+# doc-grounded absence (ran=False), and the verdict rests on the edge's all-fetched
+# absence-of-evidence lead_basis, enforced by the base build_receipt honesty contract.
+
+class PTCDemonstrator(BaseDemonstrator):
+    demo_kind = "token_accounting"
+
+    def estimate(self, edge, spec):
+        model = (self.fair_comparison(edge).get("claude_config") or {}).get("model", "sonnet")
+        return CostEstimate(usd=0.06, wall_clock_s=90.0, command="make ptc",
+                            note=f"two fan-out runs on {model}, the only spend is the model arms")
+
+    def run_claude_arm(self, edge, spec):
+        client = spec.get("client") or get_client()
+        model_key = spec.get("model") or (self.fair_comparison(edge).get("claude_config") or {}).get("model", "sonnet")
+        winner = spec.get("winner") or true_winner()[0]
+        a_run = run_mode(client, model_key, programmatic=False)   # Mode A: plain tool use (the A/B baseline)
+        b_run = run_mode(client, model_key, programmatic=True)    # Mode B: PTC (the Claude arm)
+        pct = (1 - b_run["billed_input"] / a_run["billed_input"]) * 100 if a_run["billed_input"] else 0.0
+        return Arm(
+            provider="claude", model=get(model_key).id, text=str(b_run["answer"]),
+            latency_s=b_run["time"], input_tokens=b_run["billed_input"],
+            output_tokens=b_run["output_tokens"], cost_usd=b_run["cost"], ctx=b_run["billed_input"],
+            metric={
+                "mode_b_billed_input": b_run["billed_input"], "mode_a_billed_input": a_run["billed_input"],
+                "pct_input_reduction": round(pct, 1), "round_trips": b_run["turns"],
+                "mode_b_answer": b_run["answer"], "mode_a_answer": a_run["answer"],
+                "mode_b_correct": b_run["answer"] == winner, "mode_a_correct": a_run["answer"] == winner,
+                "mode_a_cost": a_run["cost"],
+            },
+            note="Mode B is PTC, Mode A is the within-Claude plain-tool-use baseline carried in metric",
+        )
+
+    def run_competitor_arms(self, edge, spec):
+        # No named OpenAI or Google surface keeps a developer's own custom-tool OUTPUTS out of context.
+        # The competitor side is a documented absence, never a faked or zeroed row.
+        return [Arm(provider="openai", model="(none: no allowed_callers equivalent)", ran=False,
+                    note="OpenAI ships a code interpreter and tool search but keeps no custom-tool "
+                         "OUTPUTS out of context; doc-grounded absence, not a head-to-head loss"),
+                Arm(provider="gemini", model="(none: no allowed_callers equivalent)", ran=False,
+                    note="no named Gemini equivalent keeps custom-tool OUTPUTS out of context")]
+
+    def score(self, claude, competitors, spec):
+        # The SAME machine-checkable gate the CLI asserts: the answer is correct AND PTC billed fewer
+        # input tokens than the plain path. No rubric.
+        m = claude.metric
+        passed = bool(m.get("mode_b_correct")) and m.get("mode_b_billed_input", 0) < m.get("mode_a_billed_input", 0)
+        return Verdict(
+            verdict="claude-ahead" if passed else "never-evaluated", passed=passed,
+            metric={"pct_input_reduction": m.get("pct_input_reduction"),
+                    "mode_b_billed_input": m.get("mode_b_billed_input"),
+                    "mode_a_billed_input": m.get("mode_a_billed_input"),
+                    "round_trips": m.get("round_trips")},
+            note="answer matches and PTC billed fewer input tokens" if passed
+                 else "the PTC invariant did not hold this run",
+        )
+
+    def receipt(self, edge, claude, competitors, verdict, spec):
+        fc = self.fair_comparison(edge)
+        return self.build_receipt(
+            edge, claude, competitors, verdict, spec,
+            workload={
+                "task_shape": fc.get("task_shape", f"fan-out, {len(REGIONS)} regions x ~{ROWS_PER_REGION} rows"),
+                "model": claude.model, "features_on": ["allowed_callers", "code_execution_20260120"],
+                "assumptions": "fan-out shaped; sequential single-call tasks are flat to +8%; adds "
+                               "round-trips; not on Bedrock or Vertex, not ZDR-eligible",
+            },
+            grounding=[{"claim": "PTC keeps tool outputs out of model context (allowed_callers)",
+                        "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling",
+                        "date": "2026-06-18"}],
+            fairness={"best_to_best": "same model both modes, Claude's full PTC stack on",
+                      "isolate": "only programmatic-tool-calling toggled; memory and prompt held constant"},
+        )
+
+
+register(PTCDemonstrator())
 
 
 def main():

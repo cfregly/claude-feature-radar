@@ -196,14 +196,16 @@ def test_parity_and_behind_score_zero():
 # ----- rank sorts genuine leads above parity, and keeps parity in the list -----
 
 def test_rank_keeps_parity_but_below_leads():
+    # Use a built-edge key (ptc) for the lead: it carries a seed demoKind with a registered
+    # demonstrator, so it survives the never-evaluated demotion that an unbuilt guessed kind takes.
     caps = {
-        "claude:lead": _cap("claude", "lead", axis="cost"),           # no competitor: lead 2
+        "claude:ptc": _cap("claude", "ptc", axis="cost"),             # no competitor: lead 2
         "claude:parity": _cap("claude", "parity", axis="cost"),       # competitor parity: lead 0
         "openai:parity": _cap("openai", "parity"),
     }
     ranked = se.rank(caps, all_competitor_fetched_ok=True)
     keys = [e["key"] for e in ranked]
-    assert keys[0] == "lead"
+    assert keys[0] == "ptc"
     parity = next(e for e in ranked if e["key"] == "parity")
     assert parity["lead_score"] == 0  # kept in the landscape, never pitched
     assert ranked[0]["score"] > parity["score"]
@@ -217,18 +219,30 @@ def test_rank_holds_leads_when_competitors_unfetched():
     assert ranked[0]["verdict"] == "never-evaluated"
 
 
-# ----- route sends a known key to its built edge, a new key to an ASK stub -----
+# ----- route (now dispatch by demoKind) sends a built key to its demonstrator, a new key to a stub -----
 
-def test_route_uses_existing_for_a_built_edge():
+def test_route_dispatches_a_built_edge_to_its_demonstrator():
+    # A built edge keys to a registered demonstrator. The demonstrator spends a credit, so the gate is
+    # ASK and its estimate is surfaced (no spend until a human sees the number). The demonstrator name
+    # rides on the decision.
     ranked = [{"key": "ptc", "lead_score": 2, "axis": "cost"}]
     out = se.route(ranked, covered={"programmatic-tool-calling"})
-    assert out[0]["action"] == "use-existing" and out[0]["gate"] == "always"
+    assert out[0]["covered"] is True
+    assert out[0]["demonstrator"] == "PTCDemonstrator"
+    assert out[0]["gate"] == "ask"               # PTC spends a credit, so it waits for approval
+    assert out[0]["estimate_surfaced"] is True   # the estimate is shown before any spend
+    assert out[0]["estimate"]["command"] == "make ptc"
 
 
-def test_route_files_ask_stub_for_a_new_key():
-    ranked = [{"key": "brand_new_edge", "lead_score": 2, "axis": "reliability"}]
+def test_route_files_build_stub_for_a_new_key():
+    # A genuinely new key whose guessed kind has no registered demonstrator files a build-a-demonstrator
+    # ASK stub that names the kind, rather than crashing.
+    ranked = [{"key": "brand_new_edge", "lead_score": 2, "axis": "observability"}]
     out = se.route(ranked, covered=set())
-    assert out[0]["gate"] == "ask"  # scaffolding and benchmarking both wait for a human
+    assert out[0]["gate"] == "ask"
+    assert out[0]["action"] == "ask-build-demonstrator"
+    assert out[0]["demonstrator"] is None
+    assert "build a demonstrator" in out[0]["note"]
 
 
 def test_route_never_routes_a_parity_edge():

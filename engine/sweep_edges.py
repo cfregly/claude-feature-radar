@@ -39,6 +39,8 @@ import urllib.request
 
 from common.client import repo_root
 from engine import scan
+from engine.demokinds import demokind_for, is_seeded
+from engine.demonstrators.registry import dispatch
 from engine.sources_registry import sources
 
 UA = "claude-competitive-engine/edges (+local-sweep; stdlib-urllib)"
@@ -286,12 +288,25 @@ def rank(caps: dict, all_competitor_fetched_ok: bool) -> list[dict]:
     for cap in claude:
         lead, verdict = _lead_score(cap, competitors, all_competitor_fetched_ok)
         v = _value_score(cap)
-        edges.append({
+        edge = {
             "key": cap["key"], "vendor": "claude", "axis": cap.get("axis", "unknown"),
             "status": cap.get("status"), "beta_header": cap.get("beta_header"),
+            "fetched_date": cap.get("fetched_date"),
             "evidence_quote": cap.get("evidence_quote", ""), "source_url": cap.get("source_url"),
             "value_score": v, "lead_score": lead, "score": v * lead, "verdict": verdict,
-        })
+        }
+        # Stamp demoKind + fair_comparison from the seed table (engine/scan.stamp_demokind). A built
+        # edge inherits its vetted seed spec; an unknown key gets an axis->demoKind guess. A guessed
+        # kind with no registered demonstrator is held never-evaluated, the same honesty cut the
+        # absence-of-evidence rule already makes: it stays in the landscape, it is never pitched.
+        scan.stamp_demokind(edge)
+        if lead > 0 and not is_seeded(cap["key"]) and dispatch(edge).demonstrator is None:
+            edge["lead_score"], edge["score"], edge["verdict"] = 0, 0, "never-evaluated"
+        # Apply the grounded landscape correction (managedAgentsCorrection): retention and
+        # context-management keys are doc-grounded parity, never an absence-of-evidence Claude-only
+        # lead manufactured from a competitor key the registry simply does not carry.
+        scan.apply_grounding_correction(edge)
+        edges.append(edge)
     edges.sort(key=lambda e: (e["score"], e["value_score"]), reverse=True)
     return edges
 
@@ -328,26 +343,52 @@ def _covered_dirs() -> set[str]:
     return {p.name for p in edges_root.iterdir() if p.is_dir()} if edges_root.exists() else set()
 
 
-# ----- route (existing edge vs ASK stub for a genuinely new key) ---------------------------------
+# ----- dispatch (registry-keyed routing by demoKind) ---------------------------------------------
 
 def route(ranked: list[dict], covered: set[str]) -> list[dict]:
-    """For each genuine-lead edge (lead_score > 0) with no built benchmark, emit a routing decision.
-    A known key maps to its existing edges/<dir>. A genuinely new key files an ASK stub, it does NOT
-    scaffold or run anything: benchmarks spend credits and a new folder changes the repo, both ASK."""
+    """For each genuine-lead edge (lead_score > 0), dispatch to its demonstrator by demoKind via the
+    REGISTRY, instead of branching on the specific feature through a hardcoded directory map.
+
+    The typed seam: dispatch(edge) reads edge["demoKind"], looks up the registered demonstrator, and
+    returns either a demonstrator to run (with its declared estimate, surfaced for the ASK gate) or an
+    ASK stub that NAMES the demonstrator a brand-new kind needs. A demonstrator that spends a credit is
+    ASK and its estimate must be surfaced before any spend (audit() asserts this). A $0 demonstrator
+    (a pure-pricing cost model, the discovery loop) is the only one that may run unattended.
+
+    The decision carries the demonstrator name and the estimate so the ASK gate and audit() can read
+    it directly. The estimate-surfaced field is what makes "no demonstrator spends a credit until its
+    estimate is surfaced and approved" checkable in code, not just a convention."""
     out = []
     for e in ranked:
         if e["lead_score"] <= 0:
             continue
-        edge_dir = EDGE_DIR_FOR.get(e["key"])
-        if edge_dir and edge_dir in covered:
-            out.append({"key": e["key"], "action": "use-existing", "gate": "always",
-                        "edge_dir": f"edges/{edge_dir}", "covered": True})
+        result = dispatch(e)
+        if result.demonstrator is not None:
+            est = result.estimate
+            out.append({
+                "key": e["key"], "demoKind": result.demo_kind,
+                "action": "use-existing" if result.gate == "always" else "ask-run-demonstrator",
+                "gate": result.gate, "covered": True,
+                "demonstrator": type(result.demonstrator).__name__,
+                "estimate_surfaced": est is not None,
+                "estimate": (est.to_dict() if est else None),
+                "edge_dir": _edge_dir_for(e["key"]),
+            })
         else:
-            out.append({"key": e["key"], "action": "ask-scaffold-and-benchmark", "gate": "ask",
-                        "edge_dir": None, "covered": False,
-                        "note": "new high-value edge with no built demo: scaffolding a folder and "
-                                "running a benchmark both spend or change the repo, so they wait for you"})
+            out.append({
+                "key": e["key"], "demoKind": result.demo_kind,
+                "action": "ask-build-demonstrator", "gate": "ask", "covered": False,
+                "demonstrator": None, "estimate_surfaced": False, "estimate": None,
+                "note": result.ask_stub,
+            })
     return out
+
+
+def _edge_dir_for(key: str) -> str | None:
+    """Resolve a source key to its built edges/<dir> when one exists, for the changelog/brief 'built'
+    column. The dispatch decision no longer depends on this map, it is display-only now."""
+    edge_dir = EDGE_DIR_FOR.get(key)
+    return f"edges/{edge_dir}" if edge_dir else None
 
 
 # ----- persist ------------------------------------------------------------------------------------
@@ -534,9 +575,16 @@ def main():
     if not all_competitor_fetched_ok:
         print("  a competitor source did not fetch this run, so absence-of-evidence leads are held, "
               "not pitched.")
-    print(f"  {len(leads)} ranked lead edge(s). routing: "
-          f"{sum(1 for r in routing if r['gate']=='always')} use-existing, "
-          f"{sum(1 for r in routing if r['gate']=='ask')} ASK stub(s).")
+    n_run = sum(1 for r in routing if r["action"] == "ask-run-demonstrator")
+    n_use = sum(1 for r in routing if r["action"] == "use-existing")
+    n_build = sum(1 for r in routing if r["action"] == "ask-build-demonstrator")
+    # The ASK gate's invariant, checked in code: every proposed spend carries a surfaced estimate.
+    unestimated = [r["key"] for r in routing if r["gate"] == "ask" and r.get("demonstrator")
+                   and not r.get("estimate_surfaced")]
+    print(f"  {len(leads)} ranked lead edge(s). dispatch by demoKind: {n_use} $0 use-existing, "
+          f"{n_run} ASK run-demonstrator (estimate surfaced), {n_build} ASK build-demonstrator stub(s).")
+    if unestimated:
+        print(f"  WARNING: spend proposed without a surfaced estimate: {', '.join(unestimated)}")
     print(f"  wrote landscape/landscape.json, {cl}, {br}.\n")
 
 

@@ -4,38 +4,29 @@ What changed since the last sweep. Mechanical successor to the master brief's ha
 
 ## What changed
 
-- NEW claude:release_notes (beta). "Claude Platform - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K Release notes Overview System prompts Migration guides Migrating to Managed Agents  Log in  Release" https://platform.claude.com/docs/en/release-notes/overview
-- NEW claude:overview (beta). "Features overview - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API" https://platform.claude.com/docs/en/build-with-claude/overview
-- NEW claude:ptc (unverified). "Programmatic tool calling - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Mess" https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
-- NEW claude:citations (beta). "Citations - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop re" https://platform.claude.com/docs/en/build-with-claude/citations
-- NEW claude:context_editing (beta). "Context editing - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API S" https://platform.claude.com/docs/en/build-with-claude/context-editing
-- NEW claude:memory_tool (beta). "Memory tool - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop" https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool
-- NEW claude:code_execution (beta). "Code execution tool - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages A" https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool
-- NEW claude:prompt_caching (beta). "Prompt caching - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API St" https://platform.claude.com/docs/en/build-with-claude/prompt-caching
-- NEW claude:managed_agents (unverified). "Self-hosted sandboxes - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Overview Quickstart Prototype in Console Define your agent Agent setup Tools MCP con" https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes
-- NEW claude:pricing (unverified). "Pricing - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K Models Models overview Model IDs and versioning Choosing a model Introducing Claude Fable 5 and Claude Mythos" https://platform.claude.com/docs/en/about-claude/pricing
-- NEW openai:compaction (unverified). "Home API Docs Guides and concepts for the OpenAI API API reference Endpoints, parameters, and responses Codex Docs Guides, concepts, and product docs for Codex Use cases Example workflows and tasks teams hand to Codex ChatGPT Apps SDK Build" https://developers.openai.com/api/docs/guides/compaction
-- NEW openai:prompt_caching (unverified). "Home API Docs Guides and concepts for the OpenAI API API reference Endpoints, parameters, and responses Codex Docs Guides, concepts, and product docs for Codex Use cases Example workflows and tasks teams hand to Codex ChatGPT Apps SDK Build" https://developers.openai.com/api/docs/guides/prompt-caching
-- NEW openai:pricing (beta). "Home API Docs Guides and concepts for the OpenAI API API reference Endpoints, parameters, and responses Codex Docs Guides, concepts, and product docs for Codex Use cases Example workflows and tasks teams hand to Codex ChatGPT Apps SDK Build" https://developers.openai.com/api/docs/pricing
-- NEW gemini:file_search (unverified). "The Gemini API enables Retrieval Augmented Generation ("RAG") through the File" https://ai.google.dev/gemini-api/docs/file-search
-- NEW gemini:caching (unverified). "a model. The Gemini API offers two different caching mechanisms:" https://ai.google.dev/gemini-api/docs/caching
-- NEW gemini:pricing (unverified). "Gemini Developer API pricing  \|  Gemini API  \|  Google AI for Developers" https://ai.google.dev/gemini-api/docs/pricing
+- CHANGED claude:release_notes: beta -> beta. "Claude Platform - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K Release notes Overview System prompts Migration guides Migrating to Managed Agents  Log in  Release" https://platform.claude.com/docs/en/release-notes/overview
+- CHANGED claude:citations: beta -> beta. "Citations - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop re" https://platform.claude.com/docs/en/build-with-claude/citations
+- CHANGED claude:context_editing: beta -> beta. "Context editing - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API S" https://platform.claude.com/docs/en/build-with-claude/context-editing
+- CHANGED claude:memory_tool: beta -> beta. "Memory tool - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop" https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool
+- CHANGED claude:code_execution: beta -> beta. "Code execution tool - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages A" https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool
+- CHANGED claude:prompt_caching: beta -> beta. "Prompt caching - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API St" https://platform.claude.com/docs/en/build-with-claude/prompt-caching
+- CHANGED claude:pricing: unverified -> unverified. "Pricing - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K Models Models overview Model IDs and versioning Choosing a model Introducing Claude Fable 5 and Claude Mythos" https://platform.claude.com/docs/en/about-claude/pricing
 
-Unchanged this run: 0.
+Unchanged this run: 9.
 
 ## Top ranked edges this run (value times genuine lead)
 
 - ptc [cost] score 6 (value 3 x lead 2), claude-ahead, covered by an existing edges/ email.
-- citations [reliability] score 6 (value 3 x lead 2), claude-ahead, covered by an existing edges/ email.
-- context_editing [reliability] score 6 (value 3 x lead 2), claude-ahead, covered by an existing edges/ email.
-- memory_tool [long-horizon] score 6 (value 3 x lead 2), claude-ahead, no built email yet.
 - code_execution [cost] score 6 (value 3 x lead 2), claude-ahead, no built email yet.
-- managed_agents [long-horizon] score 6 (value 3 x lead 2), claude-ahead, no built email yet.
-- release_notes [unknown] score 2 (value 1 x lead 2), claude-ahead, no built email yet.
-- overview [unknown] score 2 (value 1 x lead 2), claude-ahead, no built email yet.
+- citations [grounding] score 2 (value 1 x lead 2), claude-ahead, covered by an existing edges/ email.
 
 ## Parity or behind, kept in the landscape, never pitched
 
+- context_editing [reliability] parity (lead 0).
+- memory_tool [long-horizon] parity (lead 0).
 - prompt_caching [cost] parity (lead 0).
+- managed_agents [long-horizon] parity (lead 0).
 - pricing [cost] parity (lead 0).
+- release_notes [unknown] never-evaluated (lead 0).
+- overview [unknown] never-evaluated (lead 0).
 

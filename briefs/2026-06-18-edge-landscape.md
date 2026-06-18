@@ -9,18 +9,18 @@ Verdict legend: claude-ahead, parity, claude-behind, never-evaluated. A never-ev
 | Rank | Capability | Axis | Verdict | Score | Built |
 |------|------------|------|---------|-------|-------|
 | 1 | ptc | cost | claude-ahead | 6 | yes |
-| 2 | citations | reliability | claude-ahead | 6 | yes |
-| 3 | context_editing | reliability | claude-ahead | 6 | yes |
-| 4 | memory_tool | long-horizon | claude-ahead | 6 | no |
-| 5 | code_execution | cost | claude-ahead | 6 | no |
-| 6 | managed_agents | long-horizon | claude-ahead | 6 | no |
-| 7 | release_notes | unknown | claude-ahead | 2 | no |
-| 8 | overview | unknown | claude-ahead | 2 | no |
+| 2 | code_execution | cost | claude-ahead | 6 | no |
+| 3 | citations | grounding | claude-ahead | 2 | yes |
 
 ## Parity or behind (kept honest, never pitched)
 
+- context_editing [reliability]: parity.
+- memory_tool [long-horizon]: parity.
 - prompt_caching [cost]: parity.
+- managed_agents [long-horizon]: parity.
 - pricing [cost]: parity.
+- release_notes [unknown]: never-evaluated.
+- overview [unknown]: never-evaluated.
 
 ## Sources
 

@@ -49,6 +49,8 @@ import time
 from common.client import fmt_usd, get_client, repo_root
 from common.models import get
 from engine.demo import build_chain, parse_answer, run_agent
+from engine.demonstrators.base import Arm, BaseDemonstrator, CostEstimate, Verdict
+from engine.demonstrators.registry import register
 
 # The default uses large payloads so the editing-OFF arm reaches the window and the API errors. The
 # smoke is small, so both arms finish (and both answer correctly): it shows that context editing does
@@ -203,6 +205,122 @@ def _render_from_receipt():
     print_report(model, cfg["docs"], cfg["doc_tokens"],
                  d["editing_off"]["records"], d["editing_off"]["answer"],
                  d["editing_on"]["records"], d["editing_on"]["answer"], d["gold"], d.get("wall_s", 0.0))
+
+
+# --------------------------------------------------------------- the Demonstrator interface
+#
+# long_horizon_survival: under a long, tool-heavy, large-payload load the editing-ON config FINISHES
+# and stays correct where the editing-OFF config reaches the window and errors. Both arms hold the
+# memory tool, the prompt, and caching constant, so exactly one variable (context editing) is toggled.
+#
+# The grounding correction (see engine/scan.py): context editing vs OpenAI's server-side compaction is
+# PARITY (both ship GA server-side context management, Claude additionally ships beta in-place
+# editing), so this is a WITHIN-CLAUDE reliability receipt, not a head-to-head lead. A leadership claim
+# on long-horizon anchors on the independent METR time-horizon, never on context editing. The Claude
+# arm is editing-ON; the "competitor" is the within-Claude editing-OFF baseline, marked ran=True but
+# provider claude, so the base honesty contract reads it as within-claude-only and never pitches a
+# cross-vendor win this demonstrator did not run.
+
+class ContextEditingDemonstrator(BaseDemonstrator):
+    demo_kind = "long_horizon_survival"
+
+    def estimate(self, edge, spec):
+        smoke = spec.get("smoke")
+        return CostEstimate(usd=(0.05 if smoke else 2.0),
+                            wall_clock_s=(30.0 if smoke else 150.0),
+                            command="make longhorizon-smoke" if smoke else "make longhorizon",
+                            note="editing off vs on, memory and prompt held constant in both arms")
+
+    def _cfg(self, spec):
+        cfg = dict(PRESETS["smoke"] if spec.get("smoke") else PRESETS["default"])
+        for k in ("docs", "doc_tokens", "trigger", "keep", "max_turns"):
+            if spec.get(k) is not None:
+                cfg[k] = spec[k]
+        return cfg
+
+    def _arm(self, model_id, provider, rec, ans, gold, note):
+        roll = _roll(rec)
+        return Arm(provider=provider, model=model_id, text=str(ans), ran=True,
+                   latency_s=roll["total_time"], cost_usd=roll["total_cost"],
+                   cache_read_tokens=roll["cache_read"], ctx=roll["peak_ctx"],
+                   metric={"finished": not roll["crashed"], "correct": ans == gold,
+                           "peak_ctx": roll["peak_ctx"], "answer": ans, "gold": gold,
+                           "crashed": roll["crashed"]}, note=note)
+
+    def run_claude_arm(self, edge, spec):
+        client = spec.get("client") or get_client()
+        model_key = spec.get("model", "haiku")
+        cfg = self._cfg(spec)
+        docs, start = build_chain(cfg["docs"], cfg["doc_tokens"])
+        gold = sum(1 for d in docs.values() if d["urgent"])
+        spec["_docs"], spec["_start"], spec["_gold"], spec["_cfg"] = docs, start, gold, cfg  # share with the off arm
+        common = dict(trigger=cfg["trigger"], keep=cfg["keep"], max_turns=cfg["max_turns"])
+        on_rec, on_text = run_agent(client, model_key, docs, start, memory=True, editing=True, **common)
+        return self._arm(get(model_key).id, "claude", on_rec, parse_answer(on_text), gold,
+                         "editing ON: context held flat, the long run finishes")
+
+    def run_competitor_arms(self, edge, spec):
+        # The within-Claude editing-OFF baseline, the isolated A/B. It is provider claude, so the base
+        # contract treats the verdict as within-claude-only. The cross-vendor compaction arm is PARITY
+        # by the grounding correction and is intentionally NOT run as a head-to-head here.
+        client = spec.get("client") or get_client()
+        model_key = spec.get("model", "haiku")
+        docs, start, gold = spec.get("_docs"), spec.get("_start"), spec.get("_gold")
+        if docs is None:  # run_claude_arm builds the shared chain; if called standalone, build one
+            cfg = self._cfg(spec)
+            docs, start = build_chain(cfg["docs"], cfg["doc_tokens"])
+            gold = sum(1 for d in docs.values() if d["urgent"])
+        cfg = spec.get("_cfg") or self._cfg(spec)
+        common = dict(trigger=cfg["trigger"], keep=cfg["keep"], max_turns=cfg["max_turns"])
+        off_rec, off_text = run_agent(client, model_key, docs, start, memory=True, editing=False,
+                                      stop_on_overflow=True, **common)
+        return [self._arm(get(model_key).id, "claude", off_rec, parse_answer(off_text), gold,
+                          "editing OFF (within-Claude baseline): reaches the window and errors")]
+
+    def score(self, claude, competitors, spec):
+        # The SAME machine gate on both arms: did it finish AND answer correctly. Editing ON must
+        # finish; the editing-OFF baseline is expected to reach the window and error. The verdict is
+        # within-claude-only: a reliability receipt, not a cross-vendor lead (compaction is parity).
+        off = competitors[0] if competitors else None
+        on_finished = bool(claude.metric.get("finished")) and bool(claude.metric.get("correct"))
+        off_failed = off is not None and (off.metric.get("crashed") or not off.metric.get("correct"))
+        passed = on_finished and bool(off_failed)
+        return Verdict(
+            verdict="within-claude-only", passed=passed,
+            metric={"editing_on_finished": claude.metric.get("finished"),
+                    "editing_on_correct": claude.metric.get("correct"),
+                    "editing_on_peak_ctx": claude.metric.get("peak_ctx"),
+                    "editing_off_failed": bool(off_failed),
+                    "editing_off_outcome": "crashed at the window" if (off and off.metric.get("crashed"))
+                                           else "wrong answer" if off else "n/a"},
+            note="editing ON finished and answered correctly; editing OFF reached the window and failed. "
+                 "A within-Claude reliability receipt. Context editing vs OpenAI compaction is parity, "
+                 "so the long-horizon LEADERSHIP claim anchors on the independent METR time-horizon, "
+                 "never on context editing.",
+        )
+
+    def receipt(self, edge, claude, competitors, verdict, spec):
+        cfg = spec.get("_cfg") or self._cfg(spec)
+        return self.build_receipt(
+            edge, claude, competitors, verdict, spec,
+            workload={
+                "task_shape": f"a chain of {cfg['docs']} incident reports, each about {cfg['doc_tokens']:,} tokens",
+                "model": claude.model, "features_on": ["context_management/clear_tool_uses", "memory tool"],
+                "assumptions": "memory tool and prompt held constant in both arms; clearing rewrites the "
+                               "cached prefix so editing ON can cost MORE, the value is that a heavy job "
+                               "finishes at all, not a cheaper bill",
+            },
+            grounding=[{"claim": "context editing clears tool results in place under the window",
+                        "source_url": "https://platform.claude.com/docs/en/build-with-claude/context-editing",
+                        "date": "2026-06-18"},
+                       {"claim": "long-horizon leadership anchors on the independent METR 50% task time-horizon",
+                        "source_url": "https://metr.org/", "date": "2026-06-18"}],
+            fairness={"best_to_best": "both arms run Claude's memory tool and caching at full strength",
+                      "isolate": "only context editing toggled; memory tool and prompt identical in both arms"},
+        )
+
+
+register(ContextEditingDemonstrator())
 
 
 def main():

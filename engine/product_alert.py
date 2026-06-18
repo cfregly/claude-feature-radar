@@ -1,9 +1,9 @@
 """product_alert: when a fair run shows a competitor ahead, draft the internal product-team note.
 
-Honesty runs both directions (see CLAUDE.md). Reads data/last_compare.json, and if a competitor
-won on cost or speed at equal correctness, hands the numbers to Claude to draft a short, factual
-note to the Anthropic product team with the reproduction pointer. If Claude won, it says so and
-writes nothing. The point is signal, not spin.
+Honesty runs both directions (see CLAUDE.md). demoKind-agnostic: it first reads the unified Receipt a
+demonstrator persists (data/last_receipt.json), and a verdict of claude-behind is the trigger to draft
+the note, no matter which demoKind produced it. It falls back to the legacy data/last_compare.json
+shape. If Claude won or held parity, it says so and writes nothing. The point is signal, not spin.
 """
 
 from __future__ import annotations
@@ -21,7 +21,37 @@ SYSTEM = (
 )
 
 
+def _from_receipt() -> bool:
+    """Draft from the unified Receipt when one is present and its verdict is claude-behind. Returns
+    True when it handled the run (drafted or reported no alert needed), False to fall back to the
+    legacy compare path."""
+    f = repo_root() / "data" / "last_receipt.json"
+    if not f.exists():
+        return False
+    r = json.loads(f.read_text())
+    verdict = r.get("verdict")
+    if verdict != "claude-behind":
+        print(f"\n  Claude was not beaten on this run (verdict {verdict}), so no product-team alert "
+              f"is needed.")
+        print(f"  (edge {r.get('edge_key','')}, {r.get('demo_kind','')}, metric {r.get('metric')})\n")
+        return True
+    metric = ", ".join(f"{k} {v}" for k, v in (r.get("metric") or {}).items() if v is not None)
+    facts = (f"Fair best-to-best run on edge {r.get('edge_key','')} ({r.get('demo_kind','')}). "
+             f"Verdict claude-behind. Numbers: {metric}. Cost ${r.get('cost_usd',0.0):.5f}. "
+             f"Reproduction: {r.get('repro_command','')} in this repo.")
+    client = get_client()
+    msg = client.messages.create(
+        model=get("haiku").id, max_tokens=700, system=SYSTEM,
+        messages=[{"role": "user", "content": f"Draft the note. Facts: {facts}"}],
+    )
+    text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text").strip()
+    print("\n" + text + "\n")
+    return True
+
+
 def main():
+    if _from_receipt():
+        return
     f = repo_root() / "data" / "last_compare.json"
     if not f.exists():
         raise SystemExit("No comparison yet. Run: make compare")

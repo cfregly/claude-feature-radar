@@ -1,7 +1,10 @@
 """draft: compose the founder email from the surviving gap and the measured receipt.
 
-Reads the demo receipt if present, hands the gap plus the real numbers to Claude with the house
-voice rules, and prints a draft. The committed EMAIL.md is a polished version of this output.
+Reads the unified Receipt if a demonstrator persisted one, hands the gap plus the real numbers to
+Claude with the house voice rules, and prints a draft. demoKind-agnostic: it reads the standard
+Receipt fields (claim, metric, cost_usd, repro_command) so a new demonstrator's receipt drafts with no
+code change here. Falls back to the legacy demo receipt, then a committed example. The committed
+EMAIL.md is a polished version of this output.
 """
 
 from __future__ import annotations
@@ -12,8 +15,35 @@ from common.client import get_client, repo_root
 from common.models import get
 from engine.scan import current_anchor
 
+# A demonstrator persists its standard Receipt to one of these, newest-wins. demoKind-agnostic: the
+# drafter reads the Receipt shape, never a per-feature field, so a ported demonstrator needs no edit
+# here. See engine/demonstrators/base.py Receipt.
+_RECEIPT_FILES = ("last_receipt.json", "last_ptc.json", "last_citations.json", "last_longhorizon.json")
+
+
+def _unified_receipt() -> str | None:
+    """The newest standard Receipt a demonstrator wrote, rendered as one factual line. Reads only the
+    Receipt fields every demonstrator emits (claim, verdict, metric, cost_usd, repro_command), so it is
+    agnostic to which demoKind produced it. Returns None when no standard receipt is present."""
+    data = repo_root() / "data"
+    f = data / "last_receipt.json"
+    if not f.exists():
+        return None
+    try:
+        r = json.loads(f.read_text())
+    except (json.JSONDecodeError, OSError):
+        return None
+    metric = ", ".join(f"{k} {v}" for k, v in (r.get("metric") or {}).items() if v is not None)
+    cost = r.get("cost_usd", 0.0)
+    cmd = r.get("repro_command") or "make"
+    return (f"Edge {r.get('edge_key','')} ({r.get('demo_kind','')}, verdict {r.get('verdict','')}): "
+            f"{metric}. Measured cost ${cost:.5f}. Reproduce with `{cmd}`.")
+
 
 def _receipt() -> str:
+    unified = _unified_receipt()
+    if unified:
+        return unified
     f = repo_root() / "data" / "last_demo.json"
     if f.exists():
         d = json.loads(f.read_text())
