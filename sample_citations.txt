@@ -1,0 +1,25 @@
+
+  Verifiable source citations: 3 of your own documents, 8 questions.
+  Grader (ungameable): does each returned offset resolve to the exact source substring?
+  Claude Citations is GA, no beta header. Others have no document-pointer primitive, so
+  their only option is to prompt the model for a quote and offsets. Source documents and
+  the verbatim cited_text are checked against the real text, not the model's say-so.
+
+  what a founder building over their own documents pays for
+  arm                                       pointer  resolved  verbatim  out_tok     cost$
+  ----------------------------------------------------------------------------------------
+  Claude Haiku 4.5 + Citations (the primitive)      8/8       8/8       8/8      308   0.01112
+  Claude Haiku 4.5 prompt-for-quotes (no feature)      8/8       0/8       8/8      715   0.00739
+  OpenAI gpt-5.4-mini prompt-for-quotes         8/8       0/8       8/8      448   0.00451
+  Gemini gemini-3.5-flash prompt-for-quotes      8/8       7/8       8/8   45,630   0.41575
+
+  Honest reading:
+  - Claude Haiku 4.5 + Citations (the primitive): 8/8 pointers resolve to the exact source text, guaranteed by the API, and the quotes are free of output tokens.
+  - Claude Haiku 4.5 prompt-for-quotes (no feature): 0/8 of its claimed offsets resolve, 8/8 quotes are verbatim, and it pays 715 output tokens for the quotes.
+  - OpenAI gpt-5.4-mini prompt-for-quotes: 0/8 of its claimed offsets resolve, 8/8 quotes are verbatim, and it pays 448 output tokens for the quotes.
+  - Gemini gemini-3.5-flash prompt-for-quotes: 7/8 of its claimed offsets resolve, 8/8 quotes are verbatim, and it pays 45,630 output tokens for the quotes.
+  - A pointer that does not resolve is a citation a user cannot trust. Only the Citations
+    primitive makes every pointer resolve by construction. No competitor exposes it.
+
+  wrote receipts to data/last_citations.json
+

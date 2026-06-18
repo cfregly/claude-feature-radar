@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps demo demo-quick demo-full longhorizon longhorizon-smoke compare alert scan verify draft deslop gif clean
+.PHONY: setup compare-deps citations citations-quick demo demo-quick demo-full longhorizon longhorizon-smoke compare alert scan verify draft deslop gif clean
 
 PY := .venv/bin/python
 
@@ -13,6 +13,12 @@ compare-deps: ## install the OpenAI + Gemini SDKs into the SAME venv, for compar
 	$(PY) -m pip install --quiet -r requirements-compare.txt
 	@echo "Compare deps installed into .venv. Now paste OPENAI_API_KEY and GEMINI_API_KEY into .env."
 
+citations: ## THE ANCHOR: verifiable source citations vs prompt-for-quotes, all three vendors (needs compare-deps + 3 keys, about $0.30)
+	$(PY) run.py citations
+
+citations-quick: ## a 3-question, cents-scale smoke of the citations anchor
+	$(PY) run.py citations --quick
+
 demo: ## the main event: a long agent, with and without the managed features (about $0.90)
 	$(PY) run.py demo
 
@@ -22,8 +28,8 @@ demo-quick: ## a 10-document version that just shows the curve bend (about $0.10
 demo-full: ## a 45-document version with a more dramatic curve
 	$(PY) run.py demo --full
 
-longhorizon: ## the regime where context editing pays off: unbounded crashes at the window, edited finishes (about $1 to $2)
-	$(PY) run.py longhorizon
+longhorizon: ## context editing isolated, 3 runs: unbounded fails 3/3 (crash or wrong answer), edited finishes 3/3 (about $2)
+	$(PY) run.py longhorizon --repeat 3
 
 longhorizon-smoke: ## a cheap run that exercises the harness without reaching the window (cents)
 	$(PY) run.py longhorizon --smoke
