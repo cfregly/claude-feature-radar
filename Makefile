@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges scan verify verify-live validate agentic agentic-smoke draft check-claims check-docs core-imports test ci deslop gif clean
+.PHONY: setup compare-deps ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges scan verify verify-live validate agentic agentic-smoke eval eval-smoke eval-judge draft check-claims check-docs core-imports test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -72,6 +72,15 @@ agentic: ## EDGE: SWE-bench repo-repair head-to-head, symmetric multi-turn loop,
 
 agentic-smoke: ## a 1-instance, Claude-only smoke of the agentic grader (cents)
 	$(PY) engine/demonstrators/agentic_grading.py --limit 1 --models opus
+
+eval: ## EDGE eval_quality: the cost x effort grid on a labeled slice, held-out test split, all providers (needs compare-deps + keys, about $3-4)
+	$(PY) engine/demonstrators/eval_quality.py
+
+eval-smoke: ## a cents-scale Claude-only smoke of the eval grid (Haiku + Sonnet, low effort)
+	$(PY) engine/demonstrators/eval_quality.py --models haiku,sonnet --efforts low
+
+eval-judge: ## the eval grid with the cross-model judge panel on (the too-trusting-grader cross-check)
+	$(PY) engine/demonstrators/eval_quality.py --judge
 
 draft: ## draft the founder email from the measured receipt
 	$(PY) run.py draft

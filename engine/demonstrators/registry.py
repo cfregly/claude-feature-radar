@@ -31,6 +31,7 @@ _DEMO_MODULES = (
     "edges.citations.demo",
     "edges.context-editing.demo",
     "engine.demonstrators.agentic_grading",
+    "engine.demonstrators.eval_quality",
 )
 
 

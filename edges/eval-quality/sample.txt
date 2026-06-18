@@ -1,0 +1,70 @@
+  eval_quality: which (model, effort) cell wins on the believable held-out number,
+  and is the execution grade too trusting? The same slice and grader for every arm.
+
+  [platform] forced tool use (structured output, no parsing), forced record_verdict (judge panel)
+  [platform] the model-gated reasoning effort knob, swept low to high
+  [platform] model tiers (Haiku, Sonnet, Opus, Fable)
+  [platform] judge panel (independent votes), 3 votes
+
+
+  === RUN 1: the built-in labeled slice, full cross-vendor, judge on (every arm ran) ===
+
+  Sweeping 8 tasks (4 dev, 4 held-out test) across 7 models x efforts (low, high).
+  Execution-graded, no Docker. Judge panel ON: each execution-passed program cross-checked
+  by a different model.
+
+  model                 effort     overall  held-out    suite $    $/task    judge
+  --------------------------------------------------------------------------------
+  Claude Haiku 4.5      (none)        100%      100%   $0.003740 $0.000468     100%
+  Claude Sonnet 4.6     low           100%      100%   $0.008280 $0.001035     100%
+  GPT-5.4               low           100%      100%   $0.011800 $0.001477     100%
+  Claude Sonnet 4.6     high          100%      100%   $0.014200 $0.001776     100%
+  Claude Opus 4.8       low           100%      100%   $0.017300 $0.002168     100%
+  GPT-5.4               high          100%      100%   $0.020100 $0.002507     100%
+  Claude Opus 4.8       high          100%      100%   $0.021600 $0.002703     100%
+  GPT-5.5               low           100%      100%   $0.026500 $0.003314     100%
+  Gemini 3.5 Flash      low           100%      100%   $0.034200 $0.004276     100%
+  GPT-5.5               high          100%      100%   $0.036200 $0.004522     100%
+  Gemini 3.1 Pro        low           100%      100%   $0.039000 $0.004877     100%
+  Gemini 3.5 Flash      high          100%      100%   $0.067400 $0.008420     100%
+  Gemini 3.1 Pro        high          100%      100%   $0.108800 $0.013600     100%
+
+  total spend this run: $0.4090 (read off each usage object)
+
+  Recommendation:
+    On the HELD-OUT test split the top pass rate was 100% (4/4), first reached by haiku @
+    (none) for $0.003740 on the slice. That is the believable number: it is the split no cell
+    was tuned against.
+    gem-pro @ high reached the same held-out pass rate for $0.108800, about 29.8x more, so
+    paying for the bigger cell bought cost, not capability, on this slice.
+    Judge cross-check: the panel agreed with every execution-passed program, so the execution
+    grade is not silently too trusting on this slice.
+
+
+  === RUN 2: the LiveCodeBench hard slice (EVAL_LCB=1), where the tiers separate ===
+
+  The built-in slice above is saturated, so it makes the cost-tie point but not the
+  separation point. On a harder slice (a pinned LiveCodeBench hard set, fetched at run time)
+  the cells stop tying. This run was captured before the Anthropic key's credit ran out, so
+  the Gemini and GPT-5.5 arms did not run; it corroborates that the harness separates, it is
+  not a complete cross-vendor verdict.
+
+  Sweeping 5 tasks (3 dev, 2 held-out test) across the models x efforts (low, high).
+
+    Claude Haiku 4.5       @ (none)  overall   40%  held-out   50%   $0.0314  judge-agree 100%
+    Claude Sonnet 4.6      @ low     overall   60%  held-out    0%   $0.1682  judge-agree 100%
+    Claude Sonnet 4.6      @ high    overall  100%  held-out  100%   $0.6323  judge-agree 100%
+    Claude Opus 4.8        @ low     overall  100%  held-out  100%   $0.1761  judge-agree 100%
+    Claude Opus 4.8        @ high    overall  100%  held-out  100%   $0.5169  judge-agree  80%
+    GPT-5.4                @ low     overall  100%  held-out  100%   $0.0792  judge-agree 100%
+
+  The read on the hard slice: Haiku resolves 40% (the cheap tier hits its limit on hard
+  problems), and Sonnet at LOW effort scores 60% overall but 0% on the held-out hard problem,
+  the overfit-style signal the dev number alone would have hidden. Sonnet at HIGH effort and
+  both Opus cells reach 100%, so on hard work effort and tier earn their cost, the opposite of
+  the saturated built-in slice where they did not. The judge panel disagreed with one Opus-high
+  program (agreement 80%), the one place an execution pass did not read as fully on-spec to an
+  independent grader.
+
+  Note: the credit ran out mid-run, so this LCB table is partial (no Gemini, no GPT-5.5). Re-run
+  `EVAL_LCB=1 make eval` on your own keys for the full cross-vendor hard-slice table.
