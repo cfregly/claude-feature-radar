@@ -54,6 +54,16 @@ the truth, not to win an argument. If our best loses to their best on cost, spee
 is the finding: report it plainly and write the product-team alert below. A rigged win destroys the
 founder trust this whole repo is built to earn.
 
+## Beta, alpha, and experimental edges are fair game, and often the anchor
+A capability being beta, alpha, or experimental is never a reason to drop it from the search or the
+pitch. The newest Claude surfaces are frequently where the genuine edge lives, so when a beta or alpha
+feature is the sharpest verified differentiator, anchor on it and lead with it. Label the maturity
+plainly, name the doc and the date and any beta header it needs, and let the grounding rule carry it.
+The "compare best to best" rule already puts alpha and beta on the table for both sides. This makes it
+explicit: a stated beta caveat is part of an honest pitch, not a reason to look away from the edge.
+Many of the headline Claude API surfaces (the Files, Skills, Agents, Sessions, and Environments APIs)
+are beta today, checked 2026-06-17, and that is exactly what a founder building this quarter wants.
+
 ## Measure and document cost, time, model, and why
 Every run records, from real calls: total cost, wall-clock time, the exact model id on each side,
 and the reason for each choice. Put the why in a comment next to the choice (why this model, why
@@ -122,6 +132,28 @@ is global, and it can come from anywhere on the platform.
   feature-on-versus-off result is a within-Claude value-add, label it as exactly that until the
   cross-vendor arm is run.
 
+## Understand the mechanism, then find the workload where the edge appears
+Before you claim OR dismiss a feature, understand how it actually works: what the API does under the
+hood, what the competitor's nearest equivalent does, and exactly where each one breaks. That
+understanding is the creative engine of this repo. A naive head-to-head on a toy task usually shows
+parity, because the task never stresses the thing the feature is good at. Knowing the mechanism is
+what lets you design a REAL workload where the difference shows up as a number a founder would feel.
+- Learn the mechanism on both sides. Claude's context editing clears tool results in place, OpenAI's
+  compaction summarizes them (and can drop a detail), Gemini carries the full window (and pays for
+  it). Those are different failure modes, and the difference only appears under load.
+- Find the workload where it bites, and make the workload explicit. Name the real scenario (a long
+  tool-heavy agent, 40k-token-per-call payloads, a many-document answer), say why it exercises the
+  mechanism, and which founder situation it maps to. A reader must see exactly what was tested and
+  why it is realistic, never a black-box "Claude wins."
+- Surface the real-world edges, do not dismiss them. Reliability under a long context, finishing a
+  long-horizon job, correctness under load, cost at scale: these are the edges a founder actually
+  lives with, and a toy benchmark hides them. If the naive test shows parity, push the workload
+  toward the real condition before concluding there is no edge.
+- This is validation, not spin. Working through the mechanism vets the feature, you learn its limits,
+  where it loses, and the exact condition for its win. Getting creative means finding the genuine
+  real-world condition where the edge exists, never manufacturing a rigged one. The comparison stays
+  best-to-best and the workload stays honest and stated.
+
 ## Put the workload, cost, and time on every outbound surface
 The internal receipt is recorded above. What ships to a reader carries the same facts, up front, in
 the reader's words, never buried:
@@ -143,6 +175,16 @@ minutes to check, why should I believe you, what do I do next. The outbound-scru
 carries a dedicated reader-point-of-view reviewer whose only job is to read as that founder and flag
 anything that fails those questions. A claim that is true but does not answer "so what, for me" is
 rewritten until it does.
+
+## Name the founder use case and the Claude features on the email and the README
+Every founder email and the README hero is written for one reader, a founder building a real product
+over their users' own work (contracts, charts, tickets, research, support docs, a long-running agent).
+Name that use case and the workload behind it before anything else, then name the Claude Developer
+Platform and Claude Agent SDK features that serve it: Citations for the verifiable per-character
+pointer into the user's own document, the memory tool and context editing for the long-horizon job,
+prompt caching, the model tiers, and whichever verified differentiator the search surfaced this run.
+Name the feature, then show what the founder gets from it on that workload, measured against the
+competitor at its best. A feature name is not a value.
 
 ## Persist every synthesis to a committed file, never re-derive it from a transcript
 A run that fans out (the audit, a review panel) writes its synthesis to a committed file: the

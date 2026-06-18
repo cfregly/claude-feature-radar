@@ -32,7 +32,10 @@ These are why the output is trusted. Break one and the trust is gone.
 1. **Compare best to best, latest to latest.** Use each platform's newest API and all of its best
    features, including alpha and beta, on both sides. Never disable a competitor's caching,
    compaction, or parallelism, and never use an older API, to make Claude look better. Never
-   handicap Claude either. If our best loses to their best, that is the finding.
+   handicap Claude either. If our best loses to their best, that is the finding. Beta and alpha are
+   not merely allowed, they are often where the Claude edge lives, so anchor on a beta or alpha
+   feature when it is the sharpest verified differentiator and label it beta with the doc, the date,
+   and any beta header it needs (Claude Managed Agents needs `managed-agents-2026-04-01`, for example).
 2. **Always use the live docs.** Every capability claim and every price traces to the vendor's own
    current doc page, fetched at run time, dated. Memory tells you what to verify, never what to
    assert.
@@ -85,6 +88,25 @@ These are why the output is trusted. Break one and the trust is gone.
    reliability, long-running, correctness) AGAINST the competitor at its best, not just against Claude
    without the feature. A feature-on-versus-off result is a within-Claude value-add until the
    cross-vendor arm is run, so label it as exactly that.
+10. **Understand the mechanism, then find the workload where the edge appears.** Before claiming or
+    dismissing a feature, learn how it and the competitor's nearest equivalent actually work and where
+    each breaks (Claude's context editing clears in place, OpenAI's compaction summarizes and can drop
+    a detail, Gemini carries the full window and pays for it). A toy task shows parity because it never
+    stresses the mechanism. Use the mechanism to design a REAL workload that exercises it (a long
+    tool-heavy agent, large per-call payloads, a many-document answer), state the workload and the
+    founder situation it maps to plainly, and measure. Reliability under load, long-horizon completion,
+    correctness under load, and cost at scale are real-world edges, so surface them rather than
+    dismissing a feature on a naive test. This vets the feature and finds its genuine win condition, it
+    never manufactures a rigged one.
+
+11. **Name the founder use case and the Claude features on every outbound surface.** Every founder
+    email and the README hero is written for one reader, a founder building over their users' own work
+    (contracts, charts, tickets, research, support docs, a long-running agent). Name that use case and
+    the workload behind it first, then name the Claude Developer Platform and Claude Agent SDK features
+    that serve it: Citations for the verifiable per-character pointer, the memory tool and context
+    editing for the long-horizon job, prompt caching, the model tiers, and the verified differentiator
+    the search surfaced this run. Name the feature, then show what the founder gets on that workload,
+    measured against the competitor at its best. A feature name is not a value.
 
 ## The steps
 

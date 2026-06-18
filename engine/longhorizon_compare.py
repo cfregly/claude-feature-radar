@@ -99,6 +99,23 @@ def print_robustness(n, by_platform, gold):
     print()
 
 
+def print_workload_and_edge(cfg):
+    print("  THE WORKLOAD (the real-world condition, stated plainly, not a toy)")
+    print(f"    A tool-using agent reads a chain of {cfg['docs']} documents, each about {cfg['doc_tokens']:,}")
+    print(f"    tokens (a big file, a long PDF, a fat API response), and counts a detail spread across")
+    print(f"    them. This is the shape of a real product agent: many large tool results pile into the")
+    print(f"    context. It is where the three platforms' DIFFERENT context mechanisms diverge, which a")
+    print(f"    short prompt never reveals.")
+    print()
+    print("  THE EDGE THIS SURFACES (and where it does not)")
+    print("    Claude clears stale tool results in place and keeps the running count in a durable memory")
+    print("    file, so the count survives. OpenAI's compaction SUMMARIZES the trimmed context, which can")
+    print("    drop the detail and miscount (seen above when OpenAI is wrong). Gemini carries the full")
+    print("    window, paying for every token. On a short job all three finish, so the answer ties: the")
+    print("    edge is reliability under a long, heavy workload, plus context size, measured not asserted.")
+    print()
+
+
 def main():
     p = argparse.ArgumentParser(description="Cross-vendor head-to-head on the long-horizon task.")
     p.add_argument("--repeat", type=int, default=1)
@@ -140,6 +157,7 @@ def main():
     print_round(first_rows, gold)
     if n > 1:
         print_robustness(n, by_platform, gold)
+    print_workload_and_edge(cfg)
 
     out = {"config": cfg, "gold": gold, "runs": n,
            "by_platform": by_platform,

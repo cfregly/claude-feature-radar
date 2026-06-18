@@ -39,8 +39,8 @@ TENS_IDX = {w: n for n, w in TENS.items()}
 # enough to match only the citations cost claim, not the other "about $X" comments in the Makefile
 # or the "about 37x" ratios in the prose.
 CLAIMS = [
-    {"file": "EMAIL.md", "pattern": r"[Aa]bout ([a-z][a-z-]*) cents", "kind": "words"},
-    {"file": "README.md", "pattern": r"about ([a-z][a-z-]*) cents", "kind": "words"},
+    {"file": "edges/citations/FOUNDER_EMAIL.md", "pattern": r"[Aa]bout ([a-z][a-z-]*) cents", "kind": "words"},
+    {"file": "edges/citations/README.md", "pattern": r"about ([a-z][a-z-]*) cents", "kind": "words"},
     {"file": "Makefile", "pattern": r"^citations:.*about \$(\d+\.\d{2})", "kind": "dollars"},
 ]
 
@@ -100,9 +100,9 @@ def readme_table_arms(path):
 
 
 def main():
-    snapshot = ROOT / "sample_citations.txt"
+    snapshot = ROOT / "edges" / "citations" / "sample.txt"
     if not snapshot.exists():
-        print("cost-claim gate: SKIP (no committed receipt sample_citations.txt found)")
+        print("cost-claim gate: SKIP (no committed receipt edges/citations/sample.txt found)")
         return
     arms = snapshot_arms(snapshot)
     cents = round(sum(cost for _, cost in arms) * 100)
@@ -137,10 +137,10 @@ def main():
         if abs(claimed - cents) > TOLERANCE_CENTS:
             failures.append(f"{claim['file']}:{lineno} total claims {shown}  STALE -> {want_shown}")
 
-    # Layer 2: the per-arm cost and output-token columns of the README proof table.
-    table = readme_table_arms(ROOT / "README.md")
+    # Layer 2: the per-arm cost and output-token columns of the edge README proof table.
+    table = readme_table_arms(ROOT / "edges" / "citations" / "README.md")
     if table is None:
-        failures.append("README.md: could not locate the measured-proof table to check per-arm costs")
+        failures.append("edges/citations/README.md: could not locate the measured-proof table to check per-arm costs")
     elif len(table) != len(arms):
         failures.append(f"README.md table has {len(table)} arms, the receipt has {len(arms)}")
     else:

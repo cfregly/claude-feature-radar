@@ -9,13 +9,15 @@ import sys
 
 BANNED = {"—": "em-dash", "–": "en-dash", ";": "semicolon"}
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DOCS = ["README.md", "CLAUDE.md", "EMAIL.md", "SKILL.md", "PRODUCT_EMAIL.md",
+DOCS = ["README.md", "CLAUDE.md", "SKILL.md",
         "docs/VERIFIED_FACTS.md", "docs/FINDINGS.md"]
 
 
 def _targets():
     docs = [ROOT / d for d in DOCS]
-    return docs + sorted((ROOT / "briefs").glob("*.md"))
+    docs += sorted((ROOT / "briefs").glob("*.md"))
+    docs += sorted((ROOT / "edges").glob("*/*.md"))  # per-edge FOUNDER_EMAIL, PRODUCT_EMAIL, README
+    return docs
 
 
 def main():

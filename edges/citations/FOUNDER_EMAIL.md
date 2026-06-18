@@ -4,7 +4,7 @@ Paste into a Google Doc or your sending tool. Plain text, one link.
 
 ---
 
-**Subject:** Claude hands you a guaranteed, verifiable citation into your user's own doc in one field. Nobody else ships the primitive.
+**Subject:** Claude hands you a guaranteed, per-character citation into your user's own doc in one field.
 
 Hey {first_name},
 
@@ -15,9 +15,9 @@ Claude ships a GA feature for this called Citations. Turn it on per document, an
 I measured it honestly, including the part that is not flattering. The realistic way to do this without the feature is to ask the model for the verbatim quote and resolve it yourself with `source.find(quote)`. Over 8 questions on a set of documents:
 
 - Claude with Citations: 8 of 8 resolve, the API does the resolving and guarantees it, zero resolver code, and the quote costs zero output tokens (308 output tokens total).
-- The DIY path on Claude, OpenAI, and Gemini: also 8 of 8, because on clean text the model quotes verbatim and `find` locates it. But you own that code, you pay output tokens for every quote (586 on Claude, 391 on OpenAI, 3,466 on Gemini), and `find` returns nothing the moment the model paraphrases instead of quoting, which it will on a real messy PDF.
+- The DIY path on Claude, OpenAI, and Gemini: also 8 of 8, because on clean text the model quotes verbatim and `find` locates it. But you own that code, you pay output tokens for every quote (586 on Claude, 391 on OpenAI, 3,466 on Gemini), and `find` returns nothing the moment the model paraphrases instead of quoting verbatim. On this clean corpus it did not fail, so I am flagging that as the failure you inherit when you own the resolver, not as something I measured here.
 
-So I am not going to tell you the competitors cannot cite. On clean text the DIY bolt-on works. The honest edge is narrower and real: Claude is the only platform that gives you the pointer as a primitive, guaranteed and free of output tokens, with no resolver code to write or maintain and no silent failure when the model paraphrases. OpenAI and Google only cite web-search URLs, never a pointer into the document you uploaded.
+So I am not going to tell you the competitors cannot cite. On clean text the DIY bolt-on works, and Google's Gemini File Search now returns a page-level pointer into your uploaded document (it shipped that in May 2026). The honest edge is narrower and precise: Claude is the only GA API that returns a per-character source pointer into your document with an API-extracted verbatim quote it guarantees is valid and free of output tokens, and no resolver code to write or maintain. OpenAI's file citations index the model's own output, not your source, and Gemini's pointer is page-level only.
 
 {repo_link}
 

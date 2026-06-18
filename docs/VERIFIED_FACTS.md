@@ -44,7 +44,8 @@ Source: [citations](https://platform.claude.com/docs/en/build-with-claude/citati
   `source.find(quote)`), which also resolves 8/8 on clean text on Claude, OpenAI gpt-5.4-mini, and
   Gemini gemini-3.5-flash. The measured edge is that Claude does the resolving in-API (guaranteed,
   the DIY find returns -1 the moment the model paraphrases), the quote is free of output tokens (308
-  versus 586 on the Claude DIY arm), and no competitor ships the primitive. An earlier version of
+  versus 586 on the Claude DIY arm), and no competitor ships a per-character source pointer with these
+guarantees. An earlier version of
   this benchmark asked the models to emit the character offset and scored that 0/8, which a scrutiny
   panel correctly flagged as a strawman (a tokenizer cannot count characters). Receipt:
   [`../sample_citations.txt`](../sample_citations.txt).
@@ -52,10 +53,16 @@ Source: [citations](https://platform.claude.com/docs/en/build-with-claude/citati
 ### Competitor citation surfaces (the parity check)
 - OpenAI emits `url_citation` annotations from its web-search tool, not a pointer into a
   user-supplied document.
-- Gemini returns web grounding metadata, also web-URL based, not a char/page pointer into an uploaded
-  document.
-- Neither exposes a document-grounded char/page citation primitive as of 2026-06-17. Sourced in
-  [`../briefs/2026-06-17-platform-edge.md`](../briefs/2026-06-17-platform-edge.md).
+- Gemini File Search (shipped 2026-05) returns a PAGE-level pointer into an uploaded document
+  (`grounding_chunks.retrieved_context.page_number` plus verbatim text). It is page granularity, not
+  the per-character source pointer Claude returns, and Gemini does not state the quote is free of
+  output tokens nor guarantee pointer validity. Source:
+  [Gemini File Search](https://ai.google.dev/gemini-api/docs/file-search), checked 2026-06-17.
+- So the surviving lead is char granularity plus the guaranteed-valid, output-token-free quote, not a
+  capability absence. Rechecked 2026-06-18 against the live changelog: Gemini File Search is still
+  public preview (launched 2025-11-06, still preview on the 2026-05-28 entry, no GA entry), so Claude
+  Citations being GA is an additional live edge today. It can flip, so recheck before quoting.
+  Sourced in [`../briefs/2026-06-17-platform-edge.md`](../briefs/2026-06-17-platform-edge.md).
 
 ## Long-horizon autonomy (the second pillar)
 

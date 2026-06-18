@@ -34,10 +34,12 @@ column even if it is useful.
 - What it is: enable `citations.enabled=true` on a document and Claude returns claims interleaved with
   structured pointers, char index for plain text, page number for PDF, block index for custom content,
   each carrying the verbatim `cited_text` extracted from the source.
-- Genuine lead: yes. Confirmed against the live doc. OpenAI emits `url_citation` annotations from its
-  web search tool and Gemini returns web grounding metadata, but neither exposes a char/page/block
-  citation primitive over user-supplied documents. The pointers are guaranteed valid (parsed and
-  extracted, not model-paraphrased), so they cannot hallucinate a quote.
+- Genuine lead: yes, but narrowed by a live recheck. OpenAI emits `url_citation` annotations from its
+  web search tool and indexes its own output, not the source. Google's Gemini File Search (shipped
+  2026-05) returns a PAGE-level pointer into a user-supplied document, so the lead is not a capability
+  absence: Claude is the only one with a per-CHARACTER source pointer plus guarantees. The pointers
+  are guaranteed valid (parsed and extracted, not model-paraphrased), so they cannot hallucinate a
+  quote.
 - Why a founder feels it: a product that cites the user's own source, with a click-through to the
   exact sentence, is trustworthy in a way a paraphrased citation never is. This is the whole product
   for a contract-review, clinical-summary, financial-research, or support-over-docs startup.

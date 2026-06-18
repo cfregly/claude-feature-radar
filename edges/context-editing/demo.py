@@ -38,6 +38,10 @@ object the API returns.
 
 from __future__ import annotations
 
+import pathlib as _pl
+import sys as _sys
+_sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[2]))  # repo root, for common/ and engine/
+
 import argparse
 import json
 import time
