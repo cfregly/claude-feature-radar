@@ -43,7 +43,8 @@ Building with Claude
   scrutiny panel caught it: a tokenizer cannot count characters, and no founder would build it that
   way. The honest baseline is model-quote plus your own `str.find`, which resolves 8/8 on clean text.
   The email now states that plainly and rests on the edge that survives: the guaranteed in-API
-  pointer, free of output tokens, that no competitor ships.
+  per-character pointer, free of output tokens, that no competitor matches at char granularity
+  (Gemini File Search is page-level and still preview, OpenAI cites its own output).
 - **It states the real cost.** Citations cost more than the OpenAI DIY path on this corpus, so the
   email says so rather than claiming "cheaper."
 - **The numbers are receipts.** 8/8, the output-token counts, and the six-cent reproduction cost all
