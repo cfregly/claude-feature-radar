@@ -41,7 +41,7 @@ export ANTHROPIC_API_KEY=your-key
 make ptc        # the example, $0.06
 ```
 
-To run it on your own tool, open [yourtool.py]({repo_url}/blob/main/ptc/yourtool.py), drop in your search tool, and run `make ptc` again.
+To run it on your own tool, open [my_tool.py]({repo_url}/blob/main/ptc/my_tool.py), drop in your search tool, and run `make ptc` again.
 
 More: the [PTC cookbook](https://platform.claude.com/cookbook/tool-use-programmatic-tool-calling-ptc) is a runnable notebook.
 

@@ -13,11 +13,11 @@ compare-deps: ## install the OpenAI + Gemini SDKs into the SAME venv, for compar
 	$(PY) -m pip install --quiet -r requirements-compare.txt
 	@echo "Compare deps installed into .venv. Now paste OPENAI_API_KEY and GEMINI_API_KEY into .env."
 
-app: ## FORKABLE APP: run the fan-out task over your own tool (app/yourtool.py), print your before/after token bill (needs ANTHROPIC_API_KEY, about $0.06)
-	$(PY) -m app.billcut
+app: ## FORKABLE APP: run the fan-out task over your own tool (app/my_tool.py), print your before-and-after token bill (needs ANTHROPIC_API_KEY, about $0.06)
+	$(PY) -m app.run_tokens
 
 app-check: ## the app self-test: run the shipped example and assert the PTC invariant (Mode B bills fewer input tokens AND answers correctly) before you trust it on your own tool (about $0.06)
-	$(PY) -m app.billcut --check
+	$(PY) -m app.run_tokens --check
 
 ptc: ## EDGE: programmatic tool calling, the input-token receipt on a fan-out task (needs ANTHROPIC_API_KEY, about $0.06)
 	$(PY) edges/programmatic-tool-calling/demo.py

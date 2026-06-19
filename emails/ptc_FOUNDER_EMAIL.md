@@ -43,7 +43,7 @@ export ANTHROPIC_API_KEY=your-key
 make ptc        # the example, $0.06
 ```
 
-To run it on your own tool, open [ptc/yourtool.py]({repo_url}/blob/main/ptc/yourtool.py),
+To run it on your own tool, open [ptc/my_tool.py]({repo_url}/blob/main/ptc/my_tool.py),
 drop in your tool, and run `make ptc` again.
 
 Happy building!

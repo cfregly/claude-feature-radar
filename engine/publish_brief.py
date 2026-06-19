@@ -88,21 +88,22 @@ class VendorFile:
 class BriefPlan:
     """The static publish plan for one edge: its public slug, the demoKind, the doc URL the public brief
     points at, the vendored files, and the make-target help line. ``edit_surface`` is the one file a
-    forker edits (yourtool.py), surfaced in the README run-it-on-your-own-data section when present."""
+    forker edits (my_tool.py), surfaced in the README run-it-on-your-own-data section when present."""
     slug: str
     title: str
     demo_kind: str
     doc_url: str
     files: tuple[VendorFile, ...]
     make_help: str
-    edit_surface: str | None = None  # dst path of the edit-surface file, e.g. "yourtool.py"
+    edit_surface: str | None = None  # dst path of the edit-surface file, e.g. "my_tool.py"
 
 
 # The vendor closure for programmatic-tool-calling. The brief needs the one audited counter/run loop
 # (token_core), the anthropic-free client/models/pricing trio (flattened to a local common/), and the
-# region_sales example fixture, vendored as the brief's own yourtool.py edit surface. The run entry is a
-# generated billcut.py: the demonstrator's Claude arm (Mode A/B over token_core.run_mode) plus a --check
-# self-test, with no competitor arm (the engine's PTC competitor side is a documented absence anyway).
+# region_sales example fixture, vendored as the brief's own my_tool.py edit surface. The run entry is a
+# generated run_tokens.py: the demonstrator's Claude arm (Mode A/B over token_core.run_mode) plus a
+# --check self-test, with no competitor arm (the engine's PTC competitor side is a documented absence
+# anyway).
 PLANS: dict[str, BriefPlan] = {
     "programmatic-tool-calling": BriefPlan(
         slug="ptc",
@@ -115,8 +116,8 @@ PLANS: dict[str, BriefPlan] = {
             VendorFile("common/models.py", "common/models.py"),
             VendorFile("common/pricing.py", "common/pricing.py"),
         ),
-        make_help="build .venv, install anthropic, run the PTC bill-cut on the region_sales example (~$0.06)",
-        edit_surface="yourtool.py",
+        make_help="build .venv, install anthropic, run the PTC token-bill comparison on the region_sales example (~$0.06)",
+        edit_surface="my_tool.py",
     ),
     # citations: the verifiable-source-pointer edge. The brief needs only the anthropic-free
     # client/models/pricing trio (flattened to a local common/). The run entry is a generated cite.py:
@@ -347,17 +348,18 @@ class PublishRefused(Exception):
 # --------------------------------------------------------------------------- the generated brief files
 
 
-def _region_fixture_source() -> str:
-    """The region_sales example fixture, vendored as the brief's yourtool.py edit surface. Lifted from
-    app/yourtool.py + edges/programmatic-tool-calling/demo.py (the same deterministic ~60-rows-per-region
-    backend both use), trimmed to the edit surface a forker needs: TOOL_SPEC, call(), the fan-out
-    QUESTION, EXPECTED_ANSWER, and parse_answer. Imports only stdlib (hashlib, random, re)."""
-    return '''"""yourtool: THE single file you edit to run the bill-cut on your own tool.
+def _my_tool_source() -> str:
+    """The region_sales example fixture, vendored as the brief's my_tool.py edit surface. Lifted from
+    app/example_tool.py (the engine's single home for the shipped worked example), trimmed to the edit
+    surface a forker needs: TOOL_SPEC, call(), the fan-out QUESTION, EXPECTED_ANSWER, and parse_answer.
+    The brief ships my_tool.py self-contained (the fixture inlined) so the brief stays a small flat
+    package. Imports only stdlib (hashlib, random, re)."""
+    return '''"""my_tool: THE single file you edit to run the token-bill comparison on your own tool.
 
 This is the edit surface. Out of the box it ships a worked example: a region_sales tool that returns
 about 60 sales rows per region, and a fan-out task that asks for the highest-revenue region across four
-regions (240 rows). That is the same fan-out the brief's bill-cut measures, so `make ptc` gives you a
-real before/after number before you change a line. Then swap in your own tool:
+regions (240 rows). That is the same fan-out the brief's token-bill comparison measures, so `make ptc`
+gives you a real before-and-after number before you change a line. Then swap in your own tool:
 
   1. Replace TOOL_SPEC with your own Messages-API tool dict (name, description, input_schema).
   2. Replace call(...) with the function that runs your real backend (a database query, an API call,
@@ -369,7 +371,7 @@ Keep the task fan-out shaped: the win needs the model to call your tool many tim
 would otherwise fill its context. On a sequential single-call task the doc reports it is flat to about
 8% more expensive, so a one-shot task is the wrong shape and the bill will not drop.
 
-Nothing here imports anthropic. yourtool is data plus a plain Python function; billcut.py drives it.
+Nothing here imports anthropic. my_tool is data plus a plain Python function; run_tokens.py drives it.
 """
 
 from __future__ import annotations
@@ -473,15 +475,15 @@ def parse_answer(text: str):
 '''
 
 
-def _billcut_source(slug: str) -> str:
+def _run_tokens_source(slug: str) -> str:
     """The generated run entry: the PTC demonstrator's Claude arm (Mode A/B over the audited
     token_core.run_mode) plus a --check self-test. The competitor arm is stripped (the engine's PTC
     competitor side is a documented absence, never a runnable head-to-head row). Imports the vendored
     token_core (sibling) and the flattened common/ package; anthropic is imported lazily in main()."""
-    return f'''"""billcut: run your fan-out task twice over your own tool, print your before/after token bill.
+    return f'''"""run_tokens: run your fan-out task twice over your own tool, print your before-and-after token bill.
 
 The founder-facing artifact for the {slug} brief. It runs the SAME task two ways over the tool in
-yourtool.py, on the same model, and prints YOUR own numbers:
+my_tool.py, on the same model, and prints YOUR own numbers:
 
   Mode A  plain tool use. The model calls your tool directly, once per input, so every record it pulls
           back flows through the model's context and is billed as input tokens.
@@ -495,10 +497,10 @@ model's published input price, and an upfront cost-and-time line BEFORE it spend
 re-fetched 2026-06-18:
 https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 
-  python -m {slug}.billcut            run the example (or your tool) and print the before/after table
-  python -m {slug}.billcut --check    the self-test: run the shipped example and ASSERT the PTC invariant
+  python -m {slug}.run_tokens            run the example (or your tool) and print the before-and-after table
+  python -m {slug}.run_tokens --check    the self-test: run the shipped example and ASSERT the PTC invariant
                                    (Mode B bills fewer input tokens AND answers correctly)
-  python -m {slug}.billcut --model opus    use Opus 4.8 instead of the default Sonnet 4.6
+  python -m {slug}.run_tokens --model opus    use Opus 4.8 instead of the default Sonnet 4.6
 
 This costs about $0.06 on the shipped example on Sonnet 4.6. The model arms are the only spend, the code
 runs server-side in Anthropic's sandbox. anthropic is imported lazily, inside main(), so importing this
@@ -511,14 +513,14 @@ import argparse
 import sys
 from pathlib import Path
 
-# Make the repo root importable when run as a file (python {slug}/billcut.py), not just as a module.
+# Make the repo root importable when run as a file (python {slug}/run_tokens.py), not just as a module.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from .common.models import get  # noqa: E402  the verified id + price registry, anthropic-free
 from .common.pricing import cost_usd  # noqa: E402  real usage object -> real dollars, anthropic-free
 from .token_core import run_mode  # noqa: E402  the ONE audited counter + run loop
 
-from {slug} import yourtool  # noqa: E402  the single edit surface
+from {slug} import my_tool as tool  # noqa: E402  the single edit surface
 
 # Programmatic tool calling is supported on Opus 4.5 to 4.8 and Sonnet 4.5 to 4.6, not Haiku (verified
 # 2026-06-18 against the live doc). The brief exposes the two a founder would pick.
@@ -529,19 +531,19 @@ def fmt_usd(x: float) -> str:
     return f"${{x:,.6f}}" if x < 0.01 else f"${{x:,.4f}}"
 
 
-def run_billcut(client, model_key: str) -> dict:
-    """Run Mode A and Mode B over yourtool, on top of the one audited token_core engine. Returns both
+def run_token_compare(client, model_key: str) -> dict:
+    """Run Mode A and Mode B over my_tool, on top of the one audited token_core engine. Returns both
     runs plus the reduction and the dollar delta, all from the real usage objects."""
     model_id = get(model_key).id
-    a = run_mode(client, model_id, yourtool.TOOL_SPEC, yourtool.call, yourtool.QUESTION,
+    a = run_mode(client, model_id, tool.TOOL_SPEC, tool.call, tool.QUESTION,
                  programmatic=False, cost_fn=lambda u: cost_usd(model_key, u), label="A")
-    b = run_mode(client, model_id, yourtool.TOOL_SPEC, yourtool.call, yourtool.QUESTION,
+    b = run_mode(client, model_id, tool.TOOL_SPEC, tool.call, tool.QUESTION,
                  programmatic=True, cost_fn=lambda u: cost_usd(model_key, u), label="B")
     a_in, b_in = a["billed_input"], b["billed_input"]
     pct = (1 - b_in / a_in) * 100 if a_in else 0.0
     saved_usd = (a_in - b_in) * get(model_key).input_per_mtok / 1e6
-    a["answer_parsed"] = yourtool.parse_answer(a["answer"])
-    b["answer_parsed"] = yourtool.parse_answer(b["answer"])
+    a["answer_parsed"] = tool.parse_answer(a["answer"])
+    b["answer_parsed"] = tool.parse_answer(b["answer"])
     return {{"model_key": model_key, "model_id": model_id, "mode_a": a, "mode_b": b,
             "pct_input_reduction": round(pct, 1), "saved_input_usd": saved_usd}}
 
@@ -555,7 +557,7 @@ def print_table(result: dict) -> None:
         ans = str(r["answer_parsed"]) if r["answer_parsed"] is not None else "(unparsed)"
         print(f"  {{name:<44}}{{r['billed_input']:>18,}}{{r['turns']:>13}}{{ans:>10}}{{fmt_usd(r['cost']):>11}}")
     print()
-    print(f"  Your before/after: Mode B billed {{b['billed_input']:,}} input tokens vs Mode A's "
+    print(f"  Your before and after: Mode B billed {{b['billed_input']:,}} input tokens vs Mode A's "
           f"{{a['billed_input']:,}},")
     print(f"  a {{result['pct_input_reduction']:.0f}}% reduction worth {{fmt_usd(result['saved_input_usd'])}} "
           f"on THIS run at {{get(result['model_key']).label}}'s input price, because the records went")
@@ -566,14 +568,14 @@ def cmd_run(model_key: str) -> int:
     from .common.client import get_client  # lazy: anthropic is imported only when we actually call
 
     label = get(model_key).label
-    n = len(getattr(yourtool, "EXAMPLE_INPUTS", []) or [])
-    print(f"\\n  Bill-cut: the same fan-out task two ways over your tool ({{yourtool.TOOL_SPEC['name']}}),")
+    n = len(getattr(tool, "EXAMPLE_INPUTS", []) or [])
+    print(f"\\n  Token bill: the same fan-out task two ways over your tool ({{tool.TOOL_SPEC['name']}}),")
     print(f"  on {{label}}. Mode A calls the tool directly, Mode B (programmatic tool calling) runs it")
     print(f"  from a sandbox so the records stay out of the model's context.")
     print(f"  Upfront: this run makes 2 task runs over {{n}} inputs and costs about $0.06 and roughly")
     print(f"  90 seconds on your key. The model arms are the only spend, the sandbox is server-side.\\n")
     client = get_client()
-    result = run_billcut(client, model_key)
+    result = run_token_compare(client, model_key)
     print_table(result)
     return 0
 
@@ -584,11 +586,11 @@ def cmd_check(model_key: str) -> int:
     right answer that costs more is not the edge, so the gate requires both."""
     from .common.client import get_client  # lazy
 
-    expected = getattr(yourtool, "EXPECTED_ANSWER", None)
+    expected = getattr(tool, "EXPECTED_ANSWER", None)
     print(f"\\n  --check: running the shipped example on {{get(model_key).label}} and asserting the PTC")
     print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). About $0.06.\\n")
     client = get_client()
-    result = run_billcut(client, model_key)
+    result = run_token_compare(client, model_key)
     print_table(result)
 
     a, b = result["mode_a"], result["mode_b"]
@@ -608,13 +610,13 @@ def cmd_check(model_key: str) -> int:
     print(f"\\n  CHECK PASSED: Mode B billed {{result['pct_input_reduction']:.0f}}% fewer input tokens "
           f"({{b['billed_input']:,}} vs {{a['billed_input']:,}})" +
           (f" and answered {{b['answer_parsed']!r}} correctly." if expected is not None else "."))
-    print("  The bill-cut holds on the example. Now swap your tool into yourtool.py.\\n")
+    print("  The token saving holds on the example. Now swap your tool into my_tool.py.\\n")
     return 0
 
 
 def main() -> int:
     p = argparse.ArgumentParser(
-        description="Run a fan-out task over your tool twice (plain vs programmatic) and print the bill-cut.")
+        description="Run a fan-out task over your tool twice (plain vs programmatic) and print the token bill.")
     p.add_argument("--model", default="sonnet", choices=sorted(PTC_MODELS),
                    help="sonnet (default) or opus, Haiku does not support programmatic tool calling")
     p.add_argument("--check", action="store_true",
@@ -994,7 +996,7 @@ supported on Opus 4.5 to 4.8 and Sonnet 4.5 to 4.6 (not Haiku).
 
 ```
 export ANTHROPIC_API_KEY=your-key   # https://console.anthropic.com/
-make ptc        # build the venv, install anthropic, run the bill-cut on the region_sales example
+make ptc        # build the venv, install anthropic, run the token-bill comparison on the region_sales example
 ```
 
 `make ptc` is self-bootstrapping: it creates `.venv`, installs `anthropic`, and runs the before/after.
@@ -1187,7 +1189,7 @@ def _ensure_makefile_entry(makefile: pathlib.Path, plan: BriefPlan) -> bool:
     target = f"{plan.slug}:"
     if re.search(rf"^{re.escape(plan.slug)}:", text, re.MULTILINE):
         return False
-    run_module = "cite" if plan.slug == "citations" else "billcut"
+    run_module = "cite" if plan.slug == "citations" else "run_tokens"
     block = (
         f"\n# {plan.title}: {plan.make_help}\n"
         f"{plan.slug}: $(VENV)/.installed\n"
@@ -1261,7 +1263,7 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
     """Build the whole brief into a staging dir (so a failure leaves nothing behind), then the caller
     moves it into place atomically. Writes the vendored engine files, the edit surface, the generated
     run entry, __init__.py, README.md, and PROVENANCE.md. The edit surface and run entry differ by edge
-    (the token_accounting brief ships yourtool.py + billcut.py; the grounding_resolution brief ships a
+    (the token_accounting brief ships my_tool.py + run_tokens.py; the grounding_resolution brief ships a
     docs/ corpus + cite.py), so the body dispatches on the plan slug."""
     brief_dir = staging
     brief_dir.mkdir(parents=True, exist_ok=True)
@@ -1270,11 +1272,12 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
     (brief_dir / "__init__.py").write_text("")
 
     if plan.slug == "ptc":
-        # The token_accounting brief: the region_sales fixture as the edit surface, billcut.py as the run.
-        (brief_dir / plan.edit_surface).write_text(_region_fixture_source())
-        run_src = _billcut_source(plan.slug)
-        _assert_no_dangling(run_src, "billcut.py")  # the generated run entry must be closure-clean
-        (brief_dir / "billcut.py").write_text(run_src)
+        # The token_accounting brief: the region_sales fixture as the edit surface (my_tool.py),
+        # run_tokens.py as the run.
+        (brief_dir / plan.edit_surface).write_text(_my_tool_source())
+        run_src = _run_tokens_source(plan.slug)
+        _assert_no_dangling(run_src, "run_tokens.py")  # the generated run entry must be closure-clean
+        (brief_dir / "run_tokens.py").write_text(run_src)
         (brief_dir / "README.md").write_text(_readme_source(plan, gate.edge or {}, gate.receipt))
     elif plan.slug == "citations":
         # The grounding_resolution brief: a docs/ corpus as the edit surface, cite.py as the run.

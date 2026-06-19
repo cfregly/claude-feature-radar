@@ -36,10 +36,7 @@ import sys as _sys
 _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[2]))  # repo root, for common/ and engine/
 
 import argparse
-import hashlib
 import json
-import random
-import re
 
 from common.client import fmt_usd, get_client, load_env, repo_root
 from common.models import get
@@ -48,62 +45,21 @@ from engine.demonstrators.base import Arm, BaseDemonstrator, CostEstimate, Verdi
 from engine.demonstrators.registry import register
 from engine.demonstrators.token_core import run_mode
 
-REGIONS = ["north", "south", "east", "pacific"]
-PRODUCTS = ["widget", "gadget", "sprocket", "gizmo", "doohickey", "flange", "valve", "bracket"]
-ROWS_PER_REGION = 60
-
-QUERY_TOOL = {
-    "name": "query_region_sales",
-    "description": (
-        "Return the full list of sales order records for one region. Each call returns a JSON array "
-        "of objects, each with keys order_id (string), product (string), units (integer), and "
-        "revenue (number, USD). About 60 records per region."
-    ),
-    "input_schema": {
-        "type": "object",
-        "properties": {"region": {"type": "string", "description": "the region name, lowercase"}},
-        "required": ["region"],
-    },
-}
-
-
-def region_sales(region: str):
-    """Deterministic ~60 rows for a region, so the true winner is fixed and reproducible."""
-    seed = int(hashlib.sha256(region.encode()).hexdigest()[:8], 16)
-    rng = random.Random(seed)
-    rows = []
-    for i in range(ROWS_PER_REGION):
-        rows.append({
-            "order_id": f"{region[:2].upper()}{i:04d}",
-            "product": rng.choice(PRODUCTS),
-            "units": rng.randint(1, 100),
-            "revenue": round(rng.uniform(10.0, 5000.0), 2),
-        })
-    return rows
+# The fixture is defined once in app/example_tool.py (the app's shipped worked example) and imported
+# here, so the app's number and this demo's number come from one definition, never two redefinitions.
+from app.example_tool import (
+    QUESTION,
+    REGIONS,
+    ROWS_PER_REGION,
+    TOOL_SPEC as QUERY_TOOL,
+    parse_answer as parse_winner,
+    region_sales,
+)
 
 
 def true_winner():
     totals = {r: round(sum(row["revenue"] for row in region_sales(r)), 2) for r in REGIONS}
     return max(totals, key=totals.get), totals
-
-
-QUESTION = (
-    "You have a tool query_region_sales(region) that returns the sales records for one region. "
-    f"For these {len(REGIONS)} regions: {', '.join(REGIONS)}. Find the single region with the highest "
-    "TOTAL revenue, the sum of the revenue field across all of that region's records. "
-    "Write ONE script that loops over all of the regions in a single code execution, calls the tool "
-    "for each region inside that one loop, sums the revenue per region, and returns the winner. Do "
-    "NOT call the tool one region at a time across separate steps. Reply with exactly one final line "
-    "in the form: Winner: <region>"
-)
-
-
-def parse_winner(text: str):
-    m = re.search(r"Winner:\s*([a-zA-Z]+)", text or "")
-    if not m:
-        return None
-    w = m.group(1).lower()
-    return w if w in REGIONS else None
 
 
 def run_ptc(client, model_key, *, programmatic):

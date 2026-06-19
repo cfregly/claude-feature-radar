@@ -40,9 +40,9 @@ a tool many times over data it then crunches (the fan-out shape). The full recei
 make ptc          # about $0.06 on Sonnet, needs ANTHROPIC_API_KEY
 ```
 
-Reproduce it on your own tool: edit ONE file, [`app/yourtool.py`](app/yourtool.py), paste your
+Reproduce it on your own tool: edit ONE file, [`app/my_tool.py`](app/my_tool.py), paste your
 Messages-API tool dict and the Python that runs it, then `make app` runs the same fan-out task twice
-over your tool and prints your own before/after billed-input table and the dollar delta. `make
+over your tool and prints your own before-and-after billed-input table and the dollar delta. `make
 app-check` runs the shipped example and asserts the invariant first, so you get a real number before
 you change a line.
 
@@ -86,7 +86,7 @@ git clone <this-repo> && cd claude-competitive-engine   # the public URL lands o
 make setup                        # the venv and the one dependency (anthropic)
 cp .env.example .env              # paste your ANTHROPIC_API_KEY
 make ptc                          # the lead edge, about $0.06 (needs ANTHROPIC_API_KEY)
-make app-check                    # the forkable app on the shipped example, then edit app/yourtool.py
+make app-check                    # the forkable app on the shipped example, then edit app/my_tool.py
 ```
 
 Cost expectations: every benchmark reads its numbers off a real API call. `make ptc` and `make
@@ -100,7 +100,7 @@ keys: `make compare-deps`, then paste `OPENAI_API_KEY` and `GEMINI_API_KEY` into
 ## Layout
 
 ```
-app/            the forkable bill-cut app: yourtool.py (the one edit surface) + billcut.py
+app/            the forkable token-bill app: my_tool.py (the one edit surface) + run_tokens.py + example_tool.py
 edges/<edge>/   demo.py, sample.txt, README.md, one per edge
 common/         the verified model and price registry, the cost math, the client
 docs/           VERIFIED_FACTS.md, CITED_FACTS.md, the demo recording
