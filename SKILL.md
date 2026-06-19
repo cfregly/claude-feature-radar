@@ -131,14 +131,15 @@ These are why the output is trusted. Break one and the trust is gone.
     one reproduce path of one or two commands with the cost as a dollar figure. Keep it crisp (cut every
     word that does not earn its place, warm but never awkward, proper grammar), make the
     run-it-on-your-own-data path explicit (the one file to edit and the one command to re-run), and sign
-    as the real sender (name, team, company), with the signature in the email only and never inside the
-    public briefs repo. Do not editorialize about feature maturity in a founder email, so mention beta or
+    neutrally as a sender placeholder plus "Building with Claude" unless the user provides an approved
+    real sender. Keep the signature in the email only and never inside the public briefs repo. Do not
+    editorialize about feature maturity in a founder email, so mention beta or
     a required header only when the founder must set it, and for a GA feature do not say "it is GA" at all. The
     subject line must clear spam filters, so use no money-and-urgency trigger words (cut, save, free, cheap,
     discount, guarantee, a dollar sign) and keep it warm, personal, and specific to the feature, a genuine note
     to the reader, for example "Congrats on YC! A cool Claude feature to help you build". Write in the
-    first person as the sender who represents Anthropic ("we measured", not "Anthropic measures"), and
-    open with a concrete line, not vague filler. Use a startup-native example for a startup audience
+    first person as a builder sharing the run ("I measured", "on my key"), never as someone claiming to
+    speak for Anthropic, and open with a concrete line, not vague filler. Use a startup-native example for a startup audience
     (plan limits, usage, churn, signups, logs, MRR), not a generic enterprise one, and carry that single
     example through the problem, the code, the table, and the tool name.
     Every word fights for its place, so cut anything that does not earn its spot, the same every-word-earns-its-place standard.
@@ -188,10 +189,11 @@ review, read cold as a busy founder, before it is allowed out.
 make publish-brief EDGE=programmatic-tool-calling   # generate a self-contained public brief, offline, $0
 ```
 
-`make publish-brief EDGE=<key>` (`engine/publish_brief.py`) is the one-source-of-truth fix for the drift
-between this engine and the public claude-feature-briefs repo: instead of hand-maintaining a second copy
-of a brief, it generates the public brief FROM the engine's own committed truth. It is fail-closed. The
-verdict gate refuses to publish unless the edge reads as a clean Claude win in the engine's own records:
+`make publish-brief EDGE=<key>` (`engine/publish_brief.py`) exports to the optional public
+`claude-feature-briefs` companion repo. The engine itself is still self-contained: a normal clone does
+not need that sibling checkout unless the user is publishing a brief. Instead of hand-maintaining a
+second copy of a brief, it generates the public brief FROM the engine's own committed truth. It is
+fail-closed. The verdict gate refuses to publish unless the edge reads as a clean Claude win in the engine's own records:
 the landscape edge must be verdict `claude-ahead` with `lead_score > 0` (falling back to the
 `scan.DIFFERENTIATORS` seed leads on a fresh checkout), any present `data/last_<edge>.json` receipt must
 agree, and the `fair_comparison.lead_basis` must be a non-regime-bounded basis (head-to-head,
@@ -200,8 +202,8 @@ refusal it prints the verdict it read and the source, exits non-zero, and writes
 vendors the engine modules the brief needs (rewriting imports by a deterministic prefix swap, refusing
 any dangling import), writes a wins-only README and a PROVENANCE stamp, makes idempotent appends to the
 briefs-root Makefile and README, and writes the founder email to the engine's own `emails/`. It makes no
-model call, never spends, never pushes, and never sends. The default `--briefs-root` is
-`../claude-feature-briefs`.
+model call, never spends, never pushes, and never sends. Pass `--briefs-root=<path>` when the companion
+repo is not checked out at the default `../claude-feature-briefs` location.
 
 ### 5. Ship the reproducible bundle
 A self-contained, dated bundle with both platforms' code, the receipts (cost, time, answers), clear
