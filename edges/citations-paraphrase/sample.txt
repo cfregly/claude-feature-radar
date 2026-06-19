@@ -3,10 +3,10 @@
 
   arm                          mechanism        answered  resolves  drops   out_tok      cost  wall
   --------------------------------------------------------------------------------------------------
-  claude+citations:sonnet     API citations         8/8       8/8      0       626   $0.2396  27.7s
-  claude DIY:sonnet           DIY str.find          7/8       7/8      0       595   $0.0248  19.1s
-  openai DIY:gpt-top          DIY str.find          8/8       8/8      0       899   $0.0537  20.8s
-  gemini DIY:gem-pro          DIY str.find          5/8       8/8      0     5,577   $0.0778  51.5s
+  claude+citations:sonnet     API citations         8/8       8/8      0       572   $0.2388  24.3s
+  claude DIY:sonnet           DIY str.find          8/8       8/8      0       692   $0.0285  19.8s
+  openai DIY:gpt-top          DIY str.find          8/8       8/8      0       881   $0.0531  22.8s
+  gemini DIY:gem-pro          DIY str.find          5/8       8/8      0     5,712   $0.0795  54.0s
 
   Verdict:
     positive_signal: false
@@ -21,13 +21,40 @@
   - Every arm answered the questions in its own words (paraphrased), as instructed.
   - Claude Citations resolved every answer's pointer by guarantee (source[start:end]==cited_text,
     and a real page span for the inline PDF), each grounded in the expected source, with zero
-    hosted or persisted objects.
-  - The DIY str.find path dropped pointers under paraphrase: the model's paraphrased supporting
-    sentence is not a verbatim substring, so str.find returns -1 and the citation is silently lost.
-  - On clean VERBATIM quotes the DIY path resolves about as well on every vendor (the citations
-    edge measures that). This arm measures the paraphrase regime the clean-text test did not.
+    hosted or persisted objects, on the lower Sonnet tier.
+  - The cross-vendor DIY path also resolved: the FRONTIER models returned verbatim quotes (even
+    while paraphrasing the answer), and a whitespace-tolerant str.find resolves those, so on this
+    workload resolution is PARITY against a competent DIY resolver.
+  - So the durable Claude value here is the GUARANTEE, the free cited_text, and zero resolver code,
+    a within-Claude value-add, not a cross-vendor capability the others lack. The str.find drop
+    appears only with a weaker model or a naive resolver, both of which a founder can avoid.
+  - The robust cross-vendor PDF win (OpenAI and Gemini return NO citation pointer for a directly-
+    supplied inline PDF without a hosted vector store) is measured in the pdf-citations and
+    grounding-stack edges, not in str.find resolution.
   - cited_text is free of output tokens, so the Citations arm carries no quote-token cost.
   - Citations cannot be combined with Structured Outputs (the API returns a 400 together).
+
+  PDF glue-code demo: read the SAME PDF natively, ask for a verbatim quote, 5 questions.
+  A model quotes the sentence as the PDF renders it (line-wrapped), so the developer's naive
+  str.find in their stored canonical text can return -1. The one-line fix is whitespace-normalize.
+
+  arm                          naive str.find   + ws-normalized   Claude guarantee
+  ------------------------------------------------------------------------------------
+  claude+citations:sonnet               -                -               5/5
+  claude DIY:sonnet                   5/5              5/5                 -
+  openai DIY:gpt-top                  5/5              5/5                 -
+  gemini DIY:gem-pro                  5/5              5/5                 -
+  -> Live, the naive str.find resolved every quote this run (the models emitted clean quotes),
+     but it is one PDF-rendering artifact away from a silent -1, shown deterministically next.
+
+  Deterministic illustration (grounded in the PDF's own line-wrapping, no model call):
+    sentence: "Overage seats beyond the 50 included seats are billed at 12 US dollars per seat per month."
+    rendered as the PDF wraps it (with an interior line break), then located three ways:
+      developer naive str.find        -> DROP (-1, silent)
+      + one-line whitespace normalize -> resolves
+      Claude page_location guarantee  -> resolves
+  Claude's page_location resolved every quote by guarantee with zero resolver code. That
+  normalization is exactly what the guarantee buys: the glue a founder would otherwise own.
 
   Reproduce:
     make citations-paraphrase

@@ -28,7 +28,7 @@ citations: ## EDGE: verifiable citations vs the DIY str.find baseline, all three
 citations-quick: ## a 3-question, cents-scale smoke of the citations edge
 	$(PY) edges/citations/demo.py --quick
 
-citations-paraphrase: ## EDGE: paraphrase-robustness of citation resolution, Claude guaranteed-resolve vs the DIY str.find drop rate (needs 3 keys, cents)
+citations-paraphrase: ## MEASUREMENT: paraphrase/PDF citation resolution + the PDF glue-code demo, Claude guaranteed-resolve vs the DIY str.find baseline at the competitors' frontier tier (needs 3 keys, about $0.75)
 	$(PY) run.py citations-paraphrase --emit-edge
 
 pdf-citations: ## EDGE: page citations into a directly supplied PDF, Claude vs direct PDF/file inputs (needs 3 keys, cents)

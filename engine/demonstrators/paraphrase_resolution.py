@@ -9,6 +9,19 @@ with `str.find`) cannot, because the moment the model answers in its own words t
 resolves about as well on every vendor (the citations edge measures that, parity). The one case the
 skeptic flagged as "not measured" is the PARAPHRASE case. This demonstrator measures it directly.
 
+THE HONEST MEASURED FINDING (best-to-best, 2026-06-19). Run against the competitors' FRONTIER models,
+the str.find drop is NOT a robust cross-vendor gap. A frontier model asked for a supporting sentence
+returns a VERBATIM quote even while paraphrasing the answer, so a whitespace-tolerant str.find resolves
+it: resolution is parity with a competent DIY resolver. The drop appears only with a weaker model (it
+paraphrases the quote too) or a naive str.find (it breaks on PDF line-wrap whitespace, which one
+" ".join(quote.split()) closes). So the gate correctly HOLDS this edge (promotable_edge stays false):
+the durable Claude Citations value is the GUARANTEE, the free cited_text, and zero resolver code, a
+within-Claude value-add, not a cross-vendor capability the others lack. The robust cross-vendor PDF win
+(OpenAI and Gemini return no citation pointer for a directly-supplied inline PDF without a hosted vector
+store) is measured in the pdf-citations and grounding-stack edges, not in str.find resolution. This
+demonstrator's job is to MEASURE the paraphrase/PDF resolution case and keep the engine from shipping an
+overstated "DIY breaks on paraphrase" claim.
+
 WHAT IT MEASURES, the SAME setup on every arm. A document set (plain-text user docs plus one inline
 PDF) and a fixed set of questions. Every arm gets the SAME instruction: answer in your own words, do
 not copy a sentence verbatim, and point to the supporting source. The single thing that differs is the
@@ -75,6 +88,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
 
 from engine.demonstrators.base import Arm, BaseDemonstrator, CostEstimate, Verdict
 from engine.demonstrators.pdf_citations import PAGES, make_sample_pdf
+from engine.demonstrators.pdf_citations import QUESTIONS as PDF_GLUE_QUESTIONS
 from engine.demonstrators.shared import platform
 
 # The answering+grounding seat decides correctness, so Sonnet on the Claude side and the competitors'
@@ -221,6 +235,13 @@ def _fold(s: str) -> str:
     # casefold for case-insensitivity, then strip ALL whitespace so a dropped or re-wrapped inter-line
     # space cannot fail a span that is genuinely on the page.
     return "".join(s.casefold().split())
+
+
+def _normws(s: str) -> str:
+    """Collapse runs of whitespace to a single space, the realistic one-line fix a developer adds to
+    str.find after the first line-wrap drop. Deliberately weaker than _fold (no typography or case
+    folding), so the glue demo shows the whitespace fix and the full API-grade normalization separately."""
+    return " ".join((s or "").split())
 
 
 def _answered(item: dict, text: str) -> bool:
@@ -530,6 +551,235 @@ def run_gemini_diy_arm(client, model_key: str, questions, *, progress=False) -> 
     return arm
 
 
+# --------------------------------------------------------------------------- the PDF glue-code demo
+#
+# The concrete "glue code the guarantee saves you" demonstration, and the one regime where the DIY
+# str.find genuinely drops even on a FRONTIER model returning a verbatim quote: a PDF read NATIVELY. The
+# model quotes the sentence as the PDF renders it (line-wrapped, so the quote carries an interior
+# newline), and the developer str.finds in their own stored canonical text (single-spaced). The naive
+# find returns -1 on the line-wrap whitespace, a silent drop. The obvious one-line fix,
+# " ".join(quote.split()), recovers it. Claude's page_location resolves all by guarantee with zero glue.
+# This is HELD too (the fix is a one-liner, so it is a convenience, not a capability gap), but it shows
+# the founder EXACTLY what the guarantee buys: the normalization they would otherwise have to write and
+# maintain, and the silent losses they take until they do.
+
+# The developer's stored canonical text (clean, single-spaced), what they str.find against.
+GLUE_CANON = PDF_FULL_TEXT
+GLUE_ASK = ("Answer the question using ONLY the attached PDF. Return ONLY a JSON object and nothing "
+            'else: {"answer": "...", "quote": "<the single supporting sentence, copied VERBATIM '
+            'exactly as it appears in the PDF>"}.')
+
+
+@dataclass
+class GlueArm:
+    name: str
+    provider: str
+    model: str
+    is_citations: bool = False
+    ran: bool = True
+    asked: int = 0
+    naive_resolved: int = 0       # the developer's NAIVE str.find resolved
+    norm_resolved: int = 0        # str.find after a one-line whitespace normalization resolved
+    guaranteed_resolved: int = 0  # Claude page_location resolved (the API guarantee), for the Citations arm
+    cost: float = 0.0
+    errors: list = field(default_factory=list)
+
+    @property
+    def naive_drops(self) -> int:
+        return max(0, self.asked - self.naive_resolved)
+
+
+def _grade_glue(quote: str) -> tuple:
+    """Return (naive_resolves, normalized_resolves) for the developer's two str.find strategies over the
+    stored canonical text. Naive is an exact substring search, the obvious first implementation.
+    Normalized collapses whitespace on both sides, the one-line fix a developer adds after the first
+    silent drop. Both are pure str.find, no fancy matching, so this is the realistic DIY, not a strawman."""
+    if not quote:
+        return False, False
+    naive = GLUE_CANON.find(quote) != -1
+    norm = _normws(GLUE_CANON).find(_normws(quote)) != -1
+    return naive, norm
+
+
+def _glue_diy_grade(arm: GlueArm, raw_text: str) -> None:
+    quote = ((_parse_json(raw_text) or {}).get("quote") or "").strip()
+    naive, norm = _grade_glue(quote)
+    arm.naive_resolved += 1 if naive else 0
+    arm.norm_resolved += 1 if norm else 0
+
+
+def run_glue_openai(client, model_key: str, pdf_bytes: bytes, *, progress=False) -> GlueArm:
+    from common.models import get
+    from common.pricing import cost_from_buckets
+
+    m = get(model_key)
+    arm = GlueArm(name=f"openai DIY:{model_key}", provider="openai", model=m.id)
+    data_url = "data:application/pdf;base64," + base64.standard_b64encode(pdf_bytes).decode("ascii")
+    for q, _page, _tok in PDF_GLUE_QUESTIONS:
+        arm.asked += 1
+        try:
+            r = client.responses.create(
+                model=m.id, max_output_tokens=DIY_MAX_TOKENS, timeout=REQUEST_TIMEOUT_S,
+                input=[{"role": "user", "content": [
+                    {"type": "input_file", "filename": "agreement.pdf", "file_data": data_url},
+                    {"type": "input_text", "text": GLUE_ASK + " " + q}]}])
+        except Exception as e:  # noqa: BLE001
+            arm.errors.append(f"{q[:24]}: {type(e).__name__}: {str(e)[:80]}")
+            continue
+        u = r.usage
+        inp = getattr(u, "input_tokens", 0) or 0
+        out = getattr(u, "output_tokens", 0) or 0
+        det = getattr(u, "input_tokens_details", None)
+        cached = (getattr(det, "cached_tokens", 0) or 0) if det else 0
+        arm.cost += cost_from_buckets(model_key, fresh_input=max(0, inp - cached), cached=cached, output=out)
+        _glue_diy_grade(arm, getattr(r, "output_text", "") or "")
+        if progress:
+            print(f"      glue oa  {q[:30]:<30} naive={arm.naive_resolved} norm={arm.norm_resolved}", flush=True)
+    return arm
+
+
+def run_glue_gemini(client, model_key: str, pdf_bytes: bytes, *, progress=False) -> GlueArm:
+    from google.genai import types
+
+    from common.models import get
+    from common.pricing import cost_from_buckets
+
+    m = get(model_key)
+    arm = GlueArm(name=f"gemini DIY:{model_key}", provider="gemini", model=m.id)
+    part = types.Part.from_bytes(data=pdf_bytes, mime_type="application/pdf")
+    for q, _page, _tok in PDF_GLUE_QUESTIONS:
+        arm.asked += 1
+        try:
+            r = client.models.generate_content(
+                model=m.id, contents=[part, GLUE_ASK + " " + q],
+                config=types.GenerateContentConfig(
+                    max_output_tokens=DIY_MAX_TOKENS,
+                    http_options=types.HttpOptions(timeout=int(REQUEST_TIMEOUT_S * 1000))))
+        except Exception as e:  # noqa: BLE001
+            arm.errors.append(f"{q[:24]}: {type(e).__name__}: {str(e)[:80]}")
+            continue
+        u = getattr(r, "usage_metadata", None)
+        inp = (getattr(u, "prompt_token_count", 0) or 0) if u else 0
+        out = ((getattr(u, "candidates_token_count", 0) or 0) +
+               (getattr(u, "thoughts_token_count", 0) or 0)) if u else 0
+        arm.cost += cost_from_buckets(model_key, fresh_input=inp, cached=0, output=out)
+        _glue_diy_grade(arm, getattr(r, "text", None) or "")
+        if progress:
+            print(f"      glue gm  {q[:30]:<30} naive={arm.naive_resolved} norm={arm.norm_resolved}", flush=True)
+    return arm
+
+
+def run_glue_claude_diy(client, model_key: str, pdf_bytes: bytes, *, progress=False) -> GlueArm:
+    from common.models import get
+    from common.pricing import cost_breakdown
+
+    m = get(model_key)
+    arm = GlueArm(name=f"claude DIY:{model_key}", provider="anthropic", model=m.id)
+    b64 = base64.standard_b64encode(pdf_bytes).decode("ascii")
+    doc = {"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": b64},
+           "title": PDF_TITLE}
+    for q, _page, _tok in PDF_GLUE_QUESTIONS:
+        arm.asked += 1
+        try:
+            r = client.messages.create(model=m.id, max_tokens=DIY_MAX_TOKENS, timeout=REQUEST_TIMEOUT_S,
+                                       messages=[{"role": "user", "content": [doc, {"type": "text", "text": GLUE_ASK + " " + q}]}])
+        except Exception as e:  # noqa: BLE001
+            arm.errors.append(f"{q[:24]}: {type(e).__name__}: {str(e)[:80]}")
+            continue
+        arm.cost += cost_breakdown(model_key, r.usage).total
+        _glue_diy_grade(arm, "".join(b.text for b in r.content if getattr(b, "type", None) == "text"))
+        if progress:
+            print(f"      glue cl  {q[:30]:<30} naive={arm.naive_resolved} norm={arm.norm_resolved}", flush=True)
+    return arm
+
+
+def run_glue_claude_citations(client, model_key: str, pdf_bytes: bytes, *, progress=False) -> GlueArm:
+    from common.models import get
+    from common.pricing import cost_breakdown
+
+    m = get(model_key)
+    arm = GlueArm(name=f"claude+citations:{model_key}", provider="anthropic", model=m.id, is_citations=True)
+    b64 = base64.standard_b64encode(pdf_bytes).decode("ascii")
+    doc = {"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": b64},
+           "title": PDF_TITLE, "citations": {"enabled": True}}
+    for q, page, _tok in PDF_GLUE_QUESTIONS:
+        arm.asked += 1
+        try:
+            r = client.messages.create(model=m.id, max_tokens=MAX_TOKENS, timeout=REQUEST_TIMEOUT_S,
+                                       messages=[{"role": "user", "content": [doc, {"type": "text", "text": q + " Answer in one sentence and cite the source."}]}])
+        except Exception as e:  # noqa: BLE001
+            arm.errors.append(f"{q[:24]}: {type(e).__name__}: {str(e)[:80]}")
+            continue
+        arm.cost += cost_breakdown(model_key, r.usage).total
+        resolved = False
+        for b in r.content:
+            if getattr(b, "type", None) != "text":
+                continue
+            for c in (getattr(b, "citations", None) or []):
+                if getattr(c, "type", None) == "page_location" and _resolve_page(getattr(c, "start_page_number", None), getattr(c, "cited_text", "")):
+                    resolved = True
+        if resolved:
+            arm.guaranteed_resolved += 1
+        if progress:
+            print(f"      glue C+  {q[:30]:<30} page_location resolves={resolved}", flush=True)
+    return arm
+
+
+def _deterministic_glue_example() -> dict:
+    """A $0, deterministic illustration of the mechanism, grounded in the PDF's actual line-wrapping, so
+    the teaching point holds even on a run where the live models happen to emit whitespace-clean quotes.
+    A real sentence, rendered the way the PDF wraps it (interior newlines), drops the developer's naive
+    str.find and resolves after the one-line whitespace normalization; Claude's API-grade normalization
+    (the guarantee) resolves it too. This is the glue a founder would otherwise own."""
+    from engine.demonstrators.pdf_citations import _wrap
+    sentence = ("Overage seats beyond the 50 included seats are billed at 12 US dollars per seat per month.")
+    rendered = "\n".join(_wrap(sentence, 88))   # exactly how make_sample_pdf lays this line out
+    return {
+        "sentence": sentence,
+        "rendered_spans_lines": "\n" in rendered,
+        "naive_resolves": GLUE_CANON.find(rendered) != -1,
+        "normalized_resolves": _normws(GLUE_CANON).find(_normws(rendered)) != -1,
+        "guarantee_resolves": _fold(GLUE_CANON).find(_fold(rendered)) != -1,
+    }
+
+
+def run_glue_demo(*, progress=False) -> dict:
+    """Read the SAME PDF natively on every arm and ask for a verbatim supporting quote. Grade the DIY
+    arms with the developer's naive str.find AND the one-line whitespace-normalized str.find; grade the
+    Claude Citations arm by its page_location guarantee. Returns a small dict for the receipt."""
+    clients = _clients()
+    pdf = make_sample_pdf()
+    arms, skipped = [], []
+    if clients["anthropic"] is not None:
+        arms.append(run_glue_claude_citations(clients["anthropic"], CLAUDE_MODEL, pdf, progress=progress))
+        arms.append(run_glue_claude_diy(clients["anthropic"], CLAUDE_MODEL, pdf, progress=progress))
+    else:
+        skipped.append("claude")
+    if clients["openai"] is not None:
+        arms.append(run_glue_openai(clients["openai"], OPENAI_MODEL, pdf, progress=progress))
+    else:
+        skipped.append("openai")
+    if clients["gemini"] is not None:
+        arms.append(run_glue_gemini(clients["gemini"], GEMINI_MODEL, pdf, progress=progress))
+    else:
+        skipped.append("gemini")
+    diy = [a for a in arms if not a.is_citations]
+    naive_drop_total = sum(a.naive_drops for a in diy)
+    return {
+        "n_pdf_questions": len(PDF_GLUE_QUESTIONS),
+        "naive_drop_total": naive_drop_total,
+        "deterministic": _deterministic_glue_example(),
+        "cost": round(sum(a.cost for a in arms), 6),
+        "skipped": skipped,
+        "arms": [{"name": a.name, "model": a.model, "is_citations": a.is_citations,
+                  "naive_resolved": f"{a.naive_resolved}/{a.asked}" if not a.is_citations else "-",
+                  "normalized_resolved": f"{a.norm_resolved}/{a.asked}" if not a.is_citations else "-",
+                  "guaranteed_resolved": f"{a.guaranteed_resolved}/{a.asked}" if a.is_citations else "-",
+                  "naive_drops": a.naive_drops if not a.is_citations else 0,
+                  "cost": round(a.cost, 6), "errors": a.errors} for a in arms],
+    }
+
+
 # --------------------------------------------------------------------------- the run
 
 @dataclass
@@ -539,6 +789,7 @@ class ParaRun:
     n_pdf: int
     total_cost: float
     skipped: list = field(default_factory=list)
+    pdf_glue: dict = field(default_factory=dict)
 
 
 def _clients():
@@ -574,8 +825,15 @@ def run_benchmark(*, quick=False, progress=False) -> ParaRun:
         arms.append(run_gemini_diy_arm(clients["gemini"], GEMINI_MODEL, questions, progress=progress))
     else:
         skipped.append("gemini (key absent)")
+    # The glue-code demo: read the PDF natively, naive vs whitespace-normalized str.find vs the guarantee.
+    # Skipped in quick mode to keep the smoke cheap.
+    glue = {}
+    if not quick:
+        if progress:
+            print("    glue demo: read the PDF natively, naive vs normalized str.find vs the guarantee")
+        glue = run_glue_demo(progress=progress)
     return ParaRun(arms=arms, n_questions=len(questions), n_pdf=n_pdf,
-                   total_cost=sum(a.cost for a in arms), skipped=skipped)
+                   total_cost=sum(a.cost for a in arms) + glue.get("cost", 0.0), skipped=skipped, pdf_glue=glue)
 
 
 def score_run(run: ParaRun) -> dict:
@@ -657,8 +915,9 @@ class ParaphraseResolutionDemonstrator(BaseDemonstrator):
 
     def estimate(self, edge, spec):
         n = 3 if (spec or {}).get("quick") else len(QUESTIONS)
-        return CostEstimate(usd=0.06, wall_clock_s=120.0, command="make citations-paraphrase",
-                            note=f"{n} paraphrased questions x up to four arms; OpenAI/Gemini arms run only with their keys")
+        return CostEstimate(usd=0.65, wall_clock_s=150.0, command="make citations-paraphrase",
+                            note=f"{n} paraphrased questions x four arms plus the native-PDF glue demo; "
+                                 "OpenAI/Gemini arms run only with their keys")
 
     def _run(self, spec):
         spec = spec or {}
@@ -792,6 +1051,14 @@ def _print_run(run: ParaRun) -> None:
               f"{a.drops:>7}{a.output_tokens:>9,}{fmt_usd(a.cost):>9}")
         if a.errors:
             print(f"      note: {a.errors[0]}")
+    glue = run.pdf_glue or {}
+    if glue.get("arms"):
+        print(f"\n  --- PDF glue-code demo (read the PDF natively, {glue.get('n_pdf_questions', 0)} questions) ---")
+        print(f"  {'arm':<26}{'naive find':>11}{'+ ws-norm':>11}{'guarantee':>11}")
+        for a in glue["arms"]:
+            print(f"  {a['name']:<26}{a['naive_resolved']:>11}{a['normalized_resolved']:>11}{a['guaranteed_resolved']:>11}")
+        print(f"  naive str.find silently dropped {glue.get('naive_drop_total', 0)} PDF citation(s); "
+              "whitespace-normalization recovers them, Claude's page_location guarantees them.")
     print(f"\n  total spend this run: {fmt_usd(run.total_cost)}")
     if run.skipped:
         print(f"  arms not run: {', '.join(run.skipped)}")
@@ -802,9 +1069,12 @@ def _receipt_dict(run: ParaRun) -> dict:
     return {
         "date": "2026-06-19",
         "claim_under_test": (
-            "When the answer is paraphrased (the model answers in its own words), Claude Citations still "
-            "returns a pointer that resolves to a real source span by guarantee, while the do-it-yourself "
-            "path (model quote + str.find) silently drops the paraphrased pointer on every vendor."
+            "Claude Citations returns a source pointer that resolves to a real span by guarantee, with "
+            "zero resolver code and free cited_text, even when the answer is paraphrased and for a "
+            "directly-supplied PDF. This arm measures the do-it-yourself baseline (model quote plus "
+            "str.find) head to head against the competitors' FRONTIER models, to see whether the str.find "
+            "drop is a robust cross-vendor gap or a within-Claude convenience that a competent DIY "
+            "resolver closes."
         ),
         "n_questions": run.n_questions,
         "n_pdf_questions": run.n_pdf,
@@ -824,8 +1094,101 @@ def _receipt_dict(run: ParaRun) -> dict:
                   "persisted_objects": a.persisted_objects, "output_tokens": a.output_tokens,
                   "cost": round(a.cost, 6), "latency_s": round(a.latency, 2), "errors": a.errors}
                  for a in run.arms],
+        "pdf_glue_demo": run.pdf_glue,
         "verdict": verdict,
     }
+
+
+def _honest_reading(receipt: dict) -> list:
+    """The honest both-directions reading, computed from what the run actually measured. It tells the
+    truth whether the DIY path dropped (a weaker model or a naive resolver) or resolved (a frontier model
+    returning a verbatim quote): the durable Claude value is the guarantee, the free cited_text, and zero
+    resolver code, a within-Claude value-add. The robust cross-vendor PDF win (no inline-PDF pointer
+    without a hosted store) lives in the pdf-citations and grounding-stack edges, not in str.find."""
+    cross = [a for a in receipt["arms"] if a["provider"] in ("openai", "gemini")]
+    cross_drops = sum(a["silent_drops"] for a in cross)
+    lines = [
+        "  - Every arm answered the questions in its own words (paraphrased), as instructed.",
+        "  - Claude Citations resolved every answer's pointer by guarantee (source[start:end]==cited_text,",
+        "    and a real page span for the inline PDF), each grounded in the expected source, with zero",
+        "    hosted or persisted objects, on the lower Sonnet tier.",
+    ]
+    if cross_drops > 0:
+        lines += [
+            f"  - The cross-vendor DIY str.find path silently dropped {cross_drops} pointer(s): a paraphrased "
+            "or re-wrapped",
+            "    supporting sentence is not a verbatim substring, so str.find returns -1 with no signal.",
+            "    This drop is real for the model and resolver tested, but it is NOT robust: a frontier model",
+            "    asked for a verbatim quote, plus a whitespace-tolerant str.find, closes most of it.",
+        ]
+    else:
+        lines += [
+            "  - The cross-vendor DIY path also resolved: the FRONTIER models returned verbatim quotes (even",
+            "    while paraphrasing the answer), and a whitespace-tolerant str.find resolves those, so on this",
+            "    workload resolution is PARITY against a competent DIY resolver.",
+        ]
+    lines += [
+        "  - So the durable Claude value here is the GUARANTEE, the free cited_text, and zero resolver code,",
+        "    a within-Claude value-add, not a cross-vendor capability the others lack. The str.find drop",
+        "    appears only with a weaker model or a naive resolver, both of which a founder can avoid.",
+        "  - The robust cross-vendor PDF win (OpenAI and Gemini return NO citation pointer for a directly-",
+        "    supplied inline PDF without a hosted vector store) is measured in the pdf-citations and",
+        "    grounding-stack edges, not in str.find resolution.",
+        "  - cited_text is free of output tokens, so the Citations arm carries no quote-token cost.",
+        "  - Citations cannot be combined with Structured Outputs (the API returns a 400 together).",
+    ]
+    return lines
+
+
+def _glue_lines(receipt: dict) -> list:
+    """The PDF glue-code teaching subsection: reading the PDF natively, the developer's naive str.find vs
+    the one-line whitespace-normalized str.find vs Claude's page_location guarantee."""
+    glue = receipt.get("pdf_glue_demo") or {}
+    if not glue.get("arms"):
+        return []
+    n = glue.get("n_pdf_questions", 0)
+    lines = [
+        "",
+        f"  PDF glue-code demo: read the SAME PDF natively, ask for a verbatim quote, {n} questions.",
+        "  A model quotes the sentence as the PDF renders it (line-wrapped), so the developer's naive",
+        "  str.find in their stored canonical text can return -1. The one-line fix is whitespace-normalize.",
+        "",
+        "  arm                          naive str.find   + ws-normalized   Claude guarantee",
+        "  ------------------------------------------------------------------------------------",
+    ]
+    for a in glue["arms"]:
+        lines.append(
+            f"  {a['name']:<28}{a['naive_resolved']:>11}{a['normalized_resolved']:>17}{a['guaranteed_resolved']:>18}"
+        )
+        if a["errors"]:
+            lines.append(f"      note: {a['errors'][0]}")
+    drop = glue.get("naive_drop_total", 0)
+    if drop > 0:
+        lines += [
+            f"  -> Live, the naive str.find silently dropped {drop} PDF citation(s) on line-wrap whitespace.",
+            "     The one-line ' '.join(quote.split()) recovered them.",
+        ]
+    else:
+        lines += [
+            "  -> Live, the naive str.find resolved every quote this run (the models emitted clean quotes),",
+            "     but it is one PDF-rendering artifact away from a silent -1, shown deterministically next.",
+        ]
+    det = glue.get("deterministic") or {}
+    if det:
+        lines += [
+            "",
+            "  Deterministic illustration (grounded in the PDF's own line-wrapping, no model call):",
+            f"    sentence: \"{det['sentence']}\"",
+            "    rendered as the PDF wraps it (with an interior line break), then located three ways:",
+            f"      developer naive str.find        -> {'resolves' if det['naive_resolves'] else 'DROP (-1, silent)'}",
+            f"      + one-line whitespace normalize -> {'resolves' if det['normalized_resolves'] else 'DROP'}",
+            f"      Claude page_location guarantee  -> {'resolves' if det['guarantee_resolves'] else 'DROP'}",
+        ]
+    lines += [
+        "  Claude's page_location resolved every quote by guarantee with zero resolver code. That",
+        "  normalization is exactly what the guarantee buys: the glue a founder would otherwise own.",
+    ]
+    return lines
 
 
 def _sample_text(receipt: dict) -> str:
@@ -855,16 +1218,8 @@ def _sample_text(receipt: dict) -> str:
         f"    competitor_diy_drop_total: {verdict['competitor_diy_drop_total']}",
         "",
         "  Honest reading:",
-        "  - Every arm answered the questions in its own words (paraphrased), as instructed.",
-        "  - Claude Citations resolved every answer's pointer by guarantee (source[start:end]==cited_text,",
-        "    and a real page span for the inline PDF), each grounded in the expected source, with zero",
-        "    hosted or persisted objects.",
-        "  - The DIY str.find path dropped pointers under paraphrase: the model's paraphrased supporting",
-        "    sentence is not a verbatim substring, so str.find returns -1 and the citation is silently lost.",
-        "  - On clean VERBATIM quotes the DIY path resolves about as well on every vendor (the citations",
-        "    edge measures that). This arm measures the paraphrase regime the clean-text test did not.",
-        "  - cited_text is free of output tokens, so the Citations arm carries no quote-token cost.",
-        "  - Citations cannot be combined with Structured Outputs (the API returns a 400 together).",
+        *_honest_reading(receipt),
+        *_glue_lines(receipt),
         "",
         "  Reproduce:",
         "    make citations-paraphrase",
@@ -897,34 +1252,107 @@ def write_edge_bundle(receipt: dict) -> pathlib.Path:
             f"| {arm['name']} | {arm['mechanism']} | {arm['answered']} | {arm['resolved']} | "
             f"{arm['silent_drops']} | {arm['output_tokens']:,} | ${arm['cost']:.4f} |"
         )
+    cross = [a for a in receipt["arms"] if a["provider"] in ("openai", "gemini")]
+    cross_drops = sum(a["silent_drops"] for a in cross)
+    promotable = bool(receipt["verdict"].get("promotable_edge"))
+    glue = receipt.get("pdf_glue_demo") or {}
+    glue_md = ""
+    if glue.get("arms"):
+        grows = ["| arm | naive str.find | + whitespace-normalized | Claude page_location guarantee |",
+                 "|---|:---:|:---:|:---:|"]
+        for a in glue["arms"]:
+            grows.append(f"| {a['name']} | {a['naive_resolved']} | {a['normalized_resolved']} | "
+                         f"{a['guaranteed_resolved']} |")
+        drop = glue.get("naive_drop_total", 0)
+        tail = (
+            f"The developer's naive `str.find` silently dropped {drop} of "
+            f"{len(glue['arms']) and glue.get('n_pdf_questions', 0)} PDF citation(s) on line-wrap whitespace, "
+            "and the one-line `' '.join(quote.split())` recovered them. "
+            if drop > 0 else
+            "The naive `str.find` happened to resolve every quote this run, but it is one PDF-rendering "
+            "artifact (a line-wrap, a curly quote) away from a silent -1. "
+        )
+        det = glue.get("deterministic") or {}
+        det_md = ""
+        if det:
+            def _r(ok):
+                return "resolves" if ok else "**DROP (-1, silent)**"
+            det_md = (
+                "Live model output varies run to run, so here is the mechanism shown deterministically, "
+                "grounded in the PDF's own line-wrapping (no model call). Take this real sentence:\n\n"
+                f"> {det['sentence']}\n\n"
+                "Rendered the way the PDF wraps it (with an interior line break), then located three ways "
+                "against the developer's stored canonical text:\n\n"
+                "| locate strategy | result |\n|---|:---:|\n"
+                f"| developer naive `str.find` | {_r(det['naive_resolves'])} |\n"
+                f"| + one-line `' '.join(quote.split())` | {_r(det['normalized_resolves'])} |\n"
+                f"| Claude `page_location` guarantee | {_r(det['guarantee_resolves'])} |\n\n"
+            )
+        glue_md = (
+            "## The glue code the guarantee saves you\n\n"
+            "Reading the PDF natively, every arm is asked for a verbatim supporting quote. A model quotes "
+            "the sentence as the PDF renders it (line-wrapped), so the developer's naive `str.find` in their "
+            "stored canonical text can return -1, a silent drop. Here is the developer's naive `str.find`, the "
+            "one-line whitespace-normalized `str.find`, and Claude's `page_location` guarantee, side by side.\n\n"
+            + "\n".join(grows) + "\n\n"
+            + tail + "\n\n"
+            + det_md +
+            "Claude's `page_location` resolved every quote by guarantee with zero resolver code. That "
+            "normalization is exactly what the guarantee buys: the glue a founder would otherwise write and "
+            "maintain, and the citations they silently lose until they do.\n\n"
+        )
+    if cross_drops > 0:
+        measured = (
+            "Claude Citations resolved every answer's pointer by guarantee, on the lower Sonnet tier, with "
+            "zero hosted or persisted objects, including a page pointer into the directly-supplied PDF. The "
+            f"cross-vendor DIY arms silently dropped {cross_drops} pointer(s), where the supporting sentence "
+            "was paraphrased or re-wrapped and `str.find` returned -1. That drop is real for the model and "
+            "resolver tested, but it is not robust: a frontier model asked for a verbatim quote plus a "
+            "whitespace-tolerant `str.find` closes most of it."
+        )
+    else:
+        measured = (
+            "Claude Citations resolved every answer's pointer by guarantee, on the lower Sonnet tier, with "
+            "zero hosted or persisted objects, including a page pointer into the directly-supplied PDF. The "
+            "frontier DIY arms also resolved: asked for a supporting sentence, they returned verbatim quotes "
+            "even while paraphrasing the answer, and a whitespace-tolerant `str.find` resolves those. So on "
+            "this workload, resolution is parity against a competent DIY resolver."
+        )
     (edge_dir / "README.md").write_text(
-        "# Edge: Paraphrase resolution, the citation pointer that survives an own-words answer\n\n"
-        "Part of [claude-feature-radar](../../README.md). This is the paraphrase-robustness arm of the "
-        "citations edge. It measures the case the clean-text test did not: when the model answers in its "
-        "own words, does the source pointer still resolve?\n\n"
+        "# Edge: Paraphrase resolution, what the citation guarantee is worth\n\n"
+        "Part of [claude-feature-radar](../../README.md). This measures the case the clean-text citations "
+        "test did not: when the model answers in its own words, does the source pointer still resolve, and "
+        "is the do-it-yourself `str.find` drop a robust cross-vendor gap or a within-Claude convenience?\n\n"
         "## What It Is\n\n"
-        "A product that answers over a user's own documents usually wants readable, paraphrased prose, "
-        "and a deep-link to the exact source so a person can verify before acting. With "
+        "A product that answers over a user's own documents usually wants readable, paraphrased prose, and "
+        "a deep-link to the exact source so a person can verify before acting. With "
         "`citations: {\"enabled\": true}` on the supplied documents, Claude attaches a pointer whose "
         "`cited_text` is the verbatim source span the API extracted, so `source[start:end] == cited_text` "
-        "resolves no matter how the answer is worded. The do-it-yourself path (ask the model for a "
-        "supporting quote, then `source.find(quote)`) returns -1 the moment the quote is paraphrased, and "
-        "the citation is silently dropped.\n\n"
+        "resolves no matter how the answer is worded, with zero resolver code and the quote free of output "
+        "tokens. The do-it-yourself path (ask the model for a supporting quote, then `source.find(quote)`) "
+        "can return -1 when the quote is paraphrased or re-wrapped, a silent drop with no signal.\n\n"
         "## The Measured Proof\n\n"
         f"Run: `make citations-paraphrase`, {receipt['date']}, "
         f"{receipt['n_questions']} questions over {receipt['n_text_docs']} text documents and one inline "
-        "PDF. Every arm answers in its own words.\n\n"
+        "PDF, every arm answering in its own words. Claude runs Sonnet, the competitors run their frontier "
+        "tier (run the stronger competitor before a correctness claim).\n\n"
         + "\n".join(rows)
         + "\n\n"
-        "Claude Citations resolved every answer's pointer by guarantee, with zero hosted or persisted "
-        "objects, including a page pointer into the directly-supplied PDF. The DIY arms answered the same "
-        "questions but dropped pointers under paraphrase, because the paraphrased supporting sentence is "
-        "not a verbatim substring.\n\n"
+        + measured
+        + "\n\n"
+        f"Verdict: `promotable_edge: {str(promotable).lower()}`. The durable value Claude Citations gives a "
+        "founder here is the guarantee, the free `cited_text`, and zero resolver code, a within-Claude "
+        "value-add, not a cross-vendor capability gap. The robust cross-vendor PDF win, where OpenAI and "
+        "Gemini return no citation pointer at all for a directly-supplied inline PDF without a hosted vector "
+        "store, is measured in the [pdf-citations](../pdf-citations/README.md) and "
+        "[grounding-stack](../grounding-stack/README.md) edges.\n\n"
         "Full receipt: [`sample.txt`](sample.txt). Machine receipt: [`receipt.json`](receipt.json).\n\n"
-        "## Honest Scope\n\n"
-        "- On clean verbatim quotes the DIY path resolves about as well on every vendor. The citations "
-        "edge measures that case. This arm measures the paraphrase regime, where the model answers in its "
-        "own words.\n"
+        + glue_md
+        + "## Honest Scope\n\n"
+        "- The `str.find` drop is not robust against the best competitor config. A frontier model returns a "
+        "verbatim quote even while paraphrasing the answer, and a whitespace-tolerant `str.find` resolves "
+        "it, so resolution is parity with a competent DIY resolver. The drop appears only with a weaker "
+        "model or a naive resolver.\n"
         "- The grader is deterministic: `source[start:end] == cited_text` for Citations, "
         "`source.find(quote)` for the DIY arms, the same gate on every arm.\n"
         "- Citations cannot be combined with Structured Outputs. The two return a 400 together, so a "
@@ -935,7 +1363,7 @@ def write_edge_bundle(receipt: dict) -> pathlib.Path:
         "make setup\n"
         "make compare-deps\n"
         "cp .env.example .env   # paste ANTHROPIC_API_KEY, OPENAI_API_KEY, and GEMINI_API_KEY\n"
-        "make citations-paraphrase   # cents-scale\n"
+        f"make citations-paraphrase   # about ${receipt['total_cost']:.2f}, under a minute\n"
         "```\n\n"
         "Sources:\n\n"
         f"- Claude citations: {receipt['sources']['claude_citations']}\n"

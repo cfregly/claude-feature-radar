@@ -1,10 +1,10 @@
 {
   "date": "2026-06-19",
-  "claim_under_test": "When the answer is paraphrased (the model answers in its own words), Claude Citations still returns a pointer that resolves to a real source span by guarantee, while the do-it-yourself path (model quote + str.find) silently drops the paraphrased pointer on every vendor.",
+  "claim_under_test": "Claude Citations returns a source pointer that resolves to a real span by guarantee, with zero resolver code and free cited_text, even when the answer is paraphrased and for a directly-supplied PDF. This arm measures the do-it-yourself baseline (model quote plus str.find) head to head against the competitors' FRONTIER models, to see whether the str.find drop is a robust cross-vendor gap or a within-Claude convenience that a competent DIY resolver closes.",
   "n_questions": 8,
   "n_pdf_questions": 2,
   "n_text_docs": 3,
-  "total_cost": 0.39592,
+  "total_cost": 0.74055,
   "sources": {
     "claude_citations": "https://platform.claude.com/docs/en/build-with-claude/citations",
     "claude_pdf_support": "https://platform.claude.com/docs/en/build-with-claude/pdf-support",
@@ -24,9 +24,9 @@
       "silent_drops": 0,
       "pdf_pointer_resolved": "2/2",
       "persisted_objects": 0,
-      "output_tokens": 626,
-      "cost": 0.23961,
-      "latency_s": 27.7,
+      "output_tokens": 572,
+      "cost": 0.2388,
+      "latency_s": 24.28,
       "errors": []
     },
     {
@@ -34,18 +34,16 @@
       "provider": "anthropic",
       "model": "claude-sonnet-4-6",
       "mechanism": "DIY str.find",
-      "answered": "7/8",
-      "resolved": "7/8",
+      "answered": "8/8",
+      "resolved": "8/8",
       "grounded_correct_source": "0/8",
       "silent_drops": 0,
       "pdf_pointer_resolved": "0/2",
       "persisted_objects": 0,
-      "output_tokens": 595,
-      "cost": 0.024789,
-      "latency_s": 19.11,
-      "errors": [
-        "How much is each overage: OverloadedError: Error code: 529 - {'type': 'error', 'error': {'type': 'overloaded_error', 'messa"
-      ]
+      "output_tokens": 692,
+      "cost": 0.028512,
+      "latency_s": 19.83,
+      "errors": []
     },
     {
       "name": "openai DIY:gpt-top",
@@ -58,9 +56,9 @@
       "silent_drops": 0,
       "pdf_pointer_resolved": "0/2",
       "persisted_objects": 0,
-      "output_tokens": 899,
-      "cost": 0.053685,
-      "latency_s": 20.79,
+      "output_tokens": 881,
+      "cost": 0.053145,
+      "latency_s": 22.78,
       "errors": []
     },
     {
@@ -74,18 +72,77 @@
       "silent_drops": 0,
       "pdf_pointer_resolved": "0/2",
       "persisted_objects": 0,
-      "output_tokens": 5577,
-      "cost": 0.077836,
-      "latency_s": 51.5,
+      "output_tokens": 5712,
+      "cost": 0.079456,
+      "latency_s": 54.01,
       "errors": []
     }
   ],
+  "pdf_glue_demo": {
+    "n_pdf_questions": 5,
+    "naive_drop_total": 0,
+    "cost": 0.340637,
+    "skipped": [],
+    "arms": [
+      {
+        "name": "claude+citations:sonnet",
+        "model": "claude-sonnet-4-6",
+        "is_citations": true,
+        "naive_resolved": "-",
+        "normalized_resolved": "-",
+        "guaranteed_resolved": "5/5",
+        "naive_drops": 0,
+        "cost": 0.13749,
+        "errors": []
+      },
+      {
+        "name": "claude DIY:sonnet",
+        "model": "claude-sonnet-4-6",
+        "is_citations": false,
+        "naive_resolved": "5/5",
+        "normalized_resolved": "5/5",
+        "guaranteed_resolved": "-",
+        "naive_drops": 0,
+        "cost": 0.12567,
+        "errors": []
+      },
+      {
+        "name": "openai DIY:gpt-top",
+        "model": "gpt-5.5",
+        "is_citations": false,
+        "naive_resolved": "5/5",
+        "normalized_resolved": "5/5",
+        "guaranteed_resolved": "-",
+        "naive_drops": 0,
+        "cost": 0.024325,
+        "errors": []
+      },
+      {
+        "name": "gemini DIY:gem-pro",
+        "model": "gemini-3.1-pro-preview",
+        "is_citations": false,
+        "naive_resolved": "5/5",
+        "normalized_resolved": "5/5",
+        "guaranteed_resolved": "-",
+        "naive_drops": 0,
+        "cost": 0.053152,
+        "errors": []
+      }
+    ],
+    "deterministic": {
+      "sentence": "Overage seats beyond the 50 included seats are billed at 12 US dollars per seat per month.",
+      "rendered_spans_lines": true,
+      "naive_resolves": false,
+      "normalized_resolves": true,
+      "guarantee_resolves": true
+    }
+  },
   "verdict": {
     "positive_signal": false,
     "promotable_edge": false,
     "paraphrase_resolution_rate": {
       "claude+citations:sonnet": "8/8",
-      "claude DIY:sonnet": "7/8",
+      "claude DIY:sonnet": "8/8",
       "openai DIY:gpt-top": "8/8",
       "gemini DIY:gem-pro": "8/8"
     },
@@ -101,10 +158,10 @@
     "claude_no_hosted_store": true,
     "claude_cites_inline_pdf_under_paraphrase": true,
     "output_tokens": {
-      "claude+citations:sonnet": 626,
-      "claude DIY:sonnet": 595,
-      "openai DIY:gpt-top": 899,
-      "gemini DIY:gem-pro": 5577
+      "claude+citations:sonnet": 572,
+      "claude DIY:sonnet": 692,
+      "openai DIY:gpt-top": 881,
+      "gemini DIY:gem-pro": 5712
     },
     "all_competitors_ran": true,
     "why_not_promotable": [

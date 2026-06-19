@@ -143,6 +143,46 @@ def test_interface_score_routes_claude_ahead_only_when_every_cross_vendor_arm_ra
     assert receipt.fairness.get("lead_basis") == "head-to-head"
 
 
+def test_glue_grader_drops_line_wrapped_quote_naively_and_recovers_normalized():
+    # The PDF glue-code teaching point: a verbatim quote carrying a PDF line-wrap newline fails the
+    # developer's naive str.find but resolves after the one-line whitespace normalization.
+    span = "monthly uptime commitment of 99.9 percent"
+    assert pr.GLUE_CANON.find(span) != -1
+    wrapped = span.replace(" commitment ", " commitment\n")     # a PDF line-wrap inside the span
+    naive, norm = pr._grade_glue(wrapped)
+    assert naive is False        # naive str.find drops it (silent -1)
+    assert norm is True          # " ".join(quote.split()) recovers it
+    # a span genuinely not in the document still fails both, so this is a real check, not loosened.
+    assert pr._grade_glue("this sentence is nowhere in the agreement") == (False, False)
+
+
+def test_deterministic_glue_example_drops_naive_and_resolves_normalized_and_guarantee():
+    # The $0 teaching illustration must hold every run, independent of live model output: a PDF-wrapped
+    # sentence drops the developer's naive str.find and resolves under whitespace normalization and the
+    # API-grade guarantee.
+    d = pr._deterministic_glue_example()
+    assert d["rendered_spans_lines"] is True
+    assert d["naive_resolves"] is False
+    assert d["normalized_resolves"] is True
+    assert d["guarantee_resolves"] is True
+
+
+def test_glue_lines_render_the_teaching_table():
+    glue = {"n_pdf_questions": 5, "naive_drop_total": 2, "cost": 0.1, "skipped": [], "arms": [
+        {"name": "claude+citations:sonnet", "is_citations": True, "naive_resolved": "-",
+         "normalized_resolved": "-", "guaranteed_resolved": "5/5", "naive_drops": 0, "errors": []},
+        {"name": "openai DIY:gpt-top", "is_citations": False, "naive_resolved": "3/5",
+         "normalized_resolved": "5/5", "guaranteed_resolved": "-", "naive_drops": 2, "errors": []},
+    ]}
+    lines = pr._glue_lines({"pdf_glue_demo": glue})
+    body = "\n".join(lines)
+    assert "PDF glue-code demo" in body
+    assert "silently dropped 2" in body          # names the measured drop
+    assert "resolved every quote by guarantee" in body
+    # no glue section when the demo did not run (no keys)
+    assert pr._glue_lines({"pdf_glue_demo": {}}) == []
+
+
 def test_interface_holds_when_a_cross_vendor_arm_is_absent():
     demo = pr.ParaphraseResolutionDemonstrator()
     run = _run([
