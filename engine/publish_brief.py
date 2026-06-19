@@ -1206,25 +1206,25 @@ def _founder_email_source(plan: BriefPlan, receipt: dict | None) -> str:
         table = (
             "| | input tokens billed | why |\n"
             "|---|---:|---|\n"
-            f"| without PTC | {a_in:,} | every record lands in the model's context |\n"
-            f"| with PTC | {b_in:,} | only the relevant records reach the model |\n\n"
+            f"| without PTC | {a_in:,} | every result lands in the model's context |\n"
+            f"| with PTC | {b_in:,} | only the relevant results reach the model |\n\n"
             f"{pct_str} fewer billed input tokens on this demo, and the saving grows with the size of the fan-out.\n"
         )
     else:
         table = "Run `make ptc` to print your own before/after from a live call.\n"
 
-    return f"""Subject: Congrats on YC! 🎉 A Claude tool-calling pattern for fan-out agents
+    return f"""Subject: Token Thinning: removing unused tool results from your context window
 
 Hey {{first_name}},
 
 Congrats on getting into YC! Quick tip to trim your Claude token bill.
 
-If your app calls your own tool to answer a question and that tool returns a lot of records, every
-record it pulls back lands in the model's context, and you pay for all of them, even the ones that turn
+If your app calls your own tool to answer a question and that tool returns a lot of results, every
+result it pulls back lands in the model's context, and you pay for all of them, even the ones that turn
 out irrelevant.
 
 [Programmatic tool calling]({plan.doc_url}) (PTC) fixes that. Claude runs your tool inside a code
-sandbox, keeps only the records that matter, and passes just those to the model. The rest never reach
+sandbox, keeps only the results that matter, and passes just those to the model. The rest never reach
 the context, so you are not billed for them.
 
 It is two small additions to the API call you already make:

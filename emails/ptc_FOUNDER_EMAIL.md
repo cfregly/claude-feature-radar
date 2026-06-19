@@ -1,15 +1,15 @@
-Subject: Congrats on YC! 🎉 A Claude tool-calling pattern for fan-out agents
+Subject: Token Thinning: removing unused tool results from your context window
 
 Hey {first_name},
 
 Congrats on getting into YC! Quick tip to trim your Claude token bill.
 
-If your app calls your own tool to answer a question and that tool returns a lot of records, every
-record it pulls back lands in the model's context, and you pay for all of them, even the ones that turn
+If your app calls your own tool to answer a question and that tool returns a lot of results, every
+result it pulls back lands in the model's context, and you pay for all of them, even the ones that turn
 out irrelevant.
 
 [Programmatic tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling) (PTC) fixes that. Claude runs your tool inside a code
-sandbox, keeps only the records that matter, and passes just those to the model. The rest never reach
+sandbox, keeps only the results that matter, and passes just those to the model. The rest never reach
 the context, so you are not billed for them.
 
 It is two small additions to the API call you already make:
@@ -30,8 +30,8 @@ Same task and model (Sonnet 4.6), with and without it:
 
 | | input tokens billed | why |
 |---|---:|---|
-| without PTC | 9,451 | every record lands in the model's context |
-| with PTC | 6,828 | only the relevant records reach the model |
+| without PTC | 9,451 | every result lands in the model's context |
+| with PTC | 6,828 | only the relevant results reach the model |
 
 28% fewer billed input tokens on this demo, and the saving grows with the size of the fan-out.
 
