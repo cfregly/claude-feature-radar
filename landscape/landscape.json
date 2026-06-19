@@ -35,7 +35,7 @@
       "status": "beta",
       "beta_header": "files-api-2025-04-14",
       "evidence_quote": "Beta headers - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K \ue104 Log in \ue0dd API reference \ue027 Beta headers Loading... Loading... Loading... Loading... Loading... Loading...",
-      "content_hash": "18f28400a476894fac245702106de135a83bd9b8667a37774bfe1cefeb682017"
+      "content_hash": "7ac669b105448936840b023855bb8735ff4db9b250d08e88d9949ea5ce303969"
     },
     "claude:ptc": {
       "vendor": "claude",
@@ -47,7 +47,7 @@
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Programmatic tool calling - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Mess",
-      "content_hash": "802050c973f87640d71f79e9b344d191ab7876cfe5520259d6b3ad5edbad6b66"
+      "content_hash": "f3c32a1f70eff588163e647294d76453dbad87496502e4a9bac1a466f657b7bf"
     },
     "claude:citations": {
       "vendor": "claude",
@@ -71,7 +71,7 @@
       "status": "beta",
       "beta_header": "context-management-2025-06-27",
       "evidence_quote": "Context editing - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API S",
-      "content_hash": "1fe7ef1c9d9bf1bbaa9149a4a8d64354416c65583a6e7e35e0068876ea6c2c59"
+      "content_hash": "6a41adcb13bb09e842dab8fefdd975050921aa2f646e15c4d1684b7d255b538e"
     },
     "claude:memory_tool": {
       "vendor": "claude",
@@ -83,7 +83,7 @@
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Memory tool - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop ",
-      "content_hash": "ec980f3694fc89c10021e220b4c3e4d6d95b49ad041077ebbe1699c9d321224e"
+      "content_hash": "989507e15a8a370ec2f6dce60e9692159b8bfba6748e76b0adc720a055326fee"
     },
     "claude:code_execution": {
       "vendor": "claude",
@@ -95,7 +95,7 @@
       "status": "beta",
       "beta_header": "files-api-2025-04-14",
       "evidence_quote": "Code execution tool - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages A",
-      "content_hash": "39a0fe4fc30d57f19ecad73996a4584cae3a78274622a3f712aadec4eec1d0dc"
+      "content_hash": "e6173d576b9ec08edd11580172f1277579baf242548cbc1f784022b70059913e"
     },
     "claude:prompt_caching": {
       "vendor": "claude",
@@ -107,7 +107,7 @@
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Prompt caching - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API St",
-      "content_hash": "385a2808d39a67402e296f12274ad6c6beafb8f28ca9a0b54db07636fdf860f6"
+      "content_hash": "170828d3f16532d6867084452f38cc23422e15d07fe2762954c774e24f3abe0c"
     },
     "claude:managed_agents": {
       "vendor": "claude",
@@ -119,7 +119,7 @@
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Self-hosted sandboxes - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Overview Quickstart Prototype in Console Define your agent Agent setup Tools MCP con",
-      "content_hash": "3fa5891aeff2750d3b087049897961cca7466146da1ca14637d4cdb523173d95"
+      "content_hash": "ed1b51f5bcf07753393c7fb8804ca29e9c2e9ca820404f6c103593f011433bcc"
     },
     "claude:managed_agents_overview": {
       "vendor": "claude",
@@ -167,7 +167,7 @@
       "status": "beta",
       "beta_header": "managed-agents-2026-04-01",
       "evidence_quote": "Multiagent sessions - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Overview Quickstart Prototype in Console Define your agent Agent setup Tools MCP conne",
-      "content_hash": "dc935692271c1463a74e5a6f56b627c8abc6057a15f16f513c171cdb1d3887af"
+      "content_hash": "9946512d13584798f20f75881b430f9fe18e4426afe6393fa96e1d661532e691"
     },
     "claude:fallback_credit": {
       "vendor": "claude",
@@ -179,7 +179,7 @@
       "status": "beta",
       "beta_header": "fallback-credit-2026-06-01",
       "evidence_quote": "Fallback credit - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API S",
-      "content_hash": "d3d187b2824f28406c2645bcbb0e7cc8c1db2d30ae021b428635530f0883521c"
+      "content_hash": "662de3c064372da5859731e9ef3709209764a39b6d26371e28c8dbfbd54795e7"
     },
     "claude:adaptive_thinking": {
       "vendor": "claude",
@@ -215,7 +215,7 @@
       "status": "beta",
       "beta_header": "task-budgets-2026-03-13",
       "evidence_quote": "Task budgets - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop",
-      "content_hash": "3827e65c1f9292636aafef1e79f52fb8291426e55ad37863b1106878bb4ad366"
+      "content_hash": "e203fd29d777b14198b83f4cc6b58063e7219c8307ca3e96e4d093979768e452"
     },
     "claude:fast_mode": {
       "vendor": "claude",
@@ -239,7 +239,7 @@
       "status": "beta",
       "beta_header": "structured-outputs-2025-11-13",
       "evidence_quote": "Structured outputs - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages AP",
-      "content_hash": "1992238d0b61daace6228e56e8f0eaee79d33d9b2c79ec9157d17447f3e1c21c"
+      "content_hash": "9ee60d96f8030c580e69414eaf427ebf6042f820f0d4844b77d3e88a9b66a956"
     },
     "claude:batch_processing": {
       "vendor": "claude",
@@ -251,7 +251,7 @@
       "status": "beta",
       "beta_header": "output-300k-2026-03-24",
       "evidence_quote": "Batch processing - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API ",
-      "content_hash": "56bad43636ea582a84d3cc9e2b9c9436a48bf40d63e10b3c14474eea23329a3e"
+      "content_hash": "a5efecc20cb607c5a044c660994ae1a24bc360b6f296ce54dc027c187fd31a87"
     },
     "claude:search_results": {
       "vendor": "claude",
@@ -263,7 +263,7 @@
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Search results - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API St",
-      "content_hash": "74f1ad77ebbe481e092f4f2ee77fb5d38e209bdabdc57db00324a499f47cdf48"
+      "content_hash": "1f40ea518c8b71aade7e557409a132df7841fbb90b17075d3a3028100c3fa425"
     },
     "claude:web_search_tool": {
       "vendor": "claude",
@@ -275,7 +275,7 @@
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Web search tool - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API S",
-      "content_hash": "f57db4d9a67a28268ac51d323bd46c093b7438dfcd6be5d5305c4ba410623f37"
+      "content_hash": "503d4af79f1af1e6060850edea44ab2d439afcf3f35908dcbe7cd188da1d2bd8"
     },
     "claude:web_fetch_tool": {
       "vendor": "claude",
@@ -311,7 +311,7 @@
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Bash tool - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop re",
-      "content_hash": "99d31ab9303ceda8f1f04dd84bb0229ccf5ffa799d8155238e044128015aa988"
+      "content_hash": "da3499f15787ba9c968bab6725b88c428a2487f5f68b4653fd44b9e465ac7ef9"
     },
     "claude:computer_use": {
       "vendor": "claude",
@@ -323,7 +323,7 @@
       "status": "beta",
       "beta_header": "computer-use-2025-11-24",
       "evidence_quote": "Computer use tool - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API",
-      "content_hash": "4f4244af59ea2136faff90a3f270279d04e78195d1ddb93f33a22e1410cf6914"
+      "content_hash": "e43a8fbeb0424fa2659507cf09b61d3e5dbab5969f3a83a1727051e8c7a777f6"
     },
     "claude:text_editor": {
       "vendor": "claude",
@@ -335,7 +335,7 @@
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Text editor tool - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API ",
-      "content_hash": "9b6345165ec43e4b6d40042d16218d9c327a5bb97ec04e5e7b58d37055dda894"
+      "content_hash": "58f8b0509414cff3da3e59d5fa1b74f7e0704a5c35a7f31d22c7b032e9837e50"
     },
     "claude:tool_search": {
       "vendor": "claude",
@@ -347,7 +347,7 @@
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Tool search tool - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API ",
-      "content_hash": "f44991fc71b32ad33681ee6f4d8df16dd0fc3d4f728e9dd3a50fa9f6b6913b20"
+      "content_hash": "4f69979b7d6515814db0bc03837609ab72a03e92942def656afb5200f88d52b5"
     },
     "claude:fine_grained_tool_streaming": {
       "vendor": "claude",
@@ -371,7 +371,7 @@
       "status": "beta",
       "beta_header": "model-context-window-exceeded-2025-08-26",
       "evidence_quote": "Context windows - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API S",
-      "content_hash": "ee9b38a169f7407729a52d6df832d0be7f4e95703c68a3232a4d0a311cb6d0f7"
+      "content_hash": "ab30a795d56cf0abcda5cfc6f060d97d97be1dcc04b59b678cd4e9ea087569a2"
     },
     "claude:compaction": {
       "vendor": "claude",
@@ -383,7 +383,7 @@
       "status": "beta",
       "beta_header": "compact-2026-01-12",
       "evidence_quote": "Compaction - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop r",
-      "content_hash": "0321fc30c64d1b1f5d85be1b54c9ed30fd04aa425a67d3d1bd13490b29b4a76d"
+      "content_hash": "5f66405f0bd7a5d88cbf12bdbeb97b8d19c9dea151de3fc613c60b9302005f6d"
     },
     "claude:mid_conversation_system": {
       "vendor": "claude",
@@ -407,7 +407,7 @@
       "status": "beta",
       "beta_header": "cache-diagnosis-2026-04-07",
       "evidence_quote": "Cache diagnostics - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API",
-      "content_hash": "764d52b7ff4071922a9092d9494e03e84636c70a36abe0364d6862e354730a50"
+      "content_hash": "13b9d9dd2200a52cc964b72519ee51e0a3381b7a313988e0f4d95c9e210df0b5"
     },
     "claude:token_counting": {
       "vendor": "claude",
@@ -419,7 +419,7 @@
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Token counting - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API St",
-      "content_hash": "73b1e716622d5afda939970ad7c4591c3de77d32d04598d7d603a3409a2f9efd"
+      "content_hash": "1947ff113e37315a3327a2e327203983f57389fd7267875037ad8967f38078aa"
     },
     "claude:files": {
       "vendor": "claude",
@@ -431,7 +431,7 @@
       "status": "beta",
       "beta_header": "files-api-2025-04-14",
       "evidence_quote": "Files API - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop re",
-      "content_hash": "99824fc463bf89db0b123f8d1eb550b262f1e202cc4b18013c89e291b0828f8b"
+      "content_hash": "32266faeefe3e8f726b5cfd653ce6bd6f36bd213aa59d03f503fd2d67cb49910"
     },
     "claude:pdf_support": {
       "vendor": "claude",
@@ -443,7 +443,7 @@
       "status": "beta",
       "beta_header": "files-api-2025-04-14",
       "evidence_quote": "PDF support - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop ",
-      "content_hash": "67c2b2ea700f10474662e9f58d47b081f56931f117141783280ce06e88aa9e36"
+      "content_hash": "94274e4f913dd33c16290e2cbee7faad70927f6d9ddcbaf9451159884df2b16c"
     },
     "claude:agent_skills": {
       "vendor": "claude",
@@ -455,7 +455,7 @@
       "status": "beta",
       "beta_header": "code-execution-2025-08-25",
       "evidence_quote": "Agent Skills - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop",
-      "content_hash": "328c908a8fc8620bbe60df35f30400166258f909d0b214bddd22f36b7fd4d5d9"
+      "content_hash": "30b891e7bd1e2307c8c256536220ced3e1e7dc71aec8f69a293eed8df3d5972c"
     },
     "claude:mcp_connector": {
       "vendor": "claude",
@@ -1046,12 +1046,12 @@
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/api/beta-headers": {
-      "hash": "18f28400a476894fac245702106de135a83bd9b8667a37774bfe1cefeb682017",
+      "hash": "7ac669b105448936840b023855bb8735ff4db9b250d08e88d9949ea5ce303969",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling": {
-      "hash": "802050c973f87640d71f79e9b344d191ab7876cfe5520259d6b3ad5edbad6b66",
+      "hash": "f3c32a1f70eff588163e647294d76453dbad87496502e4a9bac1a466f657b7bf",
       "etag": null,
       "last_modified": null
     },
@@ -1061,27 +1061,27 @@
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/context-editing": {
-      "hash": "1fe7ef1c9d9bf1bbaa9149a4a8d64354416c65583a6e7e35e0068876ea6c2c59",
+      "hash": "6a41adcb13bb09e842dab8fefdd975050921aa2f646e15c4d1684b7d255b538e",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool": {
-      "hash": "ec980f3694fc89c10021e220b4c3e4d6d95b49ad041077ebbe1699c9d321224e",
+      "hash": "989507e15a8a370ec2f6dce60e9692159b8bfba6748e76b0adc720a055326fee",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool": {
-      "hash": "39a0fe4fc30d57f19ecad73996a4584cae3a78274622a3f712aadec4eec1d0dc",
+      "hash": "e6173d576b9ec08edd11580172f1277579baf242548cbc1f784022b70059913e",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/prompt-caching": {
-      "hash": "385a2808d39a67402e296f12274ad6c6beafb8f28ca9a0b54db07636fdf860f6",
+      "hash": "170828d3f16532d6867084452f38cc23422e15d07fe2762954c774e24f3abe0c",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes": {
-      "hash": "3fa5891aeff2750d3b087049897961cca7466146da1ca14637d4cdb523173d95",
+      "hash": "ed1b51f5bcf07753393c7fb8804ca29e9c2e9ca820404f6c103593f011433bcc",
       "etag": null,
       "last_modified": null
     },
@@ -1101,12 +1101,12 @@
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/managed-agents/multi-agent": {
-      "hash": "dc935692271c1463a74e5a6f56b627c8abc6057a15f16f513c171cdb1d3887af",
+      "hash": "9946512d13584798f20f75881b430f9fe18e4426afe6393fa96e1d661532e691",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/fallback-credit": {
-      "hash": "d3d187b2824f28406c2645bcbb0e7cc8c1db2d30ae021b428635530f0883521c",
+      "hash": "662de3c064372da5859731e9ef3709209764a39b6d26371e28c8dbfbd54795e7",
       "etag": null,
       "last_modified": null
     },
@@ -1121,7 +1121,7 @@
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/task-budgets": {
-      "hash": "3827e65c1f9292636aafef1e79f52fb8291426e55ad37863b1106878bb4ad366",
+      "hash": "e203fd29d777b14198b83f4cc6b58063e7219c8307ca3e96e4d093979768e452",
       "etag": null,
       "last_modified": null
     },
@@ -1131,22 +1131,22 @@
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/structured-outputs": {
-      "hash": "1992238d0b61daace6228e56e8f0eaee79d33d9b2c79ec9157d17447f3e1c21c",
+      "hash": "9ee60d96f8030c580e69414eaf427ebf6042f820f0d4844b77d3e88a9b66a956",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/batch-processing": {
-      "hash": "56bad43636ea582a84d3cc9e2b9c9436a48bf40d63e10b3c14474eea23329a3e",
+      "hash": "a5efecc20cb607c5a044c660994ae1a24bc360b6f296ce54dc027c187fd31a87",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/search-results": {
-      "hash": "74f1ad77ebbe481e092f4f2ee77fb5d38e209bdabdc57db00324a499f47cdf48",
+      "hash": "1f40ea518c8b71aade7e557409a132df7841fbb90b17075d3a3028100c3fa425",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool": {
-      "hash": "f57db4d9a67a28268ac51d323bd46c093b7438dfcd6be5d5305c4ba410623f37",
+      "hash": "503d4af79f1af1e6060850edea44ab2d439afcf3f35908dcbe7cd188da1d2bd8",
       "etag": null,
       "last_modified": null
     },
@@ -1161,22 +1161,22 @@
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/agents-and-tools/tool-use/bash-tool": {
-      "hash": "99d31ab9303ceda8f1f04dd84bb0229ccf5ffa799d8155238e044128015aa988",
+      "hash": "da3499f15787ba9c968bab6725b88c428a2487f5f68b4653fd44b9e465ac7ef9",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool": {
-      "hash": "4f4244af59ea2136faff90a3f270279d04e78195d1ddb93f33a22e1410cf6914",
+      "hash": "e43a8fbeb0424fa2659507cf09b61d3e5dbab5969f3a83a1727051e8c7a777f6",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/agents-and-tools/tool-use/text-editor-tool": {
-      "hash": "9b6345165ec43e4b6d40042d16218d9c327a5bb97ec04e5e7b58d37055dda894",
+      "hash": "58f8b0509414cff3da3e59d5fa1b74f7e0704a5c35a7f31d22c7b032e9837e50",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool": {
-      "hash": "f44991fc71b32ad33681ee6f4d8df16dd0fc3d4f728e9dd3a50fa9f6b6913b20",
+      "hash": "4f69979b7d6515814db0bc03837609ab72a03e92942def656afb5200f88d52b5",
       "etag": null,
       "last_modified": null
     },
@@ -1186,12 +1186,12 @@
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/context-windows": {
-      "hash": "ee9b38a169f7407729a52d6df832d0be7f4e95703c68a3232a4d0a311cb6d0f7",
+      "hash": "ab30a795d56cf0abcda5cfc6f060d97d97be1dcc04b59b678cd4e9ea087569a2",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/compaction": {
-      "hash": "0321fc30c64d1b1f5d85be1b54c9ed30fd04aa425a67d3d1bd13490b29b4a76d",
+      "hash": "5f66405f0bd7a5d88cbf12bdbeb97b8d19c9dea151de3fc613c60b9302005f6d",
       "etag": null,
       "last_modified": null
     },
@@ -1201,27 +1201,27 @@
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics": {
-      "hash": "764d52b7ff4071922a9092d9494e03e84636c70a36abe0364d6862e354730a50",
+      "hash": "13b9d9dd2200a52cc964b72519ee51e0a3381b7a313988e0f4d95c9e210df0b5",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/token-counting": {
-      "hash": "73b1e716622d5afda939970ad7c4591c3de77d32d04598d7d603a3409a2f9efd",
+      "hash": "1947ff113e37315a3327a2e327203983f57389fd7267875037ad8967f38078aa",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/files": {
-      "hash": "99824fc463bf89db0b123f8d1eb550b262f1e202cc4b18013c89e291b0828f8b",
+      "hash": "32266faeefe3e8f726b5cfd653ce6bd6f36bd213aa59d03f503fd2d67cb49910",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/pdf-support": {
-      "hash": "67c2b2ea700f10474662e9f58d47b081f56931f117141783280ce06e88aa9e36",
+      "hash": "94274e4f913dd33c16290e2cbee7faad70927f6d9ddcbaf9451159884df2b16c",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview": {
-      "hash": "328c908a8fc8620bbe60df35f30400166258f909d0b214bddd22f36b7fd4d5d9",
+      "hash": "30b891e7bd1e2307c8c256536220ced3e1e7dc71aec8f69a293eed8df3d5972c",
       "etag": null,
       "last_modified": null
     },
@@ -1297,7 +1297,7 @@
     },
     "https://github.com/anthropics/claude-code/releases": {
       "hash": "5e133fa69ba56d5fa68821d5fee1f081751f9b6683ec3c0b622177729bac4641",
-      "etag": "W/\"c3e832f8726695bff7ed9db18fd65427\"",
+      "etag": "W/\"e29c83aac1479c9b77e70101f467071c\"",
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/about-claude/pricing": {

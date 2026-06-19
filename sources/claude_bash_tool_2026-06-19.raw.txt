@@ -16,6 +16,17 @@ System automation: Execute scripts, manage files, automate tasks
 Data processing: Process files, run analysis scripts, manage datasets
 Environment setup: Install packages, configure environments
  Quick start
+cURL CLI Python TypeScript C# Go Java PHP Ruby  import anthropic
+client = anthropic.Anthropic()
+response = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 1024 ,
+tools = [{ "type" : "bash_20250124" , "name" : "bash" }],
+messages = [
+{ "role" : "user" , "content" : "List all Python files in the current directory." }
+],
+)
+print (response)
  How it works
 The bash tool maintains a persistent session:
 Claude determines what command to run
@@ -41,69 +52,7 @@ Claude's tool uses:
 The session maintains state between commands, so files created in step 2 are available in step 3.
  Implement the bash tool
 The bash tool is implemented as a schema-less tool. When using this tool, you don't need to provide an input schema as with other tools; the schema is built into Claude's model and can't be modified.
- Handle errors
-When implementing the bash tool, handle various error scenarios:
-Command execution timeout Command not found
- Follow implementation best practices
-Use command timeouts
- Security
- The bash tool provides direct system access. Implement these essential safety measures:
-Running in isolated environments (Docker/VM)
-Implementing command filtering and allowlists
-Setting resource limits (CPU, memory, disk)
-Logging all executed commands
- Key recommendations
-Use ulimit to set resource constraints
-Filter dangerous commands ( sudo , rm -rf , etc.)
-Run with minimal user permissions
-Monitor and log all command execution
- Pricing
-The bash tool adds 245 input tokens to your API calls.
-Additional tokens are consumed by:
-Command outputs (stdout/stderr)
-Error messages
-Large file contents
-See tool use pricing for complete pricing details.
- Common patterns
- Development workflows
-Running tests: pytest && coverage report
-Building projects: npm install && npm run build
-Git operations: git status && git add . && git commit -m "message"
- Git-based checkpointing
-Git serves as a structured recovery mechanism in long-running agent workflows, not just a way to save changes:
-Capture a baseline: Before any agent work begins, commit the current state. This is the known-good starting point.
-Commit per feature: Each completed feature gets its own commit. These serve as rollback points if something goes wrong later.
-Reconstruct state at session start: Read git log alongside a progress file to understand what has already been done and what comes next.
-Revert on failure: If work goes sideways, git checkout reverts to the last good commit instead of trying to debug a broken state.
- File operations
-Processing data: wc -l *.csv && ls -lh *.csv
-Searching files: find . -name "*.py" | xargs grep "pattern"
-Creating backups: tar -czf backup.tar.gz ./data
- System tasks
-Checking resources: df -h && free -m
-Process management: ps aux | grep python
-Environment setup: export PATH=$PATH:/new/path && echo $PATH
- Limitations
-No interactive commands: Cannot handle vim , less , or password prompts
-No GUI applications: Command-line only
-Session scope: Bash session state is client-side. The API is stateless. Your application is responsible for maintaining the shell session between turns.
-Output limits: Large outputs may be truncated
-No streaming: Results returned after completion
- Combining with other tools
-The bash tool is most powerful when combined with the text editor and other tools.
- If you're also using the code execution tool , Claude has access to two separate execution environments: your local bash session and Anthropic's sandboxed container. State is not shared between them. See Using code execution with other execution tools for guidance on prompting Claude to distinguish between environments.
- Next steps
- Tool use overview Learn about tool use with Claude  Text editor tool View and edit text files with Claude Was this page helpful?   Overview Use cases Quick start How it works Parameters Example: Multi-step automation Implement the bash tool Handle errors Follow implementation best practices Security Key recommendations Pricing Common patterns Development workflows File operations System tasks Limitations Combining with other tools Next steps cURL CLI Python TypeScript C# Go Java PHP Ruby  import anthropic
-client = anthropic.Anthropic()
-response = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 1024 ,
-tools = [{ "type" : "bash_20250124" , "name" : "bash" }],
-messages = [
-{ "role" : "user" , "content" : "List all Python files in the current directory." }
-],
-)
-print (response) 1 Set up a bash environment Create a persistent bash session that Claude can interact with: import subprocess
+1 Set up a bash environment Create a persistent bash session that Claude can interact with: import subprocess
 import threading
 import queue
 class BashSession :
@@ -156,4 +105,57 @@ return False , f "Command ' { executable } ' is not in the allowlist"
 for token in tokens[ 1 :]:
 if token in SHELL_OPERATORS or token.startswith(( "$" , "`" )):
 return False , f "Shell operator ' { token } ' is not allowed"
-return True , None  This check is a first line of defense. For stronger isolation, run validated commands with shell=False and pass shlex.split(command) as the argument list, so the shell never interprets the string. Permission denied Maintain session state Handle large outputs Log all commands Sanitize outputs
+return True , None  This check is a first line of defense. For stronger isolation, run validated commands with shell=False and pass shlex.split(command) as the argument list, so the shell never interprets the string.
+ Handle errors
+When implementing the bash tool, handle various error scenarios:
+Command execution timeout Command not found Permission denied
+ Follow implementation best practices
+Use command timeouts Maintain session state Handle large outputs Log all commands Sanitize outputs
+ Security
+ The bash tool provides direct system access. Implement these essential safety measures:
+Running in isolated environments (Docker/VM)
+Implementing command filtering and allowlists
+Setting resource limits (CPU, memory, disk)
+Logging all executed commands
+ Key recommendations
+Use ulimit to set resource constraints
+Filter dangerous commands ( sudo , rm -rf , etc.)
+Run with minimal user permissions
+Monitor and log all command execution
+ Pricing
+The bash tool adds 245 input tokens to your API calls.
+Additional tokens are consumed by:
+Command outputs (stdout/stderr)
+Error messages
+Large file contents
+See tool use pricing for complete pricing details.
+ Common patterns
+ Development workflows
+Running tests: pytest && coverage report
+Building projects: npm install && npm run build
+Git operations: git status && git add . && git commit -m "message"
+ Git-based checkpointing
+Git serves as a structured recovery mechanism in long-running agent workflows, not just a way to save changes:
+Capture a baseline: Before any agent work begins, commit the current state. This is the known-good starting point.
+Commit per feature: Each completed feature gets its own commit. These serve as rollback points if something goes wrong later.
+Reconstruct state at session start: Read git log alongside a progress file to understand what has already been done and what comes next.
+Revert on failure: If work goes sideways, git checkout reverts to the last good commit instead of trying to debug a broken state.
+ File operations
+Processing data: wc -l *.csv && ls -lh *.csv
+Searching files: find . -name "*.py" | xargs grep "pattern"
+Creating backups: tar -czf backup.tar.gz ./data
+ System tasks
+Checking resources: df -h && free -m
+Process management: ps aux | grep python
+Environment setup: export PATH=$PATH:/new/path && echo $PATH
+ Limitations
+No interactive commands: Cannot handle vim , less , or password prompts
+No GUI applications: Command-line only
+Session scope: Bash session state is client-side. The API is stateless. Your application is responsible for maintaining the shell session between turns.
+Output limits: Large outputs may be truncated
+No streaming: Results returned after completion
+ Combining with other tools
+The bash tool is most powerful when combined with the text editor and other tools.
+ If you're also using the code execution tool , Claude has access to two separate execution environments: your local bash session and Anthropic's sandboxed container. State is not shared between them. See Using code execution with other execution tools for guidance on prompting Claude to distinguish between environments.
+ Next steps
+ Tool use overview Learn about tool use with Claude  Text editor tool View and edit text files with Claude Was this page helpful?   Overview Use cases Quick start How it works Parameters Example: Multi-step automation Implement the bash tool Handle errors Follow implementation best practices Security Key recommendations Pricing Common patterns Development workflows File operations System tasks Limitations Combining with other tools Next steps

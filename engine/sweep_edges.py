@@ -369,13 +369,110 @@ EDGE_DIR_FOR = {  # source key -> existing edges/<dir>, so the changelog flags w
     "memory_tool": "retention-resume",
     "managed_agents": "retention-resume",
     "fallback_credit": "parity-gated",
-    "cache_diagnostics": "parity-gated",
+    "cache_diagnostics": "cache-diagnostics",
+    "task_budgets": "task-budgets",
+    "search_results": "search-results",
+    "pdf_support": "pdf-citations",
+    "web_search_tool": "web-citations",
+    "batch_processing": "bulk-extended-output",
+}
+
+
+RECEIPT_EDGE_INFO = {
+    "exact-list-ledger": {
+        "axis": "cost and speed",
+        "source_key": "context_editing",
+        "why": "exact long-stream state, lower cost and faster than exact competitor arms",
+    },
+    "cache-diagnostics": {
+        "axis": "observability",
+        "source_key": "cache_diagnostics",
+        "why": "cache-miss root cause returned by Claude, counters only on competitors",
+    },
+    "task-budgets": {
+        "axis": "reliability",
+        "source_key": "task_budgets",
+        "why": "near-depleted full-loop budget marker stopped before the first external tool call",
+    },
+    "pdf-citations": {
+        "axis": "grounding",
+        "source_key": "pdf_support",
+        "why": "direct-PDF page pointers resolved to the correct supplied page",
+    },
+    "search-results": {
+        "axis": "grounding",
+        "source_key": "search_results",
+        "why": "developer-supplied RAG chunks cited inline without a hosted store",
+    },
+    "grounding-stack": {
+        "axis": "grounding",
+        "source_key": "citations+pdf_support+search_results",
+        "why": "text, PDF, and RAG chunk pointers returned in one mixed-source request",
+    },
+    "web-citations": {
+        "axis": "grounding",
+        "source_key": "web_search_tool",
+        "why": "web citations carried a verbatim source quote, not only a URL",
+    },
+    "bulk-extended-output": {
+        "axis": "large-output",
+        "source_key": "batch_processing",
+        "why": "one un-truncated batch response exceeded every competitor documented output cap",
+    },
+}
+
+HELD_PROMOTION_NOTES = {
+    "task_budgets": "subfeature promoted as edges/task-budgets; keep this high-level source in the queue only for additional task-budget modes",
+    "search_results": "subfeature promoted as edges/search-results; keep this high-level source in the queue only for additional BYO-RAG citation modes",
+    "cache_diagnostics": "subfeature promoted as edges/cache-diagnostics; keep this high-level source in the queue only for additional cache observability modes",
+    "pdf_support": "direct-PDF page-citation subfeature promoted as edges/pdf-citations; broader PDF support stays parity-gated unless a new subfeature clears a receipt",
 }
 
 
 def _covered_dirs() -> set[str]:
     edges_root = repo_root() / "edges"
     return {p.name for p in edges_root.iterdir() if p.is_dir()} if edges_root.exists() else set()
+
+
+def _promoted_receipt_edges() -> list[dict]:
+    """Scan committed edge receipts for explicit promotable verdicts.
+
+    The doc sweep only knows source keys. The deeper grinding loop promotes subfeatures and feature
+    stacks, so the generated landscape must also read the receipts. This keeps `make grind` from
+    pushing a validated subfeature back into the held queue just because the high-level doc key still
+    reads as parity or needs a narrower seed.
+    """
+    edges_root = repo_root() / "edges"
+    if not edges_root.exists():
+        return []
+    out = []
+    for receipt_path in sorted(edges_root.glob("*/receipt.json")):
+        try:
+            receipt = json.loads(receipt_path.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        verdict = receipt.get("verdict")
+        if not isinstance(verdict, dict) or verdict.get("promotable_edge") is not True:
+            continue
+        edge_dir = receipt_path.parent.name
+        info = RECEIPT_EDGE_INFO.get(edge_dir, {})
+        out.append({
+            "edge": edge_dir,
+            "axis": info.get("axis", "unknown"),
+            "source_key": info.get("source_key", "receipt"),
+            "why": info.get("why") or _q(receipt.get("claim_under_test", "")),
+            "receipt": f"edges/{edge_dir}/receipt.json",
+        })
+    order = {name: i for i, name in enumerate(RECEIPT_EDGE_INFO)}
+    out.sort(key=lambda e: (order.get(e["edge"], 999), e["edge"]))
+    return out
+
+
+def _held_reason(e: dict) -> str:
+    key = e["key"]
+    if key in HELD_PROMOTION_NOTES:
+        return HELD_PROMOTION_NOTES[key]
+    return e.get("held_reason", "needs a measured receipt or parity check")
 
 
 # ----- dispatch (registry-keyed routing by demoKind) ---------------------------------------------
@@ -500,7 +597,7 @@ def write_changelog(delta: dict, ranked: list[dict], covered: set[str], unknowns
     if held:
         for e in held:
             raw = f"raw score {e.get('raw_score')}" if e.get("raw_score") else "unscored"
-            reason = _q(e.get("held_reason", "needs a measured receipt or parity check"))
+            reason = _q(_held_reason(e))
             lines.append(f"- {e['key']} [{e['axis']}] {raw}, held as {e['verdict']}. {reason}.")
     else:
         lines.append("None this run.")
@@ -522,6 +619,7 @@ def write_brief(ranked: list[dict], covered: set[str], date: str) -> str:
     leads = [e for e in ranked if e["lead_score"] > 0]
     held = [e for e in ranked if e["lead_score"] <= 0 and (e.get("raw_score") or e.get("held_reason"))]
     aside = [e for e in ranked if e["lead_score"] <= 0 and e not in held]
+    promoted = _promoted_receipt_edges()
     lines = [
         f"# Edge landscape, {date}",
         "",
@@ -544,6 +642,23 @@ def write_brief(ranked: list[dict], covered: set[str], date: str) -> str:
         built = "yes" if EDGE_DIR_FOR.get(e["key"]) in covered else "no"
         lines.append(f"| {i} | {e['key']} | {e['axis']} | {e['verdict']} | {e['score']} | {built} |")
 
+    if promoted:
+        lines += [
+            "",
+            "## Receipt-backed promoted edges from live runs",
+            "",
+            "These are subfeatures or feature stacks that cleared a committed `promotable_edge: true` "
+            "receipt. They stay promoted even when the broader source key remains in the held queue "
+            "for deeper subfeature search.",
+            "",
+            "| Edge bundle | Axis | Source key or stack | Receipt | Why it counts |",
+            "|-------------|------|---------------------|---------|---------------|",
+        ]
+        for p in promoted:
+            lines.append(
+                f"| {p['edge']} | {p['axis']} | {p['source_key']} | `{p['receipt']}` | {_q(p['why'])} |"
+            )
+
     lines += ["", "## Held candidates (new edge work queue, not pitched yet)", ""]
     if held:
         lines += [
@@ -551,7 +666,7 @@ def write_brief(ranked: list[dict], covered: set[str], date: str) -> str:
             "|-----------|------|-----------|----------|",
         ]
         for e in held:
-            lines.append(f"| {e['key']} | {e['axis']} | {e.get('raw_score', 0)} | {_q(e.get('held_reason', 'needs a measured receipt or parity check'))} |")
+            lines.append(f"| {e['key']} | {e['axis']} | {e.get('raw_score', 0)} | {_q(_held_reason(e))} |")
     else:
         lines.append("None this run.")
 

@@ -1,7 +1,24 @@
 {
+  "date": "2026-06-19",
+  "claim_under_test": "Claude web_search returns a citation object with a verbatim quote from the web source; OpenAI web_search and Gemini Google Search return URL citations without a source quote.",
+  "sources": {
+    "claude_web_search": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool",
+    "openai_web_search": "https://developers.openai.com/api/docs/guides/tools-web-search",
+    "gemini_google_search": "https://ai.google.dev/gemini-api/docs/google-search"
+  },
   "n_questions": 3,
   "total_cost": 0.303544,
   "skipped": [],
+  "verdict": {
+    "positive_signal": true,
+    "promotable_edge": true,
+    "claude_all_web_citations_have_source_quote": true,
+    "all_competitors_ran": true,
+    "competitors_answered_all": true,
+    "competitors_cited_urls": true,
+    "competitors_returned_no_source_quote": true,
+    "why_not_promotable": []
+  },
   "arms": [
     {
       "name": "claude:sonnet",

@@ -1,13 +1,31 @@
 {
+  "date": "2026-06-19",
+  "claim_under_test": "Claude Batch API with the output-300k beta can return one un-truncated deliverable above OpenAI and Gemini's documented single-request output ceilings.",
+  "sources": {
+    "claude_batch_processing": "https://platform.claude.com/docs/en/build-with-claude/batch-processing",
+    "openai_gpt_5_5": "https://developers.openai.com/api/docs/models/gpt-5.5",
+    "gemini_3_5_flash": "https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash"
+  },
   "n_entries": 3000,
   "total_cost": 3.773489,
   "skipped": [],
+  "verdict": {
+    "positive_signal": true,
+    "promotable_edge": true,
+    "claude_finished_untruncated": true,
+    "claude_exceeds_every_documented_competitor_cap": true,
+    "claude_exceeds_every_measured_output": true,
+    "all_competitors_ran": true,
+    "max_documented_competitor_cap": 128000,
+    "why_not_promotable": []
+  },
   "arms": [
     {
       "name": "openai:gpt-top",
       "provider": "openai",
       "model": "gpt-5.5",
       "output_tokens": 764,
+      "documented_output_cap": 128000,
       "truncated": false,
       "stop_reason": "completed",
       "cost": 0.023475,
@@ -19,6 +37,7 @@
       "provider": "gemini",
       "model": "gemini-3.5-flash",
       "output_tokens": 32263,
+      "documented_output_cap": 65536,
       "truncated": false,
       "stop_reason": "STOP",
       "cost": 0.29054,
@@ -30,6 +49,7 @@
       "provider": "anthropic",
       "model": "claude-sonnet-4-6",
       "output_tokens": 230607,
+      "documented_output_cap": 300000,
       "truncated": false,
       "stop_reason": "end_turn",
       "cost": 3.459474,

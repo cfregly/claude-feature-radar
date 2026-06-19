@@ -1,7 +1,7 @@
 Source: https://platform.claude.com/docs/en/build-with-claude/search-results
 Snapshot fetched 2026-06-19. Verbatim excerpts for citation grounding.
 
-Search results - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop reasons and fallback Refusals and fallback Fallback credit Model capabilities Extended thinking Adaptive thinking Effort Task budgets (beta) Fast mode (research preview) Structured outputs Citations Streaming Messages Batch processing Search results Streaming refusals Multilingual support Embeddings Tools Overview How tool use works Tutorial: Build a tool-using agent Define tools Handle tool calls Parallel tool use Tool Runner (SDK) Strict tool use Tool use with prompt caching Server tools Troubleshooting Web search tool Web fetch tool Code execution tool Advisor tool Memory tool Bash tool Computer use tool Text editor tool Tool infrastructure Tool reference Manage tool context Tool combinations Tool search Programmatic tool calling Fine-grained tool streaming Context management Context windows Compaction Context editing Prompt caching Mid-conversation system messages Build an orchestration mode Cache diagnostics (beta) Token counting Working with files Files API PDF support Images and vision Skills Overview Quickstart Best practices Skills for enterprise Skills in the API MCP Remote MCP servers MCP connector MCP tunnels  Claude on cloud platforms Amazon Bedrock Amazon Bedrock (legacy) Claude Platform on AWS Microsoft Foundry Vertex AI  Log in  Messages  Search results Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Solutions AI agents Code modernization Coding Customer support Education Financial services Government Life sciences Partners Claude on AWS Google Cloud's Vertex AI Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Company Anthropic Careers Economic Futures Research News Responsible Scaling Policy Security and compliance Transparency Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Help and security Availability Status Support Discord Terms and policies Privacy policy Responsible disclosure policy Terms of service: Commercial Terms of service: Consumer Usage policy Messages / Model capabilities Search results Copy page  Enable natural citations for RAG applications by providing search results with source attribution Copy page   This feature is eligible for Zero Data Retention (ZDR) . When your organization has a ZDR arrangement, data sent through this feature is not stored after the API response is returned.
+Search results - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop reasons and fallback Refusals and fallback Fallback credit Model capabilities Extended thinking Adaptive thinking Effort Task budgets (beta) Fast mode (research preview) Structured outputs Citations Streaming Messages Batch processing Search results Streaming refusals Multilingual support Embeddings Tools Overview How tool use works Tutorial: Build a tool-using agent Define tools Handle tool calls Parallel tool use Tool Runner (SDK) Strict tool use Tool use with prompt caching Server tools Troubleshooting Web search tool Web fetch tool Code execution tool Advisor tool Memory tool Bash tool Computer use tool Text editor tool Tool infrastructure Tool reference Manage tool context Tool combinations Tool search Programmatic tool calling Fine-grained tool streaming Context management Context windows Compaction Context editing Prompt caching Mid-conversation system messages Build an orchestration mode Cache diagnostics (beta) Token counting Working with files Files API PDF support Images and vision Skills Overview Quickstart Best practices Skills for enterprise Skills in the API MCP Remote MCP servers MCP connector MCP tunnels  Claude on cloud platforms Amazon Bedrock Amazon Bedrock (legacy) Claude Platform on AWS Microsoft Foundry Vertex AI  Log in  Messages  Search results Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Solutions AI agents Code modernization Coding Customer support Education Financial services Government Life sciences Partners Claude on AWS Google Cloud's Vertex AI Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Company Anthropic Careers Economic Futures Research News Responsible Scaling Policy Security and compliance Transparency Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Help and security Availability Status Support Discord Terms and policies Privacy policy Responsible disclosure policy Terms of service: Commercial Terms of service: Consumer Usage policy Messages / Model capabilities Search results Copy page  Enable natural citations for RAG applications by providing search results with source attribution Copy page  Was this page helpful?   Key benefits How it works Search result schema Required fields Optional fields Method 1: Search results from tool calls Example: Knowledge base tool Method 2: Search results as top-level content Example: Direct search results Claude's response with citations Citation fields Multiple content blocks Advanced usage Combining both methods Combining with other content types Cache control Citation control Best practices For tool-based search (Method 1) For top-level search (Method 2) General best practices Limitations  This feature is eligible for Zero Data Retention (ZDR) . When your organization has a ZDR arrangement, data sent through this feature is not stored after the API response is returned.
 Search result content blocks enable natural citations with proper source attribution, bringing web search-quality citations to your custom applications. This feature is particularly powerful for RAG (Retrieval-Augmented Generation) applications where you need Claude to cite sources accurately.
 The search results feature is available on the following models:
 Claude Opus 4.8 ( claude-opus-4-8 )
@@ -54,86 +54,6 @@ text : The actual text content (non-empty string)
  Method 1: Search results from tool calls
 The most powerful use case is returning search results from your custom tools. This enables dynamic RAG applications where tools fetch and return relevant content with automatic citations.
  Example: Knowledge base tool
-Python TypeScript C# Go Java PHP Ruby  from anthropic.types import (
-MessageParam,
-TextBlockParam,
-SearchResultBlockParam,
-ToolResultBlockParam,
-)
-client = Anthropic()
-# Define a knowledge base search tool
-knowledge_base_tool = {
-"name" : "search_knowledge_base" ,
-"description" : "Search the company knowledge base for information" ,
-"input_schema" : {
-"type" : "object" ,
-"properties" : { "query" : { "type" : "string" , "description" : "The search query" }},
-"required" : [ "query" ],
-},
-}
-# Function to handle the tool call
-def search_knowledge_base ( query ):
-# Your search logic here
-# Returns search results in the correct format
-return [
-SearchResultBlockParam(
-type = "search_result" ,
-source = "https://docs.company.com/product-guide" ,
-title = "Product Configuration Guide" ,
-content = [
-TextBlockParam(
-type = "text" ,
-text = "To configure the product, navigate to Settings > Configuration. The default timeout is 30 seconds, but can be adjusted between 10-120 seconds based on your needs." ,
-)
-],
-citations = { "enabled" : True },
-),
-SearchResultBlockParam(
-type = "search_result" ,
-source = "https://docs.company.com/troubleshooting" ,
-title = "Troubleshooting Guide" ,
-content = [
-TextBlockParam(
-type = "text" ,
-text = "If you encounter timeout errors, first check the configuration settings. Common causes include network latency and incorrect timeout values." ,
-)
-],
-citations = { "enabled" : True },
-),
-]
-# Create a message with the tool
-response = client.messages.create(
-model = "claude-opus-4-8" , # Works with all supported models
-max_tokens = 1024 ,
-tools = [knowledge_base_tool],
-messages = [
-MessageParam( role = "user" , content = "How do I configure the timeout settings?" )
-],
-)
-# When Claude calls the tool, provide the search results
-if response.content[ 0 ].type == "tool_use" :
-tool_result = search_knowledge_base(response.content[ 0 ].input[ "query" ])
-# Send the tool result back
-final_response = client.messages.create(
-model = "claude-opus-4-8" , # Works with all supported models
-max_tokens = 1024 ,
-messages = [
-MessageParam(
-role = "user" , content = "How do I configure the timeout settings?"
-),
-MessageParam( role = "assistant" , content = response.content),
-MessageParam(
-role = "user" ,
-content = [
-ToolResultBlockParam(
-type = "tool_result" ,
-tool_use_id = response.content[ 0 ].id,
-content = tool_result, # Search results go here
-)
-],
-),
-],
-)
  Method 2: Search results as top-level content
 You can also provide search results directly in user messages. This is useful for:
 Pre-fetched content from your search infrastructure
@@ -141,49 +61,6 @@ Cached search results from previous queries
 Content from external search services
 Testing and development
  Example: Direct search results
-cURL CLI Python TypeScript C# Go Java PHP Ruby  from anthropic.types import MessageParam, TextBlockParam, SearchResultBlockParam
-client = Anthropic()
-# Provide search results directly in the user message
-response = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 1024 ,
-messages = [
-MessageParam(
-role = "user" ,
-content = [
-SearchResultBlockParam(
-type = "search_result" ,
-source = "https://docs.company.com/api-reference" ,
-title = "API Reference - Authentication" ,
-content = [
-TextBlockParam(
-type = "text" ,
-text = "All API requests must include an API key in the Authorization header. Keys can be generated from the dashboard. Rate limits: 1000 requests per hour for standard tier, 10000 for premium." ,
-)
-],
-citations = { "enabled" : True },
-),
-SearchResultBlockParam(
-type = "search_result" ,
-source = "https://docs.company.com/quickstart" ,
-title = "Getting Started Guide" ,
-content = [
-TextBlockParam(
-type = "text" ,
-text = "To get started: 1) Sign up for an account, 2) Generate an API key from the dashboard, 3) Install our SDK using pip install company-sdk, 4) Initialize the client with your API key." ,
-)
-],
-citations = { "enabled" : True },
-),
-TextBlockParam(
-type = "text" ,
-text = "Based on these search results, how do I authenticate API requests and what are the rate limits?" ,
-),
-],
-)
-],
-)
-print (response)
  Claude's response with citations
 Regardless of how search results are provided, Claude automatically includes citations when using information from them:
 {
@@ -227,7 +104,7 @@ Regardless of how search results are provided, Claude automatically includes cit
 } 
  Citation fields
 Each citation includes:
-Field Type Description type string Always "search_result_location" for search result citations source string The source from the original search result title string or null The title from the original search result cited_text string The full text of the cited block(s), concatenated. Equals the contents of content[start_block_index:end_block_index] joined together. Not counted toward output tokens. search_result_index integer 0-based index of the cited search result among all search_result blocks in the request, in the order they appear (across all messages and tool results). start_block_index integer 0-based index of the first cited block in the search result's content array. end_block_index integer Exclusive end index of the cited block range in the search result's content array. Always greater than start_block_index .
+Field Type Description type string Always "search_result_location" for search result citations source string The source from the original search result title string or null The title from the original search result cited_text string The full text of the cited block(s), concatenated. Equals the contents of content[start_block_index:end_block_index] joined together. Not counted toward output tokens. search_result_index integer 0-based index of the cited search result among all blocks in the request, in the order they appear (across all messages and tool results).
 The block indices identify a slice of the search result's content array, and cited_text is the full text of that slice. The text block is the minimal citable unit: Claude cites whole blocks, not substrings within a block. To get finer-grained citations, split your search result content into smaller blocks (see Multiple content blocks ).
  Multiple content blocks
 Search results can contain multiple text blocks in the content array:
@@ -381,4 +258,125 @@ return { "type" : "text" , "text" : f "Search error: { str (e) } " } 
 Search result content blocks are available on Claude API, Amazon Bedrock, and Google Cloud's Vertex AI
 Only text content is supported within search results (no images or other media)
 The content array must contain at least one text block
-Was this page helpful?   Key benefits How it works Search result schema Required fields Optional fields Method 1: Search results from tool calls Example: Knowledge base tool Method 2: Search results as top-level content Example: Direct search results Claude's response with citations Citation fields Multiple content blocks Advanced usage Combining both methods Combining with other content types Cache control Citation control Best practices For tool-based search (Method 1) For top-level search (Method 2) General best practices Limitations
+Python TypeScript C# Go Java PHP Ruby  from anthropic.types import (
+MessageParam,
+TextBlockParam,
+SearchResultBlockParam,
+ToolResultBlockParam,
+)
+client = Anthropic()
+# Define a knowledge base search tool
+knowledge_base_tool = {
+"name" : "search_knowledge_base" ,
+"description" : "Search the company knowledge base for information" ,
+"input_schema" : {
+"type" : "object" ,
+"properties" : { "query" : { "type" : "string" , "description" : "The search query" }},
+"required" : [ "query" ],
+},
+}
+# Function to handle the tool call
+def search_knowledge_base ( query ):
+# Your search logic here
+# Returns search results in the correct format
+return [
+SearchResultBlockParam(
+type = "search_result" ,
+source = "https://docs.company.com/product-guide" ,
+title = "Product Configuration Guide" ,
+content = [
+TextBlockParam(
+type = "text" ,
+text = "To configure the product, navigate to Settings > Configuration. The default timeout is 30 seconds, but can be adjusted between 10-120 seconds based on your needs." ,
+)
+],
+citations = { "enabled" : True },
+),
+SearchResultBlockParam(
+type = "search_result" ,
+source = "https://docs.company.com/troubleshooting" ,
+title = "Troubleshooting Guide" ,
+content = [
+TextBlockParam(
+type = "text" ,
+text = "If you encounter timeout errors, first check the configuration settings. Common causes include network latency and incorrect timeout values." ,
+)
+],
+citations = { "enabled" : True },
+),
+]
+# Create a message with the tool
+response = client.messages.create(
+model = "claude-opus-4-8" , # Works with all supported models
+max_tokens = 1024 ,
+tools = [knowledge_base_tool],
+messages = [
+MessageParam( role = "user" , content = "How do I configure the timeout settings?" )
+],
+)
+# When Claude calls the tool, provide the search results
+if response.content[ 0 ].type == "tool_use" :
+tool_result = search_knowledge_base(response.content[ 0 ].input[ "query" ])
+# Send the tool result back
+final_response = client.messages.create(
+model = "claude-opus-4-8" , # Works with all supported models
+max_tokens = 1024 ,
+messages = [
+MessageParam(
+role = "user" , content = "How do I configure the timeout settings?"
+),
+MessageParam( role = "assistant" , content = response.content),
+MessageParam(
+role = "user" ,
+content = [
+ToolResultBlockParam(
+type = "tool_result" ,
+tool_use_id = response.content[ 0 ].id,
+content = tool_result, # Search results go here
+)
+],
+),
+],
+) cURL CLI Python TypeScript C# Go Java PHP Ruby  from anthropic.types import MessageParam, TextBlockParam, SearchResultBlockParam
+client = Anthropic()
+# Provide search results directly in the user message
+response = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 1024 ,
+messages = [
+MessageParam(
+role = "user" ,
+content = [
+SearchResultBlockParam(
+type = "search_result" ,
+source = "https://docs.company.com/api-reference" ,
+title = "API Reference - Authentication" ,
+content = [
+TextBlockParam(
+type = "text" ,
+text = "All API requests must include an API key in the Authorization header. Keys can be generated from the dashboard. Rate limits: 1000 requests per hour for standard tier, 10000 for premium." ,
+)
+],
+citations = { "enabled" : True },
+),
+SearchResultBlockParam(
+type = "search_result" ,
+source = "https://docs.company.com/quickstart" ,
+title = "Getting Started Guide" ,
+content = [
+TextBlockParam(
+type = "text" ,
+text = "To get started: 1) Sign up for an account, 2) Generate an API key from the dashboard, 3) Install our SDK using pip install company-sdk, 4) Initialize the client with your API key." ,
+)
+],
+citations = { "enabled" : True },
+),
+TextBlockParam(
+type = "text" ,
+text = "Based on these search results, how do I authenticate API requests and what are the rate limits?" ,
+),
+],
+)
+],
+)
+print (response) search_result start_block_index integer 0-based index of the first cited block in the search result's content array. end_block_index integer Exclusive end index of the cited block range in the search result's content array. Always greater than start_block_index .

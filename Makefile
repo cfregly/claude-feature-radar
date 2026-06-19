@@ -73,7 +73,7 @@ ledger: ## EDGE: exact-list long stream, Claude context editing vs OpenAI compac
 ledger-smoke: ## cents-scale exact-list smoke, useful for checking the harness shape
 	$(PY) run.py ledger --docs 8 --doc-tokens 3000 --no-gemini
 
-compare: ## the credibility table: OpenAI vs Gemini vs Claude on the same long agent, all best config (needs compare-deps + ANTHROPIC + OPENAI + GEMINI keys; the Gemini row degrades gracefully if its key or quota is missing)
+compare: ## the credibility table: OpenAI vs Gemini vs Claude on the same long agent, all best config (needs compare-deps + ANTHROPIC + OPENAI + GEMINI keys, and the Gemini row degrades gracefully if its key or quota is missing)
 	$(PY) run.py compare
 
 alert: ## if a competitor won the last compare, draft the internal product-team note
@@ -88,14 +88,14 @@ edges: ## the cheap discovery loop: sweep the live docs, diff against the last r
 cadence: ## the unattended engine: sweep, rank, dispatch by demoKind, draft the newest uncovered lead to the inert outbox, update coverage, write the run manifest, audit the boundary (NO benchmark spend, NO send, $0)
 	$(PY) run.py cadence --dry-run
 
-grind: cadence coverage ci ## LOOP (tier 1, $0, fire-and-forget): the recurring edge loop, coverage view, and full offline gate; paid proofs stay explicit per-edge targets
+grind: cadence coverage ci ## LOOP (tier 1, $0, fire-and-forget): the recurring edge loop, coverage view, and full offline gate, and paid proofs stay explicit per-edge targets
 
-grind-deep: grind verify combine ## LOOP (tier 2, cents): the $0 loop, then the Opus skeptic and the combinatorial generator; the creative judgment layer, run on a slower cadence with a spend cap
+grind-deep: grind verify combine ## LOOP (tier 2, cents): the $0 loop, then the Opus skeptic and the combinatorial generator, the creative judgment layer, run on a slower cadence with a spend cap
 
 coverage: ## per-demoKind coverage: what is built vs adapt vs build, and the gaps the engine surfaces about itself (NO API call, $0)
 	$(PY) run.py coverage
 
-managed: ## the Tier-2 monthly resumable Managed Agents runtime, wired but not run (prints the boundary, $0; --apply runs a live session and spends a small bounded amount)
+managed: ## the Tier-2 monthly resumable Managed Agents runtime, wired but not run (prints the boundary, $0, and --apply runs a live session and spends a small bounded amount)
 	$(PY) run.py managed
 
 parity-gated: ## the long-tail parity-gated candidates, each HELD until its parity check survives (NO API call, $0)
@@ -137,7 +137,7 @@ eval-judge: ## the eval grid with the cross-model judge panel on (the too-trusti
 retention: ## EDGE retention_resume: the doc-grounded retention/bundle parity receipt across 3 vendors (NO key, NO Managed Agents spend, $0)
 	$(PY) engine/demonstrators/retention_resume.py
 
-retention-live: ## OPT-IN: the live Managed Agents kill-and-resume (start, resume, negative control, steer; beta, needs ANTHROPIC_API_KEY, spends a small bounded amount)
+retention-live: ## OPT-IN: the live Managed Agents kill-and-resume (start, resume, negative control, steer, beta, needs ANTHROPIC_API_KEY, spends a small bounded amount)
 	$(PY) engine/demonstrators/retention_resume.py --live
 
 cost: ## EDGE cost: the pure pricing-model edge over swept dated prices, both win and lose regimes with the crossover named (NO API call, NO key, $0)
@@ -164,7 +164,7 @@ check-surface: ## surface gate: no internal/private-repo leakage in source, no C
 check-receipts: ## receipt-drift gate: every measured number in the prose traces to a committed receipt (offline, $0)
 	$(PY) scripts/check_receipts.py
 
-test: ## the offline test suite (the gate boundary, the dispatch seam, the shared infra; no key, no network)
+test: ## the offline test suite (the gate boundary, the dispatch seam, the shared infra, no key, no network)
 	$(PY) -m pytest -q
 
 deslop: check-claims ## prose gate (em-dashes, en-dashes, semicolons) plus the citations cost-claim gate

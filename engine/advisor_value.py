@@ -17,6 +17,11 @@ Arms, single-turn generation, graded by EXECUTION against hidden tests:
 
 The claim under test: haiku+advisor reaches Opus-tier pass rate at far less than Opus-solo cost. If it
 does not, that is the finding and it goes to claude-feature-misses. Measured, not asserted.
+
+SECURITY: like eval_quality and advisor_routing, this grades model-generated programs through the
+shared no-Docker subprocess sandbox (engine/demonstrators/shared/sandbox.py): a temp dir, a wall-clock
+timeout, a new session, and best-effort rlimits. That is not a hard boundary like a container or VM.
+Run it on a machine you do not mind exposing to arbitrary generated code, ideally a throwaway VM.
 """
 
 from __future__ import annotations

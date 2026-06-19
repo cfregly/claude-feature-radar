@@ -67,8 +67,8 @@
       "edge_dir": "edges/citations"
     }
   ],
-  "anchor_edge": "citations",
-  "outbox_draft": "state/outbox/2026-06-19-citations.md",
+  "anchor_edge": "ptc",
+  "outbox_draft": "state/outbox/2026-06-19-ptc.md",
   "coverage": {
     "demo_kinds_total": 14,
     "registered": 13,

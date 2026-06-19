@@ -227,6 +227,8 @@ make ledger     # exact-list long stream, Claude vs OpenAI vs Gemini, data-backe
 make pdf-citations # direct-PDF page citations, data-backed edge when promotable
 make search-results # BYO RAG chunk citations, data-backed edge when promotable
 make grounding-stack # text + PDF + RAG chunk citations in one request, data-backed edge when promotable
+make web-citations # live-web citations with a verbatim source quote, data-backed edge when promotable
+make bulk-output # largest single-request deliverable, data-backed edge when promotable
 make cache-diagnostics # cache-miss root-cause observability, data-backed edge when promotable
 make task-budget # full-loop budget marker, stop-before-tool-call edge when promotable
 make fast-mode  # fast-mode access and speed validation, held if org has 0 fast-mode ITPM
@@ -236,13 +238,16 @@ make advisor    # advisor routing cost-at-quality candidate, held unless promota
 For the recurring loop, use:
 
 ```
-make grind
+make grind        # tier 1, $0: doc sweep, rank, coverage, full offline CI
+make grind-deep   # tier 2, cents: the $0 loop, then the Opus skeptic and the combinatorial generator
 ```
 
 `make grind` is the default no-credit loop: live doc sweep, rank, dispatch estimates, inert outbox
-draft, coverage view, and the full offline CI gate. It never runs a paid proof. When it surfaces a
-candidate, run the specific live target named in the estimate, promote only when the receipt says
-`promotable_edge: true`, then run `make grind` again so the landscape, coverage, and gates catch up.
+draft, coverage view, and the full offline CI gate. It never runs a paid proof. `make grind-deep` adds
+the Opus skeptic pass and the combinatorial edge generator on top, the creative judgment layer, run on
+a slower cadence with a spend cap. When the loop surfaces a candidate, run the specific live target
+named in the estimate, promote only when the receipt says `promotable_edge: true`, then run `make grind`
+again so the landscape, coverage, and gates catch up.
 
 ### 3. Synthesize the honest picture
 Combine the audit and the benchmark. State plainly where Claude wins, where it ties, and where it
@@ -253,10 +258,14 @@ For held candidates, run the narrow validators before writing any public claim:
 
 ```
 make dynamic-web   # live receipt for web search/fetch dynamic filtering, held unless promotable
+make fast-mode     # access-gated until the org has nonzero fast-mode ITPM
+make advisor       # held unless a harder workload shows cost-at-quality value
 ```
 
-This command can produce positive signal. It does not create a public edge unless its receipt shows
-`promotable_edge: true`.
+These commands can produce positive signal. None creates a public edge unless its receipt shows
+`promotable_edge: true`. Keep comparing subfeatures and combinations, not headline features: response
+fields, lifecycle behavior, billing fields, beta headers, conflicts, and how the feature behaves
+inside an agent loop are the search space.
 
 ### 4. Draft the two emails
 ```
@@ -320,6 +329,8 @@ engine/sweep.py               the variant sweep that makes the result trustworth
 engine/ledger_compare.py      the exact-list long-stream edge, best-to-best across 3 vendors
 engine/demonstrators/dynamic_web_filtering.py  the held dynamic web filtering validator
 engine/demonstrators/task_budgets.py           the task_budget full-loop edge validator
+engine/demonstrators/web_citations.py          the live-web source-quote citation edge validator
+engine/demonstrators/bulk_extended_output.py   the large single-request deliverable edge validator
 engine/draft_email.py         the founder email, from the verified anchor
 engine/product_alert.py       the product-team email, both-direction honesty
 common/                       verified model + price registry, cost math, client

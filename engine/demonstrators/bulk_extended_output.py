@@ -28,6 +28,7 @@ batch can take many minutes), so it is an explicit-go, credit-spending benchmark
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import os
 import pathlib
@@ -232,6 +233,100 @@ class BulkRun:
     skipped: list = field(default_factory=list)
 
 
+def _doc_cap_for(a: ArmResult) -> int | None:
+    if a.provider == "openai":
+        return DOC_CAPS["gpt-top"]
+    if a.provider == "gemini":
+        return DOC_CAPS["gem-flash"]
+    if a.provider == "anthropic":
+        return CLAUDE_MAX_TOKENS
+    return None
+
+
+def score_run(run: BulkRun) -> dict:
+    """Machine gate for the large single-request output edge.
+
+    The live competitors stopped early rather than truncating. The promotable claim is therefore not
+    that they hit their caps in this run. It is narrower and checkable: Claude empirically emitted one
+    un-truncated deliverable above every competitor's documented single-request output ceiling.
+    """
+    claude = next((a for a in run.arms if a.provider == "anthropic"), None)
+    competitors = [a for a in run.arms if a.provider in ("openai", "gemini")]
+    competitor_providers = {a.provider for a in competitors if a.ran}
+    competitor_caps = [_doc_cap_for(a) for a in competitors if a.ran and _doc_cap_for(a)]
+    max_competitor_cap = max(competitor_caps) if competitor_caps else 0
+
+    claude_ran = bool(claude) and claude.ran
+    claude_finished = claude_ran and not claude.truncated and claude.stop_reason not in ("max_tokens", "MAX_TOKENS")
+    claude_exceeds_doc_caps = claude_ran and bool(max_competitor_cap) and claude.output_tokens > max_competitor_cap
+    all_competitors_ran = {"openai", "gemini"}.issubset(competitor_providers)
+    claude_exceeds_measured_outputs = (
+        bool(competitors)
+        and all(claude.output_tokens > a.output_tokens for a in competitors if a.ran)
+        if claude_ran
+        else False
+    )
+
+    why_not = []
+    if not claude_ran:
+        why_not.append("claude batch arm did not run")
+    if not claude_finished:
+        why_not.append("claude output was truncated or did not finish")
+    if not claude_exceeds_doc_caps:
+        why_not.append("claude output did not exceed every competitor documented output cap")
+    if not all_competitors_ran:
+        why_not.append("both OpenAI and Gemini competitor output arms must run")
+    if not claude_exceeds_measured_outputs:
+        why_not.append("claude output did not exceed every competitor measured output")
+
+    positive = claude_finished and claude_exceeds_doc_caps and claude_exceeds_measured_outputs
+    promotable = positive and all_competitors_ran
+    return {
+        "positive_signal": positive,
+        "promotable_edge": promotable,
+        "claude_finished_untruncated": claude_finished,
+        "claude_exceeds_every_documented_competitor_cap": claude_exceeds_doc_caps,
+        "claude_exceeds_every_measured_output": claude_exceeds_measured_outputs,
+        "all_competitors_ran": all_competitors_ran,
+        "max_documented_competitor_cap": max_competitor_cap,
+        "why_not_promotable": why_not if not promotable else [],
+    }
+
+
+def _receipt_dict(run: BulkRun) -> dict:
+    return {
+        "date": datetime.date.today().isoformat(),
+        "claim_under_test": (
+            "Claude Batch API with the output-300k beta can return one un-truncated deliverable above "
+            "OpenAI and Gemini's documented single-request output ceilings."
+        ),
+        "sources": {
+            "claude_batch_processing": "https://platform.claude.com/docs/en/build-with-claude/batch-processing",
+            "openai_gpt_5_5": "https://developers.openai.com/api/docs/models/gpt-5.5",
+            "gemini_3_5_flash": "https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash",
+        },
+        "n_entries": run.n_entries,
+        "total_cost": round(run.total_cost, 6),
+        "skipped": run.skipped,
+        "verdict": score_run(run),
+        "arms": [
+            {
+                "name": a.name,
+                "provider": a.provider,
+                "model": a.model,
+                "output_tokens": a.output_tokens,
+                "documented_output_cap": _doc_cap_for(a),
+                "truncated": a.truncated,
+                "stop_reason": a.stop_reason,
+                "cost": round(a.cost, 6),
+                "latency_s": round(a.latency, 1),
+                "errors": a.errors,
+            }
+            for a in run.arms
+        ],
+    }
+
+
 def _clients():
     from common.client import get_client
     from common.runner import get_gemini_client, get_openai_client
@@ -405,13 +500,7 @@ def main(argv=None) -> int:
     run = run_benchmark(progress=True)
     _print_run(run)
 
-    out = {
-        "n_entries": run.n_entries, "total_cost": round(run.total_cost, 6), "skipped": run.skipped,
-        "arms": [{"name": a.name, "provider": a.provider, "model": a.model,
-                  "output_tokens": a.output_tokens, "truncated": a.truncated, "stop_reason": a.stop_reason,
-                  "cost": round(a.cost, 6), "latency_s": round(a.latency, 1), "errors": a.errors}
-                 for a in run.arms],
-    }
+    out = _receipt_dict(run)
     (repo_root() / "data").mkdir(exist_ok=True)
     (repo_root() / "data" / "last_bulk_extended_output.json").write_text(json.dumps(out, indent=2) + "\n")
     if a.emit_edge:

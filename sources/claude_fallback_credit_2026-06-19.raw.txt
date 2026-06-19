@@ -13,7 +13,27 @@ The fallback_has_prefill_claim field tells you whether the retry can continue th
 fallback_has_prefill_claim Retry body true The refused request body, unchanged, plus one appended assistant message whose content echoes the refused response's content . The retry model continues the response from where the refused model stopped, and completed server tool calls are not re-executed. false The refused request body, unchanged.
  Example
 The following example makes a request that may be refused and redeems the credit token on a retry against Claude Opus 4.8. When a retry attempt is rejected, the example degrades through the rejection ladder: the sequence of progressively simpler retry shapes covered in When a retry is rejected .
-cURL CLI Python TypeScript C# Go Java PHP Ruby  client = Anthropic()
+ Where it works
+Fallback credit is in beta on the Claude API, Claude Platform on AWS, Amazon Bedrock, Vertex AI, and Microsoft Foundry. Credit tokens returned in Message Batches results cannot be redeemed. Redemption applies only to direct Messages API requests.
+The retry model must be one of the refused model's permitted fallback targets. At launch, Claude Fable 5's permitted target is Claude Opus 4.8 ( claude-opus-4-8 ).
+Looking up permitted fallback targets programmatically
+ Checking that the credit applied
+The refund is visible in the retry's usage . Compared with what the same request would report without the token, cache_creation_input_tokens is lower, and cache_read_input_tokens is higher by the same amount. A shift of zero means the token was honored but there was nothing to reprice, for example because the retry model's cache was already warm.
+ When a retry is rejected
+Most retries redeem on the first attempt. When one does not, the API returns a 400 error that tells you what to try next.
+1 Continuation rejected: resend the unchanged body If the retry that appends the assistant message is rejected with a 400 error, resend the refused request body unchanged, still with the token. 2 Token rejected: drop the token If the unchanged body is also rejected with a 400 error whose message names fallback_credit_token , retry without the token. The credit is forfeited, but the retry itself goes through.
+ If the refused request executed server tools, a tokenless retry re-runs and re-bills those tools. In that case, surface the 400 error to your caller instead of falling through to a tokenless retry.
+If the error says 'redemption temporarily unavailable'
+ Reference
+The sections below cover edge cases and the complete redemption rules. Most integrations do not need them.
+Fields that must match the refused request
+Beta headers must match too
+When fallback_has_prefill_claim is absent
+Echoing the refused response's content
+Token scope and lifetime
+When a token cannot be redeemed by either shape
+ Next steps
+Refusals and fallback Detect refusals and choose between server-side fallback, the SDK middleware, and a manual retry.  Prompt caching How cache reads and cache writes are billed.  Stop reasons and fallback Every stop_reason value and how to handle it.  SDK middleware Was this page helpful?   The basic flow Example Where it works Checking that the credit applied When a retry is rejected Reference Next steps cURL CLI Python TypeScript C# Go Java PHP Ruby  client = Anthropic()
 request = {
 "max_tokens" : 1024 ,
 "messages" : [{ "role" : "user" , "content" : "Hello, Claude" }],
@@ -60,25 +80,4 @@ if "redemption temporarily unavailable" in str (error):
 raise # Transient: retry with the token within its five-minute window
 # The token itself was rejected: forfeit it and retry without.
 response = send( "claude-opus-4-8" , request)
-print (json.dumps({ "stop_reason" : response.stop_reason, "model" : response.model}))
- Where it works
-Fallback credit is in beta on the Claude API, Claude Platform on AWS, Amazon Bedrock, Vertex AI, and Microsoft Foundry. Credit tokens returned in Message Batches results cannot be redeemed. Redemption applies only to direct Messages API requests.
-The retry model must be one of the refused model's permitted fallback targets. At launch, Claude Fable 5's permitted target is Claude Opus 4.8 ( claude-opus-4-8 ).
-Looking up permitted fallback targets programmatically
- Checking that the credit applied
-The refund is visible in the retry's usage . Compared with what the same request would report without the token, cache_creation_input_tokens is lower, and cache_read_input_tokens is higher by the same amount. A shift of zero means the token was honored but there was nothing to reprice, for example because the retry model's cache was already warm.
- When a retry is rejected
-Most retries redeem on the first attempt. When one does not, the API returns a 400 error that tells you what to try next.
-1 Continuation rejected: resend the unchanged body If the retry that appends the assistant message is rejected with a 400 error, resend the refused request body unchanged, still with the token. 2 Token rejected: drop the token If the unchanged body is also rejected with a 400 error whose message names fallback_credit_token , retry without the token. The credit is forfeited, but the retry itself goes through.
- If the refused request executed server tools, a tokenless retry re-runs and re-bills those tools. In that case, surface the 400 error to your caller instead of falling through to a tokenless retry.
-If the error says 'redemption temporarily unavailable'
- Reference
-The sections below cover edge cases and the complete redemption rules. Most integrations do not need them.
-Fields that must match the refused request
-Beta headers must match too
-When fallback_has_prefill_claim is absent
-Echoing the refused response's content
-Token scope and lifetime
-When a token cannot be redeemed by either shape
- Next steps
-Refusals and fallback Detect refusals and choose between server-side fallback, the SDK middleware, and a manual retry.  Prompt caching How cache reads and cache writes are billed.  Stop reasons and fallback Every stop_reason value and how to handle it.  SDK middleware The SDK helper that applies fallback credit automatically. Was this page helpful?   The basic flow Example Where it works Checking that the credit applied When a retry is rejected Reference Next steps
+print (json.dumps({ "stop_reason" : response.stop_reason, "model" : response.model})) The SDK helper that applies fallback credit automatically.

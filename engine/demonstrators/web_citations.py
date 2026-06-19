@@ -34,6 +34,7 @@ the citation object is returned directly.
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import os
 import pathlib
@@ -206,6 +207,89 @@ class WcRun:
     skipped: list = field(default_factory=list)
 
 
+def score_run(run: WcRun) -> dict:
+    """Machine gate for the web-citation fidelity edge.
+
+    The high-level feature is web search, which is parity. The subfeature under test is the returned
+    citation object: Claude must return a web citation with the verbatim source quote, while the
+    competitor web-grounding objects cite URLs but carry no source quote.
+    """
+    claude = next((a for a in run.arms if a.provider == "anthropic"), None)
+    competitors = [a for a in run.arms if a.provider in ("openai", "gemini")]
+    competitor_providers = {a.provider for a in competitors if a.ran and a.asked > 0}
+
+    claude_answered_all = bool(claude) and claude.ran and claude.asked == run.n_questions and claude.answered == claude.asked
+    claude_has_source_quotes = (
+        bool(claude)
+        and claude.web_citations > 0
+        and claude.source_quote_citations == claude.web_citations
+    )
+    all_competitors_ran = {"openai", "gemini"}.issubset(competitor_providers)
+    competitors_answered_all = bool(competitors) and all(a.answered == a.asked == run.n_questions for a in competitors if a.ran)
+    competitors_cited_urls = bool(competitors) and all(a.web_citations > 0 for a in competitors if a.ran)
+    competitors_returned_no_source_quote = bool(competitors) and all(a.source_quote_citations == 0 for a in competitors if a.ran)
+
+    why_not = []
+    if not claude_answered_all:
+        why_not.append("claude did not answer every web question")
+    if not claude_has_source_quotes:
+        why_not.append("claude did not return a source quote on every web citation")
+    if not all_competitors_ran:
+        why_not.append("both OpenAI and Gemini competitor web arms must run")
+    if not competitors_answered_all:
+        why_not.append("a competitor did not answer every web question")
+    if not competitors_cited_urls:
+        why_not.append("competitors must cite web URLs, not fail the grounding task")
+    if not competitors_returned_no_source_quote:
+        why_not.append("a competitor returned a citation with a source quote, blocking the edge")
+
+    positive = claude_answered_all and claude_has_source_quotes and competitors_cited_urls and competitors_returned_no_source_quote
+    promotable = positive and all_competitors_ran and competitors_answered_all
+    return {
+        "positive_signal": positive,
+        "promotable_edge": promotable,
+        "claude_all_web_citations_have_source_quote": claude_has_source_quotes,
+        "all_competitors_ran": all_competitors_ran,
+        "competitors_answered_all": competitors_answered_all,
+        "competitors_cited_urls": competitors_cited_urls,
+        "competitors_returned_no_source_quote": competitors_returned_no_source_quote,
+        "why_not_promotable": why_not if not promotable else [],
+    }
+
+
+def _receipt_dict(run: WcRun) -> dict:
+    return {
+        "date": datetime.date.today().isoformat(),
+        "claim_under_test": (
+            "Claude web_search returns a citation object with a verbatim quote from the web source; "
+            "OpenAI web_search and Gemini Google Search return URL citations without a source quote."
+        ),
+        "sources": {
+            "claude_web_search": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool",
+            "openai_web_search": "https://developers.openai.com/api/docs/guides/tools-web-search",
+            "gemini_google_search": "https://ai.google.dev/gemini-api/docs/google-search",
+        },
+        "n_questions": run.n_questions,
+        "total_cost": round(run.total_cost, 6),
+        "skipped": run.skipped,
+        "verdict": score_run(run),
+        "arms": [
+            {
+                "name": a.name,
+                "provider": a.provider,
+                "model": a.model,
+                "answered": f"{a.answered}/{a.asked}",
+                "web_citations": a.web_citations,
+                "citations_with_source_quote": a.source_quote_citations,
+                "cost": round(a.cost, 6),
+                "latency_s": round(a.latency, 1),
+                "errors": a.errors,
+            }
+            for a in run.arms
+        ],
+    }
+
+
 def _clients():
     from common.client import get_client
     from common.runner import get_gemini_client, get_openai_client
@@ -366,13 +450,7 @@ def main(argv=None) -> int:
     run = run_benchmark(progress=True)
     _print_run(run)
 
-    out = {
-        "n_questions": run.n_questions, "total_cost": round(run.total_cost, 6), "skipped": run.skipped,
-        "arms": [{"name": a.name, "provider": a.provider, "model": a.model,
-                  "answered": f"{a.answered}/{a.asked}", "web_citations": a.web_citations,
-                  "citations_with_source_quote": a.source_quote_citations, "cost": round(a.cost, 6),
-                  "latency_s": round(a.latency, 1), "errors": a.errors} for a in run.arms],
-    }
+    out = _receipt_dict(run)
     (repo_root() / "data").mkdir(exist_ok=True)
     (repo_root() / "data" / "last_web_citations.json").write_text(json.dumps(out, indent=2) + "\n")
     if a.emit_edge:

@@ -2,9 +2,10 @@
 
 This is the human vetting pass over the widened 2026-06-19 source sweep and the first live
 subfeature receipts. It promotes the exact-list ledger edge, the cache diagnostics edge, the task
-budgets edge, the PDF citations edge, the search results edge, and the grounding-stack edge, because
-all six receipts cleared their best-to-best gates. The other candidates stay held with the parity risk
-and exact proof needed to move from held to measured.
+budgets edge, the PDF citations edge, the search results edge, the grounding-stack edge, the web
+citations edge, and the bulk extended-output edge, because each receipt cleared its best-to-best gate.
+The other candidates stay held with the parity risk and exact proof needed to move from held to
+measured.
 
 Update: the exact-list ledger workload below did clear the promotable gate. A new edge bundle now
 lives at `edges/exact-list-ledger/`.
@@ -23,6 +24,12 @@ at `edges/search-results/`.
 
 Update: the mixed-source grounding-stack workload cleared the promotable gate. A new edge bundle now
 lives at `edges/grounding-stack/`.
+
+Update: the live web-citations workload cleared the promotable gate. A new edge bundle now lives at
+`edges/web-citations/`.
+
+Update: the bulk extended-output workload cleared the promotable gate. A new edge bundle now lives at
+`edges/bulk-extended-output/`.
 
 ## Promoted edge: exact-list ledger
 
@@ -156,6 +163,30 @@ Primary sources:
 - OpenAI file search: https://developers.openai.com/api/docs/guides/tools-file-search
 - Gemini file search: https://ai.google.dev/gemini-api/docs/file-search
 
+## Promoted edge: web citations
+
+The new workload tests live web grounding at citation-object depth. Each vendor answers the same
+three web-search questions. The gate is whether each returned web citation carries a verbatim quote
+from the source page, not only a URL or an offset into the model's own answer.
+
+Live receipt: `make web-citations` wrote `data/last_web_citations.json`, and the committed edge
+receipt is `edges/web-citations/receipt.json`. Claude Sonnet 4.6 answered 3/3, returned 9 web
+citations, and all 9 carried a source quote. OpenAI GPT-5.5 answered 3/3 and returned 3 web
+citations, but 0 carried a source quote. Gemini 3.1 Pro Preview answered 3/3 and returned 6 web
+citations, but 0 carried a source quote. Claude cost $0.1152 and took 22.9s, OpenAI cost $0.1581 and
+took 25.3s, and Gemini cost $0.0302 and took 40.6s. Verdict: `positive_signal: true`,
+`promotable_edge: true`.
+
+Why this can ship: generic web search is parity. The promoted subfeature is narrower: Claude returned
+a source-quoted web citation object that lets a client verify the cited sentence without a second page
+fetch. The claim is scoped to the basic web-search path. Dynamic web filtering is tracked separately
+because it trades direct citation fidelity for pre-context filtering.
+
+Primary sources:
+- Claude web search: https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool
+- OpenAI web search: https://developers.openai.com/api/docs/guides/tools-web-search
+- Gemini Google Search: https://ai.google.dev/gemini-api/docs/google-search
+
 ## Best new candidate: dynamic web filtering
 
 Claude web search and web fetch now expose a sharper subfeature than the mechanical key-level scan can
@@ -235,6 +266,30 @@ Primary sources:
 - OpenAI reasoning controls: https://developers.openai.com/api/docs/guides/reasoning
 - Gemini thinking budgets: https://ai.google.dev/gemini-api/docs/thinking
 
+## Promoted edge: bulk extended output
+
+The new workload tests the per-request output ceiling, not a cost win. One request asks for a
+3,000-entry enumerated document with a strict no-abbreviation instruction. The gate is whether a
+single response can return an un-truncated deliverable above the competitors' documented output caps.
+
+Live receipt: `make bulk-output` wrote `data/last_bulk_extended_output.json`, and the committed edge
+receipt is `edges/bulk-extended-output/receipt.json`. Claude Sonnet 4.6 on the Message Batches API
+with `output-300k-2026-03-24` returned 230,607 output tokens in one request and finished at
+`stop_reason=end_turn`. OpenAI GPT-5.5 returned 764 output tokens. Gemini 3.5 Flash returned 32,263
+output tokens. The competitor responses were short answers rather than truncation events, so the
+promoted claim is the documented-cap comparison: Claude returned one un-truncated response above
+OpenAI GPT-5.5's 128,000-token output cap and Gemini 3.5 Flash's 65,536-token cap. Verdict:
+`positive_signal: true`, `promotable_edge: true`.
+
+Why this can ship: it is a narrow large-deliverable edge. It applies above 128k output tokens, uses the
+Batch API, requires the beta header, and is asynchronous. It should not be pitched as a speed or dollar
+win. It is the one-turn deliverable size that moved.
+
+Primary sources:
+- Claude batch processing: https://platform.claude.com/docs/en/build-with-claude/batch-processing
+- OpenAI GPT-5.5 model card: https://developers.openai.com/api/docs/models/gpt-5.5
+- Gemini 3.5 Flash model card: https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash
+
 ## Held or likely parity
 
 `fallback_credit` remains interesting, but it depends on a refused Fable or Mythos request. The live
@@ -270,13 +325,38 @@ thinking controls.
 remain parity or behind in the current landscape. Do not pitch them as Claude-ahead without a new
 subfeature-level claim.
 
-## Action
+## Current grinding plan after rescan
 
-Build the next demonstrators around the subfeatures, not the high-level feature names:
+Keep the loop mechanical:
 
-- For `web_search_tool` and `web_fetch_tool`, test pre-context code filtering and consumed-result
-  exclusion on noisy research pages, then measure answer quality, citation fidelity, and carried or
-  returned tokens.
+1. Run `make grind` to rescan the full first-party and competitor source set for $0.
+2. Pick the highest-value held candidate and state the subfeature claim before any benchmark.
+3. Compare Claude against OpenAI and Gemini at their best reachable stack on the same workload.
+4. Promote only when the committed receipt says `positive_signal: true` and `promotable_edge: true`.
+5. Run `make grind` again so the landscape, coverage ledger, and outbox catch up.
 
-Until those value proofs exist, the remaining candidates stay in the held/parity-gated state and out
-of any founder email or public edge bundle.
+The next grinding lanes are:
+
+- `dynamic-web`: retry the docs-new `web_search_20260318`, `web_fetch_20260318`, and
+  `response_inclusion` surface through latest SDK schema and raw HTTP. Hold until this key's runtime
+  accepts the exact tags and the workload beats the best competitor web stack on tokens or quality.
+- `advisor_tool`: build a harder execution-graded workload where the advisor must lift quality enough
+  to beat Opus solo and every same-quality competitor arm on cost per solved task.
+- `managed_agents` and sandboxes: test hosted environment lifecycle, isolation, resume, and
+  multi-agent coordination against the closest OpenAI and Gemini agent/runtime stack. Do not pitch
+  the word "sandbox" alone.
+- `memory_tool` plus `context_windows`: test long-horizon user memory, context editing, and 1M-window
+  combinations against OpenAI compaction and Gemini long context on a workload where recall or cost
+  changes.
+- `fast_mode`: blocked until this org has nonzero fast-mode input tokens per minute. After access is
+  enabled, compare wall clock, price, and answer quality against OpenAI priority processing and Gemini
+  priority inference.
+- `usage.iterations` plus cache TTL accounting: test whether per-sub-inference billing and cache-write
+  TTL split shorten a real debugging loop beyond the already promoted cache-diagnostics edge.
+- Claude Code surfaces: mine the official changelog, what's-new page, docs, and GitHub releases for
+  subfeatures, then compare each against the closest current coding-agent surface rather than against
+  a generic "Claude Code" label.
+
+Do not stop at high-level feature names. A parity headline still needs the subfeatures, response
+fields, lifecycle behavior, billing fields, conflicts, and combinations checked before the candidate
+is closed.
