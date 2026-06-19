@@ -1159,7 +1159,7 @@ def _provenance_source(plan: BriefPlan, gate: GateResult, command: str) -> str:
         receipt_line = f"data/{rpath.name}" + (f" (as_of {rdate})" if rdate else "")
     return f"""# Provenance
 
-This brief is generated from the committed truth of the claude-competitive-engine by `make publish-brief`,
+This brief is generated from the committed truth of the claude-feature-radar by `make publish-brief`,
 not hand-written: the README, the run entry, the vendored token counter, the demo tape, and the receipt
 snapshot it replays all come from the engine state below. The demo gif is rendered from the generated
 tape by `make gif` (it replays that snapshot for $0), so the gif traces to the same state. Regenerating

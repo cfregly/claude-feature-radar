@@ -1,6 +1,6 @@
 # Edge: Context Editing, in-place clearing that keeps a long agent under the window
 
-Part of [claude-competitive-engine](../../README.md). This edge is **beta**, and it is the weakest of
+Part of [claude-feature-radar](../../README.md). This edge is **beta**, and it is the weakest of
 the engine's edges competitively. We keep it because it is a real reliability mechanism, and because
 honesty about a thin edge is the point.
 
@@ -36,7 +36,7 @@ constant by the memory tool (on in both arms). Full receipt in [`sample.txt`](sa
 ## Run it yourself
 
 ```bash
-git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make setup
 cp .env.example .env   # paste your Anthropic key
 make longhorizon       # this edge, 3 runs for reliability, about two dollars on Haiku

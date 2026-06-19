@@ -50,7 +50,7 @@ AGENT_TOOLSET = "agent_toolset_20260401"    # the built-in bash/file toolset the
 AGENT_MODEL = os.environ.get("MANAGED_MODEL", "claude-sonnet-4-6")  # bound cost; opus for the strongest run
 
 SYSTEM = (
-    "You are the competitive-engine deep-dive worker running in a sandbox. You sweep a set of source "
+    "You are the feature-radar deep-dive worker running in a sandbox. You sweep a set of source "
     "pages, write a small ledger of what you finished to files, and never re-do a step already in the "
     "ledger. Keep it tight, and grade your own work deterministically."
 )
@@ -142,7 +142,7 @@ def start_session(max_events: int = 400) -> dict:
     client = _client()
 
     env = client.beta.environments.create(
-        name="competitive-engine-env",
+        name="feature-radar-env",
         config={"type": "cloud", "networking": {"type": "unrestricted"}},
     )
     agent = client.beta.agents.create(

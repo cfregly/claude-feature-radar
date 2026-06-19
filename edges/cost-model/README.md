@@ -1,6 +1,6 @@
 # Edge: cost, two conditional pricing edges with both regimes shown
 
-Part of [claude-competitive-engine](../../README.md). The question this answers for a founder watching
+Part of [claude-feature-radar](../../README.md). The question this answers for a founder watching
 the bill: are there traffic shapes where Claude's pricing structure is genuinely cheaper, and where does
 that stop being true. The honest read is that there are two, both narrow and both conditional, and this
 bundle is built to show the regime where Claude loses next to the regime where it wins, so a founder can
@@ -68,7 +68,7 @@ url and date:
 ## Run it yourself
 
 ```bash
-git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make cost          # the $0 pricing-model edge, both regimes, crossover named (no key, no spend)
 ```
 

@@ -43,7 +43,7 @@ from engine.demokinds import demokind_for, is_seeded
 from engine.demonstrators.registry import dispatch
 from engine.sources_registry import sources
 
-UA = "claude-competitive-engine/edges (+local-sweep; stdlib-urllib)"
+UA = "claude-feature-radar/edges (+local-sweep; stdlib-urllib)"
 TIMEOUT = 20
 
 # value_score: a small fixed weight per axis a founder pays for. Deterministic, no model call.

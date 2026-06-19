@@ -1,4 +1,4 @@
-# claude-competitive-engine
+# claude-feature-radar
 
 A forkable repo that repeatedly finds live Claude platform feature edges, and turns them into
 runnable code for builders to reproduce in their own environment.
@@ -89,7 +89,7 @@ Feature references, fetched 2026-06-18:
 ## Fork and run
 
 ```bash
-git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make setup                        # the venv and the one dependency (anthropic)
 cp .env.example .env              # paste your ANTHROPIC_API_KEY
 make ptc                          # the lead edge, about $0.08 (needs ANTHROPIC_API_KEY)

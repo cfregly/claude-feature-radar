@@ -1,6 +1,6 @@
 # Edge: Programmatic Tool Calling, keep your tool outputs out of the model's token bill
 
-Part of [claude-competitive-engine](../../README.md), the internal engine. This note is the internal
+Part of [claude-feature-radar](../../README.md), the internal engine. This note is the internal
 both-directions read, not founder copy. The wins-only founder brief is
 [`claude-feature-briefs/ptc`](https://github.com/cfregly/claude-feature-briefs). This is the sharpest
 edge the engine found, and it needs no beta header.
@@ -44,7 +44,7 @@ re-fetched 2026-06-18.
 ## Run it yourself
 
 ```bash
-git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make setup
 cp .env.example .env   # paste your Anthropic key
 make ptc               # this edge, on your own key, $0.08 on Sonnet 4.6

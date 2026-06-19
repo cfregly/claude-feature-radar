@@ -1,5 +1,5 @@
 ---
-name: claude-competitive-engine
+name: claude-feature-radar
 description: >-
   Run a fair, live-docs competitive analysis of the Claude platform against OpenAI and Google
   Gemini, then emit the assets: a founder email anchored on a genuinely Claude-only capability, a
@@ -12,7 +12,7 @@ description: >-
   that Claude lacks".
 ---
 
-# claude-competitive-engine
+# claude-feature-radar
 
 A repeatable engine that, every time it runs, re-checks the live docs, runs a fair benchmark, and
 produces three things:
@@ -211,7 +211,7 @@ their own prompt and know what changes. The founder email links it.
 ## What a founder runs
 
 ```bash
-git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make setup                              # venv + anthropic
 pip install -r requirements-compare.txt # openai, only for the comparison
 cp .env.example .env                    # paste ANTHROPIC_API_KEY and OPENAI_API_KEY

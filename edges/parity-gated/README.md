@@ -1,6 +1,6 @@
 # Edge: the parity-gated long tail (held until a skeptic fails to break it)
 
-Part of [claude-competitive-engine](../../README.md). This bundle is the engine's holding pen for the
+Part of [claude-feature-radar](../../README.md). This bundle is the engine's holding pen for the
 narrow candidate edges that are NOT yet pitchable: a server-side fallback credit, a per-request
 cache-miss-reason signal, and Claude Code as a programmable build surface. Each one is a plausible
 Claude edge with no head-to-head evidence yet that a competitor lacks an equivalent. The engine's own
@@ -42,7 +42,7 @@ product-team note rather than the founder email.
 ## Run it yourself
 
 ```bash
-git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make parity-gated      # the $0 view of every held candidate and its parity check (no key, no spend)
 ```
 

@@ -78,7 +78,7 @@ Scored on drama times measurability times genuine Claude lead times founder valu
   that round-trips into context. PTC is a one-line-per-tool change that cuts the input-token bill 20
   to 40 percent on exactly those workloads and collapses N inference round-trips into one. It hits
   the two things a founder watches: the Anthropic invoice and p95 agent latency.
-- **Measurability.** Yes, under a dollar on our own key (`claude-competitive-engine/.venv`,
+- **Measurability.** Yes, under a dollar on our own key (`claude-feature-radar/.venv`,
   anthropic 0.109.2, root `.env`). The dev key org already runs code execution. See the demo design
   below.
 - **Status, resolved today.** GA on the current models. The live programmatic-tool-calling page

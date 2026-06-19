@@ -1,6 +1,6 @@
 # Edge: retention and resume, does the unattended loop survive a kill, and on what terms
 
-Part of [claude-competitive-engine](../../README.md). The question this answers for a founder running a
+Part of [claude-feature-radar](../../README.md). The question this answers for a founder running a
 long, unattended agent: when the client dies mid-run, does the work survive, and how do the retention
 terms compare across vendors. The honest read, grounded against the live vendor docs on 2026-06-18, is
 **parity on the capability**: durable kill-and-resume is table stakes across Claude, OpenAI, and Gemini.
@@ -59,7 +59,7 @@ The scope is explicit: it proves the loop survives a kill and the retention term
 ## Run it yourself
 
 ```bash
-git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make retention          # the $0 doc-grounded retention/bundle parity receipt (no key, no spend)
 make setup              # only needed for the opt-in live run below
 make retention-live     # OPT-IN: the live Managed Agents kill-and-resume (beta, spends a small amount)

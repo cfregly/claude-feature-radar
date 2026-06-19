@@ -1,6 +1,6 @@
 # Edge: Citations, a verifiable per-character source pointer into your user's own document
 
-Part of [claude-competitive-engine](../../README.md), the internal engine. This note is the internal
+Part of [claude-feature-radar](../../README.md), the internal engine. This note is the internal
 both-directions read, not founder copy. The wins-only founder brief is
 [`claude-feature-briefs/citations`](https://github.com/cfregly/claude-feature-briefs). This edge needs
 no beta header.
@@ -43,7 +43,7 @@ cannot be combined with Structured Outputs on the same document (the API returns
 ## Run it yourself
 
 ```bash
-git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make setup && make compare-deps   # core deps, then the OpenAI + Gemini SDKs, into the same venv
 cp .env.example .env              # paste your Anthropic, OpenAI, and Gemini keys
 make citations                    # this edge, on your own keys, $0.06

@@ -13,7 +13,7 @@ Scanned on 2026-06-19:
 - Local deck speaker notes and slide copy in `deck/deck.js` and `deck/deck_text_for_review.txt`.
 - Local resume builder in `resume/build_resume.js`.
 - Local GitHub profile draft in `github_profile_README.md`.
-- Local outbound emails and briefs in `takehome-experiments/claude-competitive-engine/`.
+- Local outbound emails and briefs in `takehome-experiments/claude-feature-radar/`.
 - Local talk evidence in `receipts/talks_given.txt` and `receipts/cal_talks_report.md`.
 - Public talk pages and transcripts:
   - https://www.superdatascience.com/podcast/sds-973-ai-systems-performance-engineering-with-chris-fregly
@@ -164,7 +164,7 @@ Chris
 ## Competitive Engine Rules
 
 Every founder email, product email, brief, README CTA, and outbox draft in
-`takehome-experiments/claude-competitive-engine/` must use this voice guide.
+`takehome-experiments/claude-feature-radar/` must use this voice guide.
 
 - Use the founder's workload as the opening hook.
 - Show the one Claude feature that changes the workload.

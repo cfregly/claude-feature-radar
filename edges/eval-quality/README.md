@@ -1,6 +1,6 @@
 # Edge: eval quality, which model and effort do you actually need on your own cases
 
-Part of [claude-competitive-engine](../../README.md). The question this answers for a founder
+Part of [claude-feature-radar](../../README.md). The question this answers for a founder
 deciding which tier to build on: on a labeled coding slice, which (model, effort) cell clears the bar
 for the least money, measured on a HELD-OUT split so the win is not an overfit, and cross-checked by a
 judge panel so the execution grade is not silently too trusting. On one-shot coding the frontier ties,
@@ -78,7 +78,7 @@ benchmark with `EVAL_TASKS=path/to/your.jsonl make eval`, where each JSONL line 
 ## Run it yourself
 
 ```bash
-git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make setup && make compare-deps   # core deps, then openai, google-genai (datasets only for EVAL_LCB)
 cp .env.example .env              # paste your Anthropic, OpenAI, and Gemini keys
 make eval-smoke                   # a cents-scale Claude-only smoke (Haiku + Sonnet, low effort)
