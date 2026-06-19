@@ -9,6 +9,10 @@ This feature requires the code execution tool to be enabled.
 
 This feature is not eligible for Zero Data Retention (ZDR). Data is retained according to the feature's standard retention policy.
 
-Programmatic tool calling requires code_execution_20260120, which is supported on the following models: Claude Opus 4.8, Claude Opus 4.7, Claude Opus 4.6, Claude Sonnet 4.6, Claude Opus 4.5, Claude Sonnet 4.5.
+Programmatic tool calling requires code_execution_20260120 or later, which is supported on the following models: Claude Fable 5 (claude-fable-5), Claude Mythos 5 (claude-mythos-5), Claude Opus 4.8 (claude-opus-4-8), Claude Opus 4.7 (claude-opus-4-7), Claude Opus 4.6 (claude-opus-4-6), Claude Sonnet 4.6 (claude-sonnet-4-6), Claude Opus 4.5 (claude-opus-4-5-20251101), Claude Sonnet 4.5 (claude-sonnet-4-5-20250929).
+
+Programmatic tool calling is available on the Claude API, Claude Platform on AWS, and Microsoft Foundry. It is not currently available on Amazon Bedrock or Vertex AI.
 
 The request includes the code execution tool and adds the allowed_callers field to a tool definition. To enable programmatic calling, add the allowed_callers field with the value code_execution_20260120 to your tool definition.
+
+Note (re-fetched 2026-06-18): the live Model compatibility table now lists Claude Fable 5 and Claude Mythos 5 in addition to the Opus 4.5 to 4.8 and Sonnet 4.5 to 4.6 tiers. Claude Mythos 5 is limited availability (the Glasswing program). Haiku is not supported.

@@ -40,11 +40,17 @@ object.
 The edge is precise: Claude returns a per-character source pointer into your document, with an
 API-extracted verbatim quote and no resolver code to own.
 
-https://github.com/cfregly/claude-feature-briefs
+Run it yourself:
 
-Run it yourself: `make setup`, then `make compare-deps`, then `cp .env.example .env` and paste three
-keys. The file says where each goes. Then run `make citations`. $0.06 and a couple of minutes, every
-number read off the real API.
+```bash
+git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
+export ANTHROPIC_API_KEY=your-key
+make citations
+```
+
+$0.06 and a couple of minutes, every number read off the real API. To run it on your own documents,
+drop your `.txt` files into `citations/docs/`, edit the questions at the top of `citations/cite.py`,
+and run `make citations` again.
 
 Reply if you want a hand wiring it in.
 

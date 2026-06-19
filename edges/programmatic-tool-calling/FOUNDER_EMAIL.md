@@ -43,11 +43,15 @@ That is about 28% fewer billed input tokens on this workload. The scope line mat
 the model calls a tool many times over data it then crunches. If your tool returns one small object,
 this is not the pattern.
 
-https://github.com/cfregly/claude-feature-briefs
+Run it yourself:
 
-Run it yourself: `make setup`, then `cp .env.example .env` and paste your Anthropic key, then `make
-ptc`. $0.08 on Sonnet for the two runs. To try your own tool, edit `app/my_tool.py` and run
-`make app`.
+```bash
+git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
+export ANTHROPIC_API_KEY=your-key
+make ptc        # the example, $0.08 on Sonnet for the two runs
+```
+
+To run it on your own tool, edit `ptc/my_tool.py` and run `make ptc` again.
 
 Go build! 🚀
 

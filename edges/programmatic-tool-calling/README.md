@@ -1,14 +1,16 @@
 # Edge: Programmatic Tool Calling, keep your tool outputs out of the model's token bill
 
-Part of [claude-competitive-engine](../../README.md). This is the sharpest edge the engine found, and
-it needs no beta header.
+Part of [claude-competitive-engine](../../README.md), the internal engine. This note is the internal
+both-directions read, not founder copy. The wins-only founder brief is
+[`claude-feature-briefs/ptc`](https://github.com/cfregly/claude-feature-briefs). This is the sharpest
+edge the engine found, and it needs no beta header.
 
 **What it is.** Add `allowed_callers: ["code_execution_20260120"]` to one of your tools and include the
 code execution tool. Instead of one model round-trip per tool call, Claude writes a script in a sandbox
 that calls your tool in a loop, filters and aggregates the results there, and returns only the answer.
 The bulky tool outputs go to the sandbox, not the model, so you are not billed input tokens for data
-the model never reads. No beta header required (verified 2026-06-18). Supported on Opus 4.5 to 4.8 and
-Sonnet 4.5 to 4.6 (not Haiku).
+the model never reads. No beta header required (verified 2026-06-18). Supported on Fable 5, Mythos 5
+(limited availability), Opus 4.5 to 4.8, and Sonnet 4.5 to 4.6 (not Haiku).
 
 ## The measured proof
 

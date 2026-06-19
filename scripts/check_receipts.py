@@ -54,7 +54,7 @@ def check_ptc(fail, warn):
 
     # the run-cost claims must all agree with the receipt total (within a rounding tolerance)
     cost_files = [
-        "Makefile", "README.md", "FOUNDER_EMAIL.md", "app/run_tokens.py",
+        "Makefile", "README.md", "FOUNDER_EMAIL.md", "app/run_tokens.py", "demo.tape",
         "edges/programmatic-tool-calling/README.md",
         "edges/programmatic-tool-calling/FOUNDER_EMAIL.md",
         "edges/programmatic-tool-calling/PRODUCT_EMAIL.md", "emails/ptc_FOUNDER_EMAIL.md",

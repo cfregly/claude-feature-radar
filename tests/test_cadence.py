@@ -29,7 +29,7 @@ def _edge():
     return {"key": "ptc", "axis": "cost", "verdict": "claude-ahead", "lead_score": 2,
             "demoKind": "token_accounting",
             "claim": "The model writes one sandbox script that calls the developer's own tools.",
-            "fair_comparison": {"repro": {"command": "make ptc", "est_cost_usd": 0.06, "est_time_s": 90}}}
+            "fair_comparison": {"repro": {"command": "make ptc", "est_cost_usd": 0.08, "est_time_s": 90}}}
 
 
 def test_draft_is_deslop_clean():
@@ -40,7 +40,7 @@ def test_draft_is_deslop_clean():
 def test_draft_carries_the_command_cost_and_claim():
     text = cadence._draft_email(_edge(), None)
     assert "make ptc" in text
-    assert "$0.06" in text
+    assert "$0.08" in text
     assert "sandbox script" in text                   # the claim is on the surface
     assert "{repo_link}" in text                       # the link placeholder is preserved
 
@@ -97,7 +97,7 @@ def temp_repo(tmp_path, monkeypatch):
         "edges": [
             {"key": "ptc", "axis": "cost", "verdict": "claude-ahead", "lead_score": 2, "score": 6,
              "demoKind": "token_accounting",
-             "fair_comparison": {"repro": {"command": "make ptc", "est_cost_usd": 0.06, "est_time_s": 90}}},
+             "fair_comparison": {"repro": {"command": "make ptc", "est_cost_usd": 0.08, "est_time_s": 90}}},
             {"key": "managed_agents", "axis": "retention", "verdict": "parity", "lead_score": 0,
              "score": 0, "demoKind": "retention_resume", "fair_comparison": {}},
         ],

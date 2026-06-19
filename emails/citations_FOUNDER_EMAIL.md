@@ -31,6 +31,9 @@ msg = client.messages.create(
 )
 ```
 
+Want to watch it first, no clone needed? The brief opens with a gif of the run:
+https://github.com/cfregly/claude-feature-briefs/tree/main/citations
+
 See it run:
 
 ```bash

@@ -320,7 +320,7 @@
         },
         "repro": {
           "command": "make ptc",
-          "est_cost_usd": 0.06,
+          "est_cost_usd": 0.08,
           "est_time_s": 90
         }
       }

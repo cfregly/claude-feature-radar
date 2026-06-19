@@ -522,8 +522,8 @@ from .token_core import run_mode  # noqa: E402  the ONE audited counter + run lo
 
 from {slug} import my_tool as tool  # noqa: E402  the single edit surface
 
-# Programmatic tool calling is supported on Opus 4.5 to 4.8 and Sonnet 4.5 to 4.6, not Haiku (verified
-# 2026-06-18 against the live doc). The brief exposes the two a founder would pick.
+# Programmatic tool calling is supported on Fable 5, Mythos 5, Opus 4.5 to 4.8, and Sonnet 4.5 to 4.6,
+# not Haiku (verified 2026-06-18 against the live doc). The brief exposes the two a founder would pick.
 PTC_MODELS = {{"sonnet": "claude-sonnet-4-6", "opus": "claude-opus-4-8"}}
 
 
@@ -989,7 +989,7 @@ billed for them.
 The win is fan-out shaped: it lands when the model calls your tool many times, so the bulky outputs
 run in code instead of filling its context. The shipped example (`query_region_sales`, 240 rows over
 four regions) is a genuine fan-out, which is where the input-token savings show up. Programmatic tool
-calling is supported on Opus 4.5 to 4.8 and Sonnet 4.5 to 4.6 (not Haiku).
+calling is supported on Fable 5, Mythos 5, Opus 4.5 to 4.8, and Sonnet 4.5 to 4.6 (not Haiku).
 
 ## Run it (about $0.08)
 

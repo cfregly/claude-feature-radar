@@ -14,6 +14,11 @@ Each edge below is proven on a real task, with the receipt committed in `edges/<
 The distilled, founder-facing versions, the ones a founder clones and reproduces in a single
 command, live in the companion repo [`claude-feature-briefs`](https://github.com/cfregly/claude-feature-briefs).
 
+Two surfaces, two jobs. This repo is the internal engine. It keeps the full both-directions analysis,
+including where a do-it-yourself path can match Claude on a clean input, so every win it does claim has
+already survived the skeptic. The founder-facing briefs in `claude-feature-briefs` carry only the
+verified wins. The per-edge notes under `edges/` are the internal read, not founder copy.
+
 ## Lead edge: programmatic tool calling, about 28% fewer billed input tokens (`make ptc`)
 
 If your agent calls a tool many times over data it then crunches (usage rollups across cohorts,
@@ -28,10 +33,10 @@ the model.
 Measured on the same fan-out task two ways, same model (Sonnet 4.6), same answer required: across 4
 regions of 60 sales rows each (240 rows), find the highest-revenue region.
 
-| mode | billed input tokens | answer |
-|---|--:|:--:|
-| plain tool use | 9,451 | the model summed 240 rows in its head |
-| programmatic | 6,828 | east (the sandbox computed it) |
+| mode | billed input tokens | what happens to the 240 rows |
+|---|--:|:--|
+| plain tool use | 9,451 | all 240 rows flow through the model's context |
+| programmatic | 6,828 | the sandbox aggregates, only the answer (east) reaches the model |
 
 A 28% input-token cut, and the sandbox returns the exact winner. This pays off when your agent calls
 a tool many times over data it then crunches (the fan-out shape). The full receipt is [`edges/programmatic-tool-calling/sample.txt`](edges/programmatic-tool-calling/sample.txt).
@@ -61,15 +66,19 @@ resolver code on your side.
 
 Measured over 8 questions on 3 plain-text documents, each citation graded against the real source:
 
-| approach | resolves | who resolves it | quote free of output tokens | output tokens | cost |
-|---|:--:|:--:|:--:|--:|--:|
-| Claude Haiku 4.5 + Citations | 8/8 (guaranteed by the API) | the API | yes | 308 | $0.011 |
-| DIY: ask the model for the quote, resolve with `str.find` | 8/8 | your code | no | 563 | $0.006 |
+| what you get with Claude Haiku 4.5 + Citations | result |
+|---|:--|
+| every claim resolves to a real source range | 8/8, guaranteed by the API |
+| who writes the resolver | the API, zero resolver code on your side |
+| the verbatim quote | returned free of output tokens |
+| pointer granularity | per character, into the user's own document |
 
-The DIY baseline resolves on clean text too, so the edge is not that nobody else can do it. The edge
-is that Claude does it for you, guaranteed, free of output tokens, with no resolver code, and only
-Claude returns a per-character document pointer. The full receipt is
-[`edges/citations/sample.txt`](edges/citations/sample.txt).
+Claude returns a per-character pointer into your user's own document, guaranteed to resolve, with the
+verbatim quote free of output tokens and no resolver code to maintain. The full both-directions
+analysis, including where a do-it-yourself path can resolve on clean text, is the internal note in
+[`edges/citations/README.md`](edges/citations/README.md). The founder-facing brief is
+[`claude-feature-briefs/citations`](https://github.com/cfregly/claude-feature-briefs). The full receipt
+is [`edges/citations/sample.txt`](edges/citations/sample.txt).
 
 ```bash
 make citations    # about $0.06, needs ANTHROPIC_API_KEY

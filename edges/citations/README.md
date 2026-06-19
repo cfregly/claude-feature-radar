@@ -1,6 +1,9 @@
 # Edge: Citations, a verifiable per-character source pointer into your user's own document
 
-Part of [claude-competitive-engine](../../README.md). This edge needs no beta header.
+Part of [claude-competitive-engine](../../README.md), the internal engine. This note is the internal
+both-directions read, not founder copy. The wins-only founder brief is
+[`claude-feature-briefs/citations`](https://github.com/cfregly/claude-feature-briefs). This edge needs
+no beta header.
 
 **What it is.** Turn on `citations: {"enabled": true}` per document and Claude returns each claim with
 a structured pointer (a character range for text, a page range for a PDF) plus the verbatim quote,

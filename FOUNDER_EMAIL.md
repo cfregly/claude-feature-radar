@@ -40,15 +40,13 @@ this is not the pattern.
 Run it yourself:
 
 ```bash
-git clone https://github.com/cfregly/claude-feature-briefs
-cd claude-competitive-engine
-make setup
-cp .env.example .env
+git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
+export ANTHROPIC_API_KEY=your-key
 make ptc
 ```
 
-It costs about $0.08 on Sonnet for the two runs. To try your own tool, edit `app/my_tool.py` and run
-`make app`.
+It costs about $0.08 on Sonnet for the two runs. To try your own tool, edit `ptc/my_tool.py` and run
+`make ptc` again.
 
 Go build! 🚀
 

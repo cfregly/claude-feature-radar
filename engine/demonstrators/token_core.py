@@ -25,7 +25,7 @@ context window. Add `allowed_callers: ["code_execution_20260120"]` to a tool and
 invoke it from code rather than make one round trip per call (it is guidance, not a hard API block,
 so a client still handles a direct tool_use). The bulky tool OUTPUTS go to the sandbox, not the model, so
 the developer is not billed input tokens for data the model never needs to read. GA, no beta header.
-Models: Opus 4.5 to 4.8 and Sonnet 4.5 to 4.6 (not Haiku). Source, re-fetched 2026-06-18:
+Models (per the docs): Fable 5, Mythos 5, Opus 4.5 to 4.8, Sonnet 4.5 to 4.6 (not Haiku). The runnable demos use Sonnet and Opus. Source, re-fetched 2026-06-18:
 https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 
 The win is workload-shaped. It appears on a FAN-OUT task where the model calls a tool many times and
@@ -73,7 +73,7 @@ def run_mode(client, model_id, tool_spec, call_fn, question, *, programmatic,
     identical code, the only difference being the `programmatic` toggle. No second copy of the loop.
 
       client       an Anthropic client (passed in, never imported here)
-      model_id     the exact model id string (a PTC-capable model: Opus 4.5 to 4.8, Sonnet 4.5 to 4.6)
+      model_id     the exact model id string (a PTC-capable model, e.g. Sonnet 4.6 or Opus 4.8)
       tool_spec    the developer's own tool, a Messages-API tool dict with name/description/input_schema
       call_fn      the Python implementation of that tool: call_fn(**tool_input) -> JSON-serializable
       question     the task prompt that fans the tool out over many inputs

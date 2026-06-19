@@ -48,10 +48,20 @@ from common.client import fmt_usd  # noqa: E402  the one shared dollar formatter
 
 from app import my_tool as tool  # noqa: E402  the single edit surface
 
-# Programmatic tool calling is supported on Opus 4.5 to 4.8 and Sonnet 4.5 to 4.6, not Haiku
-# (verified 2026-06-18 against the live doc). The app exposes the two a founder would pick.
+# Programmatic tool calling is supported on Fable 5, Mythos 5, Opus 4.5 to 4.8, and Sonnet 4.5 to 4.6,
+# not Haiku (verified 2026-06-18 against the live doc). The app exposes the two a founder would pick.
 PTC_MODELS = {"sonnet": "claude-sonnet-4-6", "opus": "claude-opus-4-8"}
 
+
+# Upfront cost estimate for the shipped example, tied to the selected model. The committed example
+# bills about $0.08 on Sonnet 4.6. Opus 4.8 prices input and output at the same 5/3 multiple, so the
+# estimate scales with the model's input price (Opus comes out higher). Derived from the committed run.
+_REF_MODEL, _REF_USD = "sonnet", 0.0835
+
+
+def est_usd(model_key: str) -> float:
+    """The upfront dollar estimate for `model_key`, scaled from the committed Sonnet reference run."""
+    return _REF_USD * get(model_key).input_per_mtok / get(_REF_MODEL).input_per_mtok
 
 
 def run_token_compare(client, model_key: str, *, progress: bool = True) -> dict:
@@ -106,7 +116,7 @@ def cmd_run(model_key: str) -> int:
     print(f"\n  Token bill: the same fan-out task two ways over your tool ({tool.TOOL_SPEC['name']}),")
     print(f"  on {label}. Mode A calls the tool directly, Mode B (programmatic tool calling) runs it")
     print(f"  from a sandbox so the outputs stay out of the model's context.")
-    print(f"  Upfront: this run makes 2 task runs over {n} inputs and costs about $0.08 and roughly")
+    print(f"  Upfront: this run makes 2 task runs over {n} inputs and costs about ${est_usd(model_key):.2f} and roughly")
     print(f"  90 seconds on your key. The model arms are the only spend, the sandbox is server-side.\n")
     client = get_client()
     result = run_token_compare(client, model_key)
@@ -125,7 +135,7 @@ def cmd_check(model_key: str) -> int:
 
     expected = getattr(tool, "EXPECTED_ANSWER", None)
     print(f"\n  --check: running the shipped example on {get(model_key).label} and asserting the PTC")
-    print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). About $0.08.\n")
+    print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). About ${est_usd(model_key):.2f}.\n")
     client = get_client()
     result = run_token_compare(client, model_key)
     print_table(result)

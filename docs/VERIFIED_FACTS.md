@@ -180,12 +180,20 @@ tier, every id present and matching.
   provider charges a separate cache-write fee (OpenAI automatic caching, Gemini implicit caching), so the
   cache-write fields in the table are 0 by design, not a missing number. Because both providers' reported
   input field already counts the cached tokens, the cost split is fresh = reported input minus cached.
-- The tool-use loop is `client.chat.completions.create(model, messages, tools, parallel_tool_calls=False)`.
-  `parallel_tool_calls=False` forces one step per turn, matching the Claude run.
-- Cost reads from `response.usage`: `prompt_tokens` (input, includes cached), `completion_tokens`
-  (output), and `prompt_tokens_details.cached_tokens` (the cached subset, billed at the cached rate).
-- OpenAI has no in-place context editing and no model-driven memory tool on Chat Completions. Its
-  server-side context lever is compaction on the Responses API, which summarizes. Sources:
+- The tool-use loop is `client.responses.create(model, input, tools, store=True, previous_response_id=...)`
+  on the Responses API, OpenAI's latest, so the comparison is latest-to-latest. Server-stored
+  conversation (`store=True` plus `previous_response_id`) lets server-side compaction bound the
+  carried context the way Claude's context editing does, so only the new tool outputs are sent each
+  turn. The loop takes one tool call per turn, matching the Claude run. This is OpenAI at full
+  strength: latest API, compaction on, automatic prompt caching on. The exact code is
+  [`../engine/openai_arm.py`](../engine/openai_arm.py), and the single-call demonstrator arm
+  ([`../engine/providers/openai_provider.py`](../engine/providers/openai_provider.py)) is on the
+  Responses API too. No code path uses Chat Completions.
+- Cost reads from `response.usage`: `input_tokens` (the Responses API field already includes cached,
+  so it is the carried context), `output_tokens`, and `input_tokens_details.cached_tokens` (the cached
+  subset, billed at the cached rate). Fresh input is `input_tokens` minus that cached subset.
+- OpenAI has no in-place context editing and no model-driven memory tool. Its server-side context
+  lever is compaction on the Responses API, which summarizes. Sources:
   [function calling](https://developers.openai.com/api/docs/guides/function-calling),
   [compaction](https://developers.openai.com/api/docs/guides/compaction).
 - `openai` is an optional dependency ([`../requirements-compare.txt`](../requirements-compare.txt)),

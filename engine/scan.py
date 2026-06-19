@@ -51,7 +51,7 @@ DIFFERENTIATORS = [
             "score_gate": "answers_match AND mode_b_input < mode_a_input",
             "lead_basis": "absence-of-evidence",
             "maturity": {"claude": "ga", "beta_header": None, "fetched_date": "2026-06-18"},
-            "repro": {"command": "make ptc", "est_cost_usd": 0.06, "est_time_s": 90},
+            "repro": {"command": "make ptc", "est_cost_usd": 0.08, "est_time_s": 90},
         },
     },
     {

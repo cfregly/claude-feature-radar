@@ -40,6 +40,9 @@ Same task and model, with and without it:
 That is 28% cheaper on this demo. The scope line matters: it pays when your agent calls a tool many
 times over data it then crunches. If your tool returns one small object, this is not the pattern.
 
+Want to watch it first, no clone needed? The brief opens with a gif of the run:
+https://github.com/cfregly/claude-feature-briefs/tree/main/ptc
+
 See it run:
 
 ```bash
