@@ -1,0 +1,18 @@
+  web_citations: every web-grounded claim comes back with the verbatim source quote.
+
+  workload: 3 web-research questions, each forced to search the live web
+  model: claude-sonnet-4-6, tool: web_search_20250305
+
+  metric                                   value
+  ----------------------------------------------
+  questions answered                         3/3
+  web citations returned                       9
+  with verbatim source quote                   9
+  cost                                  $0.115173
+
+  the change: add one tool to the request.
+    tools=[{"type": "web_search_20250305", "name": "web_search", "max_uses": 4}]
+  each citation comes back as web_search_result_location with .cited_text (up to 150 chars of
+  the source), and those citation fields cost no input or output tokens.
+
+  Runnable code and the full brief: web_citations/README.md

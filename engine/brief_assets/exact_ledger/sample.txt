@@ -1,0 +1,24 @@
+
+  Exact-list ledger over a long stream, with Claude context editing.
+
+  The workload: a 30-report chain, each report about 20,000 tokens. The agent reads them one at a
+  time through a tool and must report the EXACT sorted list of every URGENT report id, held in its
+  own running notes (no memory tool). The bulky report text is disposable. The list must stay exact.
+
+  The change: clear the old tool results in place once context crosses the trigger, keep the most
+  recent 1, so the carried context stays flat near one report.
+
+      extra_headers = {"anthropic-beta": "context-management-2025-06-27"}
+      extra_body    = {"context_management": {"edits": [
+          {"type": "clear_tool_uses_20250919",
+           "trigger": {"type": "input_tokens", "value": 45000},
+           "keep": {"type": "tool_uses", "value": 1}}]}}
+
+  Result, one full run, Claude Haiku 4.5:
+
+      exact list           yes  [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]
+      peak carried context 35,186 tokens
+      cost                 $0.6700
+      wall time            60.7s
+
+  Runnable code and the full brief: exact_ledger/README.md

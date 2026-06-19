@@ -83,20 +83,26 @@ def check_ptc(fail, warn):
 
 
 def check_ptc_drift(fail, warn):
-    """Any PTC-token-shaped number (9,4xx / 6,8xx) on a founder surface must equal the receipt, so a
-    stray hand-typed 6,819 cannot drift away from the 6,828 the run actually billed."""
+    """Any PTC-token-shaped number (9,4xx / 6,8xx) on a PTC founder surface must equal the receipt, so a
+    stray hand-typed 6,819 cannot drift away from the 6,828 the run actually billed. Scoped to files that
+    are actually about PTC: with many briefs now, an unrelated edge can legitimately print a 6,8xx number
+    (cache diagnostics measured 6,827 missed tokens), and that is its own receipt, not PTC drift."""
     s = _read("edges/programmatic-tool-calling/sample.txt")
     a = re.search(r"Mode A:.*?([\d,]+)\s+\d+\s+\S+\s+\$", s)
     b = re.search(r"Mode B:.*?([\d,]+)\s+\d+\s+\S+\s+\$", s)
     if not (a and b):
         return
     a_tok, b_tok = int(a.group(1).replace(",", "")), int(b.group(1).replace(",", ""))
+    ptc_ctx = re.compile(r"programmatic tool calling|Token MINNing|allowed_callers|\bPTC\b", re.I)
     files = [ROOT / "README.md", ROOT / "FOUNDER_EMAIL.md"]
     files += sorted(ROOT.glob("edges/*/FOUNDER_EMAIL.md")) + sorted(ROOT.glob("emails/*.md"))
     for p in files:
         if not p.exists():
             continue
-        for m in re.finditer(r"\b([69],\d{3})\b", p.read_text()):
+        text = p.read_text()
+        if not ptc_ctx.search(text):
+            continue  # not a PTC surface, so a 6,8xx/9,4xx number here is its own receipt, not PTC's
+        for m in re.finditer(r"\b([69],\d{3})\b", text):
             v = int(m.group(1).replace(",", ""))
             if 6000 < v < 7000 and v != b_tok:
                 fail.append(f"PTC token drift: {p.relative_to(ROOT)} has {m.group(1)}, receipt Mode B is {b_tok:,}")

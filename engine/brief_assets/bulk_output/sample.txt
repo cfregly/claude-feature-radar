@@ -1,0 +1,18 @@
+  bulk_output: the largest deliverable in ONE request, with Claude extended output
+
+  Workload: one batch request asking for a 3,000-entry enumerated document, no abbreviation.
+  The gate: how many output tokens land in ONE request, un-truncated.
+
+  model                            output tokens   finished        cost
+  -----------------------------------------------------------------------
+  claude-sonnet-4-6 (300k beta)          230,607   yes (end_turn)  $3.46
+
+  The change:
+    betas=["output-300k-2026-03-24"]   # raises the single-request max_tokens cap to 300,000
+    max_tokens=300000
+
+  Claude emitted 230,607 output tokens in one request and finished clean, about 1.8x a 128k
+  single-request ceiling. One un-truncated turn, no chunk-and-stitch loop to maintain.
+  Batch-only, the 50% batch discount applies, and the batch can take many minutes.
+
+  Runnable code and the full brief: bulk_output/README.md

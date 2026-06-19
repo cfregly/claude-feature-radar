@@ -1,0 +1,23 @@
+
+  Claude cache diagnostics: why did the prompt cache miss?
+
+  Workload: two long cached-prefix requests. The second silently changes the
+  system prompt, the kind of bug you get from a timestamp or routing metadata.
+  The client sees a cache miss. The question is what changed.
+
+  field             value
+  ----------------------------------------
+  model             claude-haiku-4-5-20251001
+  miss reason       system_changed
+  missed tokens     6,827
+  cost              $0.0150
+  wall time         1.5s
+
+  The change: pass diagnostics={"previous_message_id": first.id} and the
+  beta header cache-diagnosis-2026-04-07, then read
+  second.diagnostics.cache_miss_reason.type.
+
+  Result: Claude named the changed surface and cut the suspect list from
+  4 possible prefix surfaces to 1.
+
+  Runnable code and the full brief: cache_diagnostics/README.md

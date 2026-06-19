@@ -1899,23 +1899,38 @@
     {
       "key": "task_budgets",
       "vendor": "claude",
-      "axis": "cost",
+      "axis": "reliability",
       "status": "beta",
       "beta_header": "task-budgets-2026-03-13",
       "fetched_date": "2026-06-19",
       "evidence_quote": "Task budgets - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/task-budgets",
       "value_score": 3,
-      "lead_score": 0,
-      "score": 0,
-      "verdict": "never-evaluated",
-      "demoKind": "other",
+      "lead_score": 2,
+      "score": 5,
+      "verdict": "claude-ahead",
+      "demoKind": "task_budget",
       "fair_comparison": {
-        "task_shape": "unknown until a demonstrator is built",
-        "claude_config": {},
-        "competitor_arms": [],
-        "isolate": "",
-        "score_gate": "machine-checkable gate to be defined by the demonstrator",
+        "task_shape": "Single-turn agentic-loop decision with one fetch_record tool: start a 12-record audit by calling fetch_record(1) unless a hidden near-exhausted task budget says to hand off first. Same prompt across all arms; only the remaining-budget signal differs.",
+        "claude_config": {
+          "feature": "task_budget (output_config.task_budget {type:tokens,total:20000,remaining:N})",
+          "beta_on": "task-budgets-2026-03-13",
+          "model": "claude-opus-4-8"
+        },
+        "competitor_arms": [
+          {
+            "provider": "openai",
+            "model": "gpt-5.5",
+            "closest_control": "reasoning_effort=low + max_output_tokens=256, Responses API"
+          },
+          {
+            "provider": "gemini",
+            "model": "gemini-3.1-pro-preview",
+            "closest_control": "thinking_budget=128 + max_output_tokens=256"
+          }
+        ],
+        "isolate": "Only the remaining task budget is toggled between the Claude low-budget arm (remaining=50) and the Claude high-budget control (remaining=5000); prompt, model, tool, and effort are held constant, so the behavior change is attributable to the budget alone.",
+        "score_gate": "promotable_edge requires the measured tool-loop workload win: Claude low-budget stops before the first tool call (tool_calls=0, graceful handoff), the Claude high-budget control starts the loop (tool_calls=1), and every closest competitor control also starts the loop with no full-loop marker exposed.",
         "lead_basis": "absence-of-evidence",
         "maturity": {
           "claude": "beta",
@@ -1923,9 +1938,9 @@
           "fetched_date": "2026-06-19"
         },
         "repro": {
-          "command": "",
-          "est_cost_usd": 0.0,
-          "est_time_s": 0.0
+          "command": "make task_budgets",
+          "est_cost_usd": 0.01,
+          "est_time_s": 8
         }
       },
       "raw_lead_score": 2,
@@ -2494,32 +2509,39 @@
       "key": "search_results",
       "vendor": "claude",
       "axis": "grounding",
-      "status": "beta",
-      "beta_header": null,
+      "status": "ga",
+      "beta_header": "none",
       "fetched_date": "2026-06-19",
       "evidence_quote": "Search results - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API St",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/search-results",
-      "value_score": 1,
-      "lead_score": 0,
-      "score": 0,
-      "verdict": "never-evaluated",
+      "value_score": 3,
+      "lead_score": 4,
+      "score": 7,
+      "verdict": "claude-ahead",
       "demoKind": "byo_rag_grounding",
       "fair_comparison": {
-        "task_shape": "unknown until a demonstrator is built",
-        "claude_config": {},
-        "competitor_arms": [],
-        "isolate": "",
-        "score_gate": "machine-checkable gate to be defined by the demonstrator",
-        "lead_basis": "absence-of-evidence",
+        "task_shape": "5 questions over 5 developer-supplied RAG chunks; the gate is a citation that resolves to the correct source chunk and the count of hosted-store setup calls and persisted objects required to get it",
+        "claude_config": {
+          "feature": "search_result content blocks with citations enabled (search_result_location)",
+          "beta_on": false,
+          "model": "claude-haiku-4-5-20251001"
+        },
+        "competitor_arms": [
+          "openai:gpt-5.4 file_search over a real hosted vector_store",
+          "gemini:gemini-3.5-flash file_search over a real hosted file_search_store"
+        ],
+        "isolate": "same chunks, same questions, same cite instruction on every arm; only the platform and its citation mechanism differ",
+        "score_gate": "Claude answered 5/5 and cited 5/5 inline with block-span and 0 hosted objects; every competitor needed a hosted store (setup_calls>0, persisted_objects>0) and returned a coarser pointer",
+        "lead_basis": "head-to-head",
         "maturity": {
-          "claude": "beta",
-          "beta_header": null,
+          "claude": "GA",
+          "beta_header": "none",
           "fetched_date": "2026-06-19"
         },
         "repro": {
-          "command": "",
-          "est_cost_usd": 0.0,
-          "est_time_s": 0.0
+          "command": "make search-results",
+          "est_cost_usd": 0.06,
+          "est_time_s": 120
         }
       },
       "raw_lead_score": 2,
@@ -2736,23 +2758,30 @@
     {
       "key": "cache_diagnostics",
       "vendor": "claude",
-      "axis": "observability",
+      "axis": "cost",
       "status": "beta",
       "beta_header": "cache-diagnosis-2026-04-07",
       "fetched_date": "2026-06-19",
       "evidence_quote": "Cache diagnostics - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics",
-      "value_score": 1,
-      "lead_score": 0,
-      "score": 0,
-      "verdict": "never-evaluated",
-      "demoKind": "other",
+      "value_score": 3,
+      "lead_score": 2,
+      "score": 5,
+      "verdict": "claude-ahead",
+      "demoKind": "cache_diagnostics",
       "fair_comparison": {
-        "task_shape": "unknown until a demonstrator is built",
-        "claude_config": {},
-        "competitor_arms": [],
-        "isolate": "",
-        "score_gate": "machine-checkable gate to be defined by the demonstrator",
+        "task_shape": "Two consecutive long cached-prefix requests where the second silently changes one prefix surface; read the per-request cache-miss diagnostic.",
+        "claude_config": {
+          "feature": "cache diagnostics (diagnostics.previous_message_id + diagnostics.cache_miss_reason)",
+          "beta_on": true,
+          "model": "claude-haiku-4-5-20251001"
+        },
+        "competitor_arms": [
+          "openai gpt-5.5 Responses API prompt_cache_key + prompt_cache_retention",
+          "gemini gemini-3.1-pro-preview context caching counters"
+        ],
+        "isolate": "Only the changed prefix surface varies between the two calls; the diagnostic field is the measured output.",
+        "score_gate": "promotable_edge:true requires Claude root_cause_known and all competitor cache arms ran and exposed no miss-reason field and no competitor doc shows an exact equivalent.",
         "lead_basis": "absence-of-evidence",
         "maturity": {
           "claude": "beta",
@@ -2760,9 +2789,9 @@
           "fetched_date": "2026-06-19"
         },
         "repro": {
-          "command": "",
-          "est_cost_usd": 0.0,
-          "est_time_s": 0.0
+          "command": "make cache-diagnostics",
+          "est_cost_usd": 0.14,
+          "est_time_s": 20
         }
       },
       "raw_lead_score": 2,
@@ -3240,6 +3269,206 @@
           "command": "make code-exec-state",
           "est_cost_usd": 0.05,
           "est_time_s": 60
+        }
+      }
+    },
+    {
+      "key": "pdf-citations",
+      "vendor": "claude",
+      "evidence_quote": "For a PDF supplied directly in the request (base64 document block), Claude Citations returns a verifiable page_location pointer (start/end page, 1-indexed) plus the cited_text quote, free of output tokens and with no bet",
+      "verdict": "claude-ahead",
+      "value_score": 3,
+      "lead_score": 5,
+      "score": 8,
+      "demoKind": "pdf_grounding",
+      "source_url": "https://platform.claude.com/docs/en/build-with-claude/citations",
+      "axis": "grounding",
+      "fetched_date": "2026-06-19",
+      "status": "ga",
+      "beta_header": null,
+      "fair_comparison": {
+        "task_shape": "5 questions over a 5-page synthetic SaaS Pro Plan agreement PDF supplied directly in the request (not uploaded to a hosted vector store); the gate is a verifiable per-page pointer into that PDF, checked against the known answer page; same PDF, same questions, same one-sentence-and-cite instruction on every arm.",
+        "claude_config": {
+          "feature": "Citations on an inline base64 PDF document block (page_location)",
+          "beta_on": false,
+          "model": "claude-haiku-4-5-20251001"
+        },
+        "competitor_arms": [
+          "openai:gpt-5.4 (Responses input_file, directly-supplied PDF, no vector store)",
+          "gemini:gemini-3.5-flash (inline PDF part, no file_search_store)"
+        ],
+        "isolate": "only the platform differs; identical PDF, questions, and instruction across arms; competitors scored on whether the DIRECT-PDF path returns any pointer, since a hosted vector store is a separate persisted flow named in the sources",
+        "score_gate": "Claude answered all and every pointer resolved to the exact expected page; no competitor returned any pointer into the directly-supplied PDF; every arm ran cleanly",
+        "lead_basis": "head-to-head",
+        "maturity": {
+          "claude": "GA",
+          "beta_header": null,
+          "fetched_date": "2026-06-19"
+        },
+        "repro": {
+          "command": "make pdf-citations",
+          "est_cost_usd": 0.084408,
+          "est_time_s": 40
+        }
+      }
+    },
+    {
+      "key": "grounding-stack",
+      "vendor": "claude",
+      "evidence_quote": "In one client.messages.create request, Claude cites a plain-text document (char_location), a directly-supplied base64 PDF (page_location), and a developer-supplied search_result chunk (search_result_location), returning ",
+      "verdict": "claude-ahead",
+      "value_score": 3,
+      "lead_score": 8,
+      "score": 11,
+      "demoKind": "grounding_stack",
+      "source_url": "https://platform.claude.com/docs/en/build-with-claude/citations",
+      "axis": "grounding",
+      "fetched_date": "2026-06-19",
+      "status": "ga",
+      "beta_header": "none required (Citations and search_result blocks are GA, verified 2026-06-19)",
+      "fair_comparison": {
+        "task_shape": "one request carrying three mixed inline sources (a plain-text document, a directly-supplied base64 PDF, and a developer-supplied search_result chunk) plus a three-part question, one fact unique to each source; gate counts how many sources return a citation that resolves to that exact source and how many hosted-store objects were required",
+        "claude_config": {
+          "feature": "Citations (char_location + page_location + search_result_location in one response)",
+          "beta_on": false,
+          "model": "claude-haiku-4-5-20251001"
+        },
+        "competitor_arms": [
+          "openai:gpt-5.4 (Responses API, input_file PDF + input_text inline, no vector store)",
+          "gemini:gemini-3.5-flash (inline PDF part + inline text, no file_search_store)"
+        ],
+        "isolate": "same three inline sources, same question, one request on every arm; only the platform citation mechanism differs, so the per-source pointer count is attributable",
+        "score_gate": "claude answered==3 AND sources_cited==3 AND pointer_kinds=={char_location,page_location,search_result_location} AND persisted_objects==0; competitors answered==3 AND sources_cited==0",
+        "lead_basis": "head-to-head",
+        "maturity": {
+          "claude": "GA",
+          "beta_header": "none required (Citations and search_result blocks are GA, verified 2026-06-19)",
+          "fetched_date": "2026-06-19"
+        },
+        "repro": {
+          "command": "make grounding_stack",
+          "est_cost_usd": 0.0101,
+          "est_time_s": 40
+        }
+      }
+    },
+    {
+      "key": "web-citations",
+      "vendor": "claude",
+      "evidence_quote": "Claude's web_search returns each web-grounded claim as a web_search_result_location citation carrying the verbatim cited_text (up to 150 chars of the source page), free of input/output tokens; the nearest competitor web-",
+      "verdict": "claude-ahead",
+      "value_score": 3,
+      "lead_score": 4,
+      "score": 7,
+      "demoKind": "web_grounding",
+      "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool",
+      "axis": "grounding",
+      "fetched_date": "2026-06-19",
+      "status": "ga",
+      "beta_header": "none",
+      "fair_comparison": {
+        "task_shape": "3 web-research questions, each forced to search the live web on every vendor; the gate is how many returned citations carry a verbatim quote FROM the source page vs a bare URL plus an offset into the model's own answer",
+        "claude_config": {
+          "feature": "web_search with web_search_result_location citations (cited_text)",
+          "beta_on": false,
+          "model": "claude-sonnet-4-6"
+        },
+        "competitor_arms": [
+          "openai:gpt-5.5 web_search (url_citation)",
+          "gemini:gemini-3.1-pro-preview Google Search grounding (grounding_chunks)"
+        ],
+        "isolate": "the same web-research questions on every arm; only the platform's web citation mechanism differs, so the source-quote count is attributable",
+        "score_gate": "claude returns web citations carrying a verbatim source quote AND every competitor cites URLs but returns zero citations with a source quote",
+        "lead_basis": "head-to-head",
+        "maturity": {
+          "claude": "GA",
+          "beta_header": "none",
+          "fetched_date": "2026-06-19"
+        },
+        "repro": {
+          "command": "make web_citations",
+          "est_cost_usd": 0.12,
+          "est_time_s": 60
+        }
+      }
+    },
+    {
+      "key": "bulk-extended-output",
+      "vendor": "claude",
+      "evidence_quote": "Claude emits one un-truncated deliverable above 128k output tokens in a single request via the Message Batches API with the output-300k-2026-03-24 beta header (cap 300,000), exceeding the documented single-request output",
+      "verdict": "claude-ahead",
+      "value_score": 3,
+      "lead_score": 4,
+      "score": 7,
+      "demoKind": "extended_output",
+      "source_url": "https://platform.claude.com/docs/en/build-with-claude/batch-processing",
+      "axis": "cost",
+      "fetched_date": "2026-06-19",
+      "status": "beta",
+      "beta_header": "output-300k-2026-03-24",
+      "fair_comparison": {
+        "task_shape": "one request asking for a 3,000-entry enumerated document with a strict no-abbreviation instruction; the gate is output tokens produced in ONE request and whether it truncated",
+        "claude_config": {
+          "feature": "Message Batches API + extended output (300k max_tokens)",
+          "beta_on": "output-300k-2026-03-24",
+          "model": "claude-sonnet-4-6"
+        },
+        "competitor_arms": [
+          "openai:gpt-5.5 (documented 128k output cap)",
+          "gemini:gemini-3.5-flash (documented 65,536 output cap)"
+        ],
+        "isolate": "same prompt and same above-cap max-output setting on every arm; only the platform single-request output ceiling differs",
+        "score_gate": "claude finished un-truncated AND claude output tokens > every competitor documented cap AND > every competitor measured output AND both competitor arms ran",
+        "lead_basis": "head-to-head",
+        "maturity": {
+          "claude": "beta",
+          "beta_header": "output-300k-2026-03-24",
+          "fetched_date": "2026-06-19"
+        },
+        "repro": {
+          "command": "make bulk_output",
+          "est_cost_usd": 0.2,
+          "est_time_s": 200
+        }
+      }
+    },
+    {
+      "key": "exact-list-ledger",
+      "vendor": "claude",
+      "evidence_quote": "On a long-stream exact-list workload (30-report chain, each report about 20,000 tokens, the agent must report the exact sorted list of every URGENT id held in its own reasoning with no memory tool), Claude Haiku 4.5 with",
+      "verdict": "claude-ahead",
+      "value_score": 3,
+      "lead_score": 6,
+      "score": 9,
+      "demoKind": "token_accounting",
+      "source_url": "https://platform.claude.com/docs/en/build-with-claude/context-editing",
+      "axis": "cost",
+      "fetched_date": "2026-06-19",
+      "status": "beta",
+      "beta_header": "context-management-2025-06-27",
+      "fair_comparison": {
+        "task_shape": "Long-stream chain agent: 30 incident reports, each about 20,000 tokens, read one at a time through a read_document tool (each report names the next, shuffled order so no batching), agent must output the exact sorted list of every URGENT id held in its own running notes, no memory tool, max_turns 44.",
+        "claude_config": {
+          "feature": "context editing (clear_tool_uses_20250919, trigger input_tokens 45000, keep tool_uses 1)",
+          "beta_on": true,
+          "model": "claude-haiku-4-5-20251001"
+        },
+        "competitor_arms": [
+          "OpenAI gpt-5.5 with Responses compaction (compact_threshold 45000)",
+          "Gemini gemini-3.1-pro-preview with full context window"
+        ],
+        "isolate": "Same deterministic seeded corpus (CHAIN_SEED 42), same exact-list prompt, same agent strategy on every arm; only each platform's context-management mechanism differs, so the cost and time delta is attributable to it. Prompt caching on for the Claude arm; OpenAI caching automatic; Gemini implicit caching, none disabled.",
+        "score_gate": "Promote only when Claude is exact AND every competitor that ran is exact AND Claude beats every exact competitor on cost AND wall-clock time (engine/ledger_compare.py verdict()).",
+        "lead_basis": "head-to-head",
+        "maturity": {
+          "claude": "beta",
+          "beta_header": "context-management-2025-06-27",
+          "fetched_date": "2026-06-19"
+        },
+        "repro": {
+          "command": "make ledger",
+          "est_cost_usd": 5,
+          "est_time_s": 426
         }
       }
     }

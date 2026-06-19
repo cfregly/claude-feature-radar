@@ -96,6 +96,13 @@ class BriefPlan:
     files: tuple[VendorFile, ...]
     make_help: str
     edit_surface: str | None = None  # dst path of the edit-surface file, e.g. "my_tool.py"
+    # Data-driven briefs: when from_assets is True, the brief's README.md, run.py, sample.txt, and
+    # email.md are read from engine/brief_assets/<slug>/ instead of a per-slug generator function, so a
+    # new edge is content, not code. headline is the demo.tape headline line, index_blurb the root README
+    # one-liner. The asset files may use {slug}, {title}, {doc_url} placeholders, substituted on assembly.
+    from_assets: bool = False
+    headline: str = ""
+    index_blurb: str = ""
 
 
 # The vendor closure for programmatic-tool-calling. The brief needs the one audited counter/run loop
@@ -155,6 +162,126 @@ PLANS: dict[str, BriefPlan] = {
         ),
         make_help="build .venv, install anthropic, write a file in your agent's sandbox and read it back from the reused container (~$0.05)",
         edit_surface=None,  # no single edit surface: the README explains adapting the workload
+    ),
+    "pdf-citations": BriefPlan(
+        slug="pdf_citations",
+        title='PDF citations',
+        demo_kind="pdf_grounding",
+        doc_url="https://platform.claude.com/docs/en/build-with-claude/citations",
+        files=(
+            VendorFile("common/client.py", "common/client.py"),
+            VendorFile("common/models.py", "common/models.py"),
+            VendorFile("common/pricing.py", "common/pricing.py"),
+        ),
+        make_help='build .venv, install anthropic, answer questions over a directly-supplied PDF and get a correct-page pointer for each answer (~$0.02)',
+        from_assets=True,
+        headline="# Deep-link every answer to the exact page of a user's PDF with Claude Citations",
+        index_blurb='Answer questions over a directly-supplied PDF and get a verifiable page_location pointer (page number plus the quoted source text) for every answer, with zero resolver code.',
+    ),
+    "search-results": BriefPlan(
+        slug="search_results",
+        title='Inline RAG citations',
+        demo_kind="byo_rag_grounding",
+        doc_url="https://platform.claude.com/docs/en/build-with-claude/search-results",
+        files=(
+            VendorFile("common/client.py", "common/client.py"),
+            VendorFile("common/models.py", "common/models.py"),
+            VendorFile("common/pricing.py", "common/pricing.py"),
+        ),
+        make_help='search_results  Cite your own RAG chunks inline, resolver-free, with search_result blocks (~$0.05)',
+        from_assets=True,
+        headline='# Cite your own RAG chunks inline with Claude search_result content blocks',
+        index_blurb='Cite the chunks your own retriever returned, inline and resolver-free, with a search_result_location block-span pointer and no hosted vector store.',
+    ),
+    "grounding-stack": BriefPlan(
+        slug="grounding_stack",
+        title='Grounding stack (text + PDF + RAG cited in one request)',
+        demo_kind="grounding_stack",
+        doc_url="https://platform.claude.com/docs/en/build-with-claude/citations",
+        files=(
+            VendorFile("common/client.py", "common/client.py"),
+            VendorFile("common/models.py", "common/models.py"),
+            VendorFile("common/pricing.py", "common/pricing.py"),
+        ),
+        make_help='grounding_stack  Cite text + PDF + RAG chunk in one request, one typed pointer each (~$0.01)',
+        from_assets=True,
+        headline='# Cite a text doc, a PDF, and a RAG chunk in one request with Claude Citations',
+        index_blurb='Cite a plain-text note, a directly-supplied PDF, and a RAG chunk in one Claude request, each with its own typed pointer (char, page, search_result) and no vector store.',
+    ),
+    "web-citations": BriefPlan(
+        slug="web_citations",
+        title='Web search citations',
+        demo_kind="web_grounding",
+        doc_url="https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool",
+        files=(
+            VendorFile("common/client.py", "common/client.py"),
+            VendorFile("common/models.py", "common/models.py"),
+            VendorFile("common/pricing.py", "common/pricing.py"),
+        ),
+        make_help='web_citations  Run the web-citation fidelity workload: every web claim comes back with the verbatim source quote (~$0.12)',
+        from_assets=True,
+        headline="# Verifiable web answers with Claude's web search citations",
+        index_blurb="Claude's web search tool returns each web-grounded claim with the verbatim source quote attached, so a reader verifies the exact sentence in seconds instead of re-fetching the page.",
+    ),
+    "bulk-extended-output": BriefPlan(
+        slug="bulk_output",
+        title='Extended output',
+        demo_kind="extended_output",
+        doc_url="https://platform.claude.com/docs/en/build-with-claude/batch-processing",
+        files=(
+            VendorFile("common/client.py", "common/client.py"),
+            VendorFile("common/models.py", "common/models.py"),
+            VendorFile("common/pricing.py", "common/pricing.py"),
+        ),
+        make_help='bulk_output  the largest deliverable in one request with Claude extended output, live check (~$0.20)',
+        from_assets=True,
+        headline='# The largest deliverable in one request, with Claude extended output',
+        index_blurb='One un-truncated deliverable per request above 128k output tokens, via the Message Batches API with the output-300k-2026-03-24 extended-output beta.',
+    ),
+    "exact-list-ledger": BriefPlan(
+        slug="exact_ledger",
+        title='Exact-list ledger',
+        demo_kind="token_accounting",
+        doc_url="https://platform.claude.com/docs/en/build-with-claude/context-editing",
+        files=(
+            VendorFile("common/client.py", "common/client.py"),
+            VendorFile("common/models.py", "common/models.py"),
+            VendorFile("common/pricing.py", "common/pricing.py"),
+        ),
+        make_help='build .venv, install anthropic, run the long-stream exact-list ledger agent with context editing and assert the win (~$0.17)',
+        from_assets=True,
+        headline='# Keep an exact running list across a long agent, with Claude context editing',
+        index_blurb='A long tool-heavy agent keeps an exact running list while Claude context editing clears the bulky tool results in place, holding carried context flat and the bill down.',
+    ),
+    "cache-diagnostics": BriefPlan(
+        slug="cache_diagnostics",
+        title='Cache diagnostics',
+        demo_kind="cache_diagnostics",
+        doc_url="https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics",
+        files=(
+            VendorFile("common/client.py", "common/client.py"),
+            VendorFile("common/models.py", "common/models.py"),
+            VendorFile("common/pricing.py", "common/pricing.py"),
+        ),
+        make_help='cache_diagnostics  Name the silent prompt-cache-miss cause with a typed reason (~$0.02)',
+        from_assets=True,
+        headline='# Know why your prompt cache missed with Claude cache diagnostics',
+        index_blurb='Claude cache diagnostics names the exact prefix surface that broke a prompt-cache hit (model, system, tools, or messages), turning a blind cache-miss hunt into a one-line typed answer.',
+    ),
+    "task-budgets": BriefPlan(
+        slug="task_budgets",
+        title='Task budgets',
+        demo_kind="task_budget",
+        doc_url="https://platform.claude.com/docs/en/build-with-claude/task-budgets",
+        files=(
+            VendorFile("common/client.py", "common/client.py"),
+            VendorFile("common/models.py", "common/models.py"),
+            VendorFile("common/pricing.py", "common/pricing.py"),
+        ),
+        make_help='task_budgets   stop a budget-exhausted agent before the next tool call (~$0.01)',
+        from_assets=True,
+        headline='# Stop a budget-blown agent before it burns the next tool call, with Claude task budgets',
+        index_blurb="Claude's task_budget gives an agent a server-side countdown for the whole loop, so it hands off cleanly before starting a tool call it cannot pay for.",
     ),
 }
 
@@ -1380,12 +1507,12 @@ def _demo_tape_source(plan: BriefPlan) -> str:
     a republish reproduces it, and the gif binary is rendered from this tape by `make gif` (vhs + ffmpeg)."""
     slug = plan.slug
     _dims = {"citations": (1240, 820), "code_exec_state": (1200, 720)}
-    width, height = _dims.get(slug, (1200, 640))
+    width, height = _dims.get(slug, (1200, 720) if plan.from_assets else (1200, 640))
     _headlines = {
         "citations": "# Citations: a verifiable source pointer for every answer, resolved in your own code",
         "code_exec_state": "# code execution state: your agent's sandbox keeps its files between requests",
     }
-    headline = _headlines.get(
+    headline = plan.headline or _headlines.get(
         slug, "# programmatic tool calling: about 28% fewer billed input tokens on a fan-out task")
     return (
         f"# VHS tape for the {slug} brief gif (https://github.com/charmbracelet/vhs).\n"
@@ -1434,6 +1561,8 @@ def _sample_source(plan: BriefPlan, receipt: dict | None) -> str:
     """The committed receipt snapshot that the demo gif replays (cat by demo.tape). Wins-only, honest,
     deterministic. The token_accounting brief shows the billed-input table token-only (no answer-correctness
     claim, since plain tool use can miss on 240 rows); grounding_resolution shows the per-pointer table."""
+    if plan.from_assets:
+        return _read_asset(plan, "sample.txt")
     if plan.slug == "code_exec_state":
         return _codeexec_sample_source()
     if plan.slug == "citations":
@@ -1635,7 +1764,7 @@ def _ensure_makefile_entry(makefile: pathlib.Path, plan: BriefPlan) -> bool:
     """Idempotently add the brief's make target to the briefs-root Makefile. Returns True if it appended,
     False if the entry was already present. Never duplicates: it keys on the target name."""
     text = makefile.read_text() if makefile.exists() else ""
-    run_module = {"citations": "cite", "code_exec_state": "run"}.get(plan.slug, "run_tokens")
+    run_module = "run" if plan.from_assets else {"citations": "cite", "code_exec_state": "run"}.get(plan.slug, "run_tokens")
     recipe = f"\t$(PY) -m {plan.slug}.{run_module}"
     # Refresh an existing target's recipe (its run module may have been renamed on republish), so a
     # republished brief never leaves make pointed at a deleted module.
@@ -1680,7 +1809,9 @@ def _ensure_readme_entry(readme: pathlib.Path, plan: BriefPlan) -> bool:
         if refreshed != text:
             readme.write_text(refreshed)
         return refreshed != text
-    if plan.slug == "code_exec_state":
+    if plan.from_assets and plan.index_blurb:
+        blurb = plan.index_blurb
+    elif plan.slug == "code_exec_state":
         blurb = ("Keep a multi-step agent's sandbox state between turns by reusing the code-execution "
                  "container, so a file written in one request is there in the next.")
     elif plan.slug == "citations":
@@ -1706,6 +1837,29 @@ def _ensure_readme_entry(readme: pathlib.Path, plan: BriefPlan) -> bool:
         text = text.rstrip("\n") + "\n\n## Briefs\n\n" + entry
     readme.write_text(text)
     return True
+
+
+# --------------------------------------------------------------------------- data-driven asset briefs
+
+ASSETS_ROOT = ROOT / "engine" / "brief_assets"
+
+
+def _assets_dir(plan: BriefPlan) -> pathlib.Path:
+    """Where a from_assets brief's committed content (README.md, run.py, sample.txt, email.md) lives."""
+    return ASSETS_ROOT / plan.slug
+
+
+def _sub(text: str, plan: BriefPlan) -> str:
+    """Substitute the brief placeholders into an asset file. Single-source for the slug, title, and doc
+    URL so a brief's content cannot drift from its plan."""
+    return (text.replace("{slug}", plan.slug)
+                .replace("{title}", plan.title)
+                .replace("{doc_url}", plan.doc_url))
+
+
+def _read_asset(plan: BriefPlan, name: str) -> str:
+    """Read one committed asset file for a from_assets brief, with placeholders substituted."""
+    return _sub((_assets_dir(plan) / name).read_text(), plan)
 
 
 # --------------------------------------------------------------------------- the generator
@@ -1738,7 +1892,13 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
     _vendor_files(plan, brief_dir)
     (brief_dir / "__init__.py").write_text("")
 
-    if plan.slug == "ptc":
+    if plan.from_assets:
+        # Data-driven brief: the run entry and README are committed under engine/brief_assets/<slug>/.
+        run_src = _read_asset(plan, "run.py")
+        _assert_no_dangling(run_src, "run.py")  # the shipped run entry must import only from its closure
+        (brief_dir / "run.py").write_text(run_src)
+        (brief_dir / "README.md").write_text(_read_asset(plan, "README.md"))
+    elif plan.slug == "ptc":
         # The token_accounting brief: the region_sales fixture as the edit surface (my_tool.py),
         # run_tokens.py as the run.
         (brief_dir / plan.edit_surface).write_text(_my_tool_source())
@@ -1822,7 +1982,9 @@ def publish(edge_key: str, briefs_root: pathlib.Path, command: str) -> int:
     emails_dir = ROOT / "emails"
     emails_dir.mkdir(exist_ok=True)
     email_path = emails_dir / f"{plan.slug}_FOUNDER_EMAIL.md"
-    if plan.slug == "code_exec_state":
+    if plan.from_assets:
+        email_src = _read_asset(plan, "email.md")
+    elif plan.slug == "code_exec_state":
         email_src = _codeexec_founder_email_source(plan)
     elif plan.slug == "citations":
         email_src = _citations_founder_email_source(plan)
