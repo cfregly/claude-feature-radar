@@ -1,6 +1,6 @@
 """Per-demo feature telemetry: make the Claude platform surfaces a run leans on visible at runtime.
 
-Ported from claude-overnight overnight/platform.py and widened to the surfaces this engine's
+Widened to the surfaces this engine's
 demonstrators exercise. Each feature prints a one-line marker to stderr the first time it fires, so a
 run teaches what it leans on instead of using it silently. A demonstrator's receipt() reads
 exercised() (or exercised_keys()) so its "what this teaches about the platform" line is grounded in
@@ -14,8 +14,7 @@ from __future__ import annotations
 import sys
 
 # The platform surfaces this engine exercises, in the rough order they tend to fire. The first block
-# is the cross-cutting set from claude-overnight; the second names the surfaces specific demonstrators
-# in this engine prove.
+# is the cross-cutting set; the second names the surfaces specific demonstrators in this engine prove.
 FEATURES = {
     "tools": "forced tool use (structured output, no parsing)",
     "cache": "prompt caching (shared prefix cached across cases)",

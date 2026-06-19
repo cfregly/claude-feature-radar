@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps app app-check ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges cadence coverage managed parity-gated scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports test ci deslop gif clean
+.PHONY: setup compare-deps app app-check ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges cadence coverage managed parity-gated scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports check-surface test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -115,13 +115,16 @@ check-docs: ## docs-vs-code gate: no make/run.py/model-id/beta-header drift in t
 core-imports: ## one-dependency gate: the core imports with anthropic alone, the optional SDKs blocked (offline, $0)
 	$(PY) scripts/check_core_imports.py
 
+check-surface: ## surface gate: no internal/private-repo leakage in source, no Claude negative on a founder email (offline, $0)
+	$(PY) scripts/check_surface.py
+
 test: ## the offline test suite (the gate boundary, the dispatch seam, the shared infra; no key, no network)
 	$(PY) -m pytest -q
 
 deslop: check-claims ## prose gate (em-dashes, en-dashes, semicolons) plus the citations cost-claim gate
 	$(PY) scripts/deslop_check.py
 
-ci: deslop check-docs core-imports test ## the full offline gate chain, the same one CI runs ($0)
+ci: deslop check-docs core-imports check-surface test ## the full offline gate chain, the same one CI runs ($0)
 	@echo "ci: all offline gates passed."
 
 gif: ## regenerate docs/demo.gif from demo.tape (needs vhs, ffmpeg, ttyd)

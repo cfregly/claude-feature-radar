@@ -1,7 +1,6 @@
 """providers: the cross-vendor callers every demonstrator's competitor arm runs through.
 
-Ported from ship-on-claude common/openai_provider.py and common/gemini_provider.py, the
-provider-blind, access-probing layer a Demonstrator's competitor arm runs through. It is the
+The provider-blind, access-probing layer a Demonstrator's competitor arm runs through. It is the
 single-call demonstrator path. The stateful multi-turn chain agents in engine/openai_arm.py and
 engine/gemini_arm.py stay the backend for the legacy long-horizon comparison (compare, sweep,
 longhorizon_compare), so the committed receipts do not move. Each provider here exposes three

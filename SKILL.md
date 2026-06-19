@@ -136,7 +136,7 @@ These are why the output is trusted. Break one and the trust is gone.
     open with a concrete line, not vague filler. Use a startup-native example for a startup audience
     (plan limits, usage, churn, signups, logs, MRR), not a generic enterprise one, and carry that single
     example through the problem, the code, the table, and the tool name.
-    Every word fights for its place, so cut anything that does not earn its spot, the same standard the deck's pitch linter enforces.
+    Every word fights for its place, so cut anything that does not earn its spot, the same every-word-earns-its-place standard.
 
 ## The steps
 

@@ -3,9 +3,9 @@ no network, and they assert the one thing the gated-outbound posture rests on: a
 returns an empty list only when the unattended work was all measurement and drafting, and
 flags any outward or non-always action that slipped into the loop.
 
-The pattern is borrowed from claude-overnight/tests/test_gate.py, re-keyed to this engine's
-action set (sweep, diff, rank, draft, write, update coverage as ALWAYS, the benchmark and
-edge scaffold as ASK, send and post and push and overspend as NEVER)."""
+The pattern is keyed to this engine's action set (sweep, diff, rank, draft, write, update
+coverage as ALWAYS, the benchmark and edge scaffold as ASK, send and post and push and
+overspend as NEVER)."""
 from engine import gate
 
 

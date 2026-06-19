@@ -1,10 +1,7 @@
 """eval_quality: on a labeled eval split (or your own JSONL), which (model, effort) cell wins on the
 believable HELD-OUT test number, and is the string grade too trusting?
 
-Ported from ship-on-claude edges/cost-and-effort (eval.py grid + grader.py sandbox + local_tasks.py
-BYO-JSONL + livecodebench.py runtime-fetch loader) and claude-overnight overnight/evalrunner.py (the
-cross-model judge panel and the dev/test held-out split), refactored behind the engine's Demonstrator
-interface. The claim, grounded on a hard coding slice: on one-shot coding the frontier ties, so the
+The claim, grounded on a hard coding slice: on one-shot coding the frontier ties, so the
 deciding factor is which (model, effort) cell clears the bar for the least money, measured on a
 held-out split so the win is not an overfit, and cross-checked by a judge panel so the execution grade
 is not silently too trusting.
@@ -18,8 +15,8 @@ identically on every arm, so a cell's pass rate is a measured K/N, never a rubri
 THE DEV/TEST OVERFIT GUARD. The slice carries a dev split and a held-out test split. Every cell is
 scored on both, and the receipt's headline number is the HELD-OUT test pass rate, because a dev-only
 number can be an artifact of tuning the prompt against the cases you measured. A cell that wins on dev
-but not on test is reported as exactly that (the overfit signal), the same held-out discipline as the
-claude-overnight model-tier-migration receipt.
+but not on test is reported as exactly that (the overfit signal), the same held-out discipline a
+model-tier-migration receipt needs.
 
 THE JUDGE PANEL CROSS-CHECK. An optional cross-model judge panel re-grades each execution-passed
 program: a panel of judges votes (each at a different temperature so they can disagree), the writer is
@@ -174,7 +171,7 @@ def _load_byo(path: str) -> list:
     """A bring-your-own benchmark from a JSONL file. Each line is one task:
         {"name":..., "prompt":..., "tests":[[stdin, expected], ...], "difficulty":..., "split":...}
     split defaults to "test" (a stranger's own cases are the held-out set by construction), difficulty
-    to "medium". Ported from ship-on-claude local_tasks.load_tasks, with the split field added."""
+    to "medium"."""
     out = []
     with open(path) as f:
         for i, raw in enumerate(f, 1):
@@ -202,8 +199,8 @@ def _load_byo(path: str) -> list:
 def _load_lcb(limit: int | None) -> list:
     """A pinned LiveCodeBench slice, pulled from HuggingFace at run time. datasets/huggingface_hub are
     OPTIONAL comparison deps, imported lazily here so the one-dependency core never loads them; the
-    repo never vendors the contest text, only the ids and this loader (ported from ship-on-claude
-    livecodebench.py). Every LCB problem is treated as a held-out test-split case."""
+    repo never vendors the contest text, only the ids and this loader. Every LCB problem is treated as
+    a held-out test-split case."""
     import base64
     import pickle
     import zlib
@@ -255,7 +252,7 @@ def load_problems(limit: int | None = None) -> list:
 
 class Tally:
     """A passed-out-of-graded counter that tracks truncations separately (a response cut off at the
-    token budget is not a wrong answer). Ported from ship-on-claude eval.Tally."""
+    token budget is not a wrong answer)."""
 
     def __init__(self):
         self.correct = 0
@@ -514,8 +511,8 @@ def run_grid(models=None, *, limit=None, efforts=DEFAULT_EFFORTS, judge=False, p
 
 def recommend(run: GridRun) -> list:
     """A reader-facing finding derived ONLY from the measured numbers: the cheapest cell that reaches
-    the top HELD-OUT pass rate, the overfit gap where dev beats test, and the judge-disagreement note.
-    Ported from ship-on-claude eval.recommend, retargeted onto the held-out split."""
+    the top HELD-OUT pass rate, the overfit gap where dev beats test, and the judge-disagreement
+    note, all reported against the held-out split."""
     ran = [c for c in run.cells if c.ran]
     if not ran:
         return ["No cells produced a result, so there is nothing to recommend."]

@@ -6,8 +6,9 @@ canonical demoKind:
 
   - registered      is a Demonstrator registered for the kind (the registry has a plugin for it).
   - bundle          is there a built edges/<key>/ bundle (README + sample + emails) for the kind.
-  - port_status     the framework's assetMapping status: exists (built in C), adapt (ported from A/B),
-                    or build (new in C). A label, so a reader sees where each kind's code came from.
+  - port_status     the coverage status: exists (built into the engine), adapt (adapted from a prior
+                    implementation), or build (new here). A label, so a reader sees where each kind's
+                    code came from.
   - spend           the lane the demonstrator runs in: $0 ALWAYS, or a credit-spending ASK.
 
 Stdlib only, no key, no network, no model call. It reads the demoKind taxonomy (engine/demokinds), the
@@ -24,10 +25,10 @@ from common.client import repo_root
 from engine.demokinds import DEMO_KINDS
 from engine.demonstrators.registry import REGISTRY, register_all
 
-# The framework assetMapping port status per demoKind: where each kind's demonstrator code came from.
-#   exists  built natively in claude-competitive-engine (the three Phase-2 demos, the discovery loop).
-#   adapt   ported from ship-on-claude (A) or claude-overnight (B) and refactored behind the interface.
-#   build   newly built in this engine (the pure-pricing cost model, the thin parity-gated candidates).
+# The coverage status per demoKind: where each kind's demonstrator code came from.
+#   exists  built into the engine (the token/grounding/long-horizon demos and the discovery loop).
+#   adapt   adapted from a prior implementation and refactored behind the interface.
+#   build   new here (the pure-pricing cost model, the thin parity-gated candidates).
 PORT_STATUS = {
     "token_accounting": "exists",
     "grounding_resolution": "exists",
@@ -103,7 +104,7 @@ def coverage() -> list[dict]:
 
 # discovery_loop is proven by the cadence and the gate themselves (engine/cadence.py + sweep_edges.py +
 # gate.py), not by a Demonstrator plugin behind the registry, so its "no registered demonstrator" state
-# is by design, not a gap. The framework's assetMapping marks it status "exists" for exactly this reason.
+# is by design, not a gap. The coverage status marks it "exists" for exactly this reason.
 _INTRINSIC_KINDS = {"discovery_loop"}
 
 

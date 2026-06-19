@@ -52,6 +52,5 @@ are described and gated, not run here, the same opt-in shape as the live Managed
 retention edge. The surfaces are fast-moving, so re-ground each one against its live doc before any
 parity check is recorded.
 
-See [`PRODUCT_EMAIL.md`](PRODUCT_EMAIL.md) for the internal read (these are never-evaluated, here is the
-parity check each one needs) and [`FOUNDER_EMAIL.md`](FOUNDER_EMAIL.md) for why there is no founder
-pitch yet, and what would have to be true for one.
+See [`PRODUCT_EMAIL.md`](PRODUCT_EMAIL.md) for the internal read: these are never-evaluated, here is
+the parity check each one needs, and what would have to be true before any founder pitch.

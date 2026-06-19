@@ -20,8 +20,8 @@ never clobbered by the table.
 
 from __future__ import annotations
 
-# The canonical demoKind list. Each names a way to prove an edge. The taxonomy is the one the
-# framework design fixed, kept here as the single source of truth the registry and tests read.
+# The canonical demoKind list. Each names a way to prove an edge. This is the taxonomy this engine
+# uses, kept here as the single source of truth the registry and tests read.
 #   token_accounting    a Claude mechanism bills fewer input/context tokens for the same answer.
 #   grounding_resolution a guaranteed-valid, output-token-free source pointer into the user's doc.
 #   long_horizon_survival a long, tool-heavy load FINISHES and stays correct where the other errors.
@@ -42,7 +42,7 @@ DEMO_KINDS = [
 ]
 
 # The seed table: a source key (the short doc slug the sweep keys on, or a built-edge folder name)
-# maps to the demoKind that proves it. The framework's edgeModelChanges fixed these assignments.
+# maps to the demoKind that proves it. This is the taxonomy this engine uses for these assignments.
 # Both the slug form (ptc, context_editing) and the built-edge folder form (programmatic-tool-calling,
 # long-horizon-autonomy) are listed so the live sweep key and the seed key both resolve.
 KEY_TO_DEMOKIND = {

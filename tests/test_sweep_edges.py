@@ -4,7 +4,7 @@ urllib so a blocked or failed request is exercised without a real socket.
 
 The thing these tests protect is the honesty posture, the product of this engine: a blocked or failed
 fetch is recorded as status "unknown", NEVER as competitor-absence, so the engine can never
-manufacture a false Claude lead. They mirror the offline, no-network shape of claude-overnight/tests.
+manufacture a false Claude lead. They run fully offline, with no network.
 """
 import json
 

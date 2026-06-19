@@ -59,7 +59,7 @@ def test_manifest_summarizes_by_port_status_and_lists_gaps():
 
 
 def test_no_gaps_when_every_plugin_kind_is_covered():
-    # The Phase-5 engine has a demonstrator for every plugin demoKind and a bundle for every built one,
+    # The engine has a demonstrator for every plugin demoKind and a bundle for every built one,
     # so the engine should report no gaps about itself.
     register_all()
     assert cov.gaps() == []

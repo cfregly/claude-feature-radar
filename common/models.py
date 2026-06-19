@@ -160,8 +160,8 @@ def request_kwargs(key_or_id: str, effort: str | None = None, adaptive_thinking:
     """Build valid messages.create() kwargs for a Claude model, dropping knobs the model rejects.
 
     The function that keeps a request from 400ing: it omits effort on models without it (Haiku), and
-    only sends adaptive thinking where it is supported. Merged from ship-on-claude common/models.py so
-    every demonstrator's Claude arm builds its request the same way.
+    only sends adaptive thinking where it is supported, so every demonstrator's Claude arm builds its
+    request the same way.
     """
     m = get(key_or_id)
     kw: dict = {"model": m.id}

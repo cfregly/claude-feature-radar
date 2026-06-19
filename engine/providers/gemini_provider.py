@@ -1,6 +1,6 @@
 """The Gemini provider: a client, one call helper, and an access probe.
 
-Ported from ship-on-claude common/gemini_provider.py. It lets the cross-vendor runner run a Gemini
+It lets the cross-vendor runner run a Gemini
 model through the same call-and-receipt path the Claude side uses, returning text, token counts,
 latency, and a truncation flag. Nothing in here is faked: a model the key cannot reach is reported
 unavailable, the same way the Claude side reports an access-gated tier instead of pretending the call

@@ -1,6 +1,6 @@
 """The provider-blind call helper every demonstrator shares.
 
-Ported from ship-on-claude common/runner.py. call() makes a request, times it, pulls the token
+call() makes a request, times it, pulls the token
 usage, and computes the exact cost, so a demonstrator gets back one Result with everything it needs
 to print a receipt, no matter which vendor ran it. It dispatches on the model's provider (set in
 common/models.py): Claude through the Anthropic SDK, OpenAI and Gemini through the engine.providers

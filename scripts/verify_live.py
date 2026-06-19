@@ -1,8 +1,8 @@
 """Re-prove the load-bearing facts this engine depends on, against live API calls.
 
-Ported from ship-on-claude scripts/verify.py and widened with the cross-vendor access probe, so this
-is the live-claim re-prover half of the doc gate (the offline docs-vs-code half is
-scripts/check_docs.py). It makes real, tiny requests and prints PASS or FAIL for each claim, so you
+The live-claim re-prover half of the doc gate, with the cross-vendor access probe (the offline
+docs-vs-code half is scripts/check_docs.py). It makes real, tiny requests and prints PASS or FAIL
+for each claim, so you
 never have to take docs/VERIFIED_FACTS.md on faith.
 
 This SPENDS a few cents and needs ANTHROPIC_API_KEY (the OpenAI and Gemini probes run only when their

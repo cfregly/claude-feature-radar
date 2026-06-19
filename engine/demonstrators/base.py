@@ -55,7 +55,7 @@ LEAD_BASES = (
 
 @dataclass
 class Arm:
-    """One provider's run, provider-blind. The shape mirrors ship-on-claude common/runner.py Result so
+    """One provider's run, provider-blind. The shape mirrors the cross-vendor runner Result so
     a grader, a grid, or a table never branches on the vendor.
 
     ``ctx`` is the per-turn carried context summed with the correct buckets per vendor (CLAUDE.md): on

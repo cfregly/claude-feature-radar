@@ -91,5 +91,5 @@ tests in a sandboxed subprocess (no Docker, the same posture as the official Liv
 run it on a machine you do not mind exposing to arbitrary generated code.
 
 See [`PRODUCT_EMAIL.md`](PRODUCT_EMAIL.md) for the honest other direction (the parity read that ships
-for this run) and [`FOUNDER_EMAIL.md`](FOUNDER_EMAIL.md) for the cost-axis framing the methodology
-supports: how to find out which tier you are overpaying for on your own cases.
+for this run) and the cost-axis methodology: how to find out which tier you are overpaying for on
+your own cases.

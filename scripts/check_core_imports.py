@@ -1,7 +1,7 @@
 """One-dependency gate: the engine's core imports with anthropic alone.
 
-The Phase 3 infra port brought in a cross-vendor runner and OpenAI and Gemini provider callers. The
-promise is that they stay OPTIONAL: a new third-party dep (openai, google-genai) lives in
+The cross-vendor runner and the OpenAI and Gemini provider callers add imports that must stay
+OPTIONAL: a new third-party dep (openai, google-genai) lives in
 requirements-compare.txt, and the imported demonstrator code pulls those SDKs lazily, so the core
 still runs with just anthropic installed. This gate proves it: it blocks openai and google-genai at
 the import system, then imports every core module and registers the built demonstrators. A stray

@@ -78,6 +78,5 @@ choice. A founder's real numbers (prefix size, reuse density, hold time, context
 so the bundle states the assumptions and lets you re-run on your own shape. Prices move, so re-fetch the
 four sources before quoting.
 
-See [`PRODUCT_EMAIL.md`](PRODUCT_EMAIL.md) for the internal read (where Claude loses and why) and
-[`FOUNDER_EMAIL.md`](FOUNDER_EMAIL.md) for the founder framing: know which side of the crossover your
-workload sits on before you pick a vendor on price.
+See [`PRODUCT_EMAIL.md`](PRODUCT_EMAIL.md) for the internal read: which side of the crossover a
+workload sits on, and where the price advantage flips.

@@ -1,7 +1,6 @@
 """The gate: what the engine may do on its own, what waits for you, and what it
-refuses by design. Ported from claude-overnight/overnight/gate.py and re-keyed to
-this engine. The boundary is fixed in code, not discovered at runtime, and audit()
-proves nothing crossed it.
+refuses by design, re-keyed to this engine's ALWAYS/ASK/NEVER lanes. The boundary
+is fixed in code, not discovered at runtime, and audit() proves nothing crossed it.
 
 The recurring loop is a doc sweep, a diff against the last run, a value-times-lead
 rank, a fresh draft into an inert outbox, and the written brief, changelog, and

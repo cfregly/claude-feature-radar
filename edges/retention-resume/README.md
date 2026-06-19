@@ -45,7 +45,7 @@ Zero Data Retention or a HIPAA Business Associate Agreement.
 
 ## The live kill-and-resume (opt-in, never on a schedule)
 
-The continuity engine ported from the overnight optimizer can prove the bundle survives a real kill,
+The continuity engine can prove the bundle survives a real kill,
 but it is an opt-in you trigger, never the default and never on a schedule. `make retention-live`
 starts a live Managed Agents session that writes a small ledger to the sandbox, kills the client,
 re-attaches off the server-side event log, replays the prior events, checks the ledger files are still
@@ -71,6 +71,5 @@ SDK (it sets the `managed-agents-2026-04-01` beta header automatically), and it 
 amount of Managed Agents sandbox time, a few minutes, well under the per-edge cap. The surface is beta
 and moves monthly, so re-ground the header before quoting it.
 
-See [`PRODUCT_EMAIL.md`](PRODUCT_EMAIL.md) for the internal parity read (the verdict this run ships) and
-[`FOUNDER_EMAIL.md`](FOUNDER_EMAIL.md) for the founder framing: stop building the resume plumbing, and
-know exactly what the retention terms are before you commit.
+See [`PRODUCT_EMAIL.md`](PRODUCT_EMAIL.md) for the internal parity read (the verdict this run ships):
+the doc-grounded retention terms and the managed-harness bundle win, labeled beta.

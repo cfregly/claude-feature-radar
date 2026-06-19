@@ -43,4 +43,4 @@ make longhorizon       # this edge, 3 runs for reliability, about two dollars on
 # or one off+on pair ($0.65): python edges/context-editing/demo.py
 ```
 
-See [`FOUNDER_EMAIL.md`](FOUNDER_EMAIL.md) and [`PRODUCT_EMAIL.md`](PRODUCT_EMAIL.md).
+See [`PRODUCT_EMAIL.md`](PRODUCT_EMAIL.md) for the internal read.

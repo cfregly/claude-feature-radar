@@ -4,8 +4,7 @@ The cadence has two tiers. Tier-1 is the weekly cheap sweep (engine/cadence.py):
 fetch, diff, rank, dispatch, and draft-to-outbox, all unattended. Tier-2 is an optional monthly deep
 run on Claude Managed Agents: the hosted, stateful, resumable sandbox runs the agent loop for you, so
 a long deep-dive survives a kill and re-attaches off the server-side event log instead of starting
-cold. This module is that Tier-2 runtime, PORTED from claude-overnight overnight/managed.py and re-keyed
-to this engine.
+cold. This module is that Tier-2 runtime.
 
 WIRED, NOT RUN. Nothing here runs on a schedule, and nothing here runs in the default cadence. The
 cadence imports the boundary fact (TIER2_GATE = ASK) and the state path, never these live functions.
@@ -98,8 +97,8 @@ def _block_text(block) -> str:
 def _drain(stream, max_events: int, seen_ids: set | None = None) -> dict:
     """Consume a live event stream until the session goes idle or the cap is hit. Collect the agent
     text, the tool calls, the bash outputs, and the ids of the new events, so a resume can skip the
-    events that were replayed off the server-side log. Ported from claude-overnight, with the
-    bash-output capture so a resume can prove the sandbox files are still present."""
+    events that were replayed off the server-side log, with the bash-output capture so a resume can
+    prove the sandbox files are still present."""
     transcript: list[str] = []
     tools_used: list[str] = []
     tool_output: list[str] = []
@@ -139,7 +138,7 @@ def _persisted_session_id() -> str:
 def start_session(max_events: int = 400) -> dict:
     """Create a real agent, environment, and session, run the deep-dive ledger task in the hosted
     sandbox, persist the ids under state/, and return the receipt. LIVE, spends Managed Agents time, so
-    it is the operator's ASK, never an unattended motion. Ported from claude-overnight."""
+    it is the operator's ASK, never an unattended motion."""
     client = _client()
 
     env = client.beta.environments.create(
@@ -175,8 +174,8 @@ def resume_session(session_id: str | None = None, max_events: int = 400) -> dict
     """Re-attach to a session by id with the documented reconnect pattern: retrieve the status, list
     the prior events to replay them off the server-side log, then open the stream, send the follow-up,
     and continue. A wrong or expired session id is the negative control: retrieve or list raises and we
-    report recovered False, so the clean resume is attributable to server-side persistence. Ported from
-    claude-overnight, with the sandbox-files-present check off the resume bash output."""
+    report recovered False, so the clean resume is attributable to server-side persistence, with the
+    sandbox-files-present check off the resume bash output."""
     client = _client()
     if session_id is None:
         session_id = _persisted_session_id()
@@ -216,7 +215,7 @@ def resume_session(session_id: str | None = None, max_events: int = 400) -> dict
 def prove(max_events: int = 400) -> dict:
     """The full Tier-2 continuity receipt: start a session, re-attach, and run the wrong-session-id
     negative control (which must recover nothing, so the clean resume is attributable to server-side
-    persistence). LIVE, spends Managed Agents time, the operator's ASK. Ported from claude-overnight."""
+    persistence). LIVE, spends Managed Agents time, the operator's ASK."""
     started = start_session(max_events)
     sid = started["session_id"]
     resumed = resume_session(sid, max_events)

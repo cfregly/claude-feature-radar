@@ -1,4 +1,4 @@
-"""Offline tests for the Phase 3 shared infrastructure ported from the A and B harnesses.
+"""Offline tests for the shared cross-vendor infrastructure (runner, providers, sandbox, platform).
 
 No key, no network, no real model call. Every provider call is driven through a fake client, the
 no-key paths are exercised by clearing the env and pointing the loader at an empty .env, and the

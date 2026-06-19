@@ -1,9 +1,8 @@
 """Doc-correctness gate: the README, CLAUDE.md, SKILL.md, and the edge READMEs must not drift from the
 code. Exits nonzero on any mismatch. Stdlib only, runs offline with no key.
 
-Adapted from claude-overnight scripts/check_docs.py to this engine. The rule it enforces is B's: a doc
-must not advertise a command, a model, or a runnable receipt the code does not actually produce. It
-checks four kinds of drift:
+The rule it enforces: a doc must not advertise a command, a model, or a runnable receipt the code
+does not actually produce. It checks four kinds of drift:
 
   1. Every `make <target>` named in a doc is a real Makefile target.
   2. Every `run.py <cmd>` named in a doc is a real run.py subcommand.
@@ -12,8 +11,8 @@ checks four kinds of drift:
      doc cannot promise a programmatic-tool-calling or code-execution receipt the code does not run.
 
 This is the offline docs-vs-code half. The live-claim re-prover that re-checks a price or a 400
-against a real API call is scripts/verify_live.py (a paid pre-flight, not a CI step), the way A's
-make verify re-proves its load-bearing facts.
+against a real API call is scripts/verify_live.py (a paid pre-flight, not a CI step), so the
+load-bearing facts get re-proven against a real call.
 """
 
 from __future__ import annotations

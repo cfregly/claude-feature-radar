@@ -1,6 +1,6 @@
 """The OpenAI provider: a client, one call helper, and an access probe.
 
-Ported from ship-on-claude common/openai_provider.py. It gives the cross-vendor runner an OpenAI
+It gives the cross-vendor runner an OpenAI
 client and one call that returns the same shape of receipt the Claude side does: the text, the token
 counts the API actually returned, the wall-clock latency, and whether the response was cut off at the
 token cap. available_models() probes each candidate with a tiny real call and reports which ones the

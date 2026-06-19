@@ -2,11 +2,10 @@
 retention compare across vendors? The honest read is doc-grounded PARITY on the capability, with a real
 but narrower win on the managed-harness bundle and the time axis.
 
-Ported from claude-overnight overnight/managed.py (start/resume/steer/prove/_drain plus the
-negative control) and refactored behind the engine's Demonstrator interface. The continuity engine is
-the same: start a live Claude Managed Agents session, kill the client, re-attach off the server-side
-event log, replay the prior events, tail only the new ones, and report what survived (events replayed,
-sandbox files present, resume gap), with a wrong-session-id negative control and a mid-run steer.
+The continuity engine: start a live Claude Managed Agents session, kill the client, re-attach off the
+server-side event log, replay the prior events, tail only the new ones, and report what survived
+(events replayed, sandbox files present, resume gap), with a wrong-session-id negative control and a
+mid-run steer.
 
 WHY THE DEFAULT IS A DOC-GROUNDED PARITY RECEIPT, NOT A CLAUDE-ONLY CLAIM. The grounded landscape check
 (live vendor docs, fetched 2026-06-18) corrects this edge: durable kill-and-resume is table stakes
@@ -138,7 +137,7 @@ def grounded_receipt() -> dict:
 
 # --------------------------------------------------------------------------- the live continuity engine
 #
-# Ported from claude-overnight overnight/managed.py. OPT-IN ONLY: nothing here runs in the default path,
+# OPT-IN ONLY: nothing here runs in the default path,
 # on a schedule, or inside the Demonstrator interface methods below. The operator triggers it with
 # `make retention-live`. It spends a small amount of Managed Agents time and is the live counterpart to
 # the doc-grounded receipt. The SDK is imported lazily inside _client so the one-dependency core never
@@ -188,8 +187,8 @@ def _block_text(block) -> str:
 def _drain(stream, max_events: int, seen_ids: set | None = None) -> dict:
     """Consume a live event stream until the session goes idle or the cap is hit. Collect the agent
     text, the tool calls, the bash outputs, and the ids of the new events, so a resume can skip the
-    events that were replayed off the server-side log. Ported verbatim from claude-overnight, with the
-    bash-output capture added so the resume can prove the sandbox files are still present."""
+    events that were replayed off the server-side log, with the bash-output capture so the resume can
+    prove the sandbox files are still present."""
     transcript: list[str] = []
     tools_used: list[str] = []
     tool_output: list[str] = []
@@ -234,7 +233,7 @@ def _persisted_session_id() -> str:
 
 def start_session(max_events: int = 400) -> dict:
     """Create a real agent, environment, and session, run the ledger task in the hosted sandbox, persist
-    the ids, and return the receipt. OPT-IN, spends Managed Agents time. Ported from claude-overnight."""
+    the ids, and return the receipt. OPT-IN, spends Managed Agents time."""
     client = _client()
     platform.used("managed_agents", f"live session, beta {BETA_HEADER}")
 
@@ -271,8 +270,8 @@ def resume_session(session_id: str | None = None, max_events: int = 400) -> dict
     """Re-attach to a session by id with the documented reconnect pattern: retrieve the status, list the
     prior events to replay them off the server-side log, then open the stream, send the follow-up, and
     continue. A wrong or expired session id is the negative control: retrieve or list raises and we
-    report recovered False, so the clean resume is attributable to server-side persistence. Ported from
-    claude-overnight, with the sandbox-files-present check added off the resume bash output."""
+    report recovered False, so the clean resume is attributable to server-side persistence, with the
+    sandbox-files-present check added off the resume bash output."""
     client = _client()
     if session_id is None:
         session_id = _persisted_session_id()
@@ -314,8 +313,7 @@ def resume_session(session_id: str | None = None, max_events: int = 400) -> dict
 def steer_session(session_id: str | None, text: str, max_events: int = 200) -> dict:
     """Steer a live session: send an interrupt to pause the agent, then a new message that redirects it.
     The interrupt goes before the message so the redirect lands on a paused agent. Returns the tool
-    calls that follow, so a with-steer run can be compared against an un-steered tail. Ported from
-    claude-overnight."""
+    calls that follow, so a with-steer run can be compared against an un-steered tail."""
     client = _client()
     if session_id is None:
         session_id = _persisted_session_id()
@@ -340,7 +338,7 @@ def prove(max_events: int = 400) -> dict:
     """The full live continuity receipt: start a session, re-attach without steering, run the negative
     control (a wrong session id that must recover nothing), then steer and report how the next tool
     calls diverge from the un-steered tail. OPT-IN, spends Managed Agents time. Every number is measured
-    from the live run, not asserted. Ported from claude-overnight."""
+    from the live run, not asserted."""
     started = start_session(max_events)
     sid = started["session_id"]
     resumed = resume_session(sid, max_events)
