@@ -110,6 +110,7 @@ SOURCES: list[Source] = [
     Source("openai", "bash_tool", "https://developers.openai.com/api/docs/guides/tools-shell", "doc"),
     Source("openai", "files", "https://developers.openai.com/api/docs/guides/file-inputs", "doc"),
     Source("openai", "pricing", "https://developers.openai.com/api/docs/pricing", "pricing"),
+    Source("openai", "gpt_5_5_model", "https://developers.openai.com/api/docs/models/gpt-5.5", "doc"),
     # Gemini: the file-search feature, the changelog, and pricing the briefs cite.
     Source("gemini", "file_search", "https://ai.google.dev/gemini-api/docs/file-search", "doc"),
     Source("gemini", "caching", "https://ai.google.dev/gemini-api/docs/caching", "doc"),

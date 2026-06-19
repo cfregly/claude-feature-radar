@@ -197,9 +197,9 @@ def test_receipt_is_claude_ahead_with_both_crossovers_and_dated_grounding():
     assert receipt.verdict == "claude-ahead"
     assert receipt.demo_kind == "cost"
     assert receipt.cost_usd == 0.0                          # pure pricing model, no spend
-    # five dated grounding rows, every one carrying a source url and the fetch date.
-    assert len(receipt.grounding) == 5
-    assert all(g.get("date") == "2026-06-18" for g in receipt.grounding)
+    # every grounding row carries a source url and a fetch date (the OpenAI >272k row is dated later).
+    assert len(receipt.grounding) == 6
+    assert all(g.get("date", "").startswith("2026-") for g in receipt.grounding)
     assert all(g.get("source_url", "").startswith("http") for g in receipt.grounding)
     # both crossovers are carried into the receipt metric.
     assert receipt.metric["cache_ttl_crossover"]
@@ -224,9 +224,9 @@ def test_receipt_downgrades_when_the_gate_does_not_pass():
 # ----- the dated price facts -----
 
 def test_price_facts_are_all_dated_and_sourced():
-    assert len(cm.PRICE_FACTS) == 5
+    assert len(cm.PRICE_FACTS) == 6
     for fact in cm.PRICE_FACTS:
-        assert fact["date"] == "2026-06-18"
+        assert fact["date"].startswith("2026-")
         assert fact["source_url"].startswith("http")
         assert fact["claim"]
 

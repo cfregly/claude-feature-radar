@@ -92,6 +92,7 @@ CLAUDE_PRICING_SOURCE = "https://platform.claude.com/docs/en/about-claude/pricin
 GEMINI_PRICING_SOURCE = "https://ai.google.dev/gemini-api/docs/pricing"
 GEMINI_CACHING_SOURCE = "https://ai.google.dev/gemini-api/docs/caching"
 OPENAI_CACHING_SOURCE = "https://developers.openai.com/api/docs/guides/prompt-caching"
+OPENAI_GPT55_SOURCE = "https://developers.openai.com/api/docs/models/gpt-5.5"
 FETCHED = "2026-06-18"
 
 # The dated facts, each a row a reader can re-check. Multipliers are relative to base input price.
@@ -113,6 +114,10 @@ PRICE_FACTS = [
               "stay active for about 5 to 10 minutes of inactivity up to a maximum of one hour (extended "
               "retention up to 24 hours on newer models), with no separate storage fee",
      "source_url": OPENAI_CACHING_SOURCE, "date": FETCHED},
+    {"claim": "OpenAI applies a long-context surcharge above 272k input tokens: prompts over 272k are "
+              "priced at 2x input and 1.5x output for the full session, which doubles the cached-input "
+              "(cache read) line too (gpt-5.5 cached input $0.50/MTok at or below 272k, $1.00 above)",
+     "source_url": OPENAI_GPT55_SOURCE, "date": "2026-06-19"},
 ]
 
 # Competitor figures not in common/models.py. Each is the genuine, dated price for the strongest relevant
@@ -128,6 +133,13 @@ GEMINI_PRO_SURCHARGE_THRESHOLD = 200_000
 # (common/models.py gpt-mid row, gpt-5.4), used for the high-QPS lose-regime base-price comparison.
 OPENAI_BESTEFFORT_MAX_TTL_S = 3600        # up to a max of one hour, OPENAI_CACHING_SOURCE
 OPENAI_EXTENDED_MAX_TTL_S = 86_400        # up to 24h extended retention on newer models, OPENAI_CACHING_SOURCE
+# Long-context surcharge bands that ALSO double the cache-read (cached-input) line above a threshold.
+# The base cached-read rate per vendor comes from common/models.py (gpt-top, gem-pro); the threshold and
+# the documented 2x multiplier are the dated facts here. Claude has no such band (flat 1M).
+OPENAI_LC_THRESHOLD = 272_000             # gpt-5.5 >272k => 2x input incl. cached, OPENAI_GPT55_SOURCE
+OPENAI_LC_MULT = 2.0
+GEMINI_LC_THRESHOLD = 200_000             # gemini 3.1 pro >200k => 2x input incl. cached, GEMINI_PRICING_SOURCE
+GEMINI_LC_MULT = 2.0
 
 
 # --------------------------------------------------------------------------- the cache-TTL cost model
@@ -346,6 +358,80 @@ def long_context_regimes(model_key: str = "sonnet") -> dict:
     }
 
 
+# --------------------------------------------------------------------------- the cache-read carry line
+#
+# Edge 2, sharpened: the dominant cost of re-querying a large cached context across a working session is
+# the per-turn cache-READ of that prefix. The long-context surcharge bands key on TOTAL prompt size
+# INCLUDING cached tokens, so above the threshold the doubled rate lands on the cache-read line. Claude's
+# cache-read stays flat across the full 1M window; both competitors double it. This is the carry-cost
+# wedge the headline "no long-context premium" did not isolate, and it adds OpenAI's >272k band the
+# original Edge 2 omitted entirely.
+
+
+def _cache_read_line(rate_per_mtok: float, prefix_mtok: float, turns: int) -> float:
+    """The cache-read (context-carry) cost of re-reading a cached prefix once per turn."""
+    return rate_per_mtok * prefix_mtok * turns
+
+
+def long_context_cache_read_carry(model_key: str = "opus", turns: int = 40) -> dict:
+    """Edge 2 sharpening: the cache-read line of a multi-turn carry over a large cached prefix, BOTH
+    regimes. WIN regime: a ~300k cached prefix (above OpenAI's 272k and Gemini's 200k bands), where both
+    competitors' cache-read DOUBLES and Claude's stays flat, so Claude wins the carry line at the honest
+    tier (Opus vs gpt-5.5, Sonnet vs Gemini 3.1 Pro). LOSE regime: a ~150k cached prefix (below both
+    thresholds), where the competitor base cached-read rate is lower and Claude has no band edge. The
+    crossover is the surcharge threshold."""
+    m = get(model_key)
+    oa = get("gpt-top")     # gpt-5.5, cache_read base from common/models.py
+    gp = get("gem-pro")     # gemini 3.1 pro, cache_read base from common/models.py
+    big_mtok, small_mtok = 0.300, 0.150   # above / below both 272k and 200k thresholds
+
+    def vendor_rates(prefix_tok: int):
+        oa_mult = OPENAI_LC_MULT if prefix_tok > OPENAI_LC_THRESHOLD else 1.0
+        gp_mult = GEMINI_LC_MULT if prefix_tok > GEMINI_LC_THRESHOLD else 1.0
+        return (m.cache_read_per_mtok,                 # Claude: flat across the 1M window
+                oa.cache_read_per_mtok * oa_mult,      # OpenAI: doubled above 272k
+                gp.cache_read_per_mtok * gp_mult)      # Gemini: doubled above 200k
+
+    cr, oar, gpr = vendor_rates(300_000)
+    win = {
+        "shape": f"a {int(big_mtok*1000)}k cached prefix re-read across {turns} turns (above both bands)",
+        "claude_cache_read_usd": _cache_read_line(cr, big_mtok, turns),
+        "openai_cache_read_usd": _cache_read_line(oar, big_mtok, turns),
+        "gemini_cache_read_usd": _cache_read_line(gpr, big_mtok, turns),
+        "claude_read_rate_per_mtok": cr, "openai_read_rate_per_mtok": oar, "gemini_read_rate_per_mtok": gpr,
+    }
+    win["claude_wins_vs_openai"] = win["claude_cache_read_usd"] < win["openai_cache_read_usd"]
+    win["claude_wins_vs_gemini"] = win["claude_cache_read_usd"] < win["gemini_cache_read_usd"]
+
+    cr2, oar2, gpr2 = vendor_rates(150_000)
+    lose = {
+        "shape": f"the same carry at {int(small_mtok*1000)}k cached prefix (below both bands)",
+        "claude_cache_read_usd": _cache_read_line(cr2, small_mtok, turns),
+        "openai_cache_read_usd": _cache_read_line(oar2, small_mtok, turns),
+        "gemini_cache_read_usd": _cache_read_line(gpr2, small_mtok, turns),
+        "claude_read_rate_per_mtok": cr2, "openai_read_rate_per_mtok": oar2, "gemini_read_rate_per_mtok": gpr2,
+    }
+    # below the band Gemini's lower base cached rate ($0.20) undercuts Sonnet ($0.30)/Opus ($0.50)
+    lose["claude_loses_to_gemini"] = lose["claude_cache_read_usd"] > lose["gemini_cache_read_usd"]
+
+    return {
+        "edge": "flat cache-read across the 1M window (no long-context surcharge on the carry line)",
+        "model": m.id, "turns": turns,
+        "openai_threshold": OPENAI_LC_THRESHOLD, "gemini_threshold": GEMINI_LC_THRESHOLD,
+        "win_regime": win, "lose_regime": lose,
+        "claude_wins": win["claude_wins_vs_openai"] and win["claude_wins_vs_gemini"],
+        "claude_wins_vs_openai_only": win["claude_wins_vs_openai"],
+        "claude_loses": lose["claude_loses_to_gemini"],
+        "tier_note": ("the carry-line win is tier-dependent: Claude's flat cache-read beats OpenAI at "
+                      "every Claude tier, but only beats Gemini 3.1 Pro at the Sonnet tier or cheaper "
+                      "(Opus's higher base cache-read does not beat Gemini's lower base on this line)"),
+        "crossover": (f"above the surcharge thresholds (OpenAI {OPENAI_LC_THRESHOLD//1000}k, Gemini "
+                      f"{GEMINI_LC_THRESHOLD//1000}k) both competitors double the cache-read line while "
+                      f"Claude stays flat, so Claude wins the carry cost at the Sonnet tier; below the "
+                      f"thresholds the competitor base cached-read rate is lower, so Claude loses"),
+    }
+
+
 # --------------------------------------------------------------------------- the demonstrator interface
 
 
@@ -384,6 +470,7 @@ def cost_report(cache_model: str = "sonnet", lc_model: str = "sonnet") -> dict:
     return {
         "cache_ttl": cache_ttl_regimes(cache_model),
         "long_context": long_context_regimes(lc_model),
+        "long_context_carry": long_context_cache_read_carry("sonnet"),
         "price_facts": PRICE_FACTS,
     }
 
@@ -599,6 +686,20 @@ def main(argv=None) -> int:
     print("  above 200k. Claude loses at high QPS, beyond a 1h hold, and below the surcharge threshold.")
     _print_cache_ttl(report["cache_ttl"])
     _print_long_context(report["long_context"])
+
+    carry = report["long_context_carry"]
+    w, lo = carry["win_regime"], carry["lose_regime"]
+    print(f"\n  === Cache-read carry line ({carry['model']}, {carry['turns']} turns) ===")
+    print(f"    WIN  {w['shape']}:")
+    print(f"      Claude ${w['claude_cache_read_usd']:.2f}  vs  OpenAI ${w['openai_cache_read_usd']:.2f}  "
+          f"vs  Gemini ${w['gemini_cache_read_usd']:.2f}  (read rate/MTok: Claude flat "
+          f"${w['claude_read_rate_per_mtok']:.2f}, OpenAI ${w['openai_read_rate_per_mtok']:.2f}, "
+          f"Gemini ${w['gemini_read_rate_per_mtok']:.2f})")
+    print(f"    LOSE {lo['shape']}:")
+    print(f"      Claude ${lo['claude_cache_read_usd']:.2f}  vs  OpenAI ${lo['openai_cache_read_usd']:.2f}  "
+          f"vs  Gemini ${lo['gemini_cache_read_usd']:.2f}")
+    print(f"    crossover: {carry['crossover']}")
+    print(f"    note: {carry['tier_note']}")
 
     print("\n  === Both-regimes honesty gate ===")
     print(f"    Claude wins in a regime:        {checks['claude_wins_in_a_regime']}")
