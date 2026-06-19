@@ -67,12 +67,12 @@
       "edge_dir": "edges/citations"
     }
   ],
-  "anchor_edge": "ptc",
-  "outbox_draft": "state/outbox/2026-06-19-ptc.md",
+  "anchor_edge": "citations",
+  "outbox_draft": "state/outbox/2026-06-19-citations.md",
   "coverage": {
-    "demo_kinds_total": 13,
-    "registered": 12,
-    "with_bundle": 11,
+    "demo_kinds_total": 14,
+    "registered": 13,
+    "with_bundle": 12,
     "by_port_status": {
       "exists": [
         "discovery_loop",
@@ -91,7 +91,8 @@
         "extended_output",
         "grounding_stack",
         "other",
-        "pdf_grounding"
+        "pdf_grounding",
+        "web_grounding"
       ]
     },
     "gaps": [],
@@ -137,6 +138,15 @@
         "registered": true,
         "demonstrator": "GroundingStackDemonstrator",
         "bundle": "grounding-stack",
+        "has_bundle": true,
+        "port_status": "build",
+        "spend_lane": "ASK (a credit-spending benchmark, cents-scale)"
+      },
+      {
+        "demo_kind": "web_grounding",
+        "registered": true,
+        "demonstrator": "WebCitationsDemonstrator",
+        "bundle": "web-citations",
         "has_bundle": true,
         "port_status": "build",
         "spend_lane": "ASK (a credit-spending benchmark, cents-scale)"
