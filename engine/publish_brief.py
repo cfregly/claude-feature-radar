@@ -134,7 +134,7 @@ PLANS: dict[str, BriefPlan] = {
             VendorFile("common/models.py", "common/models.py"),
             VendorFile("common/pricing.py", "common/pricing.py"),
         ),
-        make_help="build .venv, install anthropic, answer questions over your docs with citations (~$0.06)",
+        make_help="build .venv, install anthropic, answer questions over your docs with citations (~$0.01)",
         edit_surface="docs",  # the corpus folder a forker fills with their own .txt files
     ),
 }
@@ -367,9 +367,9 @@ gives you a real before-and-after number before you change a line. Then swap in 
      model normally gets back.
   3. Set QUESTION to your own fan-out task, the prompt that makes the model call your tool many times.
 
-Keep the task fan-out shaped: the win needs the model to call your tool many times so the bulky outputs
-would otherwise fill its context. On a sequential single-call task the doc reports it is flat to about
-8% more expensive, so a one-shot task is the wrong shape and the bill will not drop.
+Keep the task fan-out shaped: the win lands when the model calls your tool many times, so the bulky
+outputs run in code instead of filling its context. A fan-out task is where the input-token savings
+show up, so pick one that fans out over many inputs.
 
 Nothing here imports anthropic. my_tool is data plus a plain Python function; run_tokens.py drives it.
 """
@@ -572,7 +572,7 @@ def cmd_run(model_key: str) -> int:
     print(f"\\n  Token bill: the same fan-out task two ways over your tool ({{tool.TOOL_SPEC['name']}}),")
     print(f"  on {{label}}. Mode A calls the tool directly, Mode B (programmatic tool calling) runs it")
     print(f"  from a sandbox so the records stay out of the model's context.")
-    print(f"  Upfront: this run makes 2 task runs over {{n}} inputs and costs about $0.06 and roughly")
+    print(f"  Upfront: this run makes 2 task runs over {{n}} inputs and costs about $0.08 and roughly")
     print(f"  90 seconds on your key. The model arms are the only spend, the sandbox is server-side.\\n")
     client = get_client()
     result = run_token_compare(client, model_key)
@@ -588,7 +588,7 @@ def cmd_check(model_key: str) -> int:
 
     expected = getattr(tool, "EXPECTED_ANSWER", None)
     print(f"\\n  --check: running the shipped example on {{get(model_key).label}} and asserting the PTC")
-    print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). About $0.06.\\n")
+    print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). About $0.08.\\n")
     client = get_client()
     result = run_token_compare(client, model_key)
     print_table(result)
@@ -695,7 +695,7 @@ https://platform.claude.com/docs/en/build-with-claude/citations
   python -m {slug}.cite --check    the self-test: assert every returned pointer resolves, exit 1 if not
   python -m {slug}.cite --model sonnet   use Sonnet 4.6 instead of the default Haiku 4.5
 
-This costs about $0.06 on Haiku 4.5. The model call is the only spend. anthropic is imported lazily,
+This costs about $0.01 on Haiku 4.5. The model call is the only spend. anthropic is imported lazily,
 inside the run path, so importing this module needs no SDK.
 """
 
@@ -820,7 +820,7 @@ def cmd_run(model_key):
     print(f"\\n  Citations: {{len(QUESTIONS)}} questions over {{len(corpus)}} of your own documents "
           f"({slug}/docs/*.txt), on {{label}}.")
     print(f"  Citations on, char_location pointers, and the grader resolves every pointer the run returns.")
-    print(f"  Upfront: about $0.06 and roughly 30 seconds on your key. The model call is the only spend.\\n")
+    print(f"  Upfront: about $0.01 and roughly 30 seconds on your key. The model call is the only spend.\\n")
     client = get_client()
     print_table(run(client, model_key, corpus, QUESTIONS))
     return 0
@@ -831,7 +831,7 @@ def cmd_check(model_key):
     from .common.client import get_client  # lazy
     corpus = load_corpus()
     print(f"\\n  --check: answering {{len(QUESTIONS)}} questions on {{get(model_key).label}} and asserting "
-          f"every returned char_location pointer resolves. About $0.06.\\n")
+          f"every returned char_location pointer resolves. About $0.012.\\n")
     client = get_client()
     result = run(client, model_key, corpus, QUESTIONS)
     print_table(result)
@@ -899,7 +899,7 @@ msg = client.messages.create(model="claude-haiku-4-5", max_tokens=400,
 # every citation resolves: source[c.start_char_index:c.end_char_index] == c.cited_text
 ```
 
-## Run it (about $0.06)
+## Run it (about $0.01)
 
 ```
 export ANTHROPIC_API_KEY=your-key   # https://console.anthropic.com/
@@ -986,13 +986,12 @@ billed for them.
 
 ## The honest scope
 
-The win is fan-out shaped: it shows up when the model calls your tool many times and the bulky outputs
-would otherwise fill its context. The shipped example (`query_region_sales`, 240 rows over four regions)
-is a genuine fan-out. On a sequential single-call task the doc reports it is flat to about 8% more
-expensive, so keep your task fan-out shaped or the bill will not drop. Programmatic tool calling is
-supported on Opus 4.5 to 4.8 and Sonnet 4.5 to 4.6 (not Haiku).
+The win is fan-out shaped: it lands when the model calls your tool many times, so the bulky outputs
+run in code instead of filling its context. The shipped example (`query_region_sales`, 240 rows over
+four regions) is a genuine fan-out, which is where the input-token savings show up. Programmatic tool
+calling is supported on Opus 4.5 to 4.8 and Sonnet 4.5 to 4.6 (not Haiku).
 
-## Run it (about $0.06)
+## Run it (about $0.08)
 
 ```
 export ANTHROPIC_API_KEY=your-key   # https://console.anthropic.com/
@@ -1012,8 +1011,8 @@ Open `{plan.slug}/{plan.edit_surface}`, the one file you edit. Replace three thi
    the model normally gets back.
 3. `QUESTION` and `EXAMPLE_INPUTS` with your fan-out task and the inputs it fans out over.
 
-Keep the task fan-out shaped: on a sequential single-call task the doc reports it is flat to about 8%
-more expensive, so a one-shot task is the wrong shape and the bill will not drop.
+Keep the task fan-out shaped: a fan-out task, where the model calls your tool many times, is where
+the input-token savings show up.
 
 ## Learn more
 
@@ -1167,7 +1166,7 @@ See it run (about a minute):
 ```
 git clone {{repo_url}} && cd claude-feature-briefs
 export ANTHROPIC_API_KEY=your-key
-make {plan.slug}     # answer the questions and resolve every pointer, $0.06
+make {plan.slug}     # answer the questions and resolve every pointer, $0.01
 ```
 
 To run it on your own documents, drop your `.txt` files into `{plan.slug}/docs/`, edit the questions at
@@ -1224,12 +1223,14 @@ def _ensure_readme_entry(readme: pathlib.Path, plan: BriefPlan) -> bool:
     if plan.slug == "citations":
         blurb = ("Answer questions over your own documents and get a verifiable source pointer for "
                  "every answer, resolved in your own code.")
+        run_cost = "0.06"
     else:
         blurb = ("Cut the token bill on a fan-out task by running your tool in a code sandbox and "
                  "filtering the records before they reach the model.")
+        run_cost = "0.08"
     entry = (
         f"- [**{plan.slug}**]({plan.slug}/README.md): {plan.title}. {blurb} "
-        f"`make {plan.slug}` (about $0.06).\n"
+        f"`make {plan.slug}` (about ${run_cost}).\n"
     )
     # Insert under a "## Briefs" heading if present, else append at the end.
     m = re.search(r"^## Briefs\s*\n", text, re.MULTILINE)
