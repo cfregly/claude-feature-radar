@@ -1,13 +1,14 @@
 """paraphrase_resolution: the paraphrase-robustness arm of the Citations edge, measured head to head.
 
-WHY THIS EXISTS. The citations edge was tightened to its surviving wedge: the win is NOT character
-granularity (that holds only for plain text; PDFs are page-level, the same coarseness as Gemini File
-Search). The wedge is the GUARANTEE. Claude's Citations API guarantees every returned pointer resolves
-to a real source span, and the do-it-yourself path (the model emits a supporting quote, you locate it
-with `str.find`) cannot, because the moment the model answers in its own words the quote is paraphrased,
-`str.find` returns -1, and the citation is silently dropped. On clean VERBATIM quotes the DIY path
-resolves about as well on every vendor (the citations edge measures that, parity). The one case the
-skeptic flagged as "not measured" is the PARAPHRASE case. This demonstrator measures it directly.
+WHY THIS EXISTS. The citations edge was tightened to a CANDIDATE wedge, and this arm tests it. Not
+character granularity (that holds only for plain text; PDFs are page-level, the same coarseness as
+Gemini File Search), but the GUARANTEE. The HYPOTHESIS: Claude's Citations API guarantees every returned
+pointer resolves to a real source span, while the do-it-yourself path (the model emits a supporting
+quote, you locate it with `str.find`) would fail under paraphrase, because if the model answers in its
+own words and paraphrases the quote too, `str.find` returns -1 and the citation is silently dropped. On
+clean VERBATIM quotes the DIY path resolves about as well on every vendor (parity). The skeptic flagged
+the PARAPHRASE case as "not measured." This demonstrator measures it directly, and the finding below
+REFUTES the hypothesis: best-to-best, it is parity.
 
 THE HONEST MEASURED FINDING (best-to-best, 2026-06-19). Run against the competitors' FRONTIER models,
 the str.find drop is NOT a robust cross-vendor gap. A frontier model asked for a supporting sentence
@@ -33,8 +34,10 @@ RESOLVE MECHANISM:
                        BY CONSTRUCTION. For the inline PDF the pointer is a page_location into the
                        supplied file, with zero persisted/hosted objects.
   DIY (any vendor)     the path you build without the feature: the model returns a paraphrased answer
-                       and a paraphrased supporting sentence, and you resolve it yourself with
-                       source.find(quote). Under paraphrase the find returns -1: a silent drop. You own
+                       and a supporting quote, and you resolve it yourself with source.find(quote). A
+                       frontier model returns the quote VERBATIM even while paraphrasing the answer, so a
+                       whitespace-tolerant find resolves it (parity); only a weaker model (it paraphrases
+                       the quote too) or a naive find (it breaks on PDF line-wrap) drops it (-1). You own
                        the resolver code AND you pay output tokens for every quote.
 
 THE GATES (all measured, same gate on every arm):
@@ -973,7 +976,7 @@ class ParaphraseResolutionDemonstrator(BaseDemonstrator):
         if gate["promotable_edge"] and all_cross_ran:
             return Verdict(verdict="claude-ahead", passed=True, metric=metric,
                            note="Claude Citations resolved every paraphrased answer's pointer by guarantee "
-                                "with zero hosted objects; the DIY str.find path silently dropped pointers "
+                                "with zero hosted objects. The DIY str.find path silently dropped pointers "
                                 "under paraphrase on every vendor")
         if gate["claude_guaranteed_resolve"] and not all_cross_ran:
             return Verdict(verdict="never-evaluated", passed=False, metric=metric,
