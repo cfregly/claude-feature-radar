@@ -131,6 +131,9 @@ ci: deslop check-docs core-imports check-surface check-receipts test ## the full
 	@echo "ci: all offline gates passed."
 
 gif: ## regenerate docs/demo.gif from demo.tape (needs vhs, ffmpeg, ttyd)
+	@if grep -lIE 'sk-ant-|sk-proj-|AIza[0-9A-Za-z_-]{8}|xox[baprs]-|ghp_' demo.tape edges/programmatic-tool-calling/sample.txt 2>/dev/null; then \
+		echo "ABORT: key material found in a gif input above. Scrub it before recording."; exit 1; \
+	fi
 	vhs demo.tape
 
 clean:
