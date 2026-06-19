@@ -1,0 +1,356 @@
+{
+  "date": "2026-06-19",
+  "claim_under_test": "Claude task_budget gives supported models a provider-side remaining-budget marker for the full agentic loop, while closest competitor controls are output, reasoning, or thinking budgets.",
+  "sources": {
+    "claude": "https://platform.claude.com/docs/en/build-with-claude/task-budgets",
+    "openai": "https://developers.openai.com/api/docs/guides/reasoning",
+    "gemini": "https://ai.google.dev/gemini-api/docs/thinking"
+  },
+  "docs_absence_check": {
+    "openai_reasoning": {
+      "path": "/Users/admin/dev/anthropic/takehome-experiments/claude-feature-radar/sources/openai_reasoning_2026-06-19.txt",
+      "hits": [],
+      "equivalent_found": false
+    },
+    "gemini_thinking": {
+      "path": "/Users/admin/dev/anthropic/takehome-experiments/claude-feature-radar/sources/gemini_thinking_2026-06-19.txt",
+      "hits": [],
+      "equivalent_found": false
+    }
+  },
+  "prompt": "Return JSON only with keys action, graceful_stop, reason, next_steps. If your task budget indicator says the task is near exhaustion, set action to handoff and graceful_stop to true. If you have no task budget indicator, or it is not near exhaustion, set action to continue and graceful_stop to false. Keep reason short.",
+  "arms": [
+    {
+      "provider": "claude",
+      "model": "claude-opus-4-8",
+      "ran": true,
+      "correct_for_arm": true,
+      "saw_low_budget_marker": true,
+      "graceful_stop": true,
+      "stop_reason": "end_turn",
+      "status": "",
+      "latency_s": 1.9933950830018148,
+      "input_tokens": 134,
+      "output_tokens": 80,
+      "response_chars": 1051,
+      "tool_calls": 0,
+      "text": "{\"action\":\"handoff\",\"graceful_stop\":true,\"reason\":\"Token budget indicator shows exhaustion (negative tokens remaining).\",\"next_steps\":\"Hand off to a new session or agent with fresh budget to continue the task.\"}",
+      "parsed": {
+        "action": "handoff",
+        "graceful_stop": true,
+        "reason": "Token budget indicator shows exhaustion (negative tokens remaining).",
+        "next_steps": "Hand off to a new session or agent with fresh budget to continue the task."
+      },
+      "metric": {
+        "remaining": 50,
+        "task_budget_total": 20000
+      },
+      "note": "Claude accepted task_budget and handed off when remaining budget was near exhausted",
+      "total_tokens": 214
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "ran": true,
+      "correct_for_arm": true,
+      "saw_low_budget_marker": false,
+      "graceful_stop": false,
+      "stop_reason": "",
+      "status": "completed",
+      "latency_s": 2.8484788330388255,
+      "input_tokens": 73,
+      "output_tokens": 77,
+      "response_chars": 1570,
+      "tool_calls": 0,
+      "text": "{\"action\":\"continue\",\"graceful_stop\":false,\"reason\":\"No task budget indicator provided.\",\"next_steps\":\"Proceed with the task.\"}",
+      "parsed": {
+        "action": "continue",
+        "graceful_stop": false,
+        "reason": "No task budget indicator provided.",
+        "next_steps": "Proceed with the task."
+      },
+      "metric": {
+        "reasoning_effort": "low",
+        "max_output_tokens": 256
+      },
+      "note": "OpenAI closest controls ran without a provider-side full-loop remaining-budget marker",
+      "total_tokens": 150
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3.1-pro-preview",
+      "ran": true,
+      "correct_for_arm": true,
+      "saw_low_budget_marker": false,
+      "graceful_stop": false,
+      "stop_reason": "",
+      "status": "",
+      "latency_s": 3.586698833038099,
+      "input_tokens": 72,
+      "output_tokens": 288,
+      "response_chars": 1192,
+      "tool_calls": 0,
+      "text": "{\n  \"action\": \"continue\",\n  \"graceful_stop\": false,\n  \"reason\": \"No task budget indicator provided.\",\n  \"next_steps\": \"Wait for the next user instruction.\"\n}",
+      "parsed": {
+        "action": "continue",
+        "graceful_stop": false,
+        "reason": "No task budget indicator provided.",
+        "next_steps": "Wait for the next user instruction."
+      },
+      "metric": {
+        "thinking_budget": 128,
+        "max_output_tokens": 1024
+      },
+      "note": "Gemini closest thinking budget ran without a provider-side full-loop remaining-budget marker",
+      "total_tokens": 360
+    }
+  ],
+  "tool_loop_workload": {
+    "prompt": "You are starting a budget-sensitive 12-record audit. If your hidden task budget indicator says the task is near exhaustion, do not call tools. Return JSON only: {\"action\":\"handoff\",\"graceful_stop\":true,\"tool_calls\":0,\"reason\":\"budget\"}. If you have no near-exhaustion task budget indicator, or it is not near exhaustion, call fetch_record for record_id 1 as the first step. Do not answer in text before that tool call.",
+    "measured_workload_win": true,
+    "metric": "first_tool_call_avoided_at_low_remaining_budget",
+    "claude_low_budget_tool_calls": 0,
+    "claude_control_tool_calls": 1,
+    "competitor_tool_calls": {
+      "openai": 1,
+      "gemini": 1
+    },
+    "low_stopped_before_tool": true,
+    "control_started_tool_loop": true,
+    "competitors_started_tool_loop": true,
+    "why_not_measured_win": [],
+    "arms": {
+      "claude_low_budget": {
+        "provider": "claude",
+        "model": "claude-opus-4-8",
+        "ran": true,
+        "correct_for_arm": true,
+        "saw_low_budget_marker": true,
+        "graceful_stop": true,
+        "stop_reason": "end_turn",
+        "status": "",
+        "latency_s": 1.570678542018868,
+        "input_tokens": 549,
+        "output_tokens": 38,
+        "response_chars": 912,
+        "tool_calls": 0,
+        "text": "{\"action\":\"handoff\",\"graceful_stop\":true,\"tool_calls\":0,\"reason\":\"budget\"}",
+        "parsed": {
+          "action": "handoff",
+          "graceful_stop": true,
+          "tool_calls": 0,
+          "reason": "budget"
+        },
+        "metric": {
+          "remaining": 50,
+          "task_budget_total": 20000,
+          "workload": "first_tool_call"
+        },
+        "note": "low remaining task_budget produced a graceful handoff before the first tool call",
+        "total_tokens": 587
+      },
+      "claude_control": {
+        "provider": "claude",
+        "model": "claude-opus-4-8",
+        "ran": true,
+        "correct_for_arm": true,
+        "saw_low_budget_marker": false,
+        "graceful_stop": false,
+        "stop_reason": "tool_use",
+        "status": "",
+        "latency_s": 3.037450290983543,
+        "input_tokens": 549,
+        "output_tokens": 81,
+        "response_chars": 1037,
+        "tool_calls": 1,
+        "text": "I have no near-exhaustion task budget indicator, so I'll proceed with the audit.",
+        "parsed": {},
+        "metric": {
+          "remaining": 5000,
+          "task_budget_total": 20000,
+          "workload": "first_tool_call"
+        },
+        "note": "high remaining task_budget control started the tool loop",
+        "total_tokens": 630
+      },
+      "competitors": [
+        {
+          "provider": "openai",
+          "model": "gpt-5.5",
+          "ran": true,
+          "correct_for_arm": true,
+          "saw_low_budget_marker": false,
+          "graceful_stop": false,
+          "stop_reason": "",
+          "status": "completed",
+          "latency_s": 2.0603997919824906,
+          "input_tokens": 142,
+          "output_tokens": 45,
+          "response_chars": 1683,
+          "tool_calls": 1,
+          "text": "",
+          "parsed": {},
+          "metric": {
+            "reasoning_effort": "low",
+            "max_output_tokens": 256,
+            "workload": "first_tool_call"
+          },
+          "note": "OpenAI closest controls started the tool loop; no hidden low-budget marker was exposed",
+          "total_tokens": 187
+        },
+        {
+          "provider": "gemini",
+          "model": "gemini-3.1-pro-preview",
+          "ran": true,
+          "correct_for_arm": true,
+          "saw_low_budget_marker": false,
+          "graceful_stop": false,
+          "stop_reason": "",
+          "status": "",
+          "latency_s": 3.2595588749973103,
+          "input_tokens": 153,
+          "output_tokens": 176,
+          "response_chars": 1182,
+          "tool_calls": 1,
+          "text": "",
+          "parsed": {},
+          "metric": {
+            "thinking_budget": 128,
+            "max_output_tokens": 256,
+            "workload": "first_tool_call"
+          },
+          "note": "Gemini closest thinking budget started the tool loop; no hidden low-budget marker was exposed",
+          "total_tokens": 329
+        }
+      ]
+    }
+  },
+  "verdict": {
+    "positive_signal": true,
+    "promotable_edge": true,
+    "why_not_promotable": [],
+    "competitor_exact_subfeature_documented": false,
+    "closest_competitors_showed_no_marker": true,
+    "measured_workload_win": true,
+    "tool_loop_workload_gate": {
+      "prompt": "You are starting a budget-sensitive 12-record audit. If your hidden task budget indicator says the task is near exhaustion, do not call tools. Return JSON only: {\"action\":\"handoff\",\"graceful_stop\":true,\"tool_calls\":0,\"reason\":\"budget\"}. If you have no near-exhaustion task budget indicator, or it is not near exhaustion, call fetch_record for record_id 1 as the first step. Do not answer in text before that tool call.",
+      "measured_workload_win": true,
+      "metric": "first_tool_call_avoided_at_low_remaining_budget",
+      "claude_low_budget_tool_calls": 0,
+      "claude_control_tool_calls": 1,
+      "competitor_tool_calls": {
+        "openai": 1,
+        "gemini": 1
+      },
+      "low_stopped_before_tool": true,
+      "control_started_tool_loop": true,
+      "competitors_started_tool_loop": true,
+      "why_not_measured_win": [],
+      "arms": {
+        "claude_low_budget": {
+          "provider": "claude",
+          "model": "claude-opus-4-8",
+          "ran": true,
+          "correct_for_arm": true,
+          "saw_low_budget_marker": true,
+          "graceful_stop": true,
+          "stop_reason": "end_turn",
+          "status": "",
+          "latency_s": 1.570678542018868,
+          "input_tokens": 549,
+          "output_tokens": 38,
+          "response_chars": 912,
+          "tool_calls": 0,
+          "text": "{\"action\":\"handoff\",\"graceful_stop\":true,\"tool_calls\":0,\"reason\":\"budget\"}",
+          "parsed": {
+            "action": "handoff",
+            "graceful_stop": true,
+            "tool_calls": 0,
+            "reason": "budget"
+          },
+          "metric": {
+            "remaining": 50,
+            "task_budget_total": 20000,
+            "workload": "first_tool_call"
+          },
+          "note": "low remaining task_budget produced a graceful handoff before the first tool call",
+          "total_tokens": 587
+        },
+        "claude_control": {
+          "provider": "claude",
+          "model": "claude-opus-4-8",
+          "ran": true,
+          "correct_for_arm": true,
+          "saw_low_budget_marker": false,
+          "graceful_stop": false,
+          "stop_reason": "tool_use",
+          "status": "",
+          "latency_s": 3.037450290983543,
+          "input_tokens": 549,
+          "output_tokens": 81,
+          "response_chars": 1037,
+          "tool_calls": 1,
+          "text": "I have no near-exhaustion task budget indicator, so I'll proceed with the audit.",
+          "parsed": {},
+          "metric": {
+            "remaining": 5000,
+            "task_budget_total": 20000,
+            "workload": "first_tool_call"
+          },
+          "note": "high remaining task_budget control started the tool loop",
+          "total_tokens": 630
+        },
+        "competitors": [
+          {
+            "provider": "openai",
+            "model": "gpt-5.5",
+            "ran": true,
+            "correct_for_arm": true,
+            "saw_low_budget_marker": false,
+            "graceful_stop": false,
+            "stop_reason": "",
+            "status": "completed",
+            "latency_s": 2.0603997919824906,
+            "input_tokens": 142,
+            "output_tokens": 45,
+            "response_chars": 1683,
+            "tool_calls": 1,
+            "text": "",
+            "parsed": {},
+            "metric": {
+              "reasoning_effort": "low",
+              "max_output_tokens": 256,
+              "workload": "first_tool_call"
+            },
+            "note": "OpenAI closest controls started the tool loop; no hidden low-budget marker was exposed",
+            "total_tokens": 187
+          },
+          {
+            "provider": "gemini",
+            "model": "gemini-3.1-pro-preview",
+            "ran": true,
+            "correct_for_arm": true,
+            "saw_low_budget_marker": false,
+            "graceful_stop": false,
+            "stop_reason": "",
+            "status": "",
+            "latency_s": 3.2595588749973103,
+            "input_tokens": 153,
+            "output_tokens": 176,
+            "response_chars": 1182,
+            "tool_calls": 1,
+            "text": "",
+            "parsed": {},
+            "metric": {
+              "thinking_budget": 128,
+              "max_output_tokens": 256,
+              "workload": "first_tool_call"
+            },
+            "note": "Gemini closest thinking budget started the tool loop; no hidden low-budget marker was exposed",
+            "total_tokens": 329
+          }
+        ]
+      }
+    }
+  }
+}

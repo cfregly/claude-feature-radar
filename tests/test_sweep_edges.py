@@ -22,7 +22,7 @@ def test_registry_has_all_three_vendors():
 def test_registry_entries_are_well_formed():
     for s in sources():
         assert s.url.startswith("https://")
-        assert s.kind in {"doc", "changelog", "pricing"}
+        assert s.kind in {"doc", "changelog", "blog", "pricing"}
         assert s.key and s.vendor
 
 

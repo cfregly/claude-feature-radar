@@ -1,0 +1,27 @@
+  Task-budget tool-loop workload: start a 12-record audit by calling fetch_record(1),
+  unless a hidden low remaining task budget says to hand off before beginning.
+
+  platform                              low-budget stop  first tool calls  tokens  wall time
+  -------------------------------------------------------------------------------------------
+  claude claude-opus-4-8                              YES                 0     587       1.6s
+  claude control claude-opus-4-8                      n/a                 1     630       3.0s
+  openai gpt-5.5                                         NO                 1     187       2.1s
+  gemini gemini-3.1-pro-preview                          NO                 1     329       3.3s
+
+  Verdict:
+    positive_signal: true
+    promotable_edge: true
+
+  Honest reading:
+  - Claude saw the provider-side low remaining budget and stopped before the first tool call.
+  - The Claude high-budget control started the same tool loop.
+  - OpenAI and Gemini closest controls started the tool loop because no hidden full-loop budget
+    marker was exposed to the model on this workload.
+  - The value measured here is one avoided external tool action at the point the task is already
+    budget-exhausted; it is not a claim that task_budget is a universal cost win.
+
+  Reproduce:
+    make task-budget
+
+  Machine receipt:
+    data/last_task_budgets.json

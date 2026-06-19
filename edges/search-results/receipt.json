@@ -1,0 +1,65 @@
+{
+  "date": "2026-06-19",
+  "claim_under_test": "For developer-supplied RAG chunks passed inline as search_result blocks, Claude returns a search_result_location block-span pointer without a hosted store, while OpenAI and Gemini require hosted file-search stores for their closest citation path.",
+  "n_questions": 5,
+  "n_chunks": 5,
+  "total_cost": 0.052453,
+  "sources": {
+    "claude_search_results": "https://platform.claude.com/docs/en/build-with-claude/search-results",
+    "claude_citations": "https://platform.claude.com/docs/en/build-with-claude/citations",
+    "openai_file_search": "https://developers.openai.com/api/docs/guides/tools-file-search",
+    "gemini_file_search": "https://ai.google.dev/gemini-api/docs/file-search"
+  },
+  "skipped": [],
+  "arms": [
+    {
+      "name": "claude:haiku",
+      "provider": "anthropic",
+      "model": "claude-haiku-4-5-20251001",
+      "answered": "5/5",
+      "correct_source_citation": "5/5",
+      "pointer_kind": "block-span",
+      "hosted_setup_calls": 0,
+      "persisted_objects": 0,
+      "cost": 0.006731,
+      "latency_s": 4.49,
+      "errors": []
+    },
+    {
+      "name": "openai:gpt-mid",
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "answered": "5/5",
+      "correct_source_citation": "5/5",
+      "pointer_kind": "file-level",
+      "hosted_setup_calls": 11,
+      "persisted_objects": 6,
+      "cost": 0.030103,
+      "latency_s": 19.82,
+      "errors": []
+    },
+    {
+      "name": "gemini:gem-flash",
+      "provider": "gemini",
+      "model": "gemini-3.5-flash",
+      "answered": "5/5",
+      "correct_source_citation": "5/5",
+      "pointer_kind": "chunk-level",
+      "hosted_setup_calls": 6,
+      "persisted_objects": 6,
+      "cost": 0.015619,
+      "latency_s": 26.53,
+      "errors": []
+    }
+  ],
+  "verdict": {
+    "positive_signal": true,
+    "promotable_edge": true,
+    "claude_inline_block_span_all": true,
+    "all_competitors_ran": true,
+    "competitors_cited_all": true,
+    "competitors_needed_hosted_store": true,
+    "competitor_has_inline_block_span": false,
+    "why_not_promotable": []
+  }
+}

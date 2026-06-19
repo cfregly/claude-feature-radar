@@ -297,11 +297,19 @@ def rank(caps: dict, all_competitor_fetched_ok: bool) -> list[dict]:
         }
         # Stamp demoKind + fair_comparison from the seed table (engine/scan.stamp_demokind). A built
         # edge inherits its vetted seed spec; an unknown key gets an axis->demoKind guess. A guessed
-        # kind with no registered demonstrator is held never-evaluated, the same honesty cut the
-        # absence-of-evidence rule already makes: it stays in the landscape, it is never pitched.
+        # or parity-gated kind is held never-evaluated until a vetted comparison exists. This matters
+        # now that the sweep ingests blogs, release notes, Claude Code changelogs, and broad overview
+        # pages: those are strong discovery inputs, but not proof by themselves.
         scan.stamp_demokind(edge)
-        if lead > 0 and not is_seeded(cap["key"]) and dispatch(edge).demonstrator is None:
+        routed = dispatch(edge)
+        seed = scan.seed_for_key(cap["key"])
+        if lead > 0 and (seed is None or routed.demonstrator is None):
+            edge["raw_lead_score"], edge["raw_score"] = edge["lead_score"], edge["score"]
             edge["lead_score"], edge["score"], edge["verdict"] = 0, 0, "never-evaluated"
+            edge["held_reason"] = (
+                routed.ask_stub
+                or "no vetted seed comparison and measured demonstrator for this source yet"
+            )
         # Apply the grounded landscape correction (managedAgentsCorrection): retention and
         # context-management keys are doc-grounded parity, never an absence-of-evidence Claude-only
         # lead manufactured from a competitor key the registry simply does not carry.
@@ -325,6 +333,28 @@ def _seed_axis_for(key: str) -> str:
         "managed_agents": "long-horizon", "pricing": "cost", "compaction": "reliability",
         "file_search": "reliability", "caching": "cost", "overview": "unknown",
         "release_notes": "unknown",
+        "beta_headers": "unknown", "managed_agents_overview": "long-horizon",
+        "managed_agents_sessions": "long-horizon", "managed_agents_environments": "long-horizon",
+        "managed_agents_multi_agent": "long-horizon", "fallback_credit": "correctness",
+        "adaptive_thinking": "correctness", "effort": "correctness", "task_budgets": "cost",
+        "fast_mode": "speed", "structured_outputs": "correctness", "batch_processing": "cost",
+        "search_results": "grounding", "web_search_tool": "grounding",
+        "web_fetch_tool": "grounding", "advisor_tool": "correctness", "bash_tool": "dx",
+        "computer_use": "agentic-success", "text_editor": "dx", "tool_search": "cost",
+        "fine_grained_tool_streaming": "speed", "context_windows": "long-horizon",
+        "mid_conversation_system": "agentic-success", "cache_diagnostics": "observability",
+        "token_counting": "cost", "files": "dx", "pdf_support": "grounding",
+        "document_processing": "grounding", "agent_skills": "dx", "mcp_connector": "dx",
+        "thinking": "correctness", "interactions": "agentic-success", "tools": "dx",
+        "reasoning": "correctness", "rate_limits": "cost", "google_search": "grounding",
+        "long_context": "long-horizon",
+        "claude_code_changelog": "agentic-success", "claude_code_whats_new": "agentic-success",
+        "claude_code_overview": "agentic-success", "claude_code_github_actions": "agentic-success",
+        "claude_code_sdk": "agentic-success", "claude_code_hooks": "dx",
+        "claude_code_plugins": "dx", "claude_code_github_releases": "agentic-success",
+        "news": "unknown", "opus_4_8": "agentic-success", "fable_mythos_5": "agentic-success",
+        "fable_mythos_access": "unknown", "claude_4": "agentic-success",
+        "claude_apps_release_notes": "unknown",
     }
     return table.get(key, "unknown")
 
@@ -335,6 +365,11 @@ EDGE_DIR_FOR = {  # source key -> existing edges/<dir>, so the changelog flags w
     "ptc": "programmatic-tool-calling",
     "citations": "citations",
     "context_editing": "context-editing",
+    "pricing": "cost-model",
+    "memory_tool": "retention-resume",
+    "managed_agents": "retention-resume",
+    "fallback_credit": "parity-gated",
+    "cache_diagnostics": "parity-gated",
 }
 
 
@@ -416,14 +451,15 @@ def write_landscape(caps: dict, hashes: dict, ranked: list[dict], coverage: dict
 
 
 def _q(s: str) -> str:
-    return (s or "").replace("|", "\\|").replace("\n", " ").strip()
+    return (s or "").replace("|", "\\|").replace(";", ",").replace("\n", " ").strip()
 
 
 def write_changelog(delta: dict, ranked: list[dict], covered: set[str], unknowns: list[dict],
                     date: str) -> str:
     rel = f"landscape/CHANGELOG-{date}.md"
     leads = [e for e in ranked if e["lead_score"] > 0]
-    aside = [e for e in ranked if e["lead_score"] <= 0]
+    held = [e for e in ranked if e["lead_score"] <= 0 and (e.get("raw_score") or e.get("held_reason"))]
+    aside = [e for e in ranked if e["lead_score"] <= 0 and e not in held]
     lines = [
         f"# Edge landscape changelog, {date}",
         "",
@@ -459,6 +495,16 @@ def write_changelog(delta: dict, ranked: list[dict], covered: set[str], unknowns
     for e in leads:
         cov = "covered by an existing edges/ email" if EDGE_DIR_FOR.get(e["key"]) in covered else "no built email yet"
         lines.append(f"- {e['key']} [{e['axis']}] score {e['score']} (value {e['value_score']} x lead {e['lead_score']}), {e['verdict']}, {cov}.")
+
+    lines += ["", "## Held candidates that need a vetted comparison before pitching", ""]
+    if held:
+        for e in held:
+            raw = f"raw score {e.get('raw_score')}" if e.get("raw_score") else "unscored"
+            reason = _q(e.get("held_reason", "needs a measured receipt or parity check"))
+            lines.append(f"- {e['key']} [{e['axis']}] {raw}, held as {e['verdict']}. {reason}.")
+    else:
+        lines.append("None this run.")
+
     lines += ["", "## Parity or behind, kept in the landscape, never pitched", ""]
     if aside:
         for e in aside:
@@ -474,7 +520,8 @@ def write_changelog(delta: dict, ranked: list[dict], covered: set[str], unknowns
 def write_brief(ranked: list[dict], covered: set[str], date: str) -> str:
     rel = f"briefs/{date}-edge-landscape.md"
     leads = [e for e in ranked if e["lead_score"] > 0]
-    aside = [e for e in ranked if e["lead_score"] <= 0]
+    held = [e for e in ranked if e["lead_score"] <= 0 and (e.get("raw_score") or e.get("held_reason"))]
+    aside = [e for e in ranked if e["lead_score"] <= 0 and e not in held]
     lines = [
         f"# Edge landscape, {date}",
         "",
@@ -496,6 +543,18 @@ def write_brief(ranked: list[dict], covered: set[str], date: str) -> str:
     for i, e in enumerate(leads, 1):
         built = "yes" if EDGE_DIR_FOR.get(e["key"]) in covered else "no"
         lines.append(f"| {i} | {e['key']} | {e['axis']} | {e['verdict']} | {e['score']} | {built} |")
+
+    lines += ["", "## Held candidates (new edge work queue, not pitched yet)", ""]
+    if held:
+        lines += [
+            "| Candidate | Axis | Raw score | Why held |",
+            "|-----------|------|-----------|----------|",
+        ]
+        for e in held:
+            lines.append(f"| {e['key']} | {e['axis']} | {e.get('raw_score', 0)} | {_q(e.get('held_reason', 'needs a measured receipt or parity check'))} |")
+    else:
+        lines.append("None this run.")
+
     lines += ["", "## Parity or behind (kept honest, never pitched)", ""]
     if aside:
         for e in aside:

@@ -30,6 +30,10 @@ edges/cost-model/
 edges/parity-gated/
 edges/eval-quality/
 edges/retention-resume/
+
+# Internal design notes for in-progress edges (the both-directions hypothesis, named
+# competitor mechanisms) stay local until a measured win is ready for the wins-only README.
+edges/*/LEDGER_WORKLOAD.md
 briefs/*-edge-landscape.md
 briefs/*-edge-landscape-master.md
 briefs/2026-06-17-platform-edge.md

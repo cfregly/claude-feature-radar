@@ -64,6 +64,17 @@ the truth, not to win an argument. If our best loses to their best on cost, spee
 is the finding: report it plainly and write the product-team alert below. A rigged win destroys the
 founder trust this whole repo is built to earn.
 
+When a doc names a newer tool version, model, beta header, parameter, or response field, verify the
+whole chain before classifying the edge: current docs, latest package-manager SDK version, installed
+SDK generated schema, raw API acceptance, and any documented or plausible beta header. If docs,
+SDK, and runtime disagree, the discrepancy is a first-class receipt item. Hold the edge until the
+live API accepts the exact subfeature and the workload proves value.
+
+Fast mode has a separate org-level rate-limit pool. A `0 fast mode input tokens per minute` error
+cannot be fixed in this repo or by changing the Messages request. Request fast-mode access or a
+fast-mode rate-limit increase through the Anthropic account path, confirm it on the Claude Console
+Limits page or with the Rate Limits API, then run `make fast-mode` for the receipt.
+
 ## Beta, alpha, and experimental edges are fair game, and often the anchor
 A capability being beta, alpha, or experimental is never a reason to drop it from the search or the
 pitch. The newest Claude surfaces are frequently where the genuine edge lives, so when a beta or alpha
@@ -184,6 +195,39 @@ and the exact output the developer receives.
 - Do not bury the subfeature in private notes. If it survives, the public artifact must explain the
   subfeature in public-reader language with public docs and a receipt, so a reader can understand the
   wedge without access to this workspace or any internal repo.
+- Treat positive subfeature signal as a candidate, not an edge. A receipt like `make dynamic-web` can
+  prove that Claude exercises a mechanism and the closest competitor docs lack the exact subfeature.
+  It still does not ship until the receipt shows `promotable_edge: true`, as `make task-budget` did
+  only after the tool-loop workload proved a founder-value win against the best competitor
+  configuration.
+- Resolve docs/SDK/runtime discrepancies at this same subfeature depth. A docs-new parameter that the
+  latest SDK schema lacks, or that raw HTTP rejects, is not an edge yet. Record the latest SDK version,
+  accepted tool tags, rejected variants, and beta-header attempts so the next run starts from evidence.
+
+## Check subfeatures AND combinations of features and subfeatures
+A single feature can read as parity while a COMBINATION of features (or subfeatures) is a real edge.
+The search is three-dimensional, not one: the feature, the subfeature one layer down, and the
+combination of two or more features or subfeatures stacked on one workload. Run all three before
+calling parity.
+
+- Enumerate combinations on purpose. For every workload, ask which Claude features compose and whether
+  the stack compounds a value a founder prices: prompt caching plus the Batch API plus extended output,
+  programmatic tool calling plus code execution plus dynamic web filtering, the memory tool plus context
+  editing plus the 1M window, Citations plus PDF support plus tool-returned search results, the advisor
+  tool plus the effort knob. The compounding is the candidate, even when each part alone is parity.
+- Compare against the competitor's BEST achievable combination, not a single competitor feature. The
+  honest question is whether OpenAI or Gemini can assemble an equivalent stack on the same workload, in
+  the same request count, with the same guarantees. A Claude combination is an edge only when the
+  competitor's best combination cannot match it on cost, speed, reliability, correctness, or glue code.
+- Watch for combinations that CONFLICT, and record them. Some Claude features are mutually exclusive.
+  Citations returns a 400 with structured outputs, search results is incompatible with structured
+  outputs, and context editing clear_tool_uses is not fully compatible with advisor blocks. A conflict is
+  a first-class finding: it bounds which stacks are real and stops a benchmark that cannot run.
+- Attribute the win to the combination, not a part. Toggle the stack against the best single feature
+  and against the competitor's best stack, so the receipt shows the combination is what moved the
+  number, the same isolate-one-variable discipline applied to the stack as a unit.
+- A combination still ships only at `promotable_edge: true`: the measured workload proved a
+  founder-value win against the best competitor configuration, combination against combination.
 
 ## Put the workload, cost, and time on every outbound surface
 The internal receipt is recorded above. What ships to a reader carries the same facts, up front, in
@@ -293,6 +337,34 @@ Claude `--normalize` pass on changed pages only is deferred, so the default loop
   `scan.current_edges()` reads `landscape/landscape.json` when present and falls back to the constants
   on a fresh checkout, and `verify.py` and `draft_email.py` read it so the skeptic pass and the
   drafter follow the live ranking. A built edge still carries its vetted, measured seed claim.
+
+## Fan out only on a wide, independent search space
+The engine is not a heavyweight parallel pipeline by default. The discovery loop above is a single
+deterministic pass (stdlib fetch, diff, rank, persist, for $0), and the skeptic pass in
+[`engine/verify.py`](engine/verify.py) is one model call over all candidates at once, not a fleet. A
+fan-out (the whole-surface audit, a review panel, a multi-lane sweep) is earned by a wide,
+independent search space, not taken by default. Managed Agents is a capability this engine measures
+and may anchor an edge on, never the machinery that runs the engine, so do not confuse the feature
+compared with the engine used.
+
+Fan out when:
+- The search space is wide and independent: many subfeatures or many competitor surfaces swept at
+  once, each lane blind to the others.
+- The run is a thorough audit where coverage matters more than cost.
+- A finding can fail multiple ways and wants diverse skeptic lenses, not one.
+
+Stay inline and sequential when:
+- Grounding a single claim against the live docs. That is one fetch. Fanning out wastes tokens and
+  adds nothing.
+- Verifying one edge against its primary source. That is close, sequential reading, because the
+  rigor comes from reading one source carefully, not skimming ten.
+- The fan-out cost is not justified by a real win in coverage or confidence.
+
+The rule of thumb: parallel processing is earned by a wide, independent search space, not taken by
+default. "Find the global edge", "Ground every Claude and competitor claim", and "Compare features
+at subfeature depth" above are about depth and grounding, and most of that work is inline and
+sequential. The heavy machinery comes out only when the work genuinely decomposes into independent
+lanes.
 
 ## State survives a clone, data does not
 There are two state roots, and the split matters. `data/` is gitignored transient scratch (per-run

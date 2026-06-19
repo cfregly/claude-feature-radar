@@ -217,6 +217,12 @@ def _seed_for(live_key: str) -> dict | None:
     return None
 
 
+def seed_for_key(live_key: str) -> dict | None:
+    """Public wrapper for the live sweep. A source is pitchable only when it maps to a vetted seed
+    comparison here; broad docs, blogs, and changelogs stay discovery inputs until a receipt is built."""
+    return _seed_for(live_key)
+
+
 def current_edges() -> list[dict]:
     """The live ranked edges when a sweep has run, the committed seed constants otherwise.
 

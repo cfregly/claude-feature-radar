@@ -87,7 +87,7 @@ def _generate(client, model, contents, config, retries=6):
             time.sleep(3 * (i + 1))
 
 
-def run_gemini_agent(docs, start, *, model=DEFAULT_GEMINI_MODEL, max_turns):
+def run_gemini_agent(docs, start, *, model=DEFAULT_GEMINI_MODEL, max_turns, prompt=None):
     """Run the chain audit on Gemini, implicit caching on. Returns (records, final_text, model)."""
     from google.genai import types
     client = _client()
@@ -95,7 +95,7 @@ def run_gemini_agent(docs, start, *, model=DEFAULT_GEMINI_MODEL, max_turns):
         tools=[READ_TOOL_GEMINI],
         automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
     )
-    contents = [types.Content(role="user", parts=[types.Part(text=task_prompt(start, memory=False))])]
+    contents = [types.Content(role="user", parts=[types.Part(text=prompt or task_prompt(start, memory=False))])]
     records, final_text = [], ""
     for turn in range(max_turns):
         t0 = time.perf_counter()

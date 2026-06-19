@@ -2,6 +2,7 @@
 """One entry point for the engine. Use the Makefile, or:
 
     python run.py demo [--quick|--full]   the runnable proof for the current gap
+    python run.py ledger                  the exact-list long-stream edge
     python run.py edges                    sweep the live docs, diff, rank, persist (no API call, $0)
     python run.py cadence [--dry-run]      the unattended engine: sweep, dispatch, draft to outbox ($0)
     python run.py coverage                 per-demoKind, what is built vs adapt vs build (no API call)
@@ -28,6 +29,8 @@ def main():
         from engine.demo import main as m; m()
     elif cmd in ("longhorizon-compare", "lhc"):
         from engine.longhorizon_compare import main as m; m()
+    elif cmd in ("ledger", "exact-list-ledger"):
+        from engine.ledger_compare import main as m; m()
     elif cmd == "compare":
         from engine.compare import main as m; m()
     elif cmd == "alert":
@@ -44,6 +47,24 @@ def main():
         from engine.managed import main as m; raise SystemExit(m())
     elif cmd in ("other", "parity-gated"):
         from engine.demonstrators.other_parity_gated import main as m; raise SystemExit(m())
+    elif cmd in ("dynamic-web", "dynamic-web-filtering"):
+        from engine.demonstrators.dynamic_web_filtering import main as m; raise SystemExit(m())
+    elif cmd in ("task-budget", "task-budgets"):
+        from engine.demonstrators.task_budgets import main as m; raise SystemExit(m())
+    elif cmd in ("cache-diagnostics", "cache-diagnostic"):
+        from engine.demonstrators.cache_diagnostics import main as m; raise SystemExit(m())
+    elif cmd in ("fast-mode", "fast_mode"):
+        from engine.demonstrators.fast_mode import main as m; raise SystemExit(m())
+    elif cmd in ("pdf-citations", "pdf_citations"):
+        from engine.demonstrators.pdf_citations import main as m; raise SystemExit(m())
+    elif cmd in ("search-results", "search_results"):
+        from engine.demonstrators.search_results_grounding import main as m; raise SystemExit(m())
+    elif cmd in ("grounding-stack", "grounding_stack"):
+        from engine.demonstrators.grounding_stack import main as m; raise SystemExit(m())
+    elif cmd in ("bulk-output", "bulk-extended-output", "bulk_extended_output"):
+        from engine.demonstrators.bulk_extended_output import main as m; raise SystemExit(m())
+    elif cmd in ("advisor", "advisor-routing", "advisor_routing"):
+        from engine.demonstrators.advisor_routing import main as m; raise SystemExit(m())
     elif cmd in ("eval", "eval-quality"):
         from engine.demonstrators.eval_quality import main as m; m()
     elif cmd == "scan":

@@ -164,7 +164,7 @@ def _mark_cache(messages):
 
 
 def run_agent(client, model_key, docs, start, *, memory, editing, caching=True, trigger, keep,
-              max_turns, stop_on_overflow=False):
+              max_turns, stop_on_overflow=False, prompt=None):
     """Run the chain audit once on Claude, caching ON. Returns (records, final_text).
 
     ``memory`` and ``editing`` are SEPARATE flags on purpose, so a benchmark can toggle exactly one
@@ -179,7 +179,7 @@ def run_agent(client, model_key, docs, start, *, memory, editing, caching=True, 
     finishes.
     """
     model = get(model_key)
-    messages = [{"role": "user", "content": task_prompt(start, memory)}]
+    messages = [{"role": "user", "content": prompt or task_prompt(start, memory)}]
     tools = [READ_TOOL] + ([MEMORY_TOOL] if memory else [])
 
     kw_extra = {}

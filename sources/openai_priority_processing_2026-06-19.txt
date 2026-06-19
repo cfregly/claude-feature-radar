@@ -1,0 +1,4 @@
+Source: https://developers.openai.com/api/docs/guides/priority-processing
+Snapshot fetched 2026-06-19. Verbatim excerpts for citation grounding.
+
+Priority processing delivers significantly lower and more consistent latency compared to Standard processing while keeping pay-as-you-go flexibility.

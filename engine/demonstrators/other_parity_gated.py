@@ -1,9 +1,10 @@
 """other_parity_gated: the thin demonstrators for the narrow never-evaluated candidates.
 
-These are the long-tail edges from the master brief that each need a PARITY CHECK FIRST, before any
-demonstration is even valid: a fallback-credit refusal-recovery, a cache_miss_reason observability
-signal, and the Claude Code issue-to-PR build-velocity loop. All three route to the single demoKind
-"other" (the registry keys one demonstrator per demoKind), and this one demonstrator dispatches
+These are the long-tail edges from the master brief and the live 2026-06-19 sweep that each need a
+PARITY CHECK FIRST, before any demonstration is even valid: fallback-credit refusal recovery,
+cache_miss_reason observability, task budgets, web search and fetch dynamic filtering, fast mode, and
+the Claude Code issue-to-PR build-velocity loop. They route to the single demoKind "other" (the
+registry keys one demonstrator per demoKind), and this one demonstrator dispatches
 internally by edge key to the right thin proof.
 
 WHY A PARITY-CHECK PRECONDITION. Each of these is a candidate Claude surface with NO head-to-head
@@ -74,10 +75,11 @@ PARITY_CHECKS = {
         "thin_proof": ("trigger a refusal/failure on the primary model, show the server-side fallback "
                        "recovering in ONE call with the credit applied, vs the client-side retry loop"),
         "score_gate": "recovery_happened_in_one_call AND credit_applied",
-        "maturity_note": ("Fable/Mythos may be access-gated (a dev key reaches Haiku/Sonnet/Opus, not "
-                          "Fable without Mythos access); an inaccessible tier is reported unavailable, "
-                          "never faked"),
-        "source_url": "https://platform.claude.com/docs/en/api/openai-sdk",
+        "maturity_note": ("blocked on 2026-06-19: live probes for claude-fable-5 and "
+                          "claude-mythos-5 returned unavailable and pointed to the Anthropic "
+                          "Fable/Mythos access-suspension source"),
+        "source_url": "https://platform.claude.com/docs/en/build-with-claude/fallback-credit",
+        "source_date": "2026-06-19",
         "parity_verdict": "unchecked",   # no skeptic pass run against a fetched competitor surface yet
     },
     "cache_diagnostics": {
@@ -86,13 +88,87 @@ PARITY_CHECKS = {
                           "cache read missed (prefix below the minimum, changed prefix, expired TTL)",
         "competitor_surface": "OpenAI and Gemini usage objects (no named per-request cache-miss-reason "
                               "field surfaced to the caller)",
-        "thin_proof": ("construct each cache-miss condition deliberately and show Claude reports the "
-                       "miss reason per request where the competitor usage object is silent, turning a "
-                       "silent cost leak into a debuggable signal"),
+        "thin_proof": ("run `make cache-diagnostics`: construct a silent system-prefix cache miss and "
+                       "show Claude reports the miss reason per request where the competitor usage "
+                       "objects expose counters but no root-cause field"),
         "score_gate": "miss_reason_present_on_claude AND absent_on_every_fetched_competitor",
-        "maturity_note": "a narrow observability candidate; confirm the field name against the live "
-                         "usage schema before quoting, it can move",
-        "source_url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+        "maturity_note": "promoted on 2026-06-19 by edges/cache-diagnostics/receipt.json",
+        "source_url": "https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics",
+        "source_date": "2026-06-19",
+        "parity_verdict": "survives",
+    },
+    "task_budgets": {
+        "axis": "cost",
+        "claude_surface": "task_budget gives Claude an advisory token budget for the full agentic "
+                          "loop, including thinking, tool calls, tool results, and output, so it can "
+                          "self-regulate long tasks and finish gracefully near a cost or latency cap",
+        "competitor_surface": "OpenAI max_output_tokens and reasoning effort, plus Gemini thinking "
+                              "levels and thinking budgets. These control output or reasoning spend, "
+                              "not a documented full-loop agent budget across tools and results",
+        "thin_proof": ("run `make task-budget`: start a fixed tool-loop workload near budget "
+                       "exhaustion and show Claude hands off before the first tool call, while the "
+                       "Claude high-budget control and closest competitor controls all start the "
+                       "tool loop"),
+        "score_gate": "low_budget_handoff_before_tool AND high_budget_control_tool_call AND competitor_tool_calls",
+        "maturity_note": "promoted on 2026-06-19 by edges/task-budgets/receipt.json",
+        "source_url": "https://platform.claude.com/docs/en/build-with-claude/task-budgets",
+        "source_date": "2026-06-19",
+        "parity_verdict": "survives",
+    },
+    "web_search_tool": {
+        "axis": "cost",
+        "claude_surface": "web_search_20260318 supports dynamic filtering: Claude writes and executes "
+                          "code to filter search results before they reach the context window, and "
+                          "response_inclusion can exclude consumed search result blocks from the API "
+                          "response to reduce output tokens",
+        "competitor_surface": "OpenAI Responses web_search with filters, sources, live-access control, "
+                              "and return_token_budget, plus Gemini Grounding with Google Search. The "
+                              "parity check must confirm whether either exposes pre-context code "
+                              "filtering plus consumed-result exclusion",
+        "thin_proof": ("ask each platform to answer a multi-entity web research question where many "
+                       "search hits are irrelevant, then compare search-result tokens carried into "
+                       "context, output tokens returned, citations, and answer correctness"),
+        "score_gate": "same_answer_quality AND fewer_search_or_output_tokens AND competitor_equivalent_absent",
+        "maturity_note": ("GA for web search and programmatic tool calling per release notes, with "
+                          "dynamic filtering in web_search_20260209 or later and response_inclusion "
+                          "in web_search_20260318 or later"),
+        "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool",
+        "source_date": "2026-06-19",
+        "parity_verdict": "unchecked",
+    },
+    "web_fetch_tool": {
+        "axis": "cost",
+        "claude_surface": "web_fetch_20260318 supports dynamic filtering: Claude writes and executes "
+                          "code to filter fetched page content before it reaches the context window, "
+                          "and response_inclusion can exclude consumed fetch result blocks from the "
+                          "API response",
+        "competitor_surface": "OpenAI web_search and file or URL input paths, plus Gemini URL context. "
+                              "The parity check must confirm whether either exposes code-filtered "
+                              "fetch content before it reaches context and consumed-result exclusion",
+        "thin_proof": ("fetch several long pages with mostly irrelevant sections and one relevant "
+                       "table, then compare input tokens, returned output blocks, citation fidelity, "
+                       "and answer correctness across platforms"),
+        "score_gate": "same_answer_quality AND fewer_fetch_or_output_tokens AND competitor_equivalent_absent",
+        "maturity_note": "requires web_fetch_20260209 or later for dynamic filtering and web_fetch_20260318 or later for response inclusion",
+        "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-fetch-tool",
+        "source_date": "2026-06-19",
+        "parity_verdict": "unchecked",
+    },
+    "fast_mode": {
+        "axis": "speed",
+        "claude_surface": "fast mode offers higher output speed for supported Claude Opus models at "
+                          "premium pricing for latency-sensitive and agentic workflows",
+        "competitor_surface": "OpenAI priority processing, Gemini Flash tiers, and any vendor fast or "
+                              "priority path. The parity check must compare speed, price, model tier, "
+                              "and quality on the same workload",
+        "thin_proof": ("run the same long-output agentic task on normal and fast Claude, then compare "
+                       "against the closest OpenAI and Gemini fast paths for latency, total cost, and "
+                       "answer quality"),
+        "score_gate": "quality_holds AND lower_wall_clock_at_a_declared_price_premium",
+        "maturity_note": ("blocked on 2026-06-19: standard Opus 4.8 works, but fast mode returned "
+                          "a rate-limit error because this org has 0 fast-mode input tokens per minute"),
+        "source_url": "https://platform.claude.com/docs/en/build-with-claude/fast-mode",
+        "source_date": "2026-06-19",
         "parity_verdict": "unchecked",
     },
     "build_velocity": {
@@ -110,6 +186,7 @@ PARITY_CHECKS = {
                           "every headline primitive now has a competitor equivalent, so it is treated "
                           "as supporting color, not an anchored head-to-head; parity is the likely read"),
         "source_url": "https://docs.claude.com/en/docs/claude-code/github-actions",
+        "source_date": "2026-06-19",
         "parity_verdict": "unchecked",
     },
 }
@@ -157,8 +234,14 @@ class OtherParityGatedDemonstrator(BaseDemonstrator):
         if key == "build_velocity":
             return CostEstimate(
                 usd=0.5, wall_clock_s=300.0, command="(opt-in) the Claude Code issue-to-PR loop",
-                note="a bounded headless Claude Code run on a fixed repo and issue, gated behind a "
-                     "passing parity check; not run in the offline cadence",
+                note="a bounded build-velocity proof, gated behind a passing parity check, not run in "
+                     "the offline cadence",
+            )
+        if key == "fast_mode":
+            return CostEstimate(
+                usd=0.5, wall_clock_s=180.0, command="(opt-in) the fast-mode latency proof",
+                note="a bounded speed and quality proof, gated behind a passing parity check and fast "
+                     "mode access, not run in the offline cadence",
             )
         return CostEstimate(
             usd=0.05, wall_clock_s=30.0, command=f"(opt-in) the {key} thin proof",
@@ -241,7 +324,8 @@ class OtherParityGatedDemonstrator(BaseDemonstrator):
                 "scope": "a parity-check precondition, not a measured head-to-head",
             },
             grounding=[{"claim": entry.get("claude_surface", ""),
-                        "source_url": entry.get("source_url", ""), "date": "2026-06-18"}],
+                        "source_url": entry.get("source_url", ""),
+                        "date": entry.get("source_date", "2026-06-18")}],
             fairness={
                 "best_to_best": "the competitor surface to parity-check against is named "
                                 "(" + entry.get("competitor_surface", "") + "), not a strawman",
@@ -260,12 +344,10 @@ def main(argv=None) -> int:
     import argparse
 
     p = argparse.ArgumentParser(
-        description="other_parity_gated: the thin parity-gated candidates (fallback credit, "
-                    "cache_miss_reason, Claude Code build velocity). Each is HELD never-evaluated and "
+        description="other_parity_gated: the thin parity-gated candidates. Each is HELD never-evaluated and "
                     "not pitched until its parity check (the engine/verify.py skeptic pass) survives "
                     "against a fetched competitor surface. NO API call on this view, $0.")
-    p.add_argument("--edge", default=None, help="show one candidate (fallback_credit, cache_diagnostics, "
-                                                "build_velocity); default shows all")
+    p.add_argument("--edge", default=None, help="show one candidate; default shows all")
     a = p.parse_args(argv)
 
     keys = [a.edge] if a.edge else list(PARITY_CHECKS)
@@ -285,7 +367,7 @@ def main(argv=None) -> int:
         print(f"    thin proof (gated): {entry['thin_proof']}")
         print(f"    score gate:         {entry['score_gate']}")
         print(f"    note:               {entry['maturity_note']}")
-        print(f"    source:             {entry['source_url']} (2026-06-18)\n")
+        print(f"    source:             {entry['source_url']} ({entry.get('source_date', '2026-06-18')})\n")
     held = [k for k in keys if not parity_check_passed(k)]
     print(f"  {len(held)} of {len(keys)} candidate(s) held: the parity check has not survived, so they")
     print("  stay never-evaluated and are never pitched. This is the honest state of the long tail.\n")

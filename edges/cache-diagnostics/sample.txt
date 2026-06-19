@@ -1,0 +1,34 @@
+
+  Cache diagnostics workload: two long cached-prefix requests with one silent system-prefix change.
+  The client sees a cache miss. The question is whether the API says what changed.
+
+  Cache-miss root-cause head-to-head, one live run.
+
+  platform                              root cause known  miss reason       missed tok     cache signal     cost  wall time
+  ---------------------------------------------------------------------------------------------------------------
+  claude claude-haiku-4-5-20251001           YES   system_changed          6,827              yes  $0.0694      12.7s
+  openai gpt-5.5                              NO                -              0              yes  $0.0515       2.7s
+  gemini gemini-3.1-pro-preview               NO                -              0              yes  $0.0242       3.5s
+
+  Claude diagnostic variant coverage:
+    system_changed     -> system_changed     matched=true missed=6,827
+    tools_changed      -> tools_changed      matched=true missed=7,360
+    messages_changed   -> messages_changed   matched=true missed=6,836
+    model_changed      -> model_changed      matched=true missed=6,827
+
+  Verdict:
+    positive_signal: true
+    promotable_edge: true
+
+  Honest reading:
+  - Claude named 4/4 documented cache-break root causes.
+  - Claude estimated the missed input tokens for each typed miss reason.
+  - OpenAI and Gemini exposed cache token counters but no miss-reason field on this workload.
+  - Claude reduced the manual suspect list from 4 to 1.
+  - The edge is observability, not cheaper inference on this two-call probe.
+
+  Reproduce:
+    make cache-diagnostics
+
+  Machine receipt:
+    data/last_cache_diagnostics.json

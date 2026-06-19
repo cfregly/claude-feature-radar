@@ -41,6 +41,13 @@ These are why the output is trusted. Break one and the trust is gone.
    not merely allowed, they are often where the Claude edge lives, so anchor on a beta or alpha
    feature when it is the sharpest verified differentiator and label it beta with the doc, the date,
    and any beta header it needs (Claude Managed Agents needs `managed-agents-2026-04-01`, for example).
+   When docs advertise a newer tool version, model, parameter, response field, or beta header, verify
+   latest SDK version, installed SDK schema, raw API acceptance, and header requirements before
+   treating it as live.
+   Fast mode has a separate org-level rate-limit pool. A `0 fast mode input tokens per minute` error
+   cannot be fixed in this repo or by changing the Messages request. Request fast-mode access or a
+   fast-mode rate-limit increase through the Anthropic account path, confirm it on the Claude Console
+   Limits page or with the Rate Limits API, then run `make fast-mode` for the receipt.
 2. **Always use the live docs.** Every capability claim and every price traces to the vendor's own
    current doc page, fetched at run time, dated. Memory tells you what to verify, never what to
    assert.
@@ -83,16 +90,21 @@ These are why the output is trusted. Break one and the trust is gone.
    Claude Developer Platform: an API primitive (prompt caching, the Batch API, the memory tool, code
    execution, citations, extended thinking, the 1M-token window), the Agent SDK, Agent Skills, MCP,
    Claude Code, or an economics lever. Do not lock onto the first measurable Claude-only feature, that
-   is a local minimum. Survey the entire surface, rank every genuine differentiator by value to a
-   founder times how clearly Claude leads after the competitor-parity check, and anchor on the global
-   maximum. Then pick the task that EXERCISES that edge: a toy task collapses every model to a
-   cost-and-speed race Claude may lose, so the benchmark must be a real job where the edge decides the
-   outcome. Re-run the whole search every time, the platform ships monthly and the edge moves. Search
-   and rank BEFORE you build, never anchor on the first measurable thing. Any genuine value-add is a
-   valid anchor even if narrow, provided it is measured on an axis a founder pays for (cost, speed,
-   reliability, long-running, correctness) AGAINST the competitor at its best, not just against Claude
-   without the feature. A feature-on-versus-off result is a within-Claude value-add until the
-   cross-vendor arm is run, so label it as exactly that.
+   is a local minimum. Survey the entire surface, then dive below the feature label. Break every
+   candidate into subfeatures: parameters, modes, beta headers, response fields, billing behavior,
+   lifecycle rules, failure modes, and where it sits inside an agent loop. Do not stop at "web
+   search", "files", "tools", "agents", "caching", or "code execution" and call it parity. The wedge
+   often lives one layer down, as with web search where the generic feature is parity but pre-context
+   dynamic filtering plus result-block exclusion can still be a real candidate. Rank every genuine
+   differentiator by value to a founder times how clearly Claude leads after the competitor-parity
+   check, and anchor on the global maximum. Then pick the task that EXERCISES that edge: a toy task
+   collapses every model to a cost-and-speed race Claude may lose, so the benchmark must be a real job
+   where the edge decides the outcome. Re-run the whole search every time, the platform ships monthly
+   and the edge moves. Search and rank BEFORE you build, never anchor on the first measurable thing.
+   Any genuine value-add is a valid anchor even if narrow, provided it is measured on an axis a founder
+   pays for (cost, speed, reliability, long-running, correctness) AGAINST the competitor at its best,
+   not just against Claude without the feature. A feature-on-versus-off result is a within-Claude
+   value-add until the cross-vendor arm is run, so label it as exactly that.
 10. **Understand the mechanism, then find the workload where the edge appears.** Before claiming or
     dismissing a feature, learn how it and the competitor's nearest equivalent actually work and where
     each breaks (Claude's context editing clears in place, OpenAI's compaction summarizes and can drop
@@ -104,7 +116,18 @@ These are why the output is trusted. Break one and the trust is gone.
     dismissing a feature on a naive test. This vets the feature and finds its genuine win condition, it
     never manufactures a rigged one.
 
-11. **Name the founder use case and the Claude features on every outbound surface.** Every founder
+11. **Compare at subfeature depth, then explain it plainly.** The comparison unit is the smallest
+    meaningful mechanism that changes builder value, not the broad marketing feature. For every
+    candidate, write the subfeature claim first: what changes in the API call, what the model sees,
+    what the client receives, and which cost, latency, correctness, or reliability number should move.
+    Compare the competitor's closest subfeature, not only its headline feature. If the competitor has
+    the umbrella capability but lacks the exact mode, field, lifecycle behavior, or token-accounting
+    behavior, record the candidate as parity-gated and test it. If it survives, explain that
+    subfeature in public-reader language with public docs and a receipt. If docs, SDK, and runtime
+    disagree at this level, resolve and record that discrepancy first: accepted tags, rejected tags,
+    SDK schema support, raw HTTP result, beta-header attempts, and whether the candidate is held.
+
+12. **Name the founder use case and the Claude features on every outbound surface.** Every founder
     email and the README hero is written for one reader, a founder building over their users' own work
     (contracts, charts, tickets, research, support docs, a long-running agent). Name that use case and
     the workload behind it first, then name the Claude Developer Platform and Claude Agent SDK features
@@ -113,7 +136,7 @@ These are why the output is trusted. Break one and the trust is gone.
     the search surfaced this run. Name the feature, then show what the founder gets on that workload,
     measured against the competitor at its best. A feature name is not a value.
 
-12. **The public surface shows only wins, in the founder's language.** Rules 4 and 6 (both-directions
+13. **The public surface shows only wins, in the founder's language.** Rules 4 and 6 (both-directions
     honesty, lead with the worth) govern the internal analysis and the reviewer. The founder-facing
     surface, meaning the emails, the briefs, and the landing README, shows only verified Claude wins and
     never exposes a Claude negative. No "Claude got it wrong" baseline, no "where Claude loses". Reframe
@@ -144,19 +167,40 @@ These are why the output is trusted. Break one and the trust is gone.
     example through the problem, the code, the table, and the tool name.
     Every word fights for its place, so cut anything that does not earn its spot, the same every-word-earns-its-place standard.
 
+14. **Public readers have only public context.** Any generated public brief, README, founder email, or
+    forkable bundle must stand alone with files that ship in that repo and public URLs. Do not rely on
+    this private parent workspace, private receipts, private plans, or any internal repository. If a
+    claim, instruction, source, or reproduction step is needed to understand the edge, include it in
+    the public artifact or link to a public source.
+
+15. **Fan out only on a wide, independent search space.** The engine is not a parallel pipeline by
+    default. The discovery loop is one deterministic stdlib pass for $0, and the skeptic pass is one
+    model call over all candidates, not a fleet. Fan out (a multi-lane sweep, a review panel) only
+    when the search space is wide and independent (many subfeatures or competitor surfaces at once,
+    each lane blind to the others), when a thorough audit needs coverage over cost, or when a finding
+    wants diverse skeptic lenses. Stay inline and sequential to ground a single claim (one fetch) or
+    to verify one edge against its primary source, where the rigor is reading one source carefully,
+    not skimming ten. Managed Agents is a capability this engine may anchor an edge on, never the
+    machinery that runs it. Parallel processing is earned by the search space, not taken by default.
+
 ## The steps
 
 ### 1. Audit the live docs (sweep the whole platform surface for the global edge)
 Sweep the ENTIRE Claude Developer Platform, not a fixed feature list: the Messages API primitives
 (prompt caching, the Batch API, the memory tool, code execution, citations, extended thinking, the
 1M-token window), the Agent SDK, Agent Skills, MCP, Claude Code, and the economics levers. For each
-candidate, fetch the current Claude doc, the current OpenAI doc, and the current Gemini doc, and
-classify it: claude-only, claude-ahead, parity, or behind. Run a skeptic pass that tries to refute
-every claude-only claim by finding the competitor's equivalent, and drop anything a competitor
-already matches. Then RANK what survives by value to a founder times how clearly Claude leads, and
-carry the global maximum forward as the anchor, not the first thing that was easy to measure. This
-produces two lists: Claude's genuine differentiators, ranked, and Claude's genuine gaps. Map each to
-the founder priority stack: cost, speed, then reduced maintenance and heavy lifting.
+candidate, fetch the current Claude doc, the current OpenAI doc, and the current Gemini doc. Then
+break the candidate into subfeatures before classifying it: modes, headers, parameters, response
+fields, billing behavior, lifecycle behavior, tool-loop behavior, and failure modes. Classify the
+subfeature, not only the high-level feature, as claude-only, claude-ahead, parity, or behind. Run a
+skeptic pass that tries to refute every claude-only claim by finding the competitor's exact equivalent,
+and drop anything a competitor already matches. For docs-new subfeatures, test the latest SDK and
+raw API surface before ranking. A documented field that is not accepted by the current API/key is a
+held discrepancy, not a public edge. Then RANK what survives by value to a founder times
+how clearly Claude leads, and carry the global maximum forward as the anchor, not the first thing that
+was easy to measure. This produces two lists: Claude's genuine differentiators, ranked, and Claude's
+genuine gaps. Map each to the founder priority stack: cost, speed, then reduced maintenance and heavy
+lifting.
 
 ### 2. Benchmark best to best
 Run the same long-horizon agent on each platform at full strength and measure the outcomes a
@@ -166,12 +210,28 @@ founder pays for: total cost, wall-clock time, and correctness.
 make compare    # OpenAI (Responses + compaction + caching) vs Claude (context editing + memory + caching)
 make sweep      # the same, across the knobs that matter, so the result is trusted not assumed
 make longhorizon # the regime where managed context pays off: unmanaged degrades or crashes, managed finishes
+make ledger     # exact-list long stream, Claude vs OpenAI vs Gemini, data-backed edge when promotable
+make pdf-citations # direct-PDF page citations, data-backed edge when promotable
+make search-results # BYO RAG chunk citations, data-backed edge when promotable
+make cache-diagnostics # cache-miss root-cause observability, data-backed edge when promotable
+make task-budget # full-loop budget marker, stop-before-tool-call edge when promotable
+make fast-mode  # fast-mode access and speed validation, held if org has 0 fast-mode ITPM
+make advisor    # advisor routing cost-at-quality candidate, held unless promotable
 ```
 
 ### 3. Synthesize the honest picture
 Combine the audit and the benchmark. State plainly where Claude wins, where it ties, and where it
 loses. The anchor for the founder email is the sharpest item that is genuinely Claude-only or
 clearly Claude-ahead and survived the skeptic, not whatever sounds best.
+
+For held candidates, run the narrow validators before writing any public claim:
+
+```
+make dynamic-web   # live receipt for web search/fetch dynamic filtering, held unless promotable
+```
+
+This command can produce positive signal. It does not create a public edge unless its receipt shows
+`promotable_edge: true`.
 
 ### 4. Draft the two emails
 ```
@@ -232,6 +292,9 @@ edges/context-editing/demo.py the long-horizon proof: unmanaged degrades or cras
 engine/openai_arm.py          the OpenAI arm (Responses API, compaction + caching, latest)
 engine/compare.py             OpenAI vs Claude, best to best, outcomes a founder pays for
 engine/sweep.py               the variant sweep that makes the result trustworthy
+engine/ledger_compare.py      the exact-list long-stream edge, best-to-best across 3 vendors
+engine/demonstrators/dynamic_web_filtering.py  the held dynamic web filtering validator
+engine/demonstrators/task_budgets.py           the task_budget full-loop edge validator
 engine/draft_email.py         the founder email, from the verified anchor
 engine/product_alert.py       the product-team email, both-direction honesty
 common/                       verified model + price registry, cost math, client

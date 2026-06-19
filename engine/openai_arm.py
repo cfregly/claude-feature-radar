@@ -73,7 +73,8 @@ def _cost(model, usage):
     return cost, inp, cached
 
 
-def run_openai_agent(docs, start, *, model=DEFAULT_OPENAI_MODEL, compact_threshold=None, max_turns):
+def run_openai_agent(docs, start, *, model=DEFAULT_OPENAI_MODEL, compact_threshold=None, max_turns,
+                     prompt=None):
     """Run the chain audit on OpenAI, caching always on, compaction on if compact_threshold is set.
 
     compact_threshold=None means no compaction (carry the full context, let caching make the
@@ -82,7 +83,7 @@ def run_openai_agent(docs, start, *, model=DEFAULT_OPENAI_MODEL, compact_thresho
     client = _client()
     cm = [{"type": "compaction", "compact_threshold": compact_threshold}] if compact_threshold else None
     prev_id = None
-    pending = [{"role": "user", "content": task_prompt(start, memory=False)}]
+    pending = [{"role": "user", "content": prompt or task_prompt(start, memory=False)}]
     records, final_text = [], ""
     for turn in range(max_turns):
         kwargs = dict(model=model, tools=[READ_TOOL_OAI], store=True, input=pending)

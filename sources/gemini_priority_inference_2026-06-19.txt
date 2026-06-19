@@ -1,0 +1,4 @@
+Source: https://ai.google.dev/gemini-api/docs/priority-inference
+Snapshot fetched 2026-06-19. Verbatim excerpts for citation grounding.
+
+The Gemini Priority API is a premium inference tier designed for business-critical workloads that require lower latency and the highest reliability at a premium price point.

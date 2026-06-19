@@ -1,0 +1,125 @@
+{
+  "date": "2026-06-19",
+  "claim_under_test": "On an exact-list long-stream workload, Claude context editing can preserve the running ledger exactly while using less cost and time than best competitor context paths.",
+  "sources": {
+    "claude": "https://platform.claude.com/docs/en/build-with-claude/context-editing",
+    "openai": "https://developers.openai.com/api/docs/guides/compaction",
+    "gemini": "https://ai.google.dev/gemini-api/docs/long-context"
+  },
+  "config": {
+    "docs": 30,
+    "doc_tokens": 20000,
+    "trigger": 45000,
+    "keep": 1,
+    "max_turns": 44
+  },
+  "gold": [
+    0,
+    3,
+    6,
+    9,
+    12,
+    15,
+    18,
+    21,
+    24,
+    27
+  ],
+  "rows": [
+    {
+      "platform": "Claude Haiku 4.5 (context editing)",
+      "crashed": false,
+      "answer": [
+        0,
+        3,
+        6,
+        9,
+        12,
+        15,
+        18,
+        21,
+        24,
+        27
+      ],
+      "cost": 0.6699882,
+      "peak": 35186,
+      "note": "",
+      "elapsed_s": 60.689399041002616,
+      "score": {
+        "exact": true,
+        "precision": 1.0,
+        "recall": 1.0,
+        "missing": [],
+        "extra": []
+      }
+    },
+    {
+      "platform": "OpenAI gpt-5.5 (compaction)",
+      "crashed": false,
+      "answer": [
+        0,
+        3,
+        6,
+        9,
+        12,
+        15,
+        18,
+        21,
+        24,
+        27
+      ],
+      "cost": 1.8425259999999999,
+      "peak": 41548,
+      "note": "",
+      "elapsed_s": 164.34382716700202,
+      "score": {
+        "exact": true,
+        "precision": 1.0,
+        "recall": 1.0,
+        "missing": [],
+        "extra": []
+      }
+    },
+    {
+      "platform": "Gemini gemini-3.1-pro-preview (full context)",
+      "crashed": false,
+      "answer": [
+        0,
+        3,
+        6,
+        9,
+        12,
+        15,
+        18,
+        21,
+        24,
+        27
+      ],
+      "cost": 2.568965,
+      "peak": 434629,
+      "note": "",
+      "elapsed_s": 200.95212770800572,
+      "score": {
+        "exact": true,
+        "precision": 1.0,
+        "recall": 1.0,
+        "missing": [],
+        "extra": []
+      }
+    }
+  ],
+  "verdict": {
+    "positive_signal": true,
+    "promotable_edge": true,
+    "why_not_promotable": [],
+    "measured_axis": [
+      "exactness",
+      "cost",
+      "wall_clock_time",
+      "peak_context"
+    ],
+    "cost_win_against_exact_competitors": true,
+    "time_win_against_exact_competitors": true,
+    "all_competitors_exact": true
+  }
+}

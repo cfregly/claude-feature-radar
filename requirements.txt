@@ -1,2 +1,2 @@
 # One dependency. That is the point.
-anthropic>=0.109.2
+anthropic>=0.111.0

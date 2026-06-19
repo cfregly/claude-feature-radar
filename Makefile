@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps app app-check ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges cadence coverage managed parity-gated scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports check-surface check-receipts test ci deslop gif clean
+.PHONY: setup compare-deps app app-check ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack bulk-output advisor scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports check-surface check-receipts test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -28,6 +28,21 @@ citations: ## EDGE: verifiable citations vs the DIY str.find baseline, all three
 citations-quick: ## a 3-question, cents-scale smoke of the citations edge
 	$(PY) edges/citations/demo.py --quick
 
+pdf-citations: ## EDGE: page citations into a directly supplied PDF, Claude vs direct PDF/file inputs (needs 3 keys, cents)
+	$(PY) run.py pdf-citations --emit-edge
+
+search-results: ## EDGE: cite the developer's own RAG chunks inline, vs OpenAI/Gemini hosted file_search (needs 3 keys, cents)
+	$(PY) run.py search-results --emit-edge
+
+grounding-stack: ## EDGE (combination): cite text + PDF + RAG chunk each with its own pointer in ONE request, vs OpenAI/Gemini inline (needs 3 keys, cents)
+	$(PY) run.py grounding-stack --emit-edge
+
+bulk-output: ## EDGE: largest deliverable in ONE request, Claude 300k batch beta vs OpenAI/Gemini output caps (needs 3 keys, a few dollars, the Claude batch is slow)
+	$(PY) run.py bulk-output --emit-edge
+
+advisor: ## advisor tool: cheap executor + frontier advisor in ONE request, cost-at-quality vs the competitor frontier solo (needs 3 keys, a few dollars)
+	$(PY) run.py advisor --emit-edge
+
 cite: ## ground every shipped price and fact through Claude's own Citations API (writes docs/CITED_FACTS.md, cents)
 	$(PY) -m engine.cite_facts
 
@@ -48,6 +63,12 @@ longhorizon-smoke: ## a cheap run that exercises the context-editing harness wit
 
 longhorizon-compare: ## cross-vendor head-to-head on the long task: Claude editing+memory vs OpenAI compaction vs Gemini (needs compare-deps + 3 keys, about $3)
 	$(PY) run.py longhorizon-compare --repeat 3
+
+ledger: ## EDGE: exact-list long stream, Claude context editing vs OpenAI compaction vs Gemini full context (needs 3 keys, about $5)
+	$(PY) run.py ledger --full
+
+ledger-smoke: ## cents-scale exact-list smoke, useful for checking the harness shape
+	$(PY) run.py ledger --docs 8 --doc-tokens 3000 --no-gemini
 
 compare: ## the credibility table: OpenAI vs Gemini vs Claude on the same long agent, all best config (needs compare-deps + ANTHROPIC + OPENAI + GEMINI keys; the Gemini row degrades gracefully if its key or quota is missing)
 	$(PY) run.py compare
@@ -70,8 +91,20 @@ coverage: ## per-demoKind coverage: what is built vs adapt vs build, and the gap
 managed: ## the Tier-2 monthly resumable Managed Agents runtime, wired but not run (prints the boundary, $0; --apply runs a live session and spends a small bounded amount)
 	$(PY) run.py managed
 
-parity-gated: ## the long-tail parity-gated candidates (fallback credit, cache_miss_reason, Claude Code build velocity), each HELD until its parity check survives (NO API call, $0)
+parity-gated: ## the long-tail parity-gated candidates, each HELD until its parity check survives (NO API call, $0)
 	$(PY) run.py other
+
+dynamic-web: ## live subfeature validation for web search/fetch dynamic filtering (needs 3 keys + compare-deps, spends a bounded amount)
+	$(PY) run.py dynamic-web
+
+task-budget: ## live subfeature validation for task_budget full-loop budget markers (needs 3 keys + compare-deps, spends a bounded amount)
+	$(PY) run.py task-budget --emit-edge
+
+cache-diagnostics: ## EDGE: cache-miss root-cause observability, Claude vs OpenAI/Gemini cache counters (needs 3 keys, cents)
+	$(PY) run.py cache-diagnostics --emit-edge
+
+fast-mode: ## live validation for fast mode access and same-model speedup (needs ANTHROPIC_API_KEY, held if org has 0 fast-mode ITPM)
+	$(PY) run.py fast-mode
 
 scan: ## print the candidate gaps, grounded in both sides' docs (no API call)
 	$(PY) run.py scan

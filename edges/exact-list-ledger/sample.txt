@@ -1,0 +1,28 @@
+
+  Exact-list workload (full long-stream): a 30-report chain, each report about 20,000 tokens.
+  The agent must report the EXACT sorted list of URGENT ids, held in its own reasoning, no memory tool.
+  Claude clears tool results in place, OpenAI compacts, Gemini carries the full window.
+
+  Exact-list head-to-head, one full run. Ground-truth URGENT ids (10): [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]
+
+  platform                              exact  recall  missed  peak ctx     cost  wall time
+  -----------------------------------------------------------------------------------------
+  Claude Haiku 4.5 (context editing)      YES    100%       0    35,186  $0.6700      60.7s
+  OpenAI gpt-5.5 (compaction)             YES    100%       0    41,548  $1.8425     164.3s
+  Gemini gemini-3.1-pro-preview           YES    100%       0   434,629  $2.5690     201.0s
+
+  Verdict:
+    positive_signal: true
+    promotable_edge: true
+
+  Honest reading:
+  - All three arms returned the exact list. The edge is not exclusivity.
+  - Claude was about 64% cheaper and 63% faster than the exact OpenAI run.
+  - Claude was about 74% cheaper and 70% faster than the exact Gemini run.
+  - The workload shape is specific: long stream, large disposable tool results, exact accumulated state.
+
+  Reproduce:
+    make ledger
+
+  Machine receipt:
+    data/last_ledger_compare.json

@@ -24,6 +24,9 @@ from __future__ import annotations
 # uses, kept here as the single source of truth the registry and tests read.
 #   token_accounting    a Claude mechanism bills fewer input/context tokens for the same answer.
 #   grounding_resolution a guaranteed-valid, output-token-free source pointer into the user's doc.
+#   pdf_grounding        a page pointer into a directly supplied PDF, best-to-best across vendors.
+#   byo_rag_grounding    a resolver-free block pointer into the developer's OWN inline RAG chunks.
+#   advisor_routing      a cheap executor consults a frontier advisor inside ONE request (cost-at-quality).
 #   long_horizon_survival a long, tool-heavy load FINISHES and stays correct where the other errors.
 #   retention_resume    a stateful feature survives a kill and re-attach, with a negative control.
 #   eval_quality        one (model, effort, prompt) cell wins on the believable held-out test number.
@@ -33,6 +36,11 @@ from __future__ import annotations
 DEMO_KINDS = [
     "token_accounting",
     "grounding_resolution",
+    "pdf_grounding",
+    "byo_rag_grounding",
+    "grounding_stack",
+    "advisor_routing",
+    "extended_output",
     "long_horizon_survival",
     "retention_resume",
     "eval_quality",
@@ -49,11 +57,24 @@ KEY_TO_DEMOKIND = {
     # token_accounting: a mechanism that keeps bytes out of the billed context.
     "ptc": "token_accounting",
     "programmatic-tool-calling": "token_accounting",
-    "advisor_tool": "token_accounting",
     "mid_conversation_system": "token_accounting",
+    # advisor_routing: a cheap executor consults a frontier advisor in ONE request (cost-at-quality).
+    "advisor_tool": "advisor_routing",
+    "advisor": "advisor_routing",
+    "advisor-routing": "advisor_routing",
+    "advisor_routing": "advisor_routing",
     # grounding_resolution: a guaranteed-valid source pointer into the user's own document.
     "citations": "grounding_resolution",
-    "search_results": "grounding_resolution",
+    "pdf_support": "pdf_grounding",
+    "pdf-citations": "pdf_grounding",
+    "pdf_citations": "pdf_grounding",
+    # byo_rag_grounding: a resolver-free block pointer into the developer's own inline RAG chunks.
+    "search_results": "byo_rag_grounding",
+    "search-results": "byo_rag_grounding",
+    "search_results_grounding": "byo_rag_grounding",
+    # grounding_stack: cite text + PDF + RAG chunk, each with its own pointer, in ONE request.
+    "grounding_stack": "grounding_stack",
+    "grounding-stack": "grounding_stack",
     "cite_facts": "grounding_resolution",
     # long_horizon_survival: a heavy, tool-heavy run finishes where the unmanaged one errors.
     "context_editing": "long_horizon_survival",
@@ -74,6 +95,11 @@ KEY_TO_DEMOKIND = {
     "model_tier_migration": "eval_quality",
     "tier": "eval_quality",
     "claude_code": "eval_quality",
+    # extended_output: a single request emits a deliverable larger than the competitor output caps.
+    "batch_processing": "extended_output",
+    "extended_output": "extended_output",
+    "bulk-extended-output": "extended_output",
+    "bulk_extended_output": "extended_output",
     # cost: a pure-pricing-model edge, no model call, both win and lose regimes shown.
     "pricing": "cost",
     "prompt_caching": "cost",
@@ -86,6 +112,12 @@ KEY_TO_DEMOKIND = {
     # other(): narrow candidates that each need a parity check FIRST.
     "fallback_credit": "other",
     "cache_diagnostics": "other",
+    "task_budgets": "other",
+    "web_search_tool": "other",
+    "web_fetch_tool": "other",
+    "dynamic_web_filtering": "other",
+    "response_inclusion": "other",
+    "fast_mode": "other",
     "build_velocity": "other",
 }
 

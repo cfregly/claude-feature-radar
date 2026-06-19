@@ -1,0 +1,61 @@
+{
+  "date": "2026-06-19",
+  "claim_under_test": "For a directly supplied text PDF, Claude Citations returns a verifiable page_location pointer and cited text, while OpenAI input_file and Gemini inline PDF answer but do not return a pointer into the supplied PDF.",
+  "n_questions": 5,
+  "n_pages": 5,
+  "total_cost": 0.084408,
+  "sources": {
+    "claude_citations": "https://platform.claude.com/docs/en/build-with-claude/citations",
+    "claude_pdf_support": "https://platform.claude.com/docs/en/build-with-claude/pdf-support",
+    "openai_files": "https://developers.openai.com/api/docs/guides/file-inputs",
+    "openai_file_search": "https://developers.openai.com/api/docs/guides/tools-file-search",
+    "gemini_document_processing": "https://ai.google.dev/gemini-api/docs/document-processing",
+    "gemini_file_search": "https://ai.google.dev/gemini-api/docs/file-search"
+  },
+  "skipped": [],
+  "arms": [
+    {
+      "name": "claude:haiku",
+      "provider": "anthropic",
+      "model": "claude-haiku-4-5-20251001",
+      "answered": "5/5",
+      "cited": "5/5",
+      "page_correct": "5/5",
+      "cost": 0.04581,
+      "latency_s": 6.16,
+      "errors": []
+    },
+    {
+      "name": "openai:gpt-mid",
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "answered": "5/5",
+      "cited": "0/5",
+      "page_correct": "0/5",
+      "cost": 0.006357,
+      "latency_s": 15.9,
+      "errors": []
+    },
+    {
+      "name": "gemini:gem-flash",
+      "provider": "gemini",
+      "model": "gemini-3.5-flash",
+      "answered": "5/5",
+      "cited": "0/5",
+      "page_correct": "0/5",
+      "cost": 0.032241,
+      "latency_s": 14.11,
+      "errors": []
+    }
+  ],
+  "verdict": {
+    "positive_signal": true,
+    "promotable_edge": true,
+    "claude_answered_all": true,
+    "claude_page_correct_all": true,
+    "all_competitors_ran": true,
+    "competitors_answered_all": true,
+    "competitor_any_direct_pdf_pointer": false,
+    "why_not_promotable": []
+  }
+}

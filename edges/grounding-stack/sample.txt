@@ -1,0 +1,28 @@
+  Grounding-stack combination workload: one request carrying three mixed inline sources
+  (a plain-text document, a directly-supplied PDF, and a developer-supplied search_result chunk)
+  plus a three-part question, one fact unique to each source.
+
+  platform              answered   source types cited /1 request   hosted objects     cost  wall time
+  ------------------------------------------------------------------------------------------------------
+  claude:haiku               3/3   3/3 (char+page+search_result)                0  $0.0102     2.2s
+  openai:gpt-mid             3/3   0/3 (inline)                                 0  $0.0028     7.1s
+  gemini:gem-flash           3/3   0/3 (inline)                                 0  $0.0094     4.3s
+
+  Verdict:
+    positive_signal: true
+    promotable_edge: true
+
+  Honest reading:
+  - All three answered every part correctly.
+  - Only Claude returned a pointer into the supplied content, and returned all three location types
+    (char_location + page_location + search_result_location) in one response.
+  - On the one-request inline path, OpenAI and Gemini returned no pointer into the inline sources.
+  - The competitors' hosted file-search path is measured separately in the search-results edge
+    (file/chunk-level, six persisted objects, cannot cite a directly-supplied PDF).
+  - Citations and structured outputs cannot combine (400), so the grounded answer is free text.
+
+  Reproduce:
+    make grounding-stack
+
+  Machine receipt:
+    data/last_grounding_stack.json

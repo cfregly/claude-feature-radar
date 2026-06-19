@@ -1,0 +1,25 @@
+  Bring-your-own-RAG citation workload: five questions over five developer-supplied chunks.
+  The chunks are passed inline in the request, not uploaded to a hosted vector store.
+
+  platform              answered   correct cite   pointer kind   hosted objects     cost  wall time
+  ------------------------------------------------------------------------------------------------------
+  claude:haiku                 5/5            5/5     block-span                0  $0.0067     4.5s
+  openai:gpt-mid               5/5            5/5     file-level                6  $0.0301    19.8s
+  gemini:gem-flash             5/5            5/5    chunk-level                6  $0.0156    26.5s
+
+  Verdict:
+    positive_signal: true
+    promotable_edge: true
+
+  Honest reading:
+  - All three cited the correct source chunk.
+  - Claude cited inline, resolver-free, with a block-level pointer and zero persisted objects.
+  - OpenAI and Gemini each required a hosted vector store and returned a coarser file or chunk-level pointer.
+  - The claim is scoped to citing the developer's own inline chunks. Hosted file-search stores
+    are different persisted flows and are named separately in the sources.
+
+  Reproduce:
+    make search-results
+
+  Machine receipt:
+    data/last_search_results.json

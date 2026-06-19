@@ -1,0 +1,46 @@
+{
+  "total_cost": 0.022382,
+  "skipped": [],
+  "arms": [
+    {
+      "name": "claude:haiku",
+      "provider": "anthropic",
+      "model": "claude-haiku-4-5-20251001",
+      "answered": "3/3",
+      "source_types_cited_in_one_request": "3/3",
+      "pointer_kinds": [
+        "char_location",
+        "page_location",
+        "search_result_location"
+      ],
+      "persisted_objects": 0,
+      "cost": 0.010166,
+      "latency_s": 2.19,
+      "errors": []
+    },
+    {
+      "name": "openai:gpt-mid",
+      "provider": "openai",
+      "model": "gpt-5.4",
+      "answered": "3/3",
+      "source_types_cited_in_one_request": "0/3",
+      "pointer_kinds": [],
+      "persisted_objects": 0,
+      "cost": 0.002848,
+      "latency_s": 7.06,
+      "errors": []
+    },
+    {
+      "name": "gemini:gem-flash",
+      "provider": "gemini",
+      "model": "gemini-3.5-flash",
+      "answered": "3/3",
+      "source_types_cited_in_one_request": "0/3",
+      "pointer_kinds": [],
+      "persisted_objects": 0,
+      "cost": 0.009369,
+      "latency_s": 4.25,
+      "errors": []
+    }
+  ]
+}

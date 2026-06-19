@@ -1,0 +1,24 @@
+  Direct-PDF citation workload: five questions over a five-page synthetic agreement PDF.
+  The file is supplied directly in the request, not uploaded to a hosted vector store.
+
+  platform                       answered   direct-PDF pointer   right page     cost  wall time
+  -----------------------------------------------------------------------------------------------
+  claude:haiku                       5/5                  5/5          5/5  $0.0458      6.2s
+  openai:gpt-mid                     5/5                  0/5          0/5  $0.0064     15.9s
+  gemini:gem-flash                   5/5                  0/5          0/5  $0.0322     14.1s
+
+  Verdict:
+    positive_signal: true
+    promotable_edge: true
+
+  Honest reading:
+  - Claude returned page-location citations that resolved to the correct page for 5/5 answers.
+  - OpenAI and Gemini answered the direct-PDF questions, but returned no direct-PDF page pointer.
+  - The claim is scoped to directly supplied PDFs. Hosted vector-store/file-search paths are
+    different product flows and are named separately in the sources.
+
+  Reproduce:
+    make pdf-citations
+
+  Machine receipt:
+    data/last_pdf_citations.json

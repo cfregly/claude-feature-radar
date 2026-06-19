@@ -1,0 +1,250 @@
+{
+  "date": "2026-06-19",
+  "claim_under_test": "Claude cache diagnostics returns a typed cache_miss_reason for a silent prompt-cache prefix change, while closest OpenAI and Gemini cache surfaces expose counters but no per-request miss reason.",
+  "sources": {
+    "claude": "https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics",
+    "openai": "https://developers.openai.com/api/docs/guides/prompt-caching",
+    "gemini": "https://ai.google.dev/gemini-api/docs/caching"
+  },
+  "config": {
+    "changed_surface": "system",
+    "repeats": 850,
+    "root_cause_types_considered": [
+      "model_changed",
+      "system_changed",
+      "tools_changed",
+      "messages_changed"
+    ]
+  },
+  "docs_absence_check": {
+    "openai_prompt_caching": {
+      "path": "/Users/admin/dev/anthropic/takehome-experiments/claude-feature-radar/sources/openai_prompt_caching_2026-06-19.txt",
+      "hits": [],
+      "equivalent_found": false
+    },
+    "gemini_caching": {
+      "path": "/Users/admin/dev/anthropic/takehome-experiments/claude-feature-radar/sources/gemini_caching_2026-06-19.txt",
+      "hits": [],
+      "equivalent_found": false
+    },
+    "gemini_tokens": {
+      "path": "/Users/admin/dev/anthropic/takehome-experiments/claude-feature-radar/sources/gemini_token_counting_2026-06-19.txt",
+      "hits": [],
+      "equivalent_found": false
+    }
+  },
+  "arms": [
+    {
+      "provider": "claude",
+      "model": "claude-haiku-4-5-20251001",
+      "ran": true,
+      "root_cause_known": true,
+      "miss_reason_type": "system_changed",
+      "missed_input_tokens": 6827,
+      "cache_signal_present": true,
+      "cache_read_tokens": 5968,
+      "cache_write_tokens": 42883,
+      "cached_tokens": 0,
+      "prompt_tokens": 24,
+      "output_tokens": 34,
+      "total_tokens": 48909,
+      "cost_usd": 0.06937305,
+      "latency_s": 12.657584582979325,
+      "diagnostic_fields": [
+        "cache_miss_reason",
+        "cache_missed_input_tokens",
+        "diagnostics"
+      ],
+      "variant_results": [
+        {
+          "expected": "system_changed",
+          "observed": "system_changed",
+          "matched": true,
+          "cache_missed_input_tokens": 6827,
+          "first_model": "claude-haiku-4-5-20251001",
+          "second_model": "claude-haiku-4-5-20251001",
+          "diagnostic_fields": [
+            "cache_miss_reason",
+            "cache_missed_input_tokens",
+            "diagnostics"
+          ],
+          "first_usage": {
+            "model": "claude-haiku-4-5-20251001",
+            "prompt_tokens": 3,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 5968,
+            "output_tokens": 4,
+            "total_tokens": 5975,
+            "cost_usd": 0.007482999999999999
+          },
+          "second_usage": {
+            "model": "claude-haiku-4-5-20251001",
+            "prompt_tokens": 3,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 5968,
+            "output_tokens": 4,
+            "total_tokens": 5975,
+            "cost_usd": 0.007482999999999999
+          }
+        },
+        {
+          "expected": "tools_changed",
+          "observed": "tools_changed",
+          "matched": true,
+          "cache_missed_input_tokens": 7360,
+          "first_model": "claude-haiku-4-5-20251001",
+          "second_model": "claude-haiku-4-5-20251001",
+          "diagnostic_fields": [
+            "cache_miss_reason",
+            "cache_missed_input_tokens",
+            "diagnostics"
+          ],
+          "first_usage": {
+            "model": "claude-haiku-4-5-20251001",
+            "prompt_tokens": 3,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 6516,
+            "output_tokens": 4,
+            "total_tokens": 6523,
+            "cost_usd": 0.008168
+          },
+          "second_usage": {
+            "model": "claude-haiku-4-5-20251001",
+            "prompt_tokens": 3,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 6516,
+            "output_tokens": 5,
+            "total_tokens": 6524,
+            "cost_usd": 0.008173
+          }
+        },
+        {
+          "expected": "messages_changed",
+          "observed": "messages_changed",
+          "matched": true,
+          "cache_missed_input_tokens": 6836,
+          "first_model": "claude-haiku-4-5-20251001",
+          "second_model": "claude-haiku-4-5-20251001",
+          "diagnostic_fields": [
+            "cache_miss_reason",
+            "cache_missed_input_tokens",
+            "diagnostics"
+          ],
+          "first_usage": {
+            "model": "claude-haiku-4-5-20251001",
+            "prompt_tokens": 3,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 5973,
+            "output_tokens": 4,
+            "total_tokens": 5980,
+            "cost_usd": 0.007489249999999999
+          },
+          "second_usage": {
+            "model": "claude-haiku-4-5-20251001",
+            "prompt_tokens": 3,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 5973,
+            "output_tokens": 4,
+            "total_tokens": 5980,
+            "cost_usd": 0.007489249999999999
+          }
+        },
+        {
+          "expected": "model_changed",
+          "observed": "model_changed",
+          "matched": true,
+          "cache_missed_input_tokens": 6827,
+          "first_model": "claude-haiku-4-5-20251001",
+          "second_model": "claude-sonnet-4-6",
+          "diagnostic_fields": [
+            "cache_miss_reason",
+            "cache_missed_input_tokens",
+            "diagnostics"
+          ],
+          "first_usage": {
+            "model": "claude-haiku-4-5-20251001",
+            "prompt_tokens": 3,
+            "cache_read_tokens": 5968,
+            "cache_write_tokens": 0,
+            "output_tokens": 4,
+            "total_tokens": 5975,
+            "cost_usd": 0.0006198000000000001
+          },
+          "second_usage": {
+            "model": "claude-sonnet-4-6",
+            "prompt_tokens": 3,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 5969,
+            "output_tokens": 5,
+            "total_tokens": 5977,
+            "cost_usd": 0.02246775
+          }
+        }
+      ],
+      "note": "Claude identified all 4 documented cache-miss root-cause variants: system_changed, tools_changed, messages_changed, model_changed"
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "ran": true,
+      "root_cause_known": false,
+      "miss_reason_type": "",
+      "missed_input_tokens": 0,
+      "cache_signal_present": true,
+      "cache_read_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "prompt_tokens": 10244,
+      "output_tokens": 10,
+      "total_tokens": 10254,
+      "cost_usd": 0.05152,
+      "latency_s": 2.736606166989077,
+      "diagnostic_fields": [],
+      "variant_results": [],
+      "note": "OpenAI exposed cached token counts, but no per-request cache-miss root cause field"
+    },
+    {
+      "provider": "gemini",
+      "model": "gemini-3.1-pro-preview",
+      "ran": true,
+      "root_cause_known": false,
+      "miss_reason_type": "",
+      "missed_input_tokens": 0,
+      "cache_signal_present": true,
+      "cache_read_tokens": 0,
+      "cache_write_tokens": 0,
+      "cached_tokens": 0,
+      "prompt_tokens": 11928,
+      "output_tokens": 25,
+      "total_tokens": 11953,
+      "cost_usd": 0.024155999999999997,
+      "latency_s": 3.451626166002825,
+      "diagnostic_fields": [],
+      "variant_results": [],
+      "note": "Gemini exposed cache token counters or cache metadata, but no per-request cache-miss root cause field"
+    }
+  ],
+  "verdict": {
+    "positive_signal": true,
+    "promotable_edge": true,
+    "why_not_promotable": [],
+    "measured_axis": [
+      "observability",
+      "root_cause_resolution"
+    ],
+    "competitor_exact_subfeature_documented": false,
+    "all_competitors_cache_arms_ran": true,
+    "competitors_exposed_no_miss_reason": true,
+    "root_cause_candidates_without_diagnostics": 4,
+    "root_cause_candidates_with_claude_diagnostics": 1,
+    "manual_suspects_eliminated": 3,
+    "claude_root_cause_variants_identified": [
+      "system_changed",
+      "tools_changed",
+      "messages_changed",
+      "model_changed"
+    ],
+    "claude_root_cause_variant_count": 4,
+    "claude_root_cause_variant_total": 4
+  }
+}

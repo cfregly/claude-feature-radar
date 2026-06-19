@@ -32,6 +32,11 @@ from engine.demonstrators.registry import REGISTRY, register_all
 PORT_STATUS = {
     "token_accounting": "exists",
     "grounding_resolution": "exists",
+    "pdf_grounding": "build",
+    "byo_rag_grounding": "build",
+    "grounding_stack": "build",
+    "advisor_routing": "build",
+    "extended_output": "build",
     "long_horizon_survival": "exists",
     "discovery_loop": "exists",
     "eval_quality": "adapt",
@@ -45,6 +50,10 @@ PORT_STATUS = {
 EDGE_DIR_TO_KIND = {
     "programmatic-tool-calling": "token_accounting",
     "citations": "grounding_resolution",
+    "pdf-citations": "pdf_grounding",
+    "search-results": "byo_rag_grounding",
+    "grounding-stack": "grounding_stack",
+    "bulk-extended-output": "extended_output",
     "context-editing": "long_horizon_survival",
     "eval-quality": "eval_quality",
     "retention-resume": "retention_resume",
@@ -58,6 +67,11 @@ EDGE_DIR_TO_KIND = {
 SPEND_LANE = {
     "token_accounting": "ASK (a credit-spending benchmark)",
     "grounding_resolution": "ASK (a credit-spending benchmark)",
+    "pdf_grounding": "ASK (a credit-spending benchmark, cents-scale)",
+    "byo_rag_grounding": "ASK (a credit-spending benchmark, cents-scale)",
+    "grounding_stack": "ASK (a credit-spending benchmark, cents-scale)",
+    "advisor_routing": "ASK (a credit-spending benchmark); held until the cost-at-quality value reproduces",
+    "extended_output": "ASK (a credit-spending benchmark, a few dollars, the Claude batch is slow)",
     "long_horizon_survival": "ASK (a credit-spending benchmark)",
     "eval_quality": "ASK (a credit-spending grid, the larger slice)",
     "retention_resume": "$0 ALWAYS default (doc-grounded parity); the live kill-resume is opt-in ASK",
@@ -112,7 +126,10 @@ _INTRINSIC_KINDS = {"discovery_loop"}
 # (eval_quality, retention_resume, other), so they ship no public edges/<key>/ bundle: the
 # analysis runs and is kept locally, but the public tree carries only verified wins. A missing
 # public bundle for these is by design, not a gap, the same way the "other" holding pen always was.
-_INTERNAL_KINDS = {"cost", "eval_quality", "retention_resume", "other"}
+# advisor_routing and extended_output are held the same way: the mechanism is confirmed live, but the
+# measured value did not reproduce on the built slice yet, so they ship no public bundle until the
+# value is measured.
+_INTERNAL_KINDS = {"cost", "eval_quality", "retention_resume", "other", "advisor_routing", "extended_output"}
 
 
 def gaps(rows: list[dict] | None = None) -> list[str]:

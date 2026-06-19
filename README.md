@@ -86,6 +86,164 @@ Feature references, fetched 2026-06-18:
 - Citations docs: https://platform.claude.com/docs/en/build-with-claude/citations
 - Citations cookbook (runnable): https://platform.claude.com/cookbook/misc-using-citations
 
+## Supporting edge: PDF citations, page pointers for directly supplied PDFs (`make pdf-citations`)
+
+When a user uploads a PDF and asks a question immediately, the trust layer is the page a human can
+check. Claude Citations can return a `page_location` citation for a PDF supplied directly in the
+request, with the page number and quoted source text. The app does not need to persist the document in
+a hosted search store or write its own page resolver.
+
+Measured over 5 questions on a 5-page synthetic agreement PDF, each answer graded against the known
+source page:
+
+| arm | answered | direct-PDF pointer | right page | cost | wall time |
+|---|:---:|:---:|:---:|---:|---:|
+| Claude Haiku 4.5 + PDF Citations | 5/5 | 5/5 | 5/5 | $0.0458 | 6.2s |
+| OpenAI GPT-5.4 direct `input_file` | 5/5 | 0/5 | 0/5 | $0.0064 | 15.9s |
+| Gemini 3.5 Flash inline PDF | 5/5 | 0/5 | 0/5 | $0.0322 | 14.1s |
+
+Claude answered every question and returned a correct-page citation for every answer. OpenAI and
+Gemini answered the same direct-PDF questions but returned no pointer into the supplied PDF on this
+direct-file path. The edge is direct-PDF grounding, not a claim about hosted vector-store search. The
+full receipt is [`edges/pdf-citations/sample.txt`](edges/pdf-citations/sample.txt), with machine data
+in [`edges/pdf-citations/receipt.json`](edges/pdf-citations/receipt.json).
+
+```bash
+make pdf-citations # cents-scale direct-PDF citation receipt, needs all three keys
+```
+
+Feature references, fetched 2026-06-19:
+- Claude citations docs: https://platform.claude.com/docs/en/build-with-claude/citations
+- Claude PDF support docs: https://platform.claude.com/docs/en/build-with-claude/pdf-support
+- OpenAI file inputs docs: https://developers.openai.com/api/docs/guides/file-inputs
+- OpenAI file search docs: https://developers.openai.com/api/docs/guides/tools-file-search
+- Gemini document processing docs: https://ai.google.dev/gemini-api/docs/document-processing
+- Gemini file search docs: https://ai.google.dev/gemini-api/docs/file-search
+
+## Supporting edge: Search results, citations into your own RAG chunks (`make search-results`)
+
+If you run your own retriever (pgvector, a custom reranker, multi-tenant isolation), the trust layer
+is a deep link from each answer to the exact chunk it came from. Pass your retrieved passages as
+`search_result` content blocks with `citations: {"enabled": true}` and Claude returns each claim with a
+`search_result_location`: the chunk index, the block span inside it, and the verbatim quote, free of
+output tokens. No hosted vector store to stand up, no persisted copy of the user's data, no resolver
+code.
+
+Measured over 5 questions on 5 developer-supplied chunks, each citation graded against the chunk that
+holds the answer:
+
+| arm | correct cite | pointer | hosted objects | cost |
+|---|:---:|:---:|:---:|---:|
+| Claude Haiku 4.5 + search results | 5/5 | block-span | 0 | $0.0067 |
+| OpenAI GPT-5.4 hosted file search | 5/5 | file-level | 6 | $0.0301 |
+| Gemini 3.5 Flash hosted file search | 5/5 | chunk-level | 6 | $0.0156 |
+
+All three cited the correct source. Claude did it inline, resolver-free, with a block-level pointer and
+zero persisted objects, where the others each stood up a hosted store of six objects and returned a
+coarser pointer. The full receipt is [`edges/search-results/sample.txt`](edges/search-results/sample.txt),
+with machine data in [`edges/search-results/receipt.json`](edges/search-results/receipt.json).
+
+```bash
+make search-results # cents-scale, needs all three keys
+```
+
+Feature references, fetched 2026-06-19:
+- Claude search results docs: https://platform.claude.com/docs/en/build-with-claude/search-results
+- OpenAI file search docs: https://developers.openai.com/api/docs/guides/tools-file-search
+- Gemini file search docs: https://ai.google.dev/gemini-api/docs/file-search
+
+## Supporting edge: Exact-list ledger, less cost and time on a long stream (`make ledger`)
+
+Some agent tasks do not need every old tool result in context. They need a precise running state: the
+exact set of flagged transaction ids, incident ids, support escalations, or compliance findings.
+
+The ledger edge tests that shape directly. The agent reads 30 large reports, about 20,000 tokens each,
+through a tool. It must keep the exact sorted list of every URGENT report id and print the full list
+at the end. The corpus is deterministic and the ground truth is computed in code.
+
+| arm | exact list | cost | wall time | peak context |
+|---|:---:|---:|---:|---:|
+| Claude Haiku 4.5 with context editing | yes | $0.6700 | 60.7s | 35,186 |
+| OpenAI GPT-5.5 with Responses compaction | yes | $1.8425 | 164.3s | 41,548 |
+| Gemini 3.1 Pro Preview with full context | yes | $2.5690 | 201.0s | 434,629 |
+
+All three arms got the exact list. Claude won on cost and time: about 64% cheaper and 63% faster than
+the exact OpenAI run, and about 74% cheaper and 70% faster than the exact Gemini run. The full receipt
+is [`edges/exact-list-ledger/sample.txt`](edges/exact-list-ledger/sample.txt), with machine data in
+[`edges/exact-list-ledger/receipt.json`](edges/exact-list-ledger/receipt.json).
+
+```bash
+make ledger       # about $5 on the 2026-06-19 full run, needs all three keys
+```
+
+Feature references, fetched 2026-06-19:
+- Claude context editing docs: https://platform.claude.com/docs/en/build-with-claude/context-editing
+- OpenAI compaction docs: https://developers.openai.com/api/docs/guides/compaction
+- Gemini long context docs: https://ai.google.dev/gemini-api/docs/long-context
+
+## Supporting edge: Cache diagnostics, root cause for silent cache misses (`make cache-diagnostics`)
+
+Prompt caching saves money only when the cached prefix stays stable. A timestamp in the system prompt,
+a reordered tool schema, or a changed message history can silently turn a cache hit into a miss. The
+usual counter tells you that cache reads dropped. It does not tell you why.
+
+The cache diagnostics edge tests that production debugging shape. The workload sends long
+cached-prefix requests across all four documented miss-reason variants.
+
+| arm | root cause known | miss reason | missed tokens | cost | wall time |
+|---|:---:|---|---:|---:|---:|
+| Claude Haiku 4.5 cache diagnostics | yes | `system_changed` | 6.8k | $0.0694 | 12.7s |
+| OpenAI GPT-5.5 prompt caching | no | none exposed | 0 | $0.0515 | 2.7s |
+| Gemini 3.1 Pro cache counters | no | none exposed | 0 | $0.0242 | 3.5s |
+
+Claude identified 4/4 documented cache-miss reason variants and reduced the manual cache-miss suspect
+list from four prompt-prefix surfaces to one for each miss. The edge is observability, not lower cost
+on this probe. The full receipt is
+[`edges/cache-diagnostics/sample.txt`](edges/cache-diagnostics/sample.txt), with machine data in
+[`edges/cache-diagnostics/receipt.json`](edges/cache-diagnostics/receipt.json).
+
+```bash
+make cache-diagnostics # cents-scale, needs all three keys
+```
+
+Feature references, fetched 2026-06-19:
+- Claude cache diagnostics docs: https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics
+- OpenAI prompt caching docs: https://developers.openai.com/api/docs/guides/prompt-caching
+- Gemini context caching docs: https://ai.google.dev/gemini-api/docs/caching
+
+## Supporting edge: Task budgets, stop before a budget-exhausted tool loop (`make task-budget`)
+
+Long-running agents need a clean handoff before they start work that cannot fit the remaining budget.
+Output caps and reasoning budgets can limit pieces of a call, but they do not give the model a
+provider-side remaining-budget marker for the full loop of thinking, tool calls, tool results, and
+output.
+
+The task-budget edge tests the first dangerous moment: the agent is about to begin a 12-record audit
+by calling `fetch_record(1)`. If the hidden task budget is near exhausted, the correct behavior is to
+hand off before making that external tool call.
+
+| arm | hidden low-budget stop | first tool calls | wall time |
+|---|:---:|---:|---:|
+| Claude Opus 4.8 low budget | yes | 0 | 1.6s |
+| Claude Opus 4.8 high-budget control | n/a | 1 | 3.0s |
+| OpenAI GPT-5.5 closest controls | no | 1 | 2.1s |
+| Gemini 3.1 Pro Preview closest controls | no | 1 | 3.3s |
+
+Claude saw the low remaining `task_budget` and handed off before the first tool call. The high-budget
+Claude control, OpenAI closest controls, and Gemini closest controls all started the tool loop. The
+edge is budget-control reliability, not a universal cost claim. The full receipt is
+[`edges/task-budgets/sample.txt`](edges/task-budgets/sample.txt), with machine data in
+[`edges/task-budgets/receipt.json`](edges/task-budgets/receipt.json).
+
+```bash
+make task-budget # bounded live receipt, needs all three keys
+```
+
+Feature references, fetched 2026-06-19:
+- Claude task budgets docs: https://platform.claude.com/docs/en/build-with-claude/task-budgets
+- OpenAI reasoning controls docs: https://developers.openai.com/api/docs/guides/reasoning
+- Gemini thinking budgets docs: https://ai.google.dev/gemini-api/docs/thinking
+
 ## Fork and run
 
 ```bash
@@ -96,9 +254,11 @@ make ptc                          # the lead edge, about $0.08 (needs ANTHROPIC_
 make app-check                    # the forkable app on the shipped example, then edit app/my_tool.py
 ```
 
-Cost expectations: every benchmark reads its numbers off a real API call. `make ptc` is about $0.08
-and `make citations` about $0.06 on the shipped task. There is no hidden spend, and each target
-prints its cost before it commits anything.
+Cost expectations: every benchmark reads its numbers off a real API call. `make ptc` is about $0.08,
+`make citations` about $0.06, `make pdf-citations` about $0.09, `make search-results` about $0.06,
+`make cache-diagnostics` is cents-scale, `make task-budget` is a bounded live receipt, and
+`make ledger` about $5 on the shipped full task. There is no hidden spend, and each target prints its
+receipt before it commits anything.
 
 The citations edge runs on the Anthropic key alone. To add the cross-vendor table that backs the
 per-character claim (the DIY `str.find` baseline on OpenAI and Gemini), install the optional SDKs and
