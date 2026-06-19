@@ -51,4 +51,4 @@ make ptc               # this edge, on your own key, $0.08 on Sonnet 4.6
 # or directly: python edges/programmatic-tool-calling/demo.py
 ```
 
-See [`FOUNDER_EMAIL.md`](FOUNDER_EMAIL.md) and [`PRODUCT_EMAIL.md`](PRODUCT_EMAIL.md).
+See [`FOUNDER_EMAIL.md`](FOUNDER_EMAIL.md).

@@ -57,7 +57,7 @@ def check_ptc(fail, warn):
         "Makefile", "README.md", "FOUNDER_EMAIL.md", "app/run_tokens.py", "demo.tape",
         "edges/programmatic-tool-calling/README.md",
         "edges/programmatic-tool-calling/FOUNDER_EMAIL.md",
-        "edges/programmatic-tool-calling/PRODUCT_EMAIL.md", "emails/ptc_FOUNDER_EMAIL.md",
+        "emails/ptc_FOUNDER_EMAIL.md",
     ]
     want = f"${total:.2f}"
     for rel in cost_files:
@@ -105,16 +105,16 @@ def check_ptc_drift(fail, warn):
 
 
 def check_eval(fail, warn):
-    """The eval-quality receipt total must match the internal product note that quotes it."""
+    """The eval-quality receipt total must match the public edge README that quotes it."""
     s = _read("edges/eval-quality/sample.txt")
     m = re.search(r"RUN 1.*?total spend this run: \$(\d+\.\d{2,4})", s, re.S)
     if not m:
         warn.append("eval: could not parse the RUN 1 total from sample.txt")
         return
     total = float(m.group(1))
-    # Both the internal product note AND the public-facing edge README quote the run total, so gate both
+    # The public-facing edge README quotes the run total, so gate it against the receipt
     # (the README total drifted to a stale $0.4090 precisely because it was ungated here).
-    for rel in ["edges/eval-quality/PRODUCT_EMAIL.md", "edges/eval-quality/README.md"]:
+    for rel in ["edges/eval-quality/README.md"]:
         for i, line in enumerate(_read(rel).splitlines(), 1):
             if "total" not in line.lower():
                 continue

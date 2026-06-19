@@ -9,6 +9,12 @@ memories/
 # rewritten every run, so it stays out of git.
 data/
 
+# The per-edge product-team notes are the internal both-directions read (where a
+# competitor or a do-it-yourself path matches or beats Claude). The engine still
+# writes and reads them locally, but they never ship on the public surface, which
+# carries only verified wins.
+edges/*/PRODUCT_EMAIL.md
+
 # state/ and landscape/ are the durable spine and MUST be committed. The diff
 # baseline (landscape/landscape.json) and the coverage ledger (state/coverage.jsonl)
 # have to survive a clone, or the "diff against the last run" and "never repeat an

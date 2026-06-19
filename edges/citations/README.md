@@ -51,4 +51,4 @@ make citations                    # this edge, on your own keys, $0.06
 ```
 
 Every number is read off the real API `usage` object. See [`FOUNDER_EMAIL.md`](FOUNDER_EMAIL.md) for
-the pitch and [`PRODUCT_EMAIL.md`](PRODUCT_EMAIL.md) for the honest other direction.
+the pitch.

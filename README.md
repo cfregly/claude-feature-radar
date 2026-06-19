@@ -14,10 +14,9 @@ Each edge below is proven on a real task, with the receipt committed in `edges/<
 The distilled, founder-facing versions, the ones a founder clones and reproduces in a single
 command, live in the companion repo [`claude-feature-briefs`](https://github.com/cfregly/claude-feature-briefs).
 
-Two surfaces, two jobs. This repo is the internal engine. It keeps the full both-directions analysis,
-including where a do-it-yourself path can match Claude on a clean input, so every win it does claim has
-already survived the skeptic. The founder-facing briefs in `claude-feature-briefs` carry only the
-verified wins. The per-edge notes under `edges/` are the internal read, not founder copy.
+Every edge here is verified before it ships. The engine runs a skeptic pass on each comparison, best
+to best and latest to latest across vendors, and keeps only the differentiators that survive it, so a
+win on this page has already beaten its toughest reading.
 
 ## Lead edge: programmatic tool calling, about 28% fewer billed input tokens (`make ptc`)
 
@@ -74,8 +73,7 @@ Measured over 8 questions on 3 plain-text documents, each citation graded agains
 | pointer granularity | per character, into the user's own document |
 
 Claude returns a per-character pointer into your user's own document, guaranteed to resolve, with the
-verbatim quote free of output tokens and no resolver code to maintain. The full both-directions
-analysis, including where a do-it-yourself path can resolve on clean text, is the internal note in
+verbatim quote free of output tokens and no resolver code to maintain. The per-edge writeup is
 [`edges/citations/README.md`](edges/citations/README.md). The founder-facing brief is
 [`claude-feature-briefs/citations`](https://github.com/cfregly/claude-feature-briefs). The full receipt
 is [`edges/citations/sample.txt`](edges/citations/sample.txt).
