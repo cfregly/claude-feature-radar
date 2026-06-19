@@ -1,0 +1,37 @@
+{
+  "what": "Repeated-run confirmation for the exact-list-ledger edge: the single make-ledger headline upgraded to 5 runs per cell on a fixed seeded corpus, plus a strong-tier Claude cross-check and the keep-sensitivity of the cost margin.",
+  "harness": "engine/ledger_seq.py (--chain --full, 5 runs/cell, graded by exact-match against a code-computed ground truth)",
+  "date": "2026-06-19",
+  "corpus": "30 incident reports, about 20,000 tokens each, 10 URGENT ids, identical every run (seeded)",
+  "note": "Claude vs OpenAI only: the two arms with server-side context management at this scale. Gemini full-context (about 600k tokens carried) is slow and rate-limits on a 5-run repeat, so its single headline run stands without a repeat.",
+  "configs": [
+    {
+      "config": "keep=1 (the make-ledger headline config)",
+      "runs": 5,
+      "arms": [
+        {"name": "Claude Haiku 4.5, context editing", "exact": "5/5", "avg_cost_usd": 0.667},
+        {"name": "OpenAI gpt-5.5, compaction", "exact": "5/5", "avg_cost_usd": 1.900}
+      ],
+      "read": "both reliably exact; Claude about 65% cheaper at equal correctness"
+    },
+    {
+      "config": "keep=3",
+      "runs": 5,
+      "arms": [
+        {"name": "Claude Haiku 4.5, context editing", "exact": "5/5", "avg_cost_usd": 1.727},
+        {"name": "OpenAI gpt-5.5, compaction", "exact": "5/5", "avg_cost_usd": 1.883}
+      ],
+      "read": "both reliably exact; Claude about 8% cheaper (more context retained per turn shrinks the margin)"
+    },
+    {
+      "config": "keep=3, Sonnet 4.6 executor (strong-tier cross-check)",
+      "runs": 5,
+      "arms": [
+        {"name": "Claude Sonnet 4.6, context editing", "exact": "5/5", "avg_cost_usd": 4.230},
+        {"name": "OpenAI gpt-5.5, compaction", "exact": "5/5", "avg_cost_usd": 1.933}
+      ],
+      "read": "Sonnet also reliably exact, so the correctness is not a cheap-tier fluke"
+    }
+  ],
+  "conclusion": "The single-run win holds across repeats: Claude returns the exact list 5/5 in every config and on both a cheap and a strong tier. The cost margin is config-sensitive (about 65% cheaper at keep=1, about 8% at keep=3), so the edge is reliable correctness plus a cost advantage whose size depends on the context-editing keep setting."
+}

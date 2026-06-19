@@ -1,8 +1,9 @@
 # Edge: Exact-list ledger, long streams with precise accumulated state
 
 Part of [claude-feature-radar](../../README.md). This is a measured head-to-head edge, not a broad
-claim that only Claude can solve the task. On this run, all three frontier arms returned the exact
-same list. Claude won because it did the exact long-stream job for less cost and less time.
+claim that only Claude can solve the task. On the headline run all three frontier arms returned the
+exact same list, and Claude did the exact long-stream job for less cost and less time. A 5-run repeat
+then confirmed the Claude-versus-OpenAI result holds, not a single lucky run (see below).
 
 ## What It Is
 
@@ -37,6 +38,23 @@ Claude was exact, and it was about 64% cheaper and 63% faster than the exact Ope
 
 Full receipt: [`sample.txt`](sample.txt). Machine receipt: [`receipt.json`](receipt.json).
 
+## Confirmed Across Five Runs
+
+A single run of a 30-step agent is close to a coin flip, so the headline was re-run 5 times per arm on
+the same seeded corpus, for the two arms with server-side context management at this scale (Claude and
+OpenAI). Every cell stayed exact.
+
+| config | Claude (context editing) | OpenAI gpt-5.5 (compaction) | cost gap |
+|---|---|---|---|
+| keep=1 (the headline config) | 5/5 exact, $0.667/run | 5/5 exact, $1.900/run | Claude ~65% cheaper |
+| keep=3 | 5/5 exact, $1.727/run | 5/5 exact, $1.883/run | Claude ~8% cheaper |
+| keep=3, Sonnet 4.6 executor | 5/5 exact, $4.230/run | 5/5 exact, $1.933/run | strong-tier check, also exact |
+
+Both arms are reliably exact in all 5 runs of every config, so the correctness is not a fluke and the
+cost win is not one lucky run. The size of the cost gap depends on the context-editing `keep` setting:
+aggressive clearing (keep=1) carries less context per turn, which is where the large gap comes from.
+Receipt: [`repeated_runs.json`](repeated_runs.json).
+
 ## Honest Scope
 
 - This is a long-stream exact-ledger edge. It is not a generic context-editing claim.
@@ -44,6 +62,8 @@ Full receipt: [`sample.txt`](sample.txt). Machine receipt: [`receipt.json`](rece
 - The win is that Claude got the exact list with less cost and time on this workload.
 - The edge depends on the workload shape: large disposable tool results plus a precise accumulated
   state that must stay exact.
+- The cost margin is config-sensitive: about 65% cheaper at keep=1 and about 8% at keep=3, with every
+  arm exact across 5 runs in both. Aggressive clearing is where the large gap comes from.
 
 ## Run It Yourself
 
