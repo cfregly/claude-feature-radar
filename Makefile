@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps app app-check ptc citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports check-surface check-receipts test ci deslop gif clean
+.PHONY: setup compare-deps app app-check ptc citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-exec-state code-exec-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports check-surface check-receipts test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -48,6 +48,12 @@ bulk-output: ## EDGE: largest deliverable in ONE request, Claude 300k batch beta
 
 advisor: ## advisor tool: cheap executor + frontier advisor in ONE request, cost-at-quality vs the competitor frontier solo (needs 3 keys, a few dollars)
 	$(PY) run.py advisor --emit-edge
+
+code-exec-state: ## EDGE write phase: write a nonce to each vendor's code sandbox, warm read-back, save container ids (needs 3 keys, cents)
+	$(PY) run.py code-exec-state
+
+code-exec-state-verify: ## EDGE verify phase: re-read the SAME containers after a >20-min idle, Claude survives vs OpenAI expired (needs 3 keys, cents)
+	$(PY) run.py code-exec-state --verify --emit-edge
 
 cite: ## ground every shipped price and fact through Claude's own Citations API (writes docs/CITED_FACTS.md, cents)
 	$(PY) -m engine.cite_facts

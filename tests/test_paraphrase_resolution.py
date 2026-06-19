@@ -14,11 +14,11 @@ N = 8         # questions
 N_PDF = 2     # of which are PDF questions
 
 
-def _claude(*, answered=N, resolved=N, cited=N, persisted=0, pdf_resolved=N_PDF):
+def _claude(*, answered=N, resolved=N, cited=N, source_correct=N, persisted=0, pdf_resolved=N_PDF):
     return pr.ArmResult(name="claude+citations:sonnet", provider="anthropic", model="claude-sonnet-4-6",
                         mechanism="API citations", asked=N, answered=answered, cited=cited,
-                        resolved=resolved, pdf_asked=N_PDF, pdf_pointer_resolved=pdf_resolved,
-                        persisted_objects=persisted, output_tokens=300)
+                        resolved=resolved, source_correct=source_correct, pdf_asked=N_PDF,
+                        pdf_pointer_resolved=pdf_resolved, persisted_objects=persisted, output_tokens=300)
 
 
 def _diy(provider, *, resolved, cited=N, ran=True, errors=None):
@@ -44,6 +44,7 @@ def test_promotes_when_claude_resolves_all_and_diy_drops_under_paraphrase():
     assert v["positive_signal"] is True
     assert v["promotable_edge"] is True
     assert v["claude_guaranteed_resolve"] is True
+    assert v["claude_grounded_correct_source"] == f"{N}/{N}"
     assert v["claude_no_hosted_store"] is True
     assert v["claude_cites_inline_pdf_under_paraphrase"] is True
     assert v["competitor_diy_drop_total"] > 0
@@ -51,13 +52,26 @@ def test_promotes_when_claude_resolves_all_and_diy_drops_under_paraphrase():
 
 def test_blocks_when_claude_drops_a_pointer():
     run = _run([
-        _claude(resolved=N - 1),         # one pointer did not resolve, breaks the guarantee
+        _claude(resolved=N - 1, source_correct=N - 1),   # one pointer did not resolve, breaks the guarantee
         _diy("openai", resolved=2),
         _diy("gemini", resolved=2),
     ])
     v = pr.score_run(run)
     assert v["promotable_edge"] is False
-    assert any("resolving pointer for every question" in r for r in v["why_not_promotable"])
+    assert any("ground every answer in the expected source" in r for r in v["why_not_promotable"])
+
+
+def test_blocks_when_claude_grounds_the_wrong_source():
+    # The pointers all resolve, but one lands in the wrong document, so the answer is not grounded in
+    # the expected source: the robust correctness gate holds the edge even though resolution looks clean.
+    run = _run([
+        _claude(source_correct=N - 1),
+        _diy("openai", resolved=2),
+        _diy("gemini", resolved=2),
+    ])
+    v = pr.score_run(run)
+    assert v["promotable_edge"] is False
+    assert any("expected source" in r for r in v["why_not_promotable"])
 
 
 def test_blocks_when_diy_does_not_drop_under_paraphrase():
@@ -70,7 +84,7 @@ def test_blocks_when_diy_does_not_drop_under_paraphrase():
     ])
     v = pr.score_run(run)
     assert v["promotable_edge"] is False
-    assert any("did not drop under paraphrase" in r for r in v["why_not_promotable"])
+    assert any("no silent drop under paraphrase" in r for r in v["why_not_promotable"])
 
 
 def test_blocks_when_a_cross_vendor_arm_did_not_run():

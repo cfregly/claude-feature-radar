@@ -215,6 +215,38 @@ Feature references, fetched 2026-06-19:
 - OpenAI web search docs: https://developers.openai.com/api/docs/guides/tools-web-search
 - Gemini Google Search docs: https://ai.google.dev/gemini-api/docs/google-search
 
+## Supporting edge: Code-execution state that survives (`make code-exec-state`)
+
+A multi-step data agent over a user's files wants to build up state, intermediate tables, a fitted
+model, charts, across a conversation without re-uploading or re-running setup. Claude's code execution
+sandbox persists its container and files across separate requests (reuse `response.container.id`), and
+the container lives 30 days, so the state is there even after the user steps away.
+
+Measured 2026-06-19 by writing a nonce to each vendor's sandbox, reading it back from the reused
+container, then re-reading the same container after a 31-minute idle:
+
+| vendor | persists across requests | survives a 31-min idle |
+|---|:---:|:---:|
+| Claude Sonnet 4.6 | yes | yes, read the file back |
+| OpenAI GPT-5.5 | yes, while warm | no, `400 Container is expired` |
+| Gemini 3.5 Flash | no reusable container | not applicable |
+
+While warm, Claude and OpenAI both reuse a container. After the idle, Claude read its file back while
+OpenAI's container had been discarded (the documented 20-minute idle expiry, measured as a real `400`),
+and Gemini has no reusable container to begin with. The win is durability and cross-call persistence.
+The full receipt is [`edges/code-exec-state/sample.txt`](edges/code-exec-state/sample.txt), with machine
+data in [`edges/code-exec-state/receipt.json`](edges/code-exec-state/receipt.json).
+
+```bash
+make code-exec-state        # write phase, then wait > 20 minutes
+make code-exec-state-verify # re-read: Claude survives, OpenAI expired
+```
+
+Feature references, fetched 2026-06-19:
+- Claude code execution docs: https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool
+- OpenAI code interpreter docs: https://developers.openai.com/api/docs/guides/tools-code-interpreter
+- Gemini code execution docs: https://ai.google.dev/gemini-api/docs/code-execution
+
 ## Supporting edge: Bulk extended output, the largest deliverable in one request (`make bulk-output`)
 
 A nightly job that turns each backlog row into one long deliverable (a full report, a large

@@ -4,7 +4,7 @@
   "n_questions": 8,
   "n_pdf_questions": 2,
   "n_text_docs": 3,
-  "total_cost": 0.381557,
+  "total_cost": 0.378424,
   "sources": {
     "claude_citations": "https://platform.claude.com/docs/en/build-with-claude/citations",
     "claude_pdf_support": "https://platform.claude.com/docs/en/build-with-claude/pdf-support",
@@ -18,14 +18,15 @@
       "provider": "anthropic",
       "model": "claude-sonnet-4-6",
       "mechanism": "API citations",
-      "answered": "7/8",
+      "answered": "8/8",
       "resolved": "8/8",
+      "grounded_correct_source": "8/8",
       "silent_drops": 0,
       "pdf_pointer_resolved": "2/2",
       "persisted_objects": 0,
-      "output_tokens": 639,
-      "cost": 0.239805,
-      "latency_s": 31.19,
+      "output_tokens": 594,
+      "cost": 0.23913,
+      "latency_s": 26.21,
       "errors": []
     },
     {
@@ -34,13 +35,14 @@
       "model": "claude-sonnet-4-6",
       "mechanism": "DIY str.find",
       "answered": "8/8",
-      "resolved": "4/8",
-      "silent_drops": 4,
+      "resolved": "2/8",
+      "grounded_correct_source": "0/8",
+      "silent_drops": 6,
       "pdf_pointer_resolved": "0/2",
       "persisted_objects": 0,
-      "output_tokens": 696,
-      "cost": 0.027876,
-      "latency_s": 22.68,
+      "output_tokens": 708,
+      "cost": 0.028056,
+      "latency_s": 23.42,
       "errors": []
     },
     {
@@ -50,12 +52,13 @@
       "mechanism": "DIY str.find",
       "answered": "7/8",
       "resolved": "0/8",
+      "grounded_correct_source": "0/8",
       "silent_drops": 8,
       "pdf_pointer_resolved": "0/2",
       "persisted_objects": 0,
-      "output_tokens": 471,
-      "cost": 0.019883,
-      "latency_s": 10.9,
+      "output_tokens": 453,
+      "cost": 0.019613,
+      "latency_s": 11.75,
       "errors": []
     },
     {
@@ -63,29 +66,31 @@
       "provider": "gemini",
       "model": "gemini-3.5-flash",
       "mechanism": "DIY str.find",
-      "answered": "7/8",
+      "answered": "8/8",
       "resolved": "0/8",
+      "grounded_correct_source": "0/8",
       "silent_drops": 8,
       "pdf_pointer_resolved": "0/2",
       "persisted_objects": 0,
-      "output_tokens": 9569,
-      "cost": 0.093993,
-      "latency_s": 52.72,
+      "output_tokens": 9306,
+      "cost": 0.091626,
+      "latency_s": 48.26,
       "errors": []
     }
   ],
   "verdict": {
-    "positive_signal": false,
-    "promotable_edge": false,
+    "positive_signal": true,
+    "promotable_edge": true,
     "paraphrase_resolution_rate": {
       "claude+citations:sonnet": "8/8",
-      "claude DIY:sonnet": "4/8",
+      "claude DIY:sonnet": "2/8",
       "openai DIY:gpt-mid": "0/8",
       "gemini DIY:gem-flash": "0/8"
     },
     "claude_guaranteed_resolve": true,
+    "claude_grounded_correct_source": "8/8",
     "diy_silent_drops": {
-      "claude DIY:sonnet": 4,
+      "claude DIY:sonnet": 6,
       "openai DIY:gpt-mid": 8,
       "gemini DIY:gem-flash": 8
     },
@@ -94,14 +99,12 @@
     "claude_no_hosted_store": true,
     "claude_cites_inline_pdf_under_paraphrase": true,
     "output_tokens": {
-      "claude+citations:sonnet": 639,
-      "claude DIY:sonnet": 696,
-      "openai DIY:gpt-mid": 471,
-      "gemini DIY:gem-flash": 9569
+      "claude+citations:sonnet": 594,
+      "claude DIY:sonnet": 708,
+      "openai DIY:gpt-mid": 453,
+      "gemini DIY:gem-flash": 9306
     },
     "all_competitors_ran": true,
-    "why_not_promotable": [
-      "Claude did not answer every question with the expected fact"
-    ]
+    "why_not_promotable": []
   }
 }

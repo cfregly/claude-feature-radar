@@ -3,15 +3,16 @@
 
   arm                          mechanism        answered  resolves  drops   out_tok      cost  wall
   --------------------------------------------------------------------------------------------------
-  claude+citations:sonnet     API citations         7/8       8/8      0       639   $0.2398  31.2s
-  claude DIY:sonnet           DIY str.find          8/8       4/8      4       696   $0.0279  22.7s
-  openai DIY:gpt-mid          DIY str.find          7/8       0/8      8       471   $0.0199  10.9s
-  gemini DIY:gem-flash        DIY str.find          7/8       0/8      8     9,569   $0.0940  52.7s
+  claude+citations:sonnet     API citations         8/8       8/8      0       594   $0.2391  26.2s
+  claude DIY:sonnet           DIY str.find          8/8       2/8      6       708   $0.0281  23.4s
+  openai DIY:gpt-mid          DIY str.find          7/8       0/8      8       453   $0.0196  11.8s
+  gemini DIY:gem-flash        DIY str.find          8/8       0/8      8     9,306   $0.0916  48.3s
 
   Verdict:
-    positive_signal: false
-    promotable_edge: false
+    positive_signal: true
+    promotable_edge: true
     claude_guaranteed_resolve: true
+    claude_grounded_correct_source: 8/8
     claude_no_hosted_store: true
     claude_cites_inline_pdf_under_paraphrase: true
     competitor_diy_drop_total: 16
@@ -19,7 +20,8 @@
   Honest reading:
   - Every arm answered the questions in its own words (paraphrased), as instructed.
   - Claude Citations resolved every answer's pointer by guarantee (source[start:end]==cited_text,
-    and a real page span for the inline PDF), with zero hosted or persisted objects.
+    and a real page span for the inline PDF), each grounded in the expected source, with zero
+    hosted or persisted objects.
   - The DIY str.find path dropped pointers under paraphrase: the model's paraphrased supporting
     sentence is not a verbatim substring, so str.find returns -1 and the citation is silently lost.
   - On clean VERBATIM quotes the DIY path resolves about as well on every vendor (the citations

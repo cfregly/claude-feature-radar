@@ -1,0 +1,30 @@
+  Code-execution statefulness workload: each vendor writes a unique nonce to /tmp/state.txt in its
+  sandbox, reads it back from the reused container, then re-reads the SAME container after an idle gap.
+
+  vendor                         persists across requests   survives 31-min idle
+  ----------------------------------------------------------------------------------
+  claude:sonnet (container reuse)            yes                     yes (read back)
+  openai:gpt-top (code_interpreter)          yes (warm)              no (400 Container is expired)
+  gemini:gem-flash (code execution)          no reusable container   n/a
+
+  Verdict:
+    positive_signal: true
+    promotable_edge: true
+    idle_minutes: 31.1   (OpenAI documented idle expiry: 20 min)
+
+  Honest reading:
+  - While warm, Claude and OpenAI both reuse a container and a file written in one request is readable
+    in the next, so across-requests persistence is parity in that window.
+  - After a 31-minute idle, Claude read the nonce back from the same container (30-day life), while
+    OpenAI's container had been discarded: a real 400 Container is expired (the documented 20-min idle).
+  - Gemini exposes no reusable container handle, so a file written in one call is gone in the next.
+  - The edge is durability and cross-call persistence, not warm reuse. Code execution is beta and not
+    ZDR-eligible.
+
+  Reproduce:
+    make code-exec-state         # write phase
+    # wait > 20 minutes
+    make code-exec-state-verify  # re-read after the idle
+
+  Machine receipt:
+    data/last_code_exec_state.json

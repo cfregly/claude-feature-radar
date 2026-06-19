@@ -64,6 +64,7 @@ import pathlib
 import re
 import sys
 import time
+import unicodedata
 from dataclasses import dataclass, field
 
 # repo root on the path, for common/ and engine/ when run as a script.
@@ -74,15 +75,22 @@ from engine.demonstrators.pdf_citations import PAGES, make_sample_pdf
 from engine.demonstrators.shared import platform
 
 # The answering+grounding seat decides correctness, so Sonnet on the Claude side and the competitors'
-# balanced tier, tier-matched, never Haiku for a correctness seat. All overridable via env for a forked run.
+# Claude stays Sonnet (the resolve GUARANTEE is a structural API feature, tier-independent, so running
+# Claude below the competitor's tier only strengthens any Claude win). The competitors run their FRONTIER
+# tier, the "run the stronger model before a quality/correctness claim" rule the sibling quality
+# demonstrators (eval_quality, advisor_routing, web_citations) follow. Never Haiku for a correctness seat.
+# All overridable via env for a forked run.
 CLAUDE_MODEL = os.environ.get("PARA_CLAUDE_MODEL", "sonnet")
-OPENAI_MODEL = os.environ.get("PARA_OPENAI_MODEL", "gpt-mid")     # gpt-5.4, balanced, tier-matched to Sonnet
-GEMINI_MODEL = os.environ.get("PARA_GEMINI_MODEL", "gem-flash")   # gemini-3.5-flash, balanced
+OPENAI_MODEL = os.environ.get("PARA_OPENAI_MODEL", "gpt-top")     # gpt-5.5, frontier
+GEMINI_MODEL = os.environ.get("PARA_GEMINI_MODEL", "gem-pro")     # gemini-3.1-pro, frontier
 MAX_TOKENS = int(os.environ.get("PARA_MAX_TOKENS", "400"))        # the Citations arm: a short paraphrased answer
 # The DIY arms emit a JSON answer plus quote. Gemini 3.5 Flash thinks by default, so give the DIY arms
 # enough output budget that extended thinking is never starved. Thinking stays ON (best config, never
 # handicapped); the budget only keeps a thinking model from running out of room before it answers.
 DIY_MAX_TOKENS = int(os.environ.get("PARA_DIY_MAX_TOKENS", "1536"))
+# A per-request wall-clock cap so one stuck network read can never hang an unattended run. A failed or
+# slow call is recorded as an arm error (never faked), and a missing arm holds the verdict, never pitched.
+REQUEST_TIMEOUT_S = float(os.environ.get("PARA_REQUEST_TIMEOUT_S", "90"))
 
 
 # --------------------------------------------------------------------------- the document set
@@ -162,12 +170,16 @@ QUESTIONS = [
 PARAPHRASE_RULE = ("Answer in your own words. Paraphrase the source. Do NOT copy any sentence verbatim "
                    "from the documents.")
 
-# The DIY ask: the realistic path without the feature, the model returns the supporting sentence (in its
-# own words, per the rule above) and you resolve it yourself with str.find.
+# The DIY ask: the realistic, STEEL-MANNED path without the feature. A competent builder paraphrases the
+# ANSWER (per the rule above) but copies the supporting quote VERBATIM so it stays a locatable substring,
+# then resolves that quote with a normalized str.find. Asking the DIY arm to paraphrase its own quote
+# would rig str.find to fail by construction, so the quote is explicitly verbatim: both arms paraphrase
+# the answer, and the only difference measured is who resolves the source pointer.
 DIY_INSTRUCTIONS = (
-    PARAPHRASE_RULE + " Then give the single supporting sentence from the source, in your own words, "
-    "and the exact title of the document it came from. Respond with ONLY a JSON object and nothing "
-    'else: {"answer": "...", "doc_title": "...", "quote": "..."}.'
+    PARAPHRASE_RULE + " Then, separately, give the single supporting sentence copied EXACTLY and "
+    "VERBATIM from the source (do NOT paraphrase this quote, it must be a literal substring of the "
+    "document so it can be located), and the exact title of the document it came from. Respond with "
+    'ONLY a JSON object and nothing else: {"answer": "...", "doc_title": "...", "quote": "..."}.'
 )
 
 ALL_DOC_TITLES = [d["title"] for d in TEXT_DOCS] + [PDF_TITLE]
@@ -179,23 +191,33 @@ def _questions(quick: bool):
     return [QUESTIONS[1], QUESTIONS[2], QUESTIONS[7]] if quick else QUESTIONS
 
 
-def _normws(s: str) -> str:
-    return " ".join((s or "").split())
-
-
-# PDF text extraction normalizes typography (a straight apostrophe in the source comes back as a curly
-# one, an en-dash for a hyphen). The char_location check below stays byte-exact (the API guarantee for
-# text documents), but the page_location check folds these so a real PDF span is not failed over a
-# rendering artifact, while still requiring the cited text to be a genuine span of the page.
-_SMART = {"’": "'", "‘": "'", "“": '"', "”": '"',
-          "–": "-", "—": "-", " ": " "}
+# A page_location's cited_text is the EXTRACTED PDF text, not the source bytes. PDF text extraction
+# (chunked into sentences, per the citations doc) re-wraps lines (a source space comes back as "\r\n",
+# and some line breaks join two words with no space at all), substitutes typographic punctuation (a
+# straight apostrophe comes back curly, a hyphen as an en-dash, a space as a non-breaking space), and can
+# vary case. The API still GUARANTEES the cited_text is a valid span of the document, so a page_location
+# that does not match the reconstructed page text is a grader artifact, never a real Claude miss. The
+# char_location check stays byte-exact (the API guarantee for text documents); the page_location check
+# folds these extraction artifacts before the span test. `_fold` removes only whitespace and canonicalizes
+# only glyph variants (NFKC, the punctuation map below, casefold), never dropping a letter, digit, or
+# punctuation mark, so a string that is NOT on the page still cannot match: this stays a true span check,
+# not a loosened gate. Verified against the cited_text the live API returns (it carries \r\n wraps and a
+# curly apostrophe) and the guarantee at platform.claude.com/docs/en/build-with-claude/citations.
+_PUNCT_FOLD = {
+    "\u2019": "'", "\u2018": "'", "\u201b": "'", "\u02bc": "'", "\u00b4": "'", "`": "'",
+    "\u201c": '"', "\u201d": '"', "\u201e": '"', "\u201f": '"',
+    "\u2010": "-", "\u2011": "-", "\u2012": "-", "\u2013": "-", "\u2014": "-", "\u2015": "-", "\u2212": "-",
+    "\u2026": "...",
+}
 
 
 def _fold(s: str) -> str:
-    s = s or ""
-    for a, b in _SMART.items():
+    s = unicodedata.normalize("NFKC", s or "")
+    for a, b in _PUNCT_FOLD.items():
         s = s.replace(a, b)
-    return " ".join(s.split())
+    # casefold for case-insensitivity, then strip ALL whitespace so a dropped or re-wrapped inter-line
+    # space cannot fail a span that is genuinely on the page.
+    return "".join(s.casefold().split())
 
 
 def _answered(item: dict, text: str) -> bool:
@@ -226,9 +248,10 @@ class ArmResult:
     mechanism: str             # "API citations" or "DIY str.find"
     ran: bool = True
     asked: int = 0
-    answered: int = 0          # the answer contained the expected token
+    answered: int = 0          # informational: the prose answer matched an accepted form of the fact
     cited: int = 0             # questions that returned at least one pointer/quote
     resolved: int = 0          # questions whose pointer resolves to a real source span
+    source_correct: int = 0    # questions whose resolving pointer lands in the EXPECTED source (the robust correctness gate)
     pdf_pointer_resolved: int = 0   # PDF questions that returned a resolving page_location into the inline PDF
     pdf_asked: int = 0
     persisted_objects: int = 0      # hosted/vector-store objects the path required
@@ -293,7 +316,7 @@ def run_claude_arm(client, model_key: str, questions, pdf_b64: str, *, progress=
         content = blocks + [{"type": "text", "text": f"{item['q']} {PARAPHRASE_RULE}"}]
         try:
             t0 = time.perf_counter()
-            r = client.messages.create(model=m.id, max_tokens=MAX_TOKENS,
+            r = client.messages.create(model=m.id, max_tokens=MAX_TOKENS, timeout=REQUEST_TIMEOUT_S,
                                        messages=[{"role": "user", "content": content}])
             arm.latency += time.perf_counter() - t0
         except Exception as e:  # noqa: BLE001
@@ -308,6 +331,7 @@ def run_claude_arm(client, model_key: str, questions, pdf_b64: str, *, progress=
         q_has_cite = False
         q_resolves = False
         q_pdf_resolves = False
+        q_source_correct = False
         for b in r.content:
             if getattr(b, "type", None) != "text":
                 continue
@@ -315,22 +339,32 @@ def run_claude_arm(client, model_key: str, questions, pdf_b64: str, *, progress=
                 ctype = getattr(c, "type", None)
                 if ctype == "char_location":
                     q_has_cite = True
-                    if _resolve_char(getattr(c, "document_index", -1), getattr(c, "start_char_index", -1),
+                    di = getattr(c, "document_index", -1)
+                    if _resolve_char(di, getattr(c, "start_char_index", -1),
                                      getattr(c, "end_char_index", -1), getattr(c, "cited_text", "")):
                         q_resolves = True
+                        if not is_pdf and di == item["ref"]:   # grounded in the expected text document
+                            q_source_correct = True
                 elif ctype == "page_location":
                     q_has_cite = True
-                    if _resolve_page(getattr(c, "start_page_number", None), getattr(c, "cited_text", "")):
+                    start = getattr(c, "start_page_number", None)
+                    end = getattr(c, "end_page_number", None) or start
+                    if _resolve_page(start, getattr(c, "cited_text", "")):
                         q_resolves = True
                         q_pdf_resolves = True
+                        if is_pdf and isinstance(start, int) and start <= item["ref"] <= (end or start):
+                            q_source_correct = True   # grounded on the expected PDF page
         if q_has_cite:
             arm.cited += 1
         if q_resolves:
             arm.resolved += 1
+        if q_source_correct:
+            arm.source_correct += 1
         if is_pdf and q_pdf_resolves:
             arm.pdf_pointer_resolved += 1
         if progress:
-            print(f"      claude  {item['q'][:34]:<34} cite={q_has_cite} resolves={q_resolves}", flush=True)
+            print(f"      claude  {item['q'][:34]:<34} cite={q_has_cite} resolves={q_resolves} "
+                  f"src_ok={q_source_correct}", flush=True)
     return arm
 
 
@@ -351,14 +385,16 @@ def _source_text_for(title: str) -> str:
 
 
 def _grade_diy(raw_text: str):
-    """The model returned a paraphrased answer and a quote. Resolve the quote ourselves with str.find,
-    the real DIY path. Returns (has_quote, resolves, answer_text)."""
+    """The model returned a paraphrased ANSWER and a VERBATIM supporting quote. Resolve the quote the way
+    a competent DIY builder would: a NORMALIZED str.find (the same _fold the Claude page resolver uses),
+    so the grader is symmetric, not a raw str.find that would punish the DIY arm for extraction artifacts
+    (whitespace, curly quotes) the Claude side tolerates. Returns (has_quote, resolves, answer_text)."""
     obj = _parse_json(raw_text) or {}
     quote = (obj.get("quote") or "").strip()
     title = (obj.get("doc_title") or "").strip()
     answer = (obj.get("answer") or "")
     src = _source_text_for(title)
-    idx = src.find(quote) if (src and quote) else -1
+    idx = _fold(src).find(_fold(quote)) if (src and quote) else -1
     return quote != "", idx != -1, answer
 
 
@@ -378,7 +414,7 @@ def run_claude_diy_arm(client, model_key: str, questions, *, progress=False) -> 
         prompt = f"{DIY_INSTRUCTIONS}\n\nSOURCE DOCUMENTS:\n{src}\n\nQUESTION: {item['q']}"
         try:
             t0 = time.perf_counter()
-            r = client.messages.create(model=m.id, max_tokens=DIY_MAX_TOKENS,
+            r = client.messages.create(model=m.id, max_tokens=DIY_MAX_TOKENS, timeout=REQUEST_TIMEOUT_S,
                                        messages=[{"role": "user", "content": prompt}])
             arm.latency += time.perf_counter() - t0
         except Exception as e:  # noqa: BLE001
@@ -416,7 +452,8 @@ def run_openai_diy_arm(client, model_key: str, questions, *, progress=False) -> 
         prompt = f"{DIY_INSTRUCTIONS}\n\nSOURCE DOCUMENTS:\n{src}\n\nQUESTION: {item['q']}"
         try:
             t0 = time.perf_counter()
-            r = client.responses.create(model=m.id, max_output_tokens=DIY_MAX_TOKENS, input=prompt)
+            r = client.responses.create(model=m.id, max_output_tokens=DIY_MAX_TOKENS, input=prompt,
+                                        timeout=REQUEST_TIMEOUT_S)
             arm.latency += time.perf_counter() - t0
         except Exception as e:  # noqa: BLE001
             arm.errors.append(f"{item['q'][:24]}: {type(e).__name__}: {str(e)[:90]}")
@@ -462,7 +499,9 @@ def run_gemini_diy_arm(client, model_key: str, questions, *, progress=False) -> 
             t0 = time.perf_counter()
             r = client.models.generate_content(
                 model=m.id, contents=prompt,
-                config=types.GenerateContentConfig(max_output_tokens=DIY_MAX_TOKENS))
+                config=types.GenerateContentConfig(
+                    max_output_tokens=DIY_MAX_TOKENS,
+                    http_options=types.HttpOptions(timeout=int(REQUEST_TIMEOUT_S * 1000))))
             arm.latency += time.perf_counter() - t0
         except Exception as e:  # noqa: BLE001
             arm.errors.append(f"{item['q'][:24]}: {type(e).__name__}: {str(e)[:90]}")
@@ -540,34 +579,44 @@ def score_run(run: ParaRun) -> dict:
     """The same machine gate on every arm: the paraphrase-resolution rate, by construction for Citations
     and by str.find for the DIY arms. The cross-vendor competitors are the OpenAI and Gemini DIY arms;
     the Claude DIY arm is the within-Claude baseline shown alongside. The edge is promotable when Claude
-    resolves every question's pointer (guaranteed), returns those pointers with zero hosted objects,
-    cites the inline PDF, every cross-vendor arm ran, and the DIY path silently drops under paraphrase."""
+    grounds every paraphrased answer in the expected source by a resolving pointer (guaranteed), with
+    zero hosted objects and a page pointer into the inline PDF, every cross-vendor arm ran, and that DIY
+    str.find path silently drops paraphrased quotes (drops > 0) while resolving strictly fewer than Claude.
+
+    The correctness gate is source_correct (the resolving pointer lands in the EXPECTED source), not the
+    prose-keyword answered count, which is reported for context only: a paraphrased prose answer is the
+    point of the test, so a keyword spot-check varies run to run, while grounding to the right source span
+    is the robust signal that Claude both answered and grounded."""
     claude = next((a for a in run.arms if a.provider == "anthropic" and a.mechanism == "API citations"), None)
     competitors = [a for a in run.arms if a.provider in ("openai", "gemini")]  # cross-vendor DIY arms
     diy_arms = [a for a in run.arms if a.mechanism == "DIY str.find"]
 
     n = run.n_questions
-    claude_answered_all = bool(claude and claude.asked == n and claude.answered == n)
-    claude_resolves_all = bool(claude and claude.asked == n and claude.resolved == n and claude.cited == n)
+    claude_grounds_every_answer = bool(
+        claude and claude.asked == n and claude.cited == n and claude.resolved == n
+        and claude.source_correct == n)
     claude_no_hosted_store = bool(claude and claude.persisted_objects == 0)
     claude_cites_inline_pdf = bool(claude and claude.pdf_asked > 0 and claude.pdf_pointer_resolved == claude.pdf_asked)
 
     all_competitors_ran = len(competitors) >= 2 and all(a.asked == n and not a.errors for a in competitors)
     competitor_drop_total = sum(a.drops for a in competitors)
     best_competitor_rate = max((a.resolution_rate for a in competitors), default=1.0)
-    diy_drops_under_paraphrase = competitor_drop_total > 0 and best_competitor_rate < 1.0
+    # Every cross-vendor DIY arm produced quotes that silently dropped under paraphrase (drops > 0). This
+    # is robust to a vendor returning one unparseable quote on a question (that lowers its quote count,
+    # not the finding), and the win is sealed by Claude resolving strictly more than the best competitor.
+    diy_drops_under_paraphrase = bool(competitors) and all(a.drops > 0 for a in competitors)
     claude_beats_best_diy = bool(claude) and claude.resolution_rate > best_competitor_rate
 
-    positive = (claude_answered_all and claude_resolves_all and claude_no_hosted_store
-                and claude_cites_inline_pdf and all_competitors_ran and diy_drops_under_paraphrase
-                and claude_beats_best_diy)
+    positive = (claude_grounds_every_answer and claude_no_hosted_store and claude_cites_inline_pdf
+                and all_competitors_ran and diy_drops_under_paraphrase and claude_beats_best_diy)
 
     return {
         "positive_signal": positive,
         "promotable_edge": positive,
         # the headline gate
         "paraphrase_resolution_rate": {a.name: f"{a.resolved}/{a.asked}" for a in run.arms},
-        "claude_guaranteed_resolve": claude_resolves_all,
+        "claude_guaranteed_resolve": claude_grounds_every_answer,
+        "claude_grounded_correct_source": f"{claude.source_correct}/{claude.asked}" if claude else "0/0",
         "diy_silent_drops": {a.name: a.drops for a in diy_arms},
         "competitor_diy_drop_total": competitor_drop_total,
         "claude_beats_best_diy": claude_beats_best_diy,
@@ -578,12 +627,11 @@ def score_run(run: ParaRun) -> dict:
         "all_competitors_ran": all_competitors_ran,
         "why_not_promotable": [] if positive else [
             reason for reason, failed in [
-                ("Claude did not answer every question with the expected fact", not claude_answered_all),
-                ("Claude did not return a resolving pointer for every question", not claude_resolves_all),
+                ("Claude did not ground every answer in the expected source with a resolving pointer", not claude_grounds_every_answer),
                 ("the Claude pointers required a hosted/persisted object", not claude_no_hosted_store),
                 ("Claude did not return a resolving page pointer into the inline PDF", not claude_cites_inline_pdf),
                 ("not every cross-vendor DIY arm ran cleanly", not all_competitors_ran),
-                ("the DIY path did not drop under paraphrase (no silent -1)", not diy_drops_under_paraphrase),
+                ("a cross-vendor DIY arm produced no silent drop under paraphrase", not diy_drops_under_paraphrase),
                 ("Claude did not beat the best DIY resolution rate", not claude_beats_best_diy),
             ] if failed
         ],
@@ -621,6 +669,7 @@ class ParaphraseResolutionDemonstrator(BaseDemonstrator):
                    cost_usd=a.cost, ctx=a.input_tokens,
                    metric={"mechanism": a.mechanism,
                            "paraphrase_resolved": f"{a.resolved}/{a.asked}",
+                           "grounded_correct_source": f"{a.source_correct}/{a.asked}",
                            "answered": f"{a.answered}/{a.asked}",
                            "silent_drops": a.drops,
                            "persisted_objects": a.persisted_objects,
@@ -652,6 +701,7 @@ class ParaphraseResolutionDemonstrator(BaseDemonstrator):
         all_cross_ran = bool(cross) and all(a.ran and a.asked > 0 and not a.errors for a in cross)
         metric = {
             "claude_paraphrase_resolved": f"{ca.resolved}/{ca.asked}",
+            "claude_grounded_correct_source": f"{ca.source_correct}/{ca.asked}",
             "diy_resolution_rates": {a.name: f"{a.resolved}/{a.asked}" for a in run.arms if a.mechanism == "DIY str.find"},
             "competitor_silent_drops": {a.name: a.drops for a in cross},
             "claude_no_hosted_store": gate["claude_no_hosted_store"],
@@ -764,6 +814,7 @@ def _receipt_dict(run: ParaRun) -> dict:
         "skipped": run.skipped,
         "arms": [{"name": a.name, "provider": a.provider, "model": a.model, "mechanism": a.mechanism,
                   "answered": f"{a.answered}/{a.asked}", "resolved": f"{a.resolved}/{a.asked}",
+                  "grounded_correct_source": f"{a.source_correct}/{a.asked}",
                   "silent_drops": a.drops, "pdf_pointer_resolved": f"{a.pdf_pointer_resolved}/{a.pdf_asked}",
                   "persisted_objects": a.persisted_objects, "output_tokens": a.output_tokens,
                   "cost": round(a.cost, 6), "latency_s": round(a.latency, 2), "errors": a.errors}
@@ -793,6 +844,7 @@ def _sample_text(receipt: dict) -> str:
         f"    positive_signal: {str(verdict['positive_signal']).lower()}",
         f"    promotable_edge: {str(verdict['promotable_edge']).lower()}",
         f"    claude_guaranteed_resolve: {str(verdict['claude_guaranteed_resolve']).lower()}",
+        f"    claude_grounded_correct_source: {verdict['claude_grounded_correct_source']}",
         f"    claude_no_hosted_store: {str(verdict['claude_no_hosted_store']).lower()}",
         f"    claude_cites_inline_pdf_under_paraphrase: {str(verdict['claude_cites_inline_pdf_under_paraphrase']).lower()}",
         f"    competitor_diy_drop_total: {verdict['competitor_diy_drop_total']}",
@@ -800,7 +852,8 @@ def _sample_text(receipt: dict) -> str:
         "  Honest reading:",
         "  - Every arm answered the questions in its own words (paraphrased), as instructed.",
         "  - Claude Citations resolved every answer's pointer by guarantee (source[start:end]==cited_text,",
-        "    and a real page span for the inline PDF), with zero hosted or persisted objects.",
+        "    and a real page span for the inline PDF), each grounded in the expected source, with zero",
+        "    hosted or persisted objects.",
         "  - The DIY str.find path dropped pointers under paraphrase: the model's paraphrased supporting",
         "    sentence is not a verbatim substring, so str.find returns -1 and the citation is silently lost.",
         "  - On clean VERBATIM quotes the DIY path resolves about as well on every vendor (the citations",

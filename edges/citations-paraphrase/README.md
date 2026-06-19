@@ -12,10 +12,10 @@ Run: `make citations-paraphrase`, 2026-06-19, 8 questions over 3 text documents 
 
 | arm | mechanism | answered | resolves | silent drops | output tokens | cost |
 |---|---|:---:|:---:|:---:|---:|---:|
-| claude+citations:sonnet | API citations | 7/8 | 8/8 | 0 | 639 | $0.2398 |
-| claude DIY:sonnet | DIY str.find | 8/8 | 4/8 | 4 | 696 | $0.0279 |
-| openai DIY:gpt-mid | DIY str.find | 7/8 | 0/8 | 8 | 471 | $0.0199 |
-| gemini DIY:gem-flash | DIY str.find | 7/8 | 0/8 | 8 | 9,569 | $0.0940 |
+| claude+citations:sonnet | API citations | 8/8 | 8/8 | 0 | 594 | $0.2391 |
+| claude DIY:sonnet | DIY str.find | 8/8 | 2/8 | 6 | 708 | $0.0281 |
+| openai DIY:gpt-mid | DIY str.find | 7/8 | 0/8 | 8 | 453 | $0.0196 |
+| gemini DIY:gem-flash | DIY str.find | 8/8 | 0/8 | 8 | 9,306 | $0.0916 |
 
 Claude Citations resolved every answer's pointer by guarantee, with zero hosted or persisted objects, including a page pointer into the directly-supplied PDF. The DIY arms answered the same questions but dropped pointers under paraphrase, because the paraphrased supporting sentence is not a verbatim substring.
 

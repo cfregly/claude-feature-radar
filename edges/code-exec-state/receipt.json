@@ -1,0 +1,45 @@
+{
+  "date": "2026-06-19",
+  "verify": {
+    "nonce": "NONCE1781889591d319",
+    "idle_minutes": 31.1,
+    "openai_idle_expiry_min": 20,
+    "claude": {
+      "container_id": "container_01XXJbuHdgZLtTTcb85sGfFe",
+      "warm_persisted": true,
+      "cost": 0.032124,
+      "survived_idle": true,
+      "reread_note": "read back",
+      "reread_cost": 0.016089
+    },
+    "openai": {
+      "container_id": "cntr_6a357a42d0808198a5377e4490f92b270ffea057b0c56fc2",
+      "warm_persisted": true,
+      "cost": 0.016535,
+      "survived_idle": false,
+      "reread_note": "container expired/error: BadRequestError: Error code: 400 - {'error': {'message': 'Container is expired.', 'type",
+      "reread_cost": 0.0
+    },
+    "gemini": {
+      "cross_call_persisted": false,
+      "cost": 0.004543500000000001
+    }
+  },
+  "verdict": {
+    "positive_signal": true,
+    "promotable_edge": true,
+    "idle_minutes": 31.1,
+    "claude_cross_request_persist": true,
+    "claude_survived_idle": true,
+    "openai_warm_persist": true,
+    "openai_survived_idle": false,
+    "gemini_cross_call_persist": false,
+    "why_not_promotable": []
+  },
+  "claim_under_test": "Claude's code-execution sandbox keeps your files across separate requests and for 30 days; OpenAI's container is discarded after 20 minutes idle (unrecoverable) and Gemini has no reusable container.",
+  "sources": {
+    "claude_code_execution": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool",
+    "openai_code_interpreter": "https://developers.openai.com/api/docs/guides/tools-code-interpreter",
+    "gemini_code_execution": "https://ai.google.dev/gemini-api/docs/code-execution"
+  }
+}
