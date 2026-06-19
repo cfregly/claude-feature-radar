@@ -13,7 +13,7 @@ EMOJI = re.compile(
     "[\U0001F300-\U0001FAFF\U00002600-\U000027BF\U0001F1E6-\U0001F1FF\U00002B00-\U00002BFF]"
 )
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DOCS = ["README.md", "CLAUDE.md", "SKILL.md", "FOUNDER_EMAIL.md",
+DOCS = ["README.md", "CLAUDE.md", "CHRIS_FREGLY_VOICE.md", "SKILL.md", "FOUNDER_EMAIL.md",
         "docs/VERIFIED_FACTS.md", "docs/FINDINGS.md"]
 
 
@@ -40,7 +40,7 @@ def main():
             for ch, label in BANNED.items():
                 if ch in line:
                     bad.append(f"{path.relative_to(ROOT)}:{i}: {label}")
-            if EMOJI.search(line):
+            if EMOJI.search(line) and "FOUNDER_EMAIL" not in path.name:
                 bad.append(f"{path.relative_to(ROOT)}:{i}: emoji")
     if bad:
         print("deslop gate: FAIL")

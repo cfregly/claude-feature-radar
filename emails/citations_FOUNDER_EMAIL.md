@@ -1,39 +1,47 @@
-Subject: Congrats on YC! A cool Claude feature to help you build
+Subject: Congrats on YC! 🎉 A Claude pattern for answers over user docs
 
 Hey {first_name},
 
-Congrats on getting into YC! Quick tip if your app answers questions over your users' own documents.
+Congrats on YC.
 
-When you answer over a contract, a policy, or a support doc, the answer is only as trustworthy as the
-source behind it. [Citations](https://platform.claude.com/docs/en/build-with-claude/citations) gives you a source pointer for every answer that you can
-check in your own code: the document, a character range, and the verbatim quote at that range. The
-pointer is guaranteed to resolve, and the quote is free of output tokens.
+Quick builder note if your product answers questions over your users' own documents: contracts,
+policies, tickets, research, support docs, or clinical notes.
 
-Turn it on per document, then verify in your own code:
+The hard part is not writing an answer. The hard part is making the answer shippable. A user needs to
+click through to the exact sentence behind the claim, and your product needs that pointer to be real.
+
+[Citations](https://platform.claude.com/docs/en/build-with-claude/citations) gives you that pointer
+from the API. Turn it on per document and Claude returns the answer with a structured source range
+plus the verbatim quote from that range. Your app can render the click-through without writing a
+resolver.
 
 ```python
 content = [
-    {"type": "document",
-      "source": {"type": "text", "media_type": "text/plain", "data": doc_text},
-      "citations": {"enabled": True}},          # add this
+    {
+        "type": "document",
+        "source": {"type": "text", "media_type": "text/plain", "data": doc_text},
+        "citations": {"enabled": True},
+    },
     {"type": "text", "text": question},
 ]
-msg = client.messages.create(model="claude-haiku-4-5", max_tokens=400,
-                            messages=[{"role": "user", "content": content}])
-# every citation resolves: source[c.start_char_index:c.end_char_index] == c.cited_text
+msg = client.messages.create(
+    model="claude-haiku-4-5",
+    max_tokens=400,
+    messages=[{"role": "user", "content": content}],
+)
 ```
 
-See it run (about a minute):
+See it run:
 
-```
-git clone {repo_url} && cd claude-feature-briefs
+```bash
+git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
 export ANTHROPIC_API_KEY=your-key
-make citations     # answer the questions and resolve every pointer, $0.06
+make citations     # resolve every pointer, $0.06
 ```
 
 To run it on your own documents, drop your `.txt` files into `citations/docs/`, edit the questions at
 the top of `citations/cite.py`, and run `make citations` again.
 
-Happy building!
-Chris Fregly
-Applied AI, Startups @ Anthropic
+Go build! 🚀
+{your_name}
+Building with Claude

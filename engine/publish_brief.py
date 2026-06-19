@@ -1085,7 +1085,7 @@ def _founder_email_source(plan: BriefPlan, receipt: dict | None) -> str:
     else:
         table = "Run `make ptc` to print your own before/after from a live call.\n"
 
-    return f"""Subject: Congrats on YC! A cool Claude feature to help you build
+    return f"""Subject: Congrats on YC! 🎉 A cool Claude feature to help you build
 
 Hey {{first_name}},
 
@@ -1119,24 +1119,24 @@ Same task and model (Sonnet 4.6), with and without it:
 See it run (about two minutes):
 
 ```
-git clone {{repo_url}} && cd claude-feature-briefs
+git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
 export ANTHROPIC_API_KEY=your-key
 make ptc        # the example, $0.08
 ```
 
-To run it on your own tool, open [{plan.slug}/{plan.edit_surface}]({{repo_url}}/blob/main/{plan.slug}/{plan.edit_surface}),
+To run it on your own tool, open [{plan.slug}/{plan.edit_surface}](https://github.com/cfregly/claude-feature-briefs/blob/main/{plan.slug}/{plan.edit_surface}),
 drop in your tool, and run `make ptc` again.
 
-Happy building!
-Chris Fregly
-Applied AI, Startups @ Anthropic
+Happy building! 🚀
+{{your_name}}
+Building with Claude
 """
 
 
 def _citations_founder_email_source(plan: BriefPlan) -> str:
     """The citations founder email, written to the ENGINE repo (never the public briefs repo). Wins-only,
     plain language, the real code, one reproduce path."""
-    return f"""Subject: Congrats on YC! A cool Claude feature to help you build
+    return f"""Subject: Congrats on YC! 🎉 A cool Claude feature to help you build
 
 Hey {{first_name}},
 
@@ -1164,7 +1164,7 @@ msg = client.messages.create(model="claude-haiku-4-5", max_tokens=400,
 See it run (about a minute):
 
 ```
-git clone {{repo_url}} && cd claude-feature-briefs
+git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
 export ANTHROPIC_API_KEY=your-key
 make {plan.slug}     # answer the questions and resolve every pointer, $0.01
 ```
@@ -1172,9 +1172,9 @@ make {plan.slug}     # answer the questions and resolve every pointer, $0.01
 To run it on your own documents, drop your `.txt` files into `{plan.slug}/docs/`, edit the questions at
 the top of `{plan.slug}/cite.py`, and run `make {plan.slug}` again.
 
-Happy building!
-Chris Fregly
-Applied AI, Startups @ Anthropic
+Happy building! 🚀
+{{your_name}}
+Building with Claude
 """
 
 

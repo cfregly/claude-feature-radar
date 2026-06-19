@@ -2,6 +2,16 @@
 
 Conventions for any agent or person working in this repo.
 
+## Use Chris Fregly's voice for every outbound surface
+
+Read `CHRIS_FREGLY_VOICE.md` before writing or editing any founder email, product email, brief,
+README CTA, generated outbox draft, or public-facing copy in this repo.
+
+The voice is builder-to-builder: warm, direct, concrete, measured, first-person, and code-backed.
+Keep the thinking pattern from public talks and writing, but remove transcript filler. No ums, uhs,
+repeated starts, or throat-clearing. Start with the founder's workload, name the pain in their terms,
+show the Claude feature and the one code change, then give the receipt and the exact next command.
+
 ## Numbers are receipts
 Every dollar figure, latency, and token count comes from a real API call, never from memory.
 The price table lives once in `common/models.py`, verified in `docs/VERIFIED_FACTS.md`. If you
@@ -308,7 +318,7 @@ A founder-facing piece is not done until it passes this, read cold as a busy YC 
 - Deslop-clean, and run the gate before it ships.
 - Crisp over chatty. Cut every word that does not earn its place. Warm and casual is good, but never at the expense of clean grammar or smooth reading. Read it aloud, and if a line is awkward, fix it.
 - Make the run-it-on-your-own-data path explicit: name the one file to edit and the one command to re-run, never a vague "swap in your tool".
-- Sign the email as the real sender, with name, team, and company, for example Chris Fregly, Applied AI, Startups team at Anthropic. The signature lives in the email only, never committed inside the public briefs repo.
+- Sign neutrally as the sender, a name placeholder and "Building with Claude". Never claim an Anthropic role or affiliation that is not held. A warm sign-off may carry one emoji.
 - Do not editorialize about a feature's maturity. Mention beta or a required beta header only when the founder must act on it (they have to set the header). For a GA feature, never write "it is GA" or "no beta header", it is noise. Get to the value.
 - The subject line must clear spam filters: no money-and-urgency trigger words (cut, save, free, cheap, discount, guarantee, a dollar sign). Keep the subject warm, personal, and specific to the feature, a genuine note to the reader, for example "Congrats on YC! A cool Claude feature to help you build".
 - Write in the first person as the sender, who represents Anthropic. It is "we measured" or "on our benchmarks", never "Anthropic measures" in the third person. Open with a plain, concrete line (a "quick tip"), never a vague filler like "quick one".

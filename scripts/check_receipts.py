@@ -72,6 +72,28 @@ def check_ptc(fail, warn):
                                 f"(${a_cost:.4f}+${b_cost:.4f}); update both together")
 
 
+def check_ptc_drift(fail, warn):
+    """Any PTC-token-shaped number (9,4xx / 6,8xx) on a founder surface must equal the receipt, so a
+    stray hand-typed 6,819 cannot drift away from the 6,828 the run actually billed."""
+    s = _read("edges/programmatic-tool-calling/sample.txt")
+    a = re.search(r"Mode A:.*?([\d,]+)\s+\d+\s+\S+\s+\$", s)
+    b = re.search(r"Mode B:.*?([\d,]+)\s+\d+\s+\S+\s+\$", s)
+    if not (a and b):
+        return
+    a_tok, b_tok = int(a.group(1).replace(",", "")), int(b.group(1).replace(",", ""))
+    files = [ROOT / "README.md", ROOT / "FOUNDER_EMAIL.md"]
+    files += sorted(ROOT.glob("edges/*/FOUNDER_EMAIL.md")) + sorted(ROOT.glob("emails/*.md"))
+    for p in files:
+        if not p.exists():
+            continue
+        for m in re.finditer(r"\b([69],\d{3})\b", p.read_text()):
+            v = int(m.group(1).replace(",", ""))
+            if 6000 < v < 7000 and v != b_tok:
+                fail.append(f"PTC token drift: {p.relative_to(ROOT)} has {m.group(1)}, receipt Mode B is {b_tok:,}")
+            if 9000 < v < 10000 and v != a_tok:
+                fail.append(f"PTC token drift: {p.relative_to(ROOT)} has {m.group(1)}, receipt Mode A is {a_tok:,}")
+
+
 def check_eval(fail, warn):
     """The eval-quality receipt total must match the internal product note that quotes it."""
     s = _read("edges/eval-quality/sample.txt")
@@ -108,6 +130,7 @@ def check_price_provenance(fail, warn):
 def main():
     fail, warn = [], []
     check_ptc(fail, warn)
+    check_ptc_drift(fail, warn)
     check_eval(fail, warn)
     check_price_provenance(fail, warn)
     for w in warn:
