@@ -112,14 +112,16 @@ def check_eval(fail, warn):
         warn.append("eval: could not parse the RUN 1 total from sample.txt")
         return
     total = float(m.group(1))
-    note = _read("edges/eval-quality/PRODUCT_EMAIL.md")
-    for i, line in enumerate(note.splitlines(), 1):
-        if "total" not in line.lower():
-            continue
-        for c in _dollars(line):
-            if 0.30 < c < 0.60 and abs(c - total) > 0.005:
-                fail.append(f"eval cost: PRODUCT_EMAIL.md:{i} says ${c:.4f}, receipt total is "
-                            f"${total:.4f}; reconcile them")
+    # Both the internal product note AND the public-facing edge README quote the run total, so gate both
+    # (the README total drifted to a stale $0.4090 precisely because it was ungated here).
+    for rel in ["edges/eval-quality/PRODUCT_EMAIL.md", "edges/eval-quality/README.md"]:
+        for i, line in enumerate(_read(rel).splitlines(), 1):
+            if "total" not in line.lower():
+                continue
+            for c in _dollars(line):
+                if 0.30 < c < 0.60 and abs(c - total) > 0.005:
+                    fail.append(f"eval cost: {rel}:{i} says ${c:.4f}, receipt total is "
+                                f"${total:.4f}; reconcile them")
 
 
 def check_price_provenance(fail, warn):

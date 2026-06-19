@@ -26,7 +26,7 @@ the standard tool-use path. ADK, Codex, and Antigravity summarize. Claude is the
 in-place clearing as a managed API feature on the standard tool-use path.
 
 Honest framing, reconciled with our own benchmark: it cuts carried tokens and bounds context
-(measured, peak 3,035 vs 35,936 tokens on a 32-step chain). It is NOT a raw dollar win when prompt
+(measured on the committed 8-report chain: editing-ON held context flat near 34k tokens while editing-OFF crashed at the 200k window, 203,056 tokens, receipt `../edges/context-editing/sample.txt`). It is NOT a raw dollar win when prompt
 caching is on, because clearing rewrites the cached prefix (see `../docs/FINDINGS.md`). Pitch it as
 context-bounding and no-build-eviction, never as "cheaper."
 

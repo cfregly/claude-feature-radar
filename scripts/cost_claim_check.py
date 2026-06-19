@@ -21,8 +21,10 @@ TABLE_COST_TOL = 0.001
 
 # (file, regex with one capturing group for the dollar total). Each is anchored tightly enough to
 # match only the citations cost claim, not another "$X" figure in the same file.
+# NOTE: edges/citations/FOUNDER_EMAIL.md is NOT listed here on purpose. That email tells the reader to
+# clone claude-feature-briefs and run the BRIEF's single-arm `make citations` (~$0.01), not the engine's
+# 4-arm cross-vendor sweep (~$0.06). Its cost is the brief's, gated by the briefs repo's own number gate.
 CLAIMS = [
-    {"file": "edges/citations/FOUNDER_EMAIL.md", "pattern": r"\$(\d+\.\d{2}) and a couple of minutes"},
     {"file": "edges/citations/README.md", "pattern": r"on your own keys, \$(\d+\.\d{2})"},
     {"file": "Makefile", "pattern": r"^citations:.*\$(\d+\.\d{2})"},
 ]

@@ -54,8 +54,10 @@ def _receipt() -> str:
             f"answer, with peak per-turn context {b['peak_input']:,} vs {m['peak_input']:,} tokens."
         )
     return (
-        "On a 32-step audit on Claude Haiku 4.5, the plain agent cost $0.59863 and the managed "
-        "agent $0.28742 for the same answer, peak context 35,206 vs 8,505 tokens."
+        "On the long-horizon chain audit on Claude Haiku 4.5 (8 reports, about 40k tokens each), the "
+        "context-editing-OFF run crashed at the 200k window (203,056 tokens) while editing-ON finished "
+        "the same job holding context flat near 34k tokens for $0.3513 (receipt: "
+        "edges/context-editing/sample.txt)."
     )
 
 

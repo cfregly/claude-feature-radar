@@ -1352,19 +1352,27 @@ def _ensure_readme_entry(readme: pathlib.Path, plan: BriefPlan) -> bool:
     appended. Keys on the slug link, so a second publish of the same edge is a no-op."""
     text = readme.read_text() if readme.exists() else ""
     link = f"({plan.slug}/README.md)"
+    # The run cost lives once, in plan.make_help, so the index entry can never drift from the make
+    # target's own stated cost (the citations brief is the single-key $0.01 run, not the engine's
+    # $0.06 cross-vendor sweep, and that distinction is exactly what kept drifting).
+    mcost = re.search(r"\$([\d.]+)\)", plan.make_help)
+    run_cost = mcost.group(1) if mcost else "?"
+    cost_phrase = f"`make {plan.slug}` (about ${run_cost})"
     if link in text:
-        return False
+        # Refresh the run-cost in an existing entry so a stale figure cannot survive a republish.
+        refreshed = re.sub(rf"`make {re.escape(plan.slug)}` \(about \$[\d.]+\)", cost_phrase, text, count=1)
+        if refreshed != text:
+            readme.write_text(refreshed)
+        return refreshed != text
     if plan.slug == "citations":
         blurb = ("Answer questions over your own documents and get a verifiable source pointer for "
                  "every answer, resolved in your own code.")
-        run_cost = "0.06"
     else:
         blurb = ("Cut the token bill on a fan-out task by running your tool in a code sandbox and "
                  "filtering the records before they reach the model.")
-        run_cost = "0.08"
     entry = (
         f"- [**{plan.slug}**]({plan.slug}/README.md): {plan.title}. {blurb} "
-        f"`make {plan.slug}` (about ${run_cost}).\n"
+        f"{cost_phrase}.\n"
     )
     # Insert under a "## Briefs" heading if present, else append at the end.
     m = re.search(r"^## Briefs\s*\n", text, re.MULTILINE)

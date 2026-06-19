@@ -48,7 +48,7 @@ export ANTHROPIC_API_KEY=your-key
 make citations
 ```
 
-$0.06 and a couple of minutes, every number read off the real API. To run it on your own documents,
+$0.01 and a couple of minutes, every number read off the real API. To run it on your own documents,
 drop your `.txt` files into `citations/docs/`, edit the questions at the top of `citations/cite.py`,
 and run `make citations` again.
 
@@ -68,5 +68,6 @@ Building with Claude
   scrutiny panel caught it: a tokenizer cannot count characters, and no founder would build it that
   way. The email now rests on the edge that survives: the guaranteed in-API per-character pointer,
   free of output tokens, returned by the API with no resolver code to own, no beta header.
-- **The numbers are receipts.** 8/8, the output-token count, and the six-cent reproduction cost all
-  come from `make citations` (`edges/citations/sample.txt`), not from memory.
+- **The numbers are receipts.** 8/8, the output-token count, and the one-cent reproduction cost (the
+  single Claude + Citations arm the brief runs) all come from `make citations`
+  (`edges/citations/sample.txt`), not from memory.

@@ -44,7 +44,7 @@ Source: [citations](https://platform.claude.com/docs/en/build-with-claude/citati
   `source.find(quote)`), which also resolves 8/8 on clean text on Claude, OpenAI gpt-5.4-mini, and
   Gemini gemini-3.5-flash. The measured edge is that Claude does the resolving in-API (guaranteed,
   the DIY find returns -1 the moment the model paraphrases), the quote is free of output tokens (308
-  versus 586 on the Claude DIY arm), and no competitor ships a per-character source pointer with these
+  versus 563 on the Claude DIY arm), and no competitor ships a per-character source pointer with these
 guarantees. An earlier version of
   this benchmark asked the models to emit the character offset and scored that 0/8, which a scrutiny
   panel correctly flagged as a strawman (a tokenizer cannot count characters). Receipt:

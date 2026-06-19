@@ -67,7 +67,7 @@ DIFFERENTIATORS = [
                "(make citations): on clean text the DIY path (model quote + your own str.find) "
                "resolves 8/8 on every vendor, so the edge is not that they cannot cite. The edge is "
                "the in-API resolve, guaranteed valid (DIY find is expected to break on paraphrase, "
-               "not measured here on clean text), free of output tokens (308 vs 586), zero resolver "
+               "not measured here on clean text), free of output tokens (308 vs 563), zero resolver "
                "code, char granularity, and the guarantees no competitor matches.",
         "fair_comparison": {
             "task_shape": "8 questions over 3 plain-text user documents",

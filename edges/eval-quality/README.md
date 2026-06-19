@@ -42,17 +42,17 @@ sweeps the SAME slice across every model x every effort level the model supports
 |---|:--:|:--:|--:|:--:|
 | **Claude Haiku 4.5** | (none) | **100% (4/4)** | $0.0037 | 100% |
 | Claude Sonnet 4.6 | low | 100% (4/4) | $0.0082 | 100% |
-| GPT-5.4 | low | 100% (4/4) | $0.0118 | 100% |
+| GPT-5.4 | low | 100% (4/4) | $0.0107 | 100% |
 | Claude Opus 4.8 | low | 100% (4/4) | $0.0173 | 100% |
-| GPT-5.5 | low | 100% (4/4) | $0.0265 | 100% |
-| Gemini 3.5 Flash | low | 100% (4/4) | $0.0342 | 100% |
-| Gemini 3.1 Pro | high | 100% (4/4) | $0.1088 | 100% |
+| GPT-5.5 | low | 100% (4/4) | $0.0272 | 100% |
+| Gemini 3.5 Flash | low | 100% (4/4) | $0.0356 | 100% |
+| Gemini 3.1 Pro | high | 100% (4/4) | $0.1252 | 100% |
 
-Total spend this run: $0.4090, every number off the API `usage` object.
+Total spend this run: $0.4285, every number off the API `usage` object.
 
 **The honest read.** Every model tied at 100% on the held-out split, so this slice does not separate
 the field on correctness. The finding is the cost spread: Claude Haiku resolved the held-out set for
-$0.0037, and Gemini 3.1 Pro at high effort resolved the same set for $0.1088, about 30x more. Paying
+$0.0037, and Gemini 3.1 Pro at high effort resolved the same set for $0.1252, about 33x more. Paying
 for the bigger cell bought cost, not capability. The judge panel agreed with every execution-passed
 program, so the grade is not too trusting here. The verdict is parity, reported exactly as it ran.
 
