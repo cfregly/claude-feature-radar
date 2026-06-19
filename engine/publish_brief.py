@@ -1267,7 +1267,7 @@ Building with Claude
 def _citations_founder_email_source(plan: BriefPlan) -> str:
     """The citations founder email, written to the ENGINE repo (never the public briefs repo). Wins-only,
     plain language, the real code, one reproduce path."""
-    return f"""Subject: Congrats on YC! 🎉 A Claude pattern for answers over user docs
+    return f"""Subject: Congrats on YC! 🎉 A Claude primitive for grounded answers you verify in code
 
 Hey {{first_name}},
 
