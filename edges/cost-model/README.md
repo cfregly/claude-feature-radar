@@ -68,7 +68,7 @@ url and date:
 ## Run it yourself
 
 ```bash
-git clone <this-repo> && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
 make cost          # the $0 pricing-model edge, both regimes, crossover named (no key, no spend)
 ```
 

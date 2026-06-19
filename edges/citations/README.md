@@ -1,6 +1,6 @@
 # Edge: Citations, a verifiable per-character source pointer into your user's own document
 
-Part of [claude-competitive-engine](../../README.md). This edge is GA today.
+Part of [claude-competitive-engine](../../README.md). This edge needs no beta header.
 
 **What it is.** Turn on `citations: {"enabled": true}` per document and Claude returns each claim with
 a structured pointer (a character range for text, a page range for a PDF) plus the verbatim quote,
@@ -40,7 +40,7 @@ cannot be combined with Structured Outputs on the same document (the API returns
 ## Run it yourself
 
 ```bash
-git clone <this-repo> && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
 make setup && make compare-deps   # core deps, then the OpenAI + Gemini SDKs, into the same venv
 cp .env.example .env              # paste your Anthropic, OpenAI, and Gemini keys
 make citations                    # this edge, on your own keys, $0.06

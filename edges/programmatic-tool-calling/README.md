@@ -1,13 +1,13 @@
 # Edge: Programmatic Tool Calling, keep your tool outputs out of the model's token bill
 
 Part of [claude-competitive-engine](../../README.md). This is the sharpest edge the engine found, and
-it is GA.
+it needs no beta header.
 
 **What it is.** Add `allowed_callers: ["code_execution_20260120"]` to one of your tools and include the
 code execution tool. Instead of one model round-trip per tool call, Claude writes a script in a sandbox
 that calls your tool in a loop, filters and aggregates the results there, and returns only the answer.
 The bulky tool outputs go to the sandbox, not the model, so you are not billed input tokens for data
-the model never reads. GA, no beta header (verified 2026-06-18). Supported on Opus 4.5 to 4.8 and
+the model never reads. No beta header required (verified 2026-06-18). Supported on Opus 4.5 to 4.8 and
 Sonnet 4.5 to 4.6 (not Haiku).
 
 ## The measured proof
@@ -42,7 +42,7 @@ re-fetched 2026-06-18.
 ## Run it yourself
 
 ```bash
-git clone <this-repo> && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
 make setup
 cp .env.example .env   # paste your Anthropic key
 make ptc               # this edge, on your own key, $0.08 on Sonnet 4.6

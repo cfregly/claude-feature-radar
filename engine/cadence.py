@@ -89,22 +89,21 @@ def _draft_email(edge: dict, routing_for_edge: dict | None) -> str:
         f"# Founder email draft (cadence, {edge.get('key','')}, {edge.get('axis','')})",
         "",
         "Drafted by the unattended cadence into the inert outbox. No model call, no send. "
-        "A deterministic template filled from the edge's measured fields, for a human to review, "
-        "edit, and decide whether to send.",
+        "A deterministic template filled from the edge's measured fields and the Chris Fregly voice "
+        "guide, for a human to review, edit, and decide whether to send.",
         "",
         "---",
         "",
-        "**Subject:** A measured edge you can check in one command, on your own key",
+        "**Subject:** A Claude edge you can test on your own key",
         "",
         "Hey {first_name},",
         "",
-        "You have shipped on all three big model platforms, so you do not need another feature list. "
-        "You need one claim you can check yourself, with the numbers and the line where it stops being "
-        "true. Here is one.",
+        "Quick builder note. If this workload looks like yours, the repo below lets you check the "
+        "number on your own key before you trust the claim.",
         "",
         claim,
         "",
-        f"{cost_line}{time_clause}. Clone the repo and run one command:",
+        f"Here is the receipt path: {cost_line}{time_clause}. Clone the repo and run one command:",
         "",
         "```",
         f"{command}",
@@ -113,10 +112,13 @@ def _draft_email(edge: dict, routing_for_edge: dict | None) -> str:
         "The run prints its own receipt: the workload, the exact models on each side, the dollar cost "
         "off the real usage object, and the assumptions your own task would change. If your numbers "
         "move the result, that is the point, the repo is built for you to swap in your own workload. "
-        "The features are beta where noted, and the gap can move as the platforms ship, so the repo "
-        "re-runs the whole search instead of caching a winner.",
+        "The gap can move as the platforms ship, so the repo re-runs the whole search instead of "
+        "caching a winner.",
         "",
         "Link: {repo_link}",
+        "",
+        "Go build,",
+        "Chris",
         "",
         "---",
         "",

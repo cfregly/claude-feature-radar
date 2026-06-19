@@ -8,9 +8,7 @@ Paste into a Google Doc or your sending tool. Plain text, one link.
 
 Hey {first_name},
 
-Congrats on YC.
-
-Quick builder note if your product answers questions over your users' own documents: contracts,
+Congrats on the YC batch. Quick builder note if your product answers questions over your users' own documents: contracts,
 policies, tickets, research, support docs, or clinical notes.
 
 The hard part is not writing an answer. The hard part is making the answer shippable. A user needs to
@@ -63,6 +61,6 @@ Building with Claude
   to emit the character offset themselves, scored that 0/8, and called it a competitor failure. A
   scrutiny panel caught it: a tokenizer cannot count characters, and no founder would build it that
   way. The email now rests on the edge that survives: the guaranteed in-API per-character pointer,
-  free of output tokens, returned by a GA API with no resolver code to own.
+  free of output tokens, returned by the API with no resolver code to own, no beta header.
 - **The numbers are receipts.** 8/8, the output-token count, and the six-cent reproduction cost all
   come from `make citations` (`edges/citations/sample.txt`), not from memory.

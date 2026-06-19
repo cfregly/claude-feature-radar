@@ -23,7 +23,7 @@ The full table, including the cache-write tiers, lives in
 ## Citations (the anchor feature)
 
 Source: [citations](https://platform.claude.com/docs/en/build-with-claude/citations), re-fetched
-2026-06-17. GA, no beta header. Supported on all active models except Haiku 3. ZDR-eligible.
+2026-06-17. No beta header required. Supported on all active models except Haiku 3. ZDR-eligible.
 
 - Request: a `document` content block with `"citations": {"enabled": true}`. The source is
   `{"type": "text", "media_type": "text/plain", "data": ...}` for plain text, a base64/url/file PDF,

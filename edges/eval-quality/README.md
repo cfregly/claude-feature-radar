@@ -78,7 +78,7 @@ benchmark with `EVAL_TASKS=path/to/your.jsonl make eval`, where each JSONL line 
 ## Run it yourself
 
 ```bash
-git clone <this-repo> && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
 make setup && make compare-deps   # core deps, then openai, google-genai (datasets only for EVAL_LCB)
 cp .env.example .env              # paste your Anthropic, OpenAI, and Gemini keys
 make eval-smoke                   # a cents-scale Claude-only smoke (Haiku + Sonnet, low effort)

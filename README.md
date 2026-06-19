@@ -20,7 +20,7 @@ If your agent calls a tool many times over data it then crunches (usage rollups 
 plan-limit checks across accounts, log or trace triage), every tool result flows into the model's
 context and you pay input tokens for all of it, even the rows the model only sums and throws away.
 
-Claude has a GA feature for this. Add `allowed_callers: ["code_execution_20260120"]` to a tool and
+Claude has a feature for this, no beta header. Add `allowed_callers: ["code_execution_20260120"]` to a tool and
 include the code execution tool, and Claude writes one sandbox script that calls your tool in a loop,
 filters and aggregates there, and returns only the answer. The bulky outputs go to the sandbox, not
 the model.
@@ -82,15 +82,15 @@ Feature references, fetched 2026-06-18:
 ## Fork and run
 
 ```bash
-git clone <this-repo> && cd claude-competitive-engine   # the public URL lands on publish
+git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
 make setup                        # the venv and the one dependency (anthropic)
 cp .env.example .env              # paste your ANTHROPIC_API_KEY
 make ptc                          # the lead edge, about $0.08 (needs ANTHROPIC_API_KEY)
 make app-check                    # the forkable app on the shipped example, then edit app/my_tool.py
 ```
 
-Cost expectations: every benchmark reads its numbers off a real API call. `make ptc` and `make
-citations` each cost about $0.06 on the shipped task. There is no hidden spend, and each target
+Cost expectations: every benchmark reads its numbers off a real API call. `make ptc` is about $0.08
+and `make citations` about $0.06 on the shipped task. There is no hidden spend, and each target
 prints its cost before it commits anything.
 
 The citations edge runs on the Anthropic key alone. To add the cross-vendor table that backs the

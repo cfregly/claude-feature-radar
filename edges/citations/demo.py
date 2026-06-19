@@ -136,7 +136,7 @@ def _doc_blocks(corpus):
 
 
 def run_claude_citations(client, model_key, corpus, questions):
-    """The primitive. citations.enabled=true, GA, no beta header. The pointer is guaranteed valid and
+    """The primitive. citations.enabled=true, no beta header. The pointer is guaranteed valid and
     the cited_text does not count toward output tokens."""
     model = get(model_key).id
     rows = []
@@ -386,7 +386,7 @@ def main():
     label = get(a.claude_model).label
 
     print(f"\n  Verifiable source citations: {len(CORPUS)} of your own documents, {n} questions.")
-    print(f"  Claude Citations is GA, no beta header. Only Claude ships a per-character document pointer")
+    print(f"  Claude Citations needs no beta header. Only Claude ships a per-character document pointer")
     print(f"  (Gemini File Search is page-level and still preview, OpenAI cites its own output), and the")
     print(f"  honest baseline without it is the DIY path: ask the model for the verbatim quote, then resolve")
     print(f"  it yourself with str.find. The grader checks that the quote resolves to the real source.\n")

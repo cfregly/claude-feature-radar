@@ -12,7 +12,7 @@ Programmatic tool calling (`allowed_callers` plus the code execution tool) is th
 engine found this month: it keeps a developer's own custom-tool outputs out of the model context, a
 direct token-cost lever no competitor names. Measured on our key (4 tools of 60 rows, fan-out task),
 it cut billed input tokens from 9,451 to 6,828, about 28%, and the sandbox code computed the answer
-correctly where the in-context model failed. It is GA (no beta header on the live doc as of 2026-06-18).
+correctly where the in-context model failed. It needs no beta header (per the live doc as of 2026-06-18).
 
 Three qualifiers we should carry, not bury.
 

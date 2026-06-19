@@ -71,6 +71,16 @@ def check_ptc(fail, warn):
                     fail.append(f"PTC cost: {rel}:{i} says ${c:.2f}, receipt total is {want} "
                                 f"(${a_cost:.4f}+${b_cost:.4f}); update both together")
 
+    # the $ figure that immediately follows a 'make ptc'/'make app' claim must be the receipt total,
+    # scanning across line breaks up to the next make-command (so 'make citations $0.06' is not misread)
+    for rel in cost_files:
+        text = _read(rel)
+        for mm in re.finditer(r"make (?:ptc|app)\b", text):
+            tail = re.split(r"\bmake \w", text[mm.end():mm.end() + 140])[0]
+            d = _dollars(tail)
+            if d and abs(d[0] - total) > COST_TOL:
+                fail.append(f"PTC cost: {rel} 'make ptc/app' is followed by ${d[0]:.2f}, receipt total is {want}")
+
 
 def check_ptc_drift(fail, warn):
     """Any PTC-token-shaped number (9,4xx / 6,8xx) on a founder surface must equal the receipt, so a

@@ -59,7 +59,7 @@ The scope is explicit: it proves the loop survives a kill and the retention term
 ## Run it yourself
 
 ```bash
-git clone <this-repo> && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
 make retention          # the $0 doc-grounded retention/bundle parity receipt (no key, no spend)
 make setup              # only needed for the opt-in live run below
 make retention-live     # OPT-IN: the live Managed Agents kill-and-resume (beta, spends a small amount)

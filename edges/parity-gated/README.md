@@ -42,7 +42,7 @@ product-team note rather than the founder email.
 ## Run it yourself
 
 ```bash
-git clone <this-repo> && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
 make parity-gated      # the $0 view of every held candidate and its parity check (no key, no spend)
 ```
 

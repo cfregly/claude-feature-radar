@@ -4,7 +4,7 @@ The anchor. Programmatic tool calling (PTC) lets Claude write one script in a co
 that calls the developer's OWN tools in a loop and filters the results before they ever reach the
 model's context window. Add `allowed_callers: ["code_execution_20260120"]` to a tool and Claude
 invokes it from code instead of one round trip per call. The bulky tool OUTPUTS go to the sandbox,
-not the model, so you are not billed input tokens for data the model never needs to read. GA, no beta
+not the model, so you are not billed input tokens for data the model never needs to read. No beta
 header. Models: Opus 4.5 to 4.8 and Sonnet 4.5 to 4.6 (not Haiku). Source, re-fetched 2026-06-17:
 https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 

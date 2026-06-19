@@ -59,10 +59,21 @@ def _receipt() -> str:
     )
 
 
-SYSTEM = (
+def _voice_guide() -> str:
+    f = repo_root() / "CHRIS_FREGLY_VOICE.md"
+    try:
+        return f.read_text().strip()
+    except OSError:
+        return (
+            "Builder talking to builders: warm, direct, concrete, measured, first-person, "
+            "code-backed. Start with the workload, then the mechanism, receipt, and next step."
+        )
+
+
+BASE_SYSTEM = (
     "You write like a builder talking to builders. Plain words. No em-dashes, no en-dashes, no "
     "semicolons, no buzzwords, no hype. One claim, one proof the reader runs themselves, one link. "
-    "Name no competitor. Be honest that the features are beta and the gap can move."
+    "Name no competitor in the founder email. State maturity only when the reader must act on it."
 )
 
 
@@ -79,7 +90,7 @@ def main():
     msg = client.messages.create(
         model=get("haiku").id,
         max_tokens=900,
-        system=SYSTEM,
+        system=BASE_SYSTEM + "\n\nUse this persistent voice guide:\n\n" + _voice_guide(),
         messages=[{"role": "user", "content": prompt}],
     )
     text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text").strip()

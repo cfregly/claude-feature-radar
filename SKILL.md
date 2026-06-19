@@ -29,6 +29,11 @@ in both directions, including when Claude loses.
 
 These are why the output is trusted. Break one and the trust is gone.
 
+0. **Use Chris Fregly's voice.** Before drafting or editing any founder email, product email, brief,
+   README CTA, or outbox draft, read `CHRIS_FREGLY_VOICE.md`. Write builder-to-builder: warm,
+   direct, concrete, measured, first-person, and code-backed. Keep the public talk cadence, but strip
+   transcript filler. Start with the workload, then the mechanism, receipt, and next step.
+
 1. **Compare best to best, latest to latest.** Use each platform's newest API and all of its best
    features, including alpha and beta, on both sides. Never disable a competitor's caching,
    compaction, or parallelism, and never use an older API, to make Claude look better. Never
@@ -206,7 +211,7 @@ their own prompt and know what changes. The founder email links it.
 ## What a founder runs
 
 ```bash
-git clone <this-repo> && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
 make setup                              # venv + anthropic
 pip install -r requirements-compare.txt # openai, only for the comparison
 cp .env.example .env                    # paste ANTHROPIC_API_KEY and OPENAI_API_KEY

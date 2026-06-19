@@ -36,7 +36,7 @@ constant by the memory tool (on in both arms). Full receipt in [`sample.txt`](sa
 ## Run it yourself
 
 ```bash
-git clone <this-repo> && cd claude-competitive-engine
+git clone https://github.com/cfregly/claude-competitive-engine && cd claude-competitive-engine
 make setup
 cp .env.example .env   # paste your Anthropic key
 make longhorizon       # this edge, 3 runs for reliability, about two dollars on Haiku
