@@ -33,9 +33,8 @@ regions of 60 sales rows each (240 rows), find the highest-revenue region.
 | plain tool use | 9,451 | the model summed 240 rows in its head |
 | programmatic | 6,828 | east (the sandbox computed it) |
 
-A 28% input-token cut, and the sandbox code computed the exact winner. The win is fan-out shaped: the
-Claude doc reports a sequential single-call task is flat to about 8% more expensive, so this is for
-tool-heavy agents that fan out. The full receipt is [`edges/programmatic-tool-calling/sample.txt`](edges/programmatic-tool-calling/sample.txt).
+A 28% input-token cut, and the sandbox returns the exact winner. This pays off when your agent calls
+a tool many times over data it then crunches (the fan-out shape). The full receipt is [`edges/programmatic-tool-calling/sample.txt`](edges/programmatic-tool-calling/sample.txt).
 
 ```bash
 make ptc          # about $0.06 on Sonnet, needs ANTHROPIC_API_KEY
