@@ -1,7 +1,7 @@
 Source: https://platform.claude.com/docs/en/build-with-claude/pdf-support
 Snapshot fetched 2026-06-19. Verbatim excerpts for citation grounding.
 
-PDF support - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop reasons and fallback Refusals and fallback Fallback credit Model capabilities Extended thinking Adaptive thinking Effort Task budgets (beta) Fast mode (research preview) Structured outputs Citations Streaming Messages Batch processing Search results Streaming refusals Multilingual support Embeddings Tools Overview How tool use works Tutorial: Build a tool-using agent Define tools Handle tool calls Parallel tool use Tool Runner (SDK) Strict tool use Tool use with prompt caching Server tools Troubleshooting Web search tool Web fetch tool Code execution tool Advisor tool Memory tool Bash tool Computer use tool Text editor tool Tool infrastructure Tool reference Manage tool context Tool combinations Tool search Programmatic tool calling Fine-grained tool streaming Context management Context windows Compaction Context editing Prompt caching Mid-conversation system messages Build an orchestration mode Cache diagnostics (beta) Token counting Working with files Files API PDF support Images and vision Skills Overview Quickstart Best practices Skills for enterprise Skills in the API MCP Remote MCP servers MCP connector MCP tunnels  Claude on cloud platforms Amazon Bedrock Amazon Bedrock (legacy) Claude Platform on AWS Microsoft Foundry Vertex AI  Log in  Messages  PDF support Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Solutions AI agents Code modernization Coding Customer support Education Financial services Government Life sciences Partners Claude on AWS Google Cloud's Vertex AI Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Company Anthropic Careers Economic Futures Research News Responsible Scaling Policy Security and compliance Transparency Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Help and security Availability Status Support Discord Terms and policies Privacy policy Responsible disclosure policy Terms of service: Commercial Terms of service: Consumer Usage policy Messages / Working with files PDF support Copy page  Process PDFs with Claude. Extract text, analyze charts, and understand visual content from your documents. Copy page   This feature is eligible for Zero Data Retention (ZDR) . When your organization has a ZDR arrangement, data sent through this feature is not stored after the API response is returned.
+PDF support - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop reasons and fallback Refusals and fallback Fallback credit Model capabilities Extended thinking Adaptive thinking Effort Task budgets (beta) Fast mode (research preview) Structured outputs Citations Streaming Messages Batch processing Search results Streaming refusals Multilingual support Embeddings Tools Overview How tool use works Tutorial: Build a tool-using agent Define tools Handle tool calls Parallel tool use Tool Runner (SDK) Strict tool use Tool use with prompt caching Server tools Troubleshooting Web search tool Web fetch tool Code execution tool Advisor tool Memory tool Bash tool Computer use tool Text editor tool Tool infrastructure Tool reference Manage tool context Tool combinations Tool search Programmatic tool calling Fine-grained tool streaming Context management Context windows Compaction Context editing Prompt caching Mid-conversation system messages Build an orchestration mode Cache diagnostics (beta) Token counting Working with files Files API PDF support Images and vision Skills Overview Quickstart Best practices Skills for enterprise Skills in the API MCP Remote MCP servers MCP connector MCP tunnels  Claude on cloud platforms Amazon Bedrock Amazon Bedrock (legacy) Claude Platform on AWS Microsoft Foundry Vertex AI  Log in  Messages  PDF support Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Solutions AI agents Code modernization Coding Customer support Education Financial services Government Life sciences Partners Claude on AWS Google Cloud's Vertex AI Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Company Anthropic Careers Economic Futures Research News Responsible Scaling Policy Security and compliance Transparency Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Help and security Availability Status Support Discord Terms and policies Privacy policy Responsible disclosure policy Terms of service: Commercial Terms of service: Consumer Usage policy Messages / Working with files PDF support Copy page  Process PDFs with Claude. Extract text, analyze charts, and understand visual content from your documents. Copy page  Was this page helpful?   Before you begin Check PDF requirements Supported platforms and models Amazon Bedrock PDF support Process PDFs with Claude Send your first PDF request How PDF support works Estimate your costs Optimize PDF processing Improve performance Scale your implementation Next steps  This feature is eligible for Zero Data Retention (ZDR) . When your organization has a ZDR arrangement, data sent through this feature is not stored after the API response is returned.
 You can ask Claude about any text, pictures, charts, and tables in PDFs you provide. Some sample use cases:
 Analyzing financial reports and understanding charts/tables
 Extracting key information from legal documents
@@ -30,7 +30,6 @@ Provides complete visual analysis of PDFs
 Can understand and analyze charts, graphs, images, and visual layouts
 Processes each page as both text and image for comprehensive understanding
 Uses approximately 7,000 tokens for a 3-page PDF
-Requires citations to be enabled in the Converse API
  Key limitations
 Converse API : Visual PDF analysis requires citations to be enabled. There is currently no option to use visual analysis without citations (unlike the InvokeModel API).
 InvokeModel API : Provides full control over PDF processing without forced citations.
@@ -47,85 +46,10 @@ By a file_id from the Files API
  On Amazon Bedrock and Vertex AI, only base64-encoded sources are currently available.
  Option 1: URL-based PDF document
 The simplest approach is to reference a PDF directly from a URL:
-cURL CLI Python TypeScript Java  client = anthropic.Anthropic()
-message = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 1024 ,
-messages = [
-{
-"role" : "user" ,
-"content" : [
-{
-"type" : "document" ,
-"source" : {
-"type" : "url" ,
-"url" : "https://assets.anthropic.com/m/1cd9d098ac3e6467/original/Claude-3-Model-Card-October-Addendum.pdf" ,
-},
-},
-{ "type" : "text" , "text" : "What are the key findings in this document?" },
-],
-}
-],
-)
-print (message.content)
  Option 2: Base64-encoded PDF document
 If you need to send PDFs from your local system or when a URL isn't available:
-cURL CLI Python TypeScript Java  import base64
-import httpx
-# First, load and encode the PDF
-pdf_url = "https://assets.anthropic.com/m/1cd9d098ac3e6467/original/Claude-3-Model-Card-October-Addendum.pdf"
-pdf_data = base64.standard_b64encode(httpx.get(pdf_url).content).decode( "utf-8" )
-# Alternative: Load from a local file
-# with open("document.pdf", "rb") as f:
-# pdf_data = base64.standard_b64encode(f.read()).decode("utf-8")
-# Send to Claude using base64 encoding
-client = anthropic.Anthropic()
-message = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 1024 ,
-messages = [
-{
-"role" : "user" ,
-"content" : [
-{
-"type" : "document" ,
-"source" : {
-"type" : "base64" ,
-"media_type" : "application/pdf" ,
-"data" : pdf_data,
-},
-},
-{ "type" : "text" , "text" : "What are the key findings in this document?" },
-],
-}
-],
-)
-print (message.content)
  Option 3: Files API
 For PDFs you'll use repeatedly, or when you want to avoid encoding overhead, use the Files API :
-cURL CLI Python TypeScript Java  client = anthropic.Anthropic()
-# Upload the PDF file
-with open ( "document.pdf" , "rb" ) as f:
-file_upload = client.beta.files.upload( file = ( "document.pdf" , f, "application/pdf" ))
-# Use the uploaded file in a message
-message = client.beta.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 1024 ,
-betas = [ "files-api-2025-04-14" ],
-messages = [
-{
-"role" : "user" ,
-"content" : [
-{
-"type" : "document" ,
-"source" : { "type" : "file" , "file_id" : file_upload.id},
-},
-{ "type" : "text" , "text" : "What are the key findings in this document?" },
-],
-}
-],
-)
-print (message.content)
  How PDF support works
 When you send a PDF to Claude, the following steps occur:
 1 The system extracts the contents of the document.
@@ -157,7 +81,82 @@ Enable prompt caching for repeated analysis
 For high-volume processing, consider these approaches:
  Use prompt caching
 Cache PDFs to improve performance on repeated queries:
-cURL CLI Python TypeScript Java  client = anthropic.Anthropic()
+ Process document batches
+Use the Message Batches API for high-volume workflows:
+ Next steps
+ Try PDF examples  Explore practical examples of PDF processing in the cookbook recipe.  View API reference See complete API documentation for PDF support. Requires citations to be enabled in the Converse API cURL CLI Python TypeScript Java  client = anthropic.Anthropic()
+message = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 1024 ,
+messages = [
+{
+"role" : "user" ,
+"content" : [
+{
+"type" : "document" ,
+"source" : {
+"type" : "url" ,
+"url" : "https://assets.anthropic.com/m/1cd9d098ac3e6467/original/Claude-3-Model-Card-October-Addendum.pdf" ,
+},
+},
+{ "type" : "text" , "text" : "What are the key findings in this document?" },
+],
+}
+],
+)
+print (message.content) cURL CLI Python TypeScript Java  import base64
+import httpx
+# First, load and encode the PDF
+pdf_url = "https://assets.anthropic.com/m/1cd9d098ac3e6467/original/Claude-3-Model-Card-October-Addendum.pdf"
+pdf_data = base64.standard_b64encode(httpx.get(pdf_url).content).decode( "utf-8" )
+# Alternative: Load from a local file
+# with open("document.pdf", "rb") as f:
+# pdf_data = base64.standard_b64encode(f.read()).decode("utf-8")
+# Send to Claude using base64 encoding
+client = anthropic.Anthropic()
+message = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 1024 ,
+messages = [
+{
+"role" : "user" ,
+"content" : [
+{
+"type" : "document" ,
+"source" : {
+"type" : "base64" ,
+"media_type" : "application/pdf" ,
+"data" : pdf_data,
+},
+},
+{ "type" : "text" , "text" : "What are the key findings in this document?" },
+],
+}
+],
+)
+print (message.content) cURL CLI Python TypeScript Java  client = anthropic.Anthropic()
+# Upload the PDF file
+with open ( "document.pdf" , "rb" ) as f:
+file_upload = client.beta.files.upload( file = ( "document.pdf" , f, "application/pdf" ))
+# Use the uploaded file in a message
+message = client.beta.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 1024 ,
+betas = [ "files-api-2025-04-14" ],
+messages = [
+{
+"role" : "user" ,
+"content" : [
+{
+"type" : "document" ,
+"source" : { "type" : "file" , "file_id" : file_upload.id},
+},
+{ "type" : "text" , "text" : "What are the key findings in this document?" },
+],
+}
+],
+)
+print (message.content) cURL CLI Python TypeScript Java  client = anthropic.Anthropic()
 # ...
 message = client.messages.create(
 model = "claude-opus-4-8" ,
@@ -179,10 +178,7 @@ messages = [
 ],
 }
 ],
-)
- Process document batches
-Use the Message Batches API for high-volume workflows:
-cURL CLI Python TypeScript Java  client = anthropic.Anthropic()
+) cURL CLI Python TypeScript Java  client = anthropic.Anthropic()
 # ...
 message_batch = client.messages.batches.create(
 requests = [
@@ -211,5 +207,3 @@ requests = [
 }
 ]
 )
- Next steps
- Try PDF examples  Explore practical examples of PDF processing in the cookbook recipe.  View API reference See complete API documentation for PDF support. Was this page helpful?   Before you begin Check PDF requirements Supported platforms and models Amazon Bedrock PDF support Process PDFs with Claude Send your first PDF request How PDF support works Estimate your costs Optimize PDF processing Improve performance Scale your implementation Next steps

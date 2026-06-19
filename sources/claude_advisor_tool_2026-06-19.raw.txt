@@ -20,26 +20,6 @@ If you request an invalid pair, the API returns a 400 invalid_request_error nami
  Platform availability
 The advisor tool is available in beta on the Claude API and on Claude Platform on AWS . It is not currently available on AWS Bedrock, Vertex AI, or Microsoft Foundry.
  Quick start
-cURL CLI Python TypeScript C# Go PHP Ruby  client = anthropic.Anthropic()
-response = client.beta.messages.create(
-model = "claude-sonnet-4-6" ,
-max_tokens = 4096 ,
-betas = [ "advisor-tool-2026-03-01" ],
-tools = [
-{
-"type" : "advisor_20260301" ,
-"name" : "advisor" ,
-"model" : "claude-opus-4-8" ,
-}
-],
-messages = [
-{
-"role" : "user" ,
-"content" : "Build a concurrent worker pool in Go with graceful shutdown." ,
-}
-],
-)
-print (response)
  How it works
 When you add the advisor tool to your tools array, the executor model decides when to call it, just like any other tool. When the executor invokes the advisor:
 The executor emits a server_tool_use block with name: "advisor" and an empty input . The executor signals timing; the server supplies context.
@@ -49,7 +29,7 @@ The executor continues generating, informed by the advice.
 All of this happens inside a single /v1/messages request. No extra round trips on your side.
 The advisor itself runs without tools and without context management. Its thinking blocks are dropped before the result returns; only the advice text reaches the executor.
  Tool parameters
-Parameter Type Default Description type string required Must be "advisor_20260301" . name string required Must be "advisor" . model string required The advisor model ID, such as "claude-opus-4-8" . Billed at this model's rates for the sub-inference. max_uses integer unlimited Maximum number of advisor calls allowed in a single request. Once the executor reaches this cap, further advisor calls return an advisor_tool_result_error with error_code: "max_uses_exceeded" and the executor continues without further advice. This is a per-request cap, not a per-conversation cap; see Cost control for conversation-level limits. max_tokens integer advisor model's output cap Caps the advisor's total output (thinking plus text) per call. Minimum 1024. See Capping advisor output . caching object | null null (off) Enables prompt caching for the advisor's own transcript across calls within a conversation. See Advisor prompt caching .
+Parameter Type Default Description type string required Must be "advisor_20260301" . name string required Must be "advisor" . model string required The advisor model ID, such as "claude-opus-4-8" . Billed at this model's rates for the sub-inference. max_uses integer unlimited Maximum number of advisor calls allowed in a single request. Once the executor reaches this cap, further advisor calls return an with and the executor continues without further advice. This is a per-request cap, not a per-conversation cap; see for conversation-level limits.
 The caching object has the shape {"type": "ephemeral", "ttl": "5m" | "1h"} . Unlike cache_control on content blocks, this is not a breakpoint marker; it is an on/off switch. The server decides where cache boundaries go.
 The advisor tool also accepts the generic properties available on any tool definition: cache_control , allowed_callers , defer_loading , and strict (covered in structured outputs ). See the Tool reference for their semantics.
  Response structure
@@ -364,4 +344,23 @@ Advisor output does not stream. Expect a pause in the stream while the sub-infer
 No built-in conversation-level cap on advisor calls. Track and cap them client-side.
 The top-level max_tokens applies to executor output only. It does not bound advisor tokens. To cap advisor output, set max_tokens on the tool definition .
 Priority Tier is honored for each model. Priority Tier on the executor model does not extend to the advisor; you need Priority Tier on the advisor model specifically.
-Was this page helpful?   When to use it Model compatibility Platform availability Quick start How it works Tool parameters Response structure Successful advisor call Result variants Error results Multi-turn conversations Mid-conversation nudge for under-calling executors Streaming Usage and billing Advisor prompt caching Executor-side caching Advisor-side caching Combining with other tools Best practices Prompting for coding and agent tasks Capping advisor output Pairing with effort settings Cost control Limitations
+Was this page helpful?   When to use it Model compatibility Platform availability Quick start How it works Tool parameters Response structure Successful advisor call Result variants Error results Multi-turn conversations Mid-conversation nudge for under-calling executors Streaming Usage and billing Advisor prompt caching Executor-side caching Advisor-side caching Combining with other tools Best practices Prompting for coding and agent tasks Capping advisor output Pairing with effort settings Cost control Limitations cURL CLI Python TypeScript C# Go PHP Ruby  client = anthropic.Anthropic()
+response = client.beta.messages.create(
+model = "claude-sonnet-4-6" ,
+max_tokens = 4096 ,
+betas = [ "advisor-tool-2026-03-01" ],
+tools = [
+{
+"type" : "advisor_20260301" ,
+"name" : "advisor" ,
+"model" : "claude-opus-4-8" ,
+}
+],
+messages = [
+{
+"role" : "user" ,
+"content" : "Build a concurrent worker pool in Go with graceful shutdown." ,
+}
+],
+)
+print (response) advisor_tool_result_error error_code: "max_uses_exceeded" Cost control max_tokens integer advisor model's output cap Caps the advisor's total output (thinking plus text) per call. Minimum 1024. See Capping advisor output . caching object | null null (off) Enables prompt caching for the advisor's own transcript across calls within a conversation. See Advisor prompt caching .

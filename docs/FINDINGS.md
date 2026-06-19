@@ -64,6 +64,27 @@ A placeholder price for gemini-3.5-flash (input $0.30) made it look cheaper than
 paid-tier price is $1.50 input and $9.00 output, so Gemini is actually pricier. Lesson: pull every
 per-token price from the vendor's live pricing page and date it, before any dollar figure ships.
 
+## 8. Citations: the edge is the guarantee and the no-store bundle, not char granularity
+
+The skeptic refuted the citations edge as first stated: on clean text a model-emitted quote plus your
+own `str.find` resolves 8 of 8 at char granularity on every vendor, so "the only API with a per-char
+source pointer" overclaims. A live-docs dig (2026-06-19) confirmed it and found the real wedge. Two
+parts were genuinely refuted: char-level granularity holds only for plain text (Claude PDFs are
+page-level via `page_location`, the same coarseness as Gemini File Search `page_number`), and on clean
+text the DIY path is parity. Three subfeatures survive. (1) The API guarantees every returned pointer
+resolves to a real source span ("citations are guaranteed to contain valid pointers to the provided
+documents"). The DIY quote-plus-find cannot, because a paraphrase makes `str.find` return -1 and the
+citation is silently dropped, so the wedge is the guarantee, not recall. (2) `cited_text` is free of
+output tokens and of input tokens on replay, which no competitor documents. (3) The global edge is the
+one-request, no-hosted-store, mixed-source bundle: Claude cites a directly-supplied PDF plus
+developer-supplied RAG chunks plus inline text in a single call with zero persisted objects, while
+OpenAI (`file_citation`) and Gemini (File Search) both require a hosted vector store with upload and
+index, neither cites a directly-supplied inline PDF, and Gemini File Search cannot be combined with
+another tool in one call. Where Claude loses: Citations and Structured Outputs return a 400 together,
+so a founder who needs strict-JSON grounded output cannot stack the two. The next demonstrator step is
+a paraphrase-resolution arm, the case "not measured on clean text," to retire the objection directly.
+Lesson: when a headline edge is refuted, the wedge is usually one subfeature deeper, not gone.
+
 ## What the benchmark is for
 
 The benchmark is a credibility tool, not a sales pitch: a fair, exhaustive, best-to-best fight a

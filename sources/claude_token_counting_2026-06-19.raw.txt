@@ -12,17 +12,37 @@ The token counting endpoint accepts the same structured list of inputs for creat
  Supported models
 All active models support token counting.
  Count tokens in basic messages
-cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
+Output  { "input_tokens" : 14 }
+ Count tokens in messages with tools
+ Server tool token counts only apply to the first sampling call.
+Output  { "input_tokens" : 403 }
+ Count tokens in messages with images
+Output  { "input_tokens" : 1551 }
+ Count tokens in messages with extended thinking
+ See how the context window is calculated with extended thinking for more details
+Thinking blocks from previous assistant turns are ignored and do not count toward your input tokens
+Current assistant turn thinking does count toward your input tokens
+Output  { "input_tokens" : 88 }
+ Count tokens in messages with PDFs
+ Token counting supports PDFs with the same limitations as the Messages API.
+Output  { "input_tokens" : 2188 }
+ Token counts on Claude Fable 5 and Claude Mythos 5
+Claude Fable 5 and Claude Mythos 5 use the tokenizer introduced with Claude Opus 4.7, which produces roughly 30% more tokens than models before Claude Opus 4.7 for the same text. The token counting endpoint returns the count under the tokenizer of the model you pass, so to measure the difference for your workload, count the same request twice: once with your current model and once with model: "claude-fable-5" (or "claude-mythos-5" ), and compare the two input_tokens values.
+ Billing and migration: Usage and billing on Claude Fable 5 and Claude Mythos 5 reflect this tokenizer's counts. If you're migrating from a model before Claude Opus 4.7, the same content consumes roughly 30% more tokens. When migrating a workload to Claude Fable 5 and Claude Mythos 5, don't reuse token counts measured on a model before Claude Opus 4.7 to estimate costs or context window fit. Count your prompts with model: "claude-fable-5" (or "claude-mythos-5" ).
+ Pricing and rate limits
+Token counting is free to use but subject to requests per minute rate limits based on your usage tier . If you need higher limits, contact sales through the Claude Console .
+Usage tier Requests per minute (RPM) 1 100 2 2,000 3 4,000 4 8,000
+ Token counting and message creation have separate and independent rate limits. Usage of one does not count against the limits of the other.
+ FAQ
+Does token counting use prompt caching?
+ Next steps
+ Count message tokens Read the full API reference for the token counting endpoint. Context windows Use token counts to keep prompts within a model's context window. Rate limits Check token counts before you send a request to stay within your usage tier. Was this page helpful?   How to count message tokens Supported models Count tokens in basic messages Count tokens in messages with tools Count tokens in messages with images Count tokens in messages with extended thinking Count tokens in messages with PDFs Token counts on Claude Fable 5 and Claude Mythos 5 Pricing and rate limits FAQ Next steps cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
 response = client.messages.count_tokens(
 model = "claude-opus-4-8" ,
 system = "You are a scientist" ,
 messages = [{ "role" : "user" , "content" : "Hello, Claude" }],
 )
-print (response.json())
-Output  { "input_tokens" : 14 }
- Count tokens in messages with tools
- Server tool token counts only apply to the first sampling call.
-cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
+print (response.json()) cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
 response = client.messages.count_tokens(
 model = "claude-opus-4-8" ,
 tools = [
@@ -43,10 +63,7 @@ tools = [
 ],
 messages = [{ "role" : "user" , "content" : "What's the weather like in San Francisco?" }],
 )
-print (response.json())
-Output  { "input_tokens" : 403 }
- Count tokens in messages with images
-cURL CLI Python TypeScript C# Go Java PHP Ruby  import base64
+print (response.json()) cURL CLI Python TypeScript C# Go Java PHP Ruby  import base64
 import httpx
 image_url = "https://upload.wikimedia.org/wikipedia/commons/a/a7/Camponotus_flavomarginatus_ant.jpg"
 image_media_type = "image/jpeg"
@@ -71,13 +88,7 @@ messages = [
 }
 ],
 )
-print (response.json())
-Output  { "input_tokens" : 1551 }
- Count tokens in messages with extended thinking
- See how the context window is calculated with extended thinking for more details
-Thinking blocks from previous assistant turns are ignored and do not count toward your input tokens
-Current assistant turn thinking does count toward your input tokens
-cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
+print (response.json()) cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
 response = client.messages.count_tokens(
 model = "claude-sonnet-4-6" ,
 thinking = { "type" : "enabled" , "budget_tokens" : 16000 },
@@ -103,11 +114,7 @@ messages = [
 { "role" : "user" , "content" : "Can you write a formal proof?" },
 ],
 )
-print (response.json())
-Output  { "input_tokens" : 88 }
- Count tokens in messages with PDFs
- Token counting supports PDFs with the same limitations as the Messages API.
-cURL CLI Python TypeScript C# Go Java PHP Ruby  import base64
+print (response.json()) cURL CLI Python TypeScript C# Go Java PHP Ruby  import base64
 import anthropic
 client = anthropic.Anthropic()
 with open ( "document.pdf" , "rb" ) as pdf_file:
@@ -131,16 +138,4 @@ messages = [
 }
 ],
 )
-print (response.json())
-Output  { "input_tokens" : 2188 }
- Token counts on Claude Fable 5 and Claude Mythos 5
-Claude Fable 5 and Claude Mythos 5 use the tokenizer introduced with Claude Opus 4.7, which produces roughly 30% more tokens than models before Claude Opus 4.7 for the same text. The token counting endpoint returns the count under the tokenizer of the model you pass, so to measure the difference for your workload, count the same request twice: once with your current model and once with model: "claude-fable-5" (or "claude-mythos-5" ), and compare the two input_tokens values.
- Billing and migration: Usage and billing on Claude Fable 5 and Claude Mythos 5 reflect this tokenizer's counts. If you're migrating from a model before Claude Opus 4.7, the same content consumes roughly 30% more tokens. When migrating a workload to Claude Fable 5 and Claude Mythos 5, don't reuse token counts measured on a model before Claude Opus 4.7 to estimate costs or context window fit. Count your prompts with model: "claude-fable-5" (or "claude-mythos-5" ).
- Pricing and rate limits
-Token counting is free to use but subject to requests per minute rate limits based on your usage tier . If you need higher limits, contact sales through the Claude Console .
-Usage tier Requests per minute (RPM) 1 100 2 2,000 3 4,000 4 8,000
- Token counting and message creation have separate and independent rate limits. Usage of one does not count against the limits of the other.
- FAQ
-Does token counting use prompt caching?
- Next steps
- Count message tokens Read the full API reference for the token counting endpoint. Context windows Use token counts to keep prompts within a model's context window. Rate limits Check token counts before you send a request to stay within your usage tier. Prompt caching Reduce cost and latency on repeated prompts by caching prompt prefixes. Was this page helpful?   How to count message tokens Supported models Count tokens in basic messages Count tokens in messages with tools Count tokens in messages with images Count tokens in messages with extended thinking Count tokens in messages with PDFs Token counts on Claude Fable 5 and Claude Mythos 5 Pricing and rate limits FAQ Next steps
+print (response.json()) Prompt caching Reduce cost and latency on repeated prompts by caching prompt prefixes.

@@ -33,9 +33,30 @@ Technical research
 Response grounding and verification
  Dynamic filtering requires the code execution tool to be enabled. The web search tool (with and without dynamic filtering) is available on the Claude API, Claude Platform on AWS , and Microsoft Foundry . On Vertex AI, only the basic web search tool (without dynamic filtering) is available. Web search is not available on Amazon Bedrock.
 To enable dynamic filtering, use web_search_20260209 or any later version. The following examples use web_search_20260209 :
+cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
+response = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 4096 ,
+messages = [
+{
+"role" : "user" ,
+"content" : "Search for the current prices of AAPL and GOOGL, then calculate which has a better P/E ratio." ,
+}
+],
+tools = [{ "type" : "web_search_20260209" , "name" : "web_search" }],
+)
+print (response)
  How to use web search
  Your organization's administrator must enable web search in the Claude Console .
 Provide the web search tool in your API request:
+cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
+response = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 1024 ,
+messages = [{ "role" : "user" , "content" : "What's the weather in NYC?" }],
+tools = [{ "type" : "web_search_20250305" , "name" : "web_search" , "max_uses" : 5 }],
+)
+print (response)
  Tool definition
 The web search tool supports the following parameters:
 JSON  {
@@ -212,23 +233,4 @@ Web search usage is charged in addition to token usage:
 Web search is available on the Claude API for $10 per 1,000 searches , plus standard token costs for search-generated content. Web search results retrieved throughout a conversation are counted as input tokens, in search iterations executed during a single turn and in subsequent conversation turns.
 Each web search counts as one use, regardless of the number of results returned. If an error occurs during web search, the web search will not be billed.
  Next steps
-Server tools Shared mechanics for Anthropic-executed tools. Tool reference Directory of all Anthropic-provided tools. Was this page helpful?   How web search works When Claude searches Dynamic filtering How to use web search Tool definition Max uses Domain filtering Localization Response inclusion Response Search results Citations Errors pause_turn stop reason Prompt caching Streaming Batch requests Usage and pricing Next steps cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
-response = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 4096 ,
-messages = [
-{
-"role" : "user" ,
-"content" : "Search for the current prices of AAPL and GOOGL, then calculate which has a better P/E ratio." ,
-}
-],
-tools = [{ "type" : "web_search_20260209" , "name" : "web_search" }],
-)
-print (response) cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
-response = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 1024 ,
-messages = [{ "role" : "user" , "content" : "What's the weather in NYC?" }],
-tools = [{ "type" : "web_search_20250305" , "name" : "web_search" , "max_uses" : 5 }],
-)
-print (response)
+Server tools Shared mechanics for Anthropic-executed tools. Tool reference Directory of all Anthropic-provided tools. Was this page helpful?   How web search works When Claude searches Dynamic filtering How to use web search Tool definition Max uses Domain filtering Localization Response inclusion Response Search results Citations Errors pause_turn stop reason Prompt caching Streaming Batch requests Usage and pricing Next steps

@@ -39,6 +39,7 @@ DEMO_KINDS = [
     "pdf_grounding",
     "byo_rag_grounding",
     "grounding_stack",
+    "web_grounding",
     "advisor_routing",
     "extended_output",
     "long_horizon_survival",
@@ -75,6 +76,10 @@ KEY_TO_DEMOKIND = {
     # grounding_stack: cite text + PDF + RAG chunk, each with its own pointer, in ONE request.
     "grounding_stack": "grounding_stack",
     "grounding-stack": "grounding_stack",
+    # web_grounding: a verifiable quote FROM the web source, not just a URL + output offset.
+    "web_grounding": "web_grounding",
+    "web-citations": "web_grounding",
+    "web_citations": "web_grounding",
     "cite_facts": "grounding_resolution",
     # long_horizon_survival: a heavy, tool-heavy run finishes where the unmanaged one errors.
     "context_editing": "long_horizon_survival",

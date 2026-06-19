@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps app app-check ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack bulk-output advisor scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports check-surface check-receipts test ci deslop gif clean
+.PHONY: setup compare-deps app app-check ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports check-surface check-receipts test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -36,6 +36,9 @@ search-results: ## EDGE: cite the developer's own RAG chunks inline, vs OpenAI/G
 
 grounding-stack: ## EDGE (combination): cite text + PDF + RAG chunk each with its own pointer in ONE request, vs OpenAI/Gemini inline (needs 3 keys, cents)
 	$(PY) run.py grounding-stack --emit-edge
+
+web-citations: ## EDGE: a verifiable quote FROM the web source vs OpenAI/Gemini url-only web citations (needs 3 keys, cents)
+	$(PY) run.py web-citations --emit-edge
 
 bulk-output: ## EDGE: largest deliverable in ONE request, Claude 300k batch beta vs OpenAI/Gemini output caps (needs 3 keys, a few dollars, the Claude batch is slow)
 	$(PY) run.py bulk-output --emit-edge
@@ -85,6 +88,10 @@ edges: ## the cheap discovery loop: sweep the live docs, diff against the last r
 cadence: ## the unattended engine: sweep, rank, dispatch by demoKind, draft the newest uncovered lead to the inert outbox, update coverage, write the run manifest, audit the boundary (NO benchmark spend, NO send, $0)
 	$(PY) run.py cadence --dry-run
 
+grind: cadence coverage ci ## LOOP (tier 1, $0, fire-and-forget): the recurring edge loop, coverage view, and full offline gate; paid proofs stay explicit per-edge targets
+
+grind-deep: grind verify combine ## LOOP (tier 2, cents): the $0 loop, then the Opus skeptic and the combinatorial generator; the creative judgment layer, run on a slower cadence with a spend cap
+
 coverage: ## per-demoKind coverage: what is built vs adapt vs build, and the gaps the engine surfaces about itself (NO API call, $0)
 	$(PY) run.py coverage
 
@@ -114,6 +121,9 @@ verify: ## the skeptic pass: ask Claude to break each candidate, keep what survi
 
 verify-live: ## live-claim re-prover: re-check the model access, knobs, and prices against real calls (spends cents)
 	$(PY) scripts/verify_live.py
+
+combine: ## the combinatorial generator: Opus + adaptive thinking proposes feature stacks, a skeptic tries the competitor's best counter-stack, survivors persist to landscape/combinations.json (spends cents)
+	$(PY) run.py combine
 
 eval: ## EDGE eval_quality: the cost x effort grid on a labeled slice, held-out test split, all providers (needs compare-deps + keys, about $3-4)
 	$(PY) engine/demonstrators/eval_quality.py

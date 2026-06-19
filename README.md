@@ -184,6 +184,37 @@ Feature references, fetched 2026-06-19:
 - OpenAI file search docs: https://developers.openai.com/api/docs/guides/tools-file-search
 - Gemini file search docs: https://ai.google.dev/gemini-api/docs/file-search
 
+## Supporting edge: Web citations, a verifiable quote from the source (`make web-citations`)
+
+For a research, monitoring, or compliance agent over live web sources, every flagged claim should
+deep-link to the exact sentence so a human verifies it in seconds. Claude's web_search returns each
+claim with a `web_search_result_location`: the URL, the title, and the verbatim `cited_text` (up to 150
+characters of the actual source passage), free of input and output tokens. The claim arrives
+self-verifying.
+
+Measured over 3 web-research questions, each forced to search the live web, 2026-06-19:
+
+| arm | answered | web citations | with a verbatim source quote |
+|---|:---:|:---:|:---:|
+| Claude Sonnet 4.6, web_search | 3/3 | 9 | 9 |
+| OpenAI GPT-5.5, web_search | 3/3 | 3 | 0 |
+| Gemini 3.1 Pro, Google Search | 3/3 | 6 | 0 |
+
+All three cited web URLs, but only Claude returned the verbatim source quote on every citation.
+OpenAI's `url_citation` and Gemini's grounding segments index the model's own answer text and carry
+only a URL and title, so a claim is not checkable without re-fetching the page. The full receipt is
+[`edges/web-citations/sample.txt`](edges/web-citations/sample.txt), with machine data in
+[`edges/web-citations/receipt.json`](edges/web-citations/receipt.json).
+
+```bash
+make web-citations # cents-scale, needs all three keys
+```
+
+Feature references, fetched 2026-06-19:
+- Claude web search docs: https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool
+- OpenAI web search docs: https://developers.openai.com/api/docs/guides/tools-web-search
+- Gemini Google Search docs: https://ai.google.dev/gemini-api/docs/google-search
+
 ## Supporting edge: Bulk extended output, the largest deliverable in one request (`make bulk-output`)
 
 A nightly job that turns each backlog row into one long deliverable (a full report, a large

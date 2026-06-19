@@ -1,0 +1,40 @@
+{
+  "n_questions": 3,
+  "total_cost": 0.303544,
+  "skipped": [],
+  "arms": [
+    {
+      "name": "claude:sonnet",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-6",
+      "answered": "3/3",
+      "web_citations": 9,
+      "citations_with_source_quote": 9,
+      "cost": 0.115173,
+      "latency_s": 22.9,
+      "errors": []
+    },
+    {
+      "name": "openai:gpt-top",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "answered": "3/3",
+      "web_citations": 3,
+      "citations_with_source_quote": 0,
+      "cost": 0.158131,
+      "latency_s": 25.3,
+      "errors": []
+    },
+    {
+      "name": "gemini:gem-pro",
+      "provider": "gemini",
+      "model": "gemini-3.1-pro-preview",
+      "answered": "3/3",
+      "web_citations": 6,
+      "citations_with_source_quote": 0,
+      "cost": 0.03024,
+      "latency_s": 40.6,
+      "errors": []
+    }
+  ]
+}

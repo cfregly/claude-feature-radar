@@ -1,7 +1,7 @@
 Source: https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 Snapshot fetched 2026-06-19. Verbatim excerpts for citation grounding.
 
-Programmatic tool calling - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop reasons and fallback Refusals and fallback Fallback credit Model capabilities Extended thinking Adaptive thinking Effort Task budgets (beta) Fast mode (research preview) Structured outputs Citations Streaming Messages Batch processing Search results Streaming refusals Multilingual support Embeddings Tools Overview How tool use works Tutorial: Build a tool-using agent Define tools Handle tool calls Parallel tool use Tool Runner (SDK) Strict tool use Tool use with prompt caching Server tools Troubleshooting Web search tool Web fetch tool Code execution tool Advisor tool Memory tool Bash tool Computer use tool Text editor tool Tool infrastructure Tool reference Manage tool context Tool combinations Tool search Programmatic tool calling Fine-grained tool streaming Context management Context windows Compaction Context editing Prompt caching Mid-conversation system messages Build an orchestration mode Cache diagnostics (beta) Token counting Working with files Files API PDF support Images and vision Skills Overview Quickstart Best practices Skills for enterprise Skills in the API MCP Remote MCP servers MCP connector MCP tunnels  Claude on cloud platforms Amazon Bedrock Amazon Bedrock (legacy) Claude Platform on AWS Microsoft Foundry Vertex AI  Log in  Messages  Programmatic tool calling Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Solutions AI agents Code modernization Coding Customer support Education Financial services Government Life sciences Partners Claude on AWS Google Cloud's Vertex AI Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Company Anthropic Careers Economic Futures Research News Responsible Scaling Policy Security and compliance Transparency Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Help and security Availability Status Support Discord Terms and policies Privacy policy Responsible disclosure policy Terms of service: Commercial Terms of service: Consumer Usage policy Messages / Tool infrastructure Programmatic tool calling Copy page  Copy page  Was this page helpful?   Model compatibility Quick start How programmatic tool calling works Core concepts The allowed_callers field The caller field in responses Container lifecycle Example workflow Step 1: Initial request Step 2: API response with tool call Step 3: Provide tool result Step 4: Next tool call or completion Step 5: Final response Advanced patterns Batch processing with loops Early termination Conditional tool selection Data filtering Response format Programmatic tool call Tool result handling Code execution completion Error handling Common errors Container expiration during tool call Tool execution errors Constraints and limitations Feature incompatibilities Tool restrictions Message formatting restrictions Rate limits Validate tool results before use Token efficiency Usage and pricing Best practices Tool design When to use programmatic calling Performance optimization Troubleshooting Common issues Debugging tips Why programmatic tool calling works Alternative implementations Client-side direct execution Self-managed sandboxed execution Anthropic-managed execution Data retention Related features Programmatic tool calling allows Claude to write code that calls your tools programmatically within a code execution container, rather than requiring round trips through the model for each tool invocation. This reduces latency for multi-tool workflows and decreases token consumption by allowing Claude to filter or process data before it reaches the model's context window. On agentic search benchmarks like BrowseComp and DeepSearchQA , which test multi-step web research and complex information retrieval, adding programmatic tool calling on top of basic search tools improved performance by an average of 11% while using 24% fewer input tokens (see Improved web search with dynamic filtering ).
+Programmatic tool calling - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop reasons and fallback Refusals and fallback Fallback credit Model capabilities Extended thinking Adaptive thinking Effort Task budgets (beta) Fast mode (research preview) Structured outputs Citations Streaming Messages Batch processing Search results Streaming refusals Multilingual support Embeddings Tools Overview How tool use works Tutorial: Build a tool-using agent Define tools Handle tool calls Parallel tool use Tool Runner (SDK) Strict tool use Tool use with prompt caching Server tools Troubleshooting Web search tool Web fetch tool Code execution tool Advisor tool Memory tool Bash tool Computer use tool Text editor tool Tool infrastructure Tool reference Manage tool context Tool combinations Tool search Programmatic tool calling Fine-grained tool streaming Context management Context windows Compaction Context editing Prompt caching Mid-conversation system messages Build an orchestration mode Cache diagnostics (beta) Token counting Working with files Files API PDF support Images and vision Skills Overview Quickstart Best practices Skills for enterprise Skills in the API MCP Remote MCP servers MCP connector MCP tunnels  Claude on cloud platforms Amazon Bedrock Amazon Bedrock (legacy) Claude Platform on AWS Microsoft Foundry Vertex AI  Log in  Messages  Programmatic tool calling Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Solutions AI agents Code modernization Coding Customer support Education Financial services Government Life sciences Partners Claude on AWS Google Cloud's Vertex AI Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Company Anthropic Careers Economic Futures Research News Responsible Scaling Policy Security and compliance Transparency Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Help and security Availability Status Support Discord Terms and policies Privacy policy Responsible disclosure policy Terms of service: Commercial Terms of service: Consumer Usage policy Messages / Tool infrastructure Programmatic tool calling Copy page  Copy page  Programmatic tool calling allows Claude to write code that calls your tools programmatically within a code execution container, rather than requiring round trips through the model for each tool invocation. This reduces latency for multi-tool workflows and decreases token consumption by allowing Claude to filter or process data before it reaches the model's context window. On agentic search benchmarks like BrowseComp and DeepSearchQA , which test multi-step web research and complex information retrieval, adding programmatic tool calling on top of basic search tools improved performance by an average of 11% while using 24% fewer input tokens (see Improved web search with dynamic filtering ).
 The difference compounds fast in real workflows. Consider checking budget compliance across 20 employees: the traditional approach requires 20 separate model round-trips, pulling thousands of expense line items into the context along the way. With programmatic tool calling, a single script runs all 20 lookups, filters the results, and returns only the employees who exceeded their limits, shrinking what Claude needs to reason over from hundreds of kilobytes down to a handful of lines.
  For a deeper look at the inference and context costs that programmatic tool calling addresses, see Advanced tool use .
  This feature requires the code execution tool to be enabled.
@@ -12,6 +12,33 @@ Model Claude Fable 5 ( claude-fable-5 ) Claude Mythos 5 ( claude-mythos-5 ) Clau
 For the full code execution tool version matrix, see the code execution tool model compatibility table . Programmatic tool calling is available on the Claude API, Claude Platform on AWS , and Microsoft Foundry . It is not currently available on Amazon Bedrock or Vertex AI.
  Quick start
 Here's an example where Claude programmatically queries a database multiple times and aggregates results:
+cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
+response = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 4096 ,
+messages = [
+{
+"role" : "user" ,
+"content" : "Query sales data for the West, East, and Central regions, then tell me which region had the highest revenue" ,
+}
+],
+tools = [
+{ "type" : "code_execution_20260120" , "name" : "code_execution" },
+{
+"name" : "query_database" ,
+"description" : "Execute a SQL query against the sales database. Returns a list of rows as JSON objects." ,
+"input_schema" : {
+"type" : "object" ,
+"properties" : {
+"sql" : { "type" : "string" , "description" : "SQL query to execute" }
+},
+"required" : [ "sql" ],
+},
+"allowed_callers" : [ "code_execution_20260120" ],
+},
+],
+)
+print (response)
  How programmatic tool calling works
 When you configure a tool to be callable from code execution and Claude decides to use that tool:
 Claude writes Python code that invokes the tool as a function, potentially including multiple tool calls and pre/post-processing logic
@@ -112,6 +139,54 @@ Output  {
 }
  Step 3: Provide tool result
 Include the full conversation history plus your tool result:
+CLI Python TypeScript C# Go Java PHP Ruby  response = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 4096 ,
+container = "container_xyz789" , # Reuse the container
+messages = [
+{
+"role" : "user" ,
+"content" : "Query customer purchase history from the last quarter and identify our top 5 customers by revenue" ,
+},
+{
+"role" : "assistant" ,
+"content" : [
+{
+"type" : "text" ,
+"text" : "I'll query the purchase history and analyze the results." ,
+},
+{
+"type" : "server_tool_use" ,
+"id" : "srvtoolu_abc123" ,
+"name" : "code_execution" ,
+"input" : { "code" : "..." },
+},
+{
+"type" : "tool_use" ,
+"id" : "toolu_def456" ,
+"name" : "query_database" ,
+"input" : { "sql" : "<sql>" },
+"caller" : {
+"type" : "code_execution_20260120" ,
+"tool_id" : "srvtoolu_abc123" ,
+},
+},
+],
+},
+{
+"role" : "user" ,
+"content" : [
+{
+"type" : "tool_result" ,
+"tool_use_id" : "toolu_def456" ,
+"content" : '[{"customer_id": "C1", "revenue": 45000}, {"customer_id": "C2", "revenue": 38000}, ...]' ,
+}
+],
+},
+],
+tools = [ ... ],
+)
+print (response)
  Step 4: Next tool call or completion
 The code execution continues and processes the results. If additional tool calls are needed, repeat Step 3 until all tool calls are satisfied.
  Step 5: Final response
@@ -373,77 +448,4 @@ Consider using Anthropic's managed solution if you're using the Claude API, Clau
 Programmatic tool calling is built on the code execution infrastructure and uses the same sandbox containers. Container data, including execution artifacts and outputs, is retained for up to 30 days.
 For ZDR eligibility across all features, see API and data retention .
  Related features
- Code execution tool Learn about the underlying code execution capability that powers programmatic tool calling.  Tool use with Claude Understand the fundamentals of tool use with Claude. Define tools Step-by-step guide for defining tools. cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
-response = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 4096 ,
-messages = [
-{
-"role" : "user" ,
-"content" : "Query sales data for the West, East, and Central regions, then tell me which region had the highest revenue" ,
-}
-],
-tools = [
-{ "type" : "code_execution_20260120" , "name" : "code_execution" },
-{
-"name" : "query_database" ,
-"description" : "Execute a SQL query against the sales database. Returns a list of rows as JSON objects." ,
-"input_schema" : {
-"type" : "object" ,
-"properties" : {
-"sql" : { "type" : "string" , "description" : "SQL query to execute" }
-},
-"required" : [ "sql" ],
-},
-"allowed_callers" : [ "code_execution_20260120" ],
-},
-],
-)
-print (response) CLI Python TypeScript C# Go Java PHP Ruby  response = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 4096 ,
-container = "container_xyz789" , # Reuse the container
-messages = [
-{
-"role" : "user" ,
-"content" : "Query customer purchase history from the last quarter and identify our top 5 customers by revenue" ,
-},
-{
-"role" : "assistant" ,
-"content" : [
-{
-"type" : "text" ,
-"text" : "I'll query the purchase history and analyze the results." ,
-},
-{
-"type" : "server_tool_use" ,
-"id" : "srvtoolu_abc123" ,
-"name" : "code_execution" ,
-"input" : { "code" : "..." },
-},
-{
-"type" : "tool_use" ,
-"id" : "toolu_def456" ,
-"name" : "query_database" ,
-"input" : { "sql" : "<sql>" },
-"caller" : {
-"type" : "code_execution_20260120" ,
-"tool_id" : "srvtoolu_abc123" ,
-},
-},
-],
-},
-{
-"role" : "user" ,
-"content" : [
-{
-"type" : "tool_result" ,
-"tool_use_id" : "toolu_def456" ,
-"content" : '[{"customer_id": "C1", "revenue": 45000}, {"customer_id": "C2", "revenue": 38000}, ...]' ,
-}
-],
-},
-],
-tools = [ ... ],
-)
-print (response)
+ Code execution tool Learn about the underlying code execution capability that powers programmatic tool calling.  Tool use with Claude Understand the fundamentals of tool use with Claude. Define tools Step-by-step guide for defining tools. Was this page helpful?   Model compatibility Quick start How programmatic tool calling works Core concepts The allowed_callers field The caller field in responses Container lifecycle Example workflow Step 1: Initial request Step 2: API response with tool call Step 3: Provide tool result Step 4: Next tool call or completion Step 5: Final response Advanced patterns Batch processing with loops Early termination Conditional tool selection Data filtering Response format Programmatic tool call Tool result handling Code execution completion Error handling Common errors Container expiration during tool call Tool execution errors Constraints and limitations Feature incompatibilities Tool restrictions Message formatting restrictions Rate limits Validate tool results before use Token efficiency Usage and pricing Best practices Tool design When to use programmatic calling Performance optimization Troubleshooting Common issues Debugging tips Why programmatic tool calling works Alternative implementations Client-side direct execution Self-managed sandboxed execution Anthropic-managed execution Data retention Related features

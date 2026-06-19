@@ -1,0 +1,26 @@
+  Web-citation fidelity workload: 3 web-research questions, each forced to search the live web on
+  every vendor. The gate is how many returned citations carry a verbatim quote FROM the source page.
+
+  platform              answered   web citations   with source quote     cost
+  -----------------------------------------------------------------------------
+  claude:sonnet              3/3               9                   9   $0.1152
+  openai:gpt-top             3/3               3                   0   $0.1581
+  gemini:gem-pro             3/3               6                   0   $0.0302
+
+  Verdict:
+    positive_signal: true
+    promotable_edge: true
+
+  Honest reading:
+  - All three answered and cited web URLs.
+  - Only Claude returned the verbatim source quote on every citation (web_search_result_location.cited_text).
+  - OpenAI url_citation and Gemini grounding segments index the MODEL'S OWN answer text and carry only
+    a URL and title, so a claim is not checkable without re-fetching the page.
+  - The win is the verifiable source quote, not the presence of a citation. Uses the basic web_search
+    tag (the dynamic-filtering tags trade the citation for code-execution pre-context filtering).
+
+  Reproduce:
+    make web-citations
+
+  Machine receipt:
+    data/last_web_citations.json

@@ -233,6 +233,17 @@ make fast-mode  # fast-mode access and speed validation, held if org has 0 fast-
 make advisor    # advisor routing cost-at-quality candidate, held unless promotable
 ```
 
+For the recurring loop, use:
+
+```
+make grind
+```
+
+`make grind` is the default no-credit loop: live doc sweep, rank, dispatch estimates, inert outbox
+draft, coverage view, and the full offline CI gate. It never runs a paid proof. When it surfaces a
+candidate, run the specific live target named in the estimate, promote only when the receipt says
+`promotable_edge: true`, then run `make grind` again so the landscape, coverage, and gates catch up.
+
 ### 3. Synthesize the honest picture
 Combine the audit and the benchmark. State plainly where Claude wins, where it ties, and where it
 loses. The anchor for the founder email is the sharpest item that is genuinely Claude-only or

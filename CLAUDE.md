@@ -314,6 +314,28 @@ drafts a fresh email for the newest uncovered edge, and writes the brief, the ch
 coverage ledger. That whole chain is measurement and drafting, so it runs unattended. The boundary is
 fixed in code in [`engine/gate.py`](engine/gate.py) and `engine.gate.audit()` proves nothing crossed
 it on a schedule.
+
+The operator command for the loop is `make grind`. It runs the $0 cadence, prints coverage, then runs
+the full offline CI gate. It does not spend credits and it does not run live proofs. When the loop
+surfaces a candidate, run the named live target explicitly, promote only on a receipt with
+`promotable_edge: true`, then run `make grind` again so the landscape, coverage ledger, and docs stay
+current.
+
+The loop has two tiers, matched to the gate. Tier 1 is `make grind`: the $0 fire-and-forget spine
+(sweep, rank, draft to the inert outbox, coverage, offline gate), safe to run on a tight schedule
+forever because nothing in it spends, sends, or pushes. Tier 2 is `make grind-deep`: tier 1 plus the
+two creative judgment seats that DO spend, the Opus skeptic (`make verify`) and the combinatorial
+generator (`make combine`, which proposes new feature stacks and skeptic-tests them against the
+competitor's best counter-stack). Run tier 2 on a slower cadence under a spend cap. The split is the
+gate: the cheap recurring discovery stays unattended, the paid reasoning is an explicit, budgeted pass.
+
+To make it truly fire-and-forget, a scheduler invokes `make grind` (tier 1) often and `make grind-deep`
+(tier 2) on a slower cadence. The scheduler is operator-side and is NOT committed here (a host cron
+entry, a Claude Code routine, or a Managed Agents scheduled deployment that fires the cadence on a cron
+and is itself a paid ASK-tier runtime). The repo's job is to expose one clean entrypoint per tier and to
+make the gate hold no matter how often the scheduler fires, so an unattended run can never cross the
+send, push, or spend boundary even if it is triggered every hour.
+
 - **ALWAYS, unattended.** Fetch the docs, diff, rank, draft into the inert `state/outbox/`, write the
   brief and the CHANGELOG, update the coverage ledger. All reversible, all internal, nothing leaves
   the repo and nothing spends credits. The sweep is stdlib HTTP fetches, so the discovery loop needs

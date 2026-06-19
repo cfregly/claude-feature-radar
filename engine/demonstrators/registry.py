@@ -37,6 +37,7 @@ _DEMO_MODULES = (
     "engine.demonstrators.pdf_citations",
     "engine.demonstrators.search_results_grounding",
     "engine.demonstrators.grounding_stack",
+    "engine.demonstrators.web_citations",
     "engine.demonstrators.advisor_routing",
     "engine.demonstrators.bulk_extended_output",
 )

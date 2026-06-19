@@ -54,7 +54,16 @@ On content_block_start with type: "tool_use" , initialize an empty string: input
 For each content_block_delta with type: "input_json_delta" , append: input_json += event.delta.partial_json
 On content_block_stop , parse the accumulated string: json.loads(input_json)
 The type mismatch between the initial input: {} (object) and partial_json (string) is by design. The empty object marks the slot in the content array; the delta strings build the real value.
-Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
+ Reach for the manual pattern when you need to react to partial input before the block closes (for example, rendering a progress indicator). Otherwise, prefer your SDK's accumulator helper where the first example on this page uses one.
+ Handling invalid JSON in tool responses
+When using fine-grained tool streaming, you may receive invalid or incomplete JSON from the model. If you need to pass this invalid JSON back to the model in an error response block, you may wrap it in a JSON object to ensure proper handling (with a reasonable key). For example:
+{
+"INVALID_JSON" : "<your invalid json string>"
+} 
+This approach helps the model understand that the content is invalid JSON while preserving the original malformed data for debugging purposes.
+ When wrapping invalid JSON, make sure to properly escape any quotes or special characters in the invalid JSON string to maintain valid JSON structure in the wrapper object.
+ Next steps
+Streaming messages Full reference for server-sent events and stream event types. Handle tool calls Execute tools and return results in the required message format. Tool reference Full directory of Anthropic-schema tools and their version strings. Was this page helpful?   How to use fine-grained tool streaming Accumulating tool input deltas Handling invalid JSON in tool responses Next steps Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
 tool_inputs: dict[ int , str ] = {} # index -> accumulated JSON string
 with client.messages.stream(
 model = "claude-opus-4-8" ,
@@ -82,13 +91,3 @@ tool_inputs[event.index] += event.delta.partial_json
 case "content_block_stop" if event.index in tool_inputs:
 parsed = json.loads(tool_inputs[event.index])
 print ( f "Tool input: { parsed } " )
- Reach for the manual pattern when you need to react to partial input before the block closes (for example, rendering a progress indicator). Otherwise, prefer your SDK's accumulator helper where the first example on this page uses one.
- Handling invalid JSON in tool responses
-When using fine-grained tool streaming, you may receive invalid or incomplete JSON from the model. If you need to pass this invalid JSON back to the model in an error response block, you may wrap it in a JSON object to ensure proper handling (with a reasonable key). For example:
-{
-"INVALID_JSON" : "<your invalid json string>"
-} 
-This approach helps the model understand that the content is invalid JSON while preserving the original malformed data for debugging purposes.
- When wrapping invalid JSON, make sure to properly escape any quotes or special characters in the invalid JSON string to maintain valid JSON structure in the wrapper object.
- Next steps
-Streaming messages Full reference for server-sent events and stream event types. Handle tool calls Execute tools and return results in the required message format. Tool reference Full directory of Anthropic-schema tools and their version strings. Was this page helpful?   How to use fine-grained tool streaming Accumulating tool input deltas Handling invalid JSON in tool responses Next steps

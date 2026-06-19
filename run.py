@@ -9,6 +9,7 @@
     python run.py managed [--apply]        the Tier-2 monthly resumable runtime (wired, $0 without --apply)
     python run.py scan                     the candidate gaps, grounded in both sides' docs
     python run.py verify                   the skeptic pass: keep only what survives
+    python run.py combine                  generate combination edges, skeptic-test, persist survivors
     python run.py draft                    draft the founder email from the measured receipt
     python run.py brief                    print the latest sourced brief
 """
@@ -61,6 +62,8 @@ def main():
         from engine.demonstrators.search_results_grounding import main as m; raise SystemExit(m())
     elif cmd in ("grounding-stack", "grounding_stack"):
         from engine.demonstrators.grounding_stack import main as m; raise SystemExit(m())
+    elif cmd in ("web-citations", "web_citations"):
+        from engine.demonstrators.web_citations import main as m; raise SystemExit(m())
     elif cmd in ("bulk-output", "bulk-extended-output", "bulk_extended_output"):
         from engine.demonstrators.bulk_extended_output import main as m; raise SystemExit(m())
     elif cmd in ("advisor", "advisor-routing", "advisor_routing"):
@@ -71,6 +74,8 @@ def main():
         from engine.scan import main as m; m()
     elif cmd == "verify":
         from engine.verify import main as m; m()
+    elif cmd in ("combine", "combinations"):
+        from engine.combine import main as m; m()
     elif cmd in ("draft", "email", "draft-email"):
         from engine.draft_email import main as m; m()
     elif cmd == "brief":

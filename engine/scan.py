@@ -57,18 +57,24 @@ DIFFERENTIATORS = [
     {
         "key": "citations", "axis": "grounding", "rank": 2,
         "demoKind": "grounding_resolution",
-        "claim": "Document-grounded citations: a guaranteed-valid char/page pointer into the user's "
-                 "own document, with the verbatim quote extracted by the API, free of output tokens.",
-        "why": "OpenAI file citations index the model's OWN output, not the source. Gemini File "
-               "Search (shipped 2026-05) returns a PAGE-level pointer into the uploaded document, so "
-               "the absolute 'no competitor' line is refuted: the surviving edge is that Claude is "
-               "the only GA API with a per-CHARACTER source pointer plus an API-extracted verbatim "
-               "quote it guarantees valid and free of output tokens. GA, no beta header. Measured "
-               "(make citations): on clean text the DIY path (model quote + your own str.find) "
-               "resolves 8/8 on every vendor, so the edge is not that they cannot cite. The edge is "
-               "the in-API resolve, guaranteed valid (DIY find is expected to break on paraphrase, "
-               "not measured here on clean text), free of output tokens (308 vs 563), zero resolver "
-               "code, char granularity, and the guarantees no competitor matches.",
+        "claim": "For a PDF or RAG chunks supplied directly in one request, an API-guaranteed-to-"
+                 "resolve source citation (page or block span plus the verbatim quote, free of output "
+                 "tokens) with no hosted vector store. OpenAI and Gemini cite only through a persisted, "
+                 "pre-indexed store, with no documented resolve guarantee and no free quote.",
+        "why": "The wedge is NOT char granularity and NOT 'they cannot cite'. On clean text the DIY "
+               "path (model quote plus your own str.find) resolves 8/8 on every vendor, and char-level "
+               "holds only for plain text: on PDFs Claude is page-level, the same coarseness as Gemini "
+               "File Search. Three subfeatures survive a skeptic. (1) The API guarantees every returned "
+               "pointer resolves to a real source span; the DIY quote-plus-find cannot, because a "
+               "paraphrase makes str.find return -1 and the citation is silently dropped. (2) cited_text "
+               "is free of output tokens and of input tokens on replay (308 vs 563 measured). (3) The "
+               "global edge: one request cites a directly-supplied PDF plus developer-supplied RAG "
+               "chunks plus inline text with zero persisted objects, while OpenAI (file_citation) and "
+               "Gemini (File Search, page-level) both require a hosted vector store with upload and "
+               "index, cannot cite a directly-supplied inline PDF, and Gemini File Search cannot be "
+               "combined with another tool in one call. GA, no beta header. Measured (make citations); "
+               "the paraphrase-resolution arm that retires the 'not measured on clean text' objection "
+               "is the next demonstrator step.",
         "fair_comparison": {
             "task_shape": "8 questions over 3 plain-text user documents",
             "claude_config": {"feature": "citations.enabled", "beta_on": False, "model": "haiku"},

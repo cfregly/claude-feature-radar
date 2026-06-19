@@ -32,34 +32,8 @@ Filtering relevant information from PDFs
 Reducing token costs when working with large documents
  Dynamic filtering requires the code execution tool to be enabled. The web fetch tool (with and without dynamic filtering) is available on the Claude API, Claude Platform on AWS , and Microsoft Foundry . It is not currently available on Amazon Bedrock or Vertex AI.
 To enable dynamic filtering, use web_fetch_20260209 or any later version. The following examples use web_fetch_20260209 :
-cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
-response = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 4096 ,
-messages = [
-{
-"role" : "user" ,
-"content" : "Fetch the content at https://example.com/research-paper and extract the key findings." ,
-}
-],
-tools = [{ "type" : "web_fetch_20260209" , "name" : "web_fetch" }],
-)
-print (response)
  How to use web fetch
 Provide the web fetch tool in your API request:
-cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
-response = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 1024 ,
-messages = [
-{
-"role" : "user" ,
-"content" : "Please analyze the content at https://example.com/article" ,
-}
-],
-tools = [{ "type" : "web_fetch_20250910" , "name" : "web_fetch" , "max_uses" : 5 }],
-)
-print (response)
  Tool definition
 The web fetch tool supports the following parameters:
 JSON  {
@@ -292,4 +266,28 @@ Average web page (10 kB): ~2,500 tokens
 Large documentation page (100 kB): ~25,000 tokens
 Research paper PDF (500 kB): ~125,000 tokens
  Next steps
-Server tools Shared mechanics for Anthropic-executed tools. Tool reference Directory of all Anthropic-provided tools. Was this page helpful?   How web fetch works When Claude fetches Dynamic filtering How to use web fetch Tool definition Max uses Domain filtering Content limits Cache bypass Response inclusion Citations Response Fetch results Errors URL validation Combined search and fetch Prompt caching Streaming Batch requests Usage and pricing Next steps
+Server tools Shared mechanics for Anthropic-executed tools. Tool reference Directory of all Anthropic-provided tools. Was this page helpful?   How web fetch works When Claude fetches Dynamic filtering How to use web fetch Tool definition Max uses Domain filtering Content limits Cache bypass Response inclusion Citations Response Fetch results Errors URL validation Combined search and fetch Prompt caching Streaming Batch requests Usage and pricing Next steps cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
+response = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 4096 ,
+messages = [
+{
+"role" : "user" ,
+"content" : "Fetch the content at https://example.com/research-paper and extract the key findings." ,
+}
+],
+tools = [{ "type" : "web_fetch_20260209" , "name" : "web_fetch" }],
+)
+print (response) cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
+response = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 1024 ,
+messages = [
+{
+"role" : "user" ,
+"content" : "Please analyze the content at https://example.com/article" ,
+}
+],
+tools = [{ "type" : "web_fetch_20250910" , "name" : "web_fetch" , "max_uses" : 5 }],
+)
+print (response)

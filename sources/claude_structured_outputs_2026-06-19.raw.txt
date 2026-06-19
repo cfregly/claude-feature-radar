@@ -1,7 +1,7 @@
 Source: https://platform.claude.com/docs/en/build-with-claude/structured-outputs
 Snapshot fetched 2026-06-19. Verbatim excerpts for citation grounding.
 
-Structured outputs - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop reasons and fallback Refusals and fallback Fallback credit Model capabilities Extended thinking Adaptive thinking Effort Task budgets (beta) Fast mode (research preview) Structured outputs Citations Streaming Messages Batch processing Search results Streaming refusals Multilingual support Embeddings Tools Overview How tool use works Tutorial: Build a tool-using agent Define tools Handle tool calls Parallel tool use Tool Runner (SDK) Strict tool use Tool use with prompt caching Server tools Troubleshooting Web search tool Web fetch tool Code execution tool Advisor tool Memory tool Bash tool Computer use tool Text editor tool Tool infrastructure Tool reference Manage tool context Tool combinations Tool search Programmatic tool calling Fine-grained tool streaming Context management Context windows Compaction Context editing Prompt caching Mid-conversation system messages Build an orchestration mode Cache diagnostics (beta) Token counting Working with files Files API PDF support Images and vision Skills Overview Quickstart Best practices Skills for enterprise Skills in the API MCP Remote MCP servers MCP connector MCP tunnels  Claude on cloud platforms Amazon Bedrock Amazon Bedrock (legacy) Claude Platform on AWS Microsoft Foundry Vertex AI  Log in  Messages  Structured outputs Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Solutions AI agents Code modernization Coding Customer support Education Financial services Government Life sciences Partners Claude on AWS Google Cloud's Vertex AI Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Company Anthropic Careers Economic Futures Research News Responsible Scaling Policy Security and compliance Transparency Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Help and security Availability Status Support Discord Terms and policies Privacy policy Responsible disclosure policy Terms of service: Commercial Terms of service: Consumer Usage policy Messages / Model capabilities Structured outputs Copy page  Get validated JSON results from agent workflows Copy page  Structured outputs constrain Claude's responses to follow a specific schema, ensuring valid, parseable output for downstream processing. Structured outputs provide two complementary features:
+Structured outputs - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop reasons and fallback Refusals and fallback Fallback credit Model capabilities Extended thinking Adaptive thinking Effort Task budgets (beta) Fast mode (research preview) Structured outputs Citations Streaming Messages Batch processing Search results Streaming refusals Multilingual support Embeddings Tools Overview How tool use works Tutorial: Build a tool-using agent Define tools Handle tool calls Parallel tool use Tool Runner (SDK) Strict tool use Tool use with prompt caching Server tools Troubleshooting Web search tool Web fetch tool Code execution tool Advisor tool Memory tool Bash tool Computer use tool Text editor tool Tool infrastructure Tool reference Manage tool context Tool combinations Tool search Programmatic tool calling Fine-grained tool streaming Context management Context windows Compaction Context editing Prompt caching Mid-conversation system messages Build an orchestration mode Cache diagnostics (beta) Token counting Working with files Files API PDF support Images and vision Skills Overview Quickstart Best practices Skills for enterprise Skills in the API MCP Remote MCP servers MCP connector MCP tunnels  Claude on cloud platforms Amazon Bedrock Amazon Bedrock (legacy) Claude Platform on AWS Microsoft Foundry Vertex AI  Log in  Messages  Structured outputs Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Solutions AI agents Code modernization Coding Customer support Education Financial services Government Life sciences Partners Claude on AWS Google Cloud's Vertex AI Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Company Anthropic Careers Economic Futures Research News Responsible Scaling Policy Security and compliance Transparency Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Help and security Availability Status Support Discord Terms and policies Privacy policy Responsible disclosure policy Terms of service: Commercial Terms of service: Consumer Usage policy Messages / Model capabilities Structured outputs Copy page  Get validated JSON results from agent workflows Copy page  Was this page helpful?   Why use structured outputs JSON outputs Quick start How it works Working with JSON outputs in SDKs Common use cases Strict tool use Using both features together Important considerations Grammar compilation and caching Prompt modification and token costs JSON Schema limitations Property ordering Invalid outputs Schema complexity limits Data retention Feature compatibility Structured outputs constrain Claude's responses to follow a specific schema, ensuring valid, parseable output for downstream processing. Structured outputs provide two complementary features:
 JSON outputs ( output_config.format ): Get Claude's response in a specific JSON format
 Strict tool use ( strict: true ): Guarantee schema validation on tool names and inputs
 You can use these features independently or together in the same request.
@@ -25,34 +25,6 @@ Extract data from images or text
 Generate structured reports
 Format API responses
  Quick start
-cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
-response = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 1024 ,
-messages = [
-{
-"role" : "user" ,
-"content" : "Extract the key information from this email: John Smith ( [email protected] ) is interested in our Enterprise plan and wants to schedule a demo for next Tuesday at 2pm." ,
-}
-],
-output_config = {
-"format" : {
-"type" : "json_schema" ,
-"schema" : {
-"type" : "object" ,
-"properties" : {
-"name" : { "type" : "string" },
-"email" : { "type" : "string" },
-"plan_interest" : { "type" : "string" },
-"demo_requested" : { "type" : "boolean" },
-},
-"required" : [ "name" , "email" , "plan_interest" , "demo_requested" ],
-"additionalProperties" : False ,
-},
-}
-},
-)
-print (response.content[ 0 ].text)
 Response format: Valid JSON matching your schema in response.content[0].text
 Output  {
 "name" : "John Smith" ,
@@ -73,31 +45,8 @@ Java: Plain Java classes with automatic schema derivation through outputConfig(C
 Ruby: Anthropic::BaseModel classes with output_config: {format: Model}
 PHP: Classes implementing StructuredOutputModel with outputConfig: ['format' => MyClass::class]
 C#: Plain C# classes with the generic Create<T>() overload, which derives the schema automatically
-Go: Go structs reflected into JSON schemas automatically on the beta API, or raw JSON schemas through output_config
-CLI: Raw JSON schemas passed through output_config
-CLI Python TypeScript C# Go Java PHP Ruby  from pydantic import BaseModel
-from anthropic import Anthropic
-class ContactInfo ( BaseModel ):
-name: str
-email: str
-plan_interest: str
-demo_requested: bool
-client = Anthropic()
-response = client.messages.parse(
-model = "claude-opus-4-8" ,
-max_tokens = 1024 ,
-messages = [
-{
-"role" : "user" ,
-"content" : "Extract the key information from this email: John Smith ( [email protected] ) is interested in our Enterprise plan and wants to schedule a demo for next Tuesday at 2pm." ,
-}
-],
-output_format = ContactInfo,
-)
-print (response.parsed_output)
  SDK-specific methods
 Each SDK provides helpers that make working with structured outputs easier. See individual SDK pages for full details.
-CLI CLI Python Python TypeScript TypeScript C# C# Go Go Java Java PHP PHP Ruby Ruby
  How SDK transformation works
 The Python, TypeScript, Ruby, and PHP SDKs automatically transform schemas with unsupported features. The C# and Go SDKs apply the same transformations when the schema is derived from a native type ( Create<T>() in C#; struct reflection or BetaJSONSchemaOutputFormat() on the Go beta API). The transformation steps:
 Remove unsupported constraints (for example, minimum , maximum , minLength , maxLength )
@@ -108,7 +57,7 @@ Validate responses against your original schema (with all constraints)
 This means Claude receives a simplified schema, but your code still enforces all constraints through validation.
 Example: A Pydantic field with minimum: 100 becomes a plain integer in the sent schema, but the SDK updates the description to "Must be at least 100" and validates the response against the original constraint.
  Common use cases
-Data extraction Classification API response formatting
+Data extraction
  Strict tool use
 For enforcing JSON Schema compliance on tool inputs with grammar-constrained sampling, see Strict tool use .
  Using both features together
@@ -116,48 +65,6 @@ JSON outputs and strict tool use solve different problems and work together:
 JSON outputs control Claude's response format (what Claude says)
 Strict tool use validates tool parameters (how Claude calls your functions)
 When combined, Claude can call tools with guaranteed-valid parameters AND return structured JSON responses. This is useful for agentic workflows where you need both reliable tool calls and structured final outputs.
-CLI Python TypeScript C# Go Java PHP Ruby  response = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 1024 ,
-messages = [
-{
-"role" : "user" ,
-"content" : "Help me plan a trip to Paris departing May 15, 2026" ,
-}
-],
-# JSON outputs: structured response format
-output_config = {
-"format" : {
-"type" : "json_schema" ,
-"schema" : {
-"type" : "object" ,
-"properties" : {
-"summary" : { "type" : "string" },
-"next_steps" : { "type" : "array" , "items" : { "type" : "string" }},
-},
-"required" : [ "summary" , "next_steps" ],
-"additionalProperties" : False ,
-},
-}
-},
-# Strict tool use: guaranteed tool parameters
-tools = [
-{
-"name" : "search_flights" ,
-"strict" : True ,
-"input_schema" : {
-"type" : "object" ,
-"properties" : {
-"destination" : { "type" : "string" },
-"date" : { "type" : "string" , "format" : "date" },
-},
-"required" : [ "destination" , "date" ],
-"additionalProperties" : False ,
-},
-}
-],
-)
-print (response)
  Important considerations
  Grammar compilation and caching
 Structured outputs use constrained sampling with compiled grammar artifacts. This introduces some performance characteristics to be aware of:
@@ -247,4 +154,91 @@ Combined usage: Use JSON outputs ( output_config.format ) and strict tool use ( 
 Incompatible with:
 Citations : Citations require interleaving citation blocks with text, which conflicts with strict JSON schema constraints. Returns 400 error if citations enabled with output_config.format .
 Message Prefilling: Incompatible with JSON outputs
- Grammar scope: Grammars apply only to Claude's direct output, not to tool use calls, tool results, or thinking tags (when using Extended Thinking ). Grammar state resets between sections, allowing Claude to think freely while still producing structured output in the final response. Was this page helpful?   Why use structured outputs JSON outputs Quick start How it works Working with JSON outputs in SDKs Common use cases Strict tool use Using both features together Important considerations Grammar compilation and caching Prompt modification and token costs JSON Schema limitations Property ordering Invalid outputs Schema complexity limits Data retention Feature compatibility
+ Grammar scope: Grammars apply only to Claude's direct output, not to tool use calls, tool results, or thinking tags (when using Extended Thinking ). Grammar state resets between sections, allowing Claude to think freely while still producing structured output in the final response. cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
+response = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 1024 ,
+messages = [
+{
+"role" : "user" ,
+"content" : "Extract the key information from this email: John Smith ( [email protected] ) is interested in our Enterprise plan and wants to schedule a demo for next Tuesday at 2pm." ,
+}
+],
+output_config = {
+"format" : {
+"type" : "json_schema" ,
+"schema" : {
+"type" : "object" ,
+"properties" : {
+"name" : { "type" : "string" },
+"email" : { "type" : "string" },
+"plan_interest" : { "type" : "string" },
+"demo_requested" : { "type" : "boolean" },
+},
+"required" : [ "name" , "email" , "plan_interest" , "demo_requested" ],
+"additionalProperties" : False ,
+},
+}
+},
+)
+print (response.content[ 0 ].text) Go: Go structs reflected into JSON schemas automatically on the beta API, or raw JSON schemas through output_config CLI: Raw JSON schemas passed through output_config CLI Python TypeScript C# Go Java PHP Ruby  from pydantic import BaseModel
+from anthropic import Anthropic
+class ContactInfo ( BaseModel ):
+name: str
+email: str
+plan_interest: str
+demo_requested: bool
+client = Anthropic()
+response = client.messages.parse(
+model = "claude-opus-4-8" ,
+max_tokens = 1024 ,
+messages = [
+{
+"role" : "user" ,
+"content" : "Extract the key information from this email: John Smith ( [email protected] ) is interested in our Enterprise plan and wants to schedule a demo for next Tuesday at 2pm." ,
+}
+],
+output_format = ContactInfo,
+)
+print (response.parsed_output) CLI CLI Python Python TypeScript TypeScript C# C# Go Go Java Java PHP PHP Ruby Ruby Classification API response formatting CLI Python TypeScript C# Go Java PHP Ruby  response = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 1024 ,
+messages = [
+{
+"role" : "user" ,
+"content" : "Help me plan a trip to Paris departing May 15, 2026" ,
+}
+],
+# JSON outputs: structured response format
+output_config = {
+"format" : {
+"type" : "json_schema" ,
+"schema" : {
+"type" : "object" ,
+"properties" : {
+"summary" : { "type" : "string" },
+"next_steps" : { "type" : "array" , "items" : { "type" : "string" }},
+},
+"required" : [ "summary" , "next_steps" ],
+"additionalProperties" : False ,
+},
+}
+},
+# Strict tool use: guaranteed tool parameters
+tools = [
+{
+"name" : "search_flights" ,
+"strict" : True ,
+"input_schema" : {
+"type" : "object" ,
+"properties" : {
+"destination" : { "type" : "string" },
+"date" : { "type" : "string" , "format" : "date" },
+},
+"required" : [ "destination" , "date" ],
+"additionalProperties" : False ,
+},
+}
+],
+)
+print (response)
