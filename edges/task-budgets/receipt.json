@@ -8,12 +8,12 @@
   },
   "docs_absence_check": {
     "openai_reasoning": {
-      "path": "/Users/admin/dev/anthropic/takehome-experiments/claude-feature-radar/sources/openai_reasoning_2026-06-19.txt",
+      "path": "sources/openai_reasoning_2026-06-19.txt",
       "hits": [],
       "equivalent_found": false
     },
     "gemini_thinking": {
-      "path": "/Users/admin/dev/anthropic/takehome-experiments/claude-feature-radar/sources/gemini_thinking_2026-06-19.txt",
+      "path": "sources/gemini_thinking_2026-06-19.txt",
       "hits": [],
       "equivalent_found": false
     }

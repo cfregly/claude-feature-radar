@@ -1499,8 +1499,7 @@ def publish(edge_key: str, briefs_root: pathlib.Path, command: str) -> int:
     email_src = (_citations_founder_email_source(plan) if plan.slug == "citations"
                  else _founder_email_source(plan, _committed_receipt(plan)))
     email_path.write_text(email_src)
-    # The adaptable outreach EXAMPLE lives in claude-founder-kit/launch/outreach-examples/, not here and
-    # not in the public briefs repo. This publisher writes only the engine's working draft.
+    # This publisher writes only the engine's working draft, not the public briefs repo.
 
     files = sorted(p.relative_to(briefs_root) for p in brief_dir.rglob("*") if p.is_file())
     print(f"\n  PUBLISHED brief {plan.slug!r} for edge {gate.edge_key!r} ({plan.demo_kind})")

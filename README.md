@@ -316,15 +316,15 @@ usual counter tells you that cache reads dropped. It does not tell you why.
 The cache diagnostics edge tests that production debugging shape. The workload sends long
 cached-prefix requests across all four documented miss-reason variants.
 
-| arm | root cause known | miss reason | missed tokens | cost | wall time |
-|---|:---:|---|---:|---:|---:|
-| Claude Haiku 4.5 cache diagnostics | yes | `system_changed` | 6.8k | $0.0694 | 12.7s |
-| OpenAI GPT-5.5 prompt caching | no | none exposed | 0 | $0.0515 | 2.7s |
-| Gemini 3.1 Pro cache counters | no | none exposed | 0 | $0.0242 | 3.5s |
+| arm | root cause known | miss reason exposed |
+|---|:---:|---|
+| Claude Haiku 4.5 cache diagnostics | yes | `system_changed`, typed and per request |
+| OpenAI GPT-5.5 prompt caching | no | none |
+| Gemini 3.1 Pro cache counters | no | none |
 
 Claude identified 4/4 documented cache-miss reason variants and reduced the manual cache-miss suspect
-list from four prompt-prefix surfaces to one for each miss. The edge is observability, not lower cost
-on this probe. The full receipt is
+list from four prompt-prefix surfaces to one for each miss. The edge is observability: a typed,
+per-request reason for every silent cache miss. The full receipt is
 [`edges/cache-diagnostics/sample.txt`](edges/cache-diagnostics/sample.txt), with machine data in
 [`edges/cache-diagnostics/receipt.json`](edges/cache-diagnostics/receipt.json).
 

@@ -1,27 +1,12 @@
 # Chris Fregly Voice
 
-This is the persistent voice guide for deck slides, speaker notes, resume copy, emails, READMEs,
-briefs, and any outbound communication written as Chris.
+This is the persistent voice guide for the emails, briefs, and READMEs this engine drafts, and any
+outbound communication written as Chris.
 
 Use this with `CLAUDE.md`. The repo rules still win: state facts, keep public artifacts generic,
 trace numbers to receipts, ground platform claims in live docs, and deslop before shipping.
 
-## Source Corpus
-
-Scanned on 2026-06-19:
-
-- Local deck speaker notes and slide copy in `deck/deck.js` and `deck/deck_text_for_review.txt`.
-- Local resume builder in `resume/build_resume.js`.
-- Local GitHub profile draft in `github_profile_README.md`.
-- Local outbound emails and briefs in `takehome-experiments/claude-feature-radar/`.
-- Local talk evidence in `receipts/talks_given.txt` and `receipts/cal_talks_report.md`.
-- Public talk pages and transcripts:
-  - https://www.superdatascience.com/podcast/sds-973-ai-systems-performance-engineering-with-chris-fregly
-  - https://home.mlops.community/public/videos/performance-optimization-and-softwarehardware-co-design-across-pytorch-cuda-and-nvidia-gpus
-  - https://softwareengineeringdaily.com/2021/07/14/data-science-on-aws-implementing-ai-and-ml-pipelines-on-aws-with-chris-fregly/
-  - https://www.datascienceonaws.com/
-  - http://www.generativeaionaws.com/
-  - https://www.linkedin.com/posts/cfregly_i-just-realized-that-while-writing-ai-systems-activity-7389050119423324160-kY-B
+## From spoken to written
 
 Do not copy raw transcript filler into polished artifacts. Strip `um`, `uh`, repeated starts,
 soft throat-clearing, and half-sentences. Keep the thinking pattern, not the disfluency.
@@ -99,7 +84,7 @@ Use these sparingly. They work because they are short.
 Cut these before anything ships:
 
 - Filler: "um", "uh", "kind of", "sort of", "you know", "basically", "just" when it weakens the line.
-- Interview framing outside private prep: "if they ask", "when the panel pushes".
+- Writing to an imagined evaluator instead of the reader: cut the second-guessing asides.
 - Hype: "magic", "breakthrough", "better than ever", "future of", "next generation".
 - Corporate mush: "use our platform to do more", "drive outcomes", "enterprise ready".
 - Defensive hedging when the receipt is strong.
@@ -144,27 +129,10 @@ Go build,
 Chris
 ```
 
-## Deck Rules
+## Engine Rules
 
-- Slide faces state facts and keep the line count low.
-- Speaker notes can be more conversational, but they still need receipts.
-- Lead with the arc: founder, operator, advisor, builder.
-- Use the platform-risk story as scar tissue, not drama.
-- Use punchy facts over adjectives.
-- Keep every claim tied to a receipt or a public source.
-
-## Resume Rules
-
-- Resume copy is compressed proof, not a narrative essay.
-- Use active verbs and concrete nouns.
-- Keep founder, operator, advisor, builder as the throughline.
-- Put the most differentiated proof near the top: startup depth, code, talks, courses, public repos.
-- Avoid "responsible for". Say what Chris built, ran, measured, or converted.
-
-## Competitive Engine Rules
-
-Every founder email, product email, brief, README CTA, and outbox draft in
-`takehome-experiments/claude-feature-radar/` must use this voice guide.
+Every founder email, product email, brief, README CTA, and outbox draft in this repo must use this
+voice guide.
 
 - Use the founder's workload as the opening hook.
 - Show the one Claude feature that changes the workload.

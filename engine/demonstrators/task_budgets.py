@@ -166,7 +166,7 @@ def _docs_equivalent_absent() -> dict:
     for name, path in sources.items():
         text = path.read_text(errors="replace").lower() if path.exists() else ""
         hits = [n for n in needles if n in text]
-        out[name] = {"path": str(path), "hits": hits, "equivalent_found": bool(hits)}
+        out[name] = {"path": str(path.relative_to(root)), "hits": hits, "equivalent_found": bool(hits)}
     return out
 
 

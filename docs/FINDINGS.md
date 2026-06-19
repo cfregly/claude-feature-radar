@@ -64,26 +64,31 @@ A placeholder price for gemini-3.5-flash (input $0.30) made it look cheaper than
 paid-tier price is $1.50 input and $9.00 output, so Gemini is actually pricier. Lesson: pull every
 per-token price from the vendor's live pricing page and date it, before any dollar figure ships.
 
-## 8. Citations: the edge is the guarantee and the no-store bundle, not char granularity
+## 8. Citations: the resolve-guarantee is parity, the edge is the no-store bundle
 
 The skeptic refuted the citations edge as first stated: on clean text a model-emitted quote plus your
 own `str.find` resolves 8 of 8 at char granularity on every vendor, so "the only API with a per-char
-source pointer" overclaims. A live-docs dig (2026-06-19) confirmed it and found the real wedge. Two
-parts were genuinely refuted: char-level granularity holds only for plain text (Claude PDFs are
-page-level via `page_location`, the same coarseness as Gemini File Search `page_number`), and on clean
-text the DIY path is parity. Three subfeatures survive. (1) The API guarantees every returned pointer
-resolves to a real source span ("citations are guaranteed to contain valid pointers to the provided
-documents"). The DIY quote-plus-find cannot, because a paraphrase makes `str.find` return -1 and the
-citation is silently dropped, so the wedge is the guarantee, not recall. (2) `cited_text` is free of
-output tokens and of input tokens on replay, which no competitor documents. (3) The global edge is the
-one-request, no-hosted-store, mixed-source bundle: Claude cites a directly-supplied PDF plus
-developer-supplied RAG chunks plus inline text in a single call with zero persisted objects, while
-OpenAI (`file_citation`) and Gemini (File Search) both require a hosted vector store with upload and
-index, neither cites a directly-supplied inline PDF, and Gemini File Search cannot be combined with
-another tool in one call. Where Claude loses: Citations and Structured Outputs return a 400 together,
-so a founder who needs strict-JSON grounded output cannot stack the two. The next demonstrator step is
-a paraphrase-resolution arm, the case "not measured on clean text," to retire the objection directly.
-Lesson: when a headline edge is refuted, the wedge is usually one subfeature deeper, not gone.
+source pointer" overclaims. Two parts stayed refuted: char-level granularity holds only for plain text
+(Claude PDFs are page-level via `page_location`, the same coarseness as Gemini File Search
+`page_number`), and on clean text the DIY path is parity. The edge was then re-tightened to the resolve
+GUARANTEE (the API never returns an unlocatable pointer, where a paraphrased DIY quote would make
+`str.find` return -1), and a paraphrase-resolution arm (`engine/demonstrators/paraphrase_resolution.py`)
+was built to measure it. The arm REFUTED that wedge too. An adversarial review caught the first version
+as a strawman: it prompted the DIY arm to paraphrase its own supporting quote, rigging `str.find` to
+fail. Steel-manned (the model paraphrases the ANSWER but copies a VERBATIM quote, resolved with a
+normalized `str.find`) and run best-to-best against frontier competitors (gpt-5.5 / gemini-3.1-pro), the
+DIY path resolves 8/8 with zero drops. Three regimes confirmed parity: frontier, the cheapest tiers
+(gpt-nano / gem-lite still copy verbatim), and 30-document scale (both Citations and DIY misgrounded the
+same questions, because the guarantee guarantees RESOLUTION, not correct ATTRIBUTION, a model error both
+inherit equally). The paraphrase-DROP is real only against WEAKER competitor models that paraphrase
+their own quote, so it is not a best-to-best edge. What survives best-to-best: (1) `cited_text` is free
+of output and replay-input tokens, which no competitor documents. (2) The one-request, no-hosted-store,
+mixed-source bundle (a directly-supplied PDF plus RAG chunks plus inline text in one call with zero
+persisted objects), while OpenAI and Gemini both require a hosted vector store and neither cites a
+directly-supplied inline PDF. (3) Zero resolver code, a DX convenience. Where Claude loses: Citations
+and Structured Outputs return a 400 together. The paraphrase arm stands as a both-directions PARITY
+record, non-promotable and held. Lesson: steel-man the baseline and run the competitor's strongest model
+before a correctness claim, or you ship a strawman win.
 
 ## What the benchmark is for
 

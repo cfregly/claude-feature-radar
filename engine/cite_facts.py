@@ -45,13 +45,11 @@ FACTS = [
      "source": "sources/claude_ptc_2026-06-18.txt"},
     {"claim": "Programmatic tool calling requires code_execution_20260120.",
      "source": "sources/claude_ptc_2026-06-18.txt"},
-    # Benchmark and competitor facts (cited to the competitor's own doc or our sourced brief)
+    # Benchmark and competitor facts (cited to the competitor's own doc)
     {"claim": "Gemini File Search may include the page number where the information was found, via the page_number attribute.",
      "source": "sources/gemini_file_search_2026-06-18.txt"},
     {"claim": "OpenAI compaction carries forward key prior state and reasoning rather than traditional summarization.",
      "source": "sources/openai_compaction_2026-06-18.txt"},
-    {"claim": "On METR's task time-horizon, the top released Claude model runs about 1.9x longer than the best non-Claude model.",
-     "source": "briefs/2026-06-17-agentic-landscape.md"},
     # Our own measured receipts (cited to the committed sample.txt)
     {"claim": "Programmatic tool calling billed 6,828 input tokens versus 9,451 for plain tool use.",
      "source": "edges/programmatic-tool-calling/sample.txt"},

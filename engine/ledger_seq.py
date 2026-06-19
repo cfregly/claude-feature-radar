@@ -13,7 +13,7 @@ context manager can hurt is the running list the agent accumulates in its own re
 
 Same corpus, same prompt, same agent strategy on every arm. Only the context manager differs, so the
 result is attributable to it. Every number is read off the real usage object. Measured, not asserted:
-if a competitor holds the list too, that is parity and the finding goes to claude-feature-misses.
+if a competitor holds the list too, that is parity and the finding goes to the internal both-directions analysis.
 
 This file is self-contained on purpose, so it never edits the file another session is rewriting.
 """

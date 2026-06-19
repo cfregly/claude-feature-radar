@@ -13,7 +13,7 @@ reasoning (no memory tool), so the mechanism difference between the platforms ac
 Same chain corpus, same prompt, same agent strategy on every arm. The only thing that differs is each
 platform's context-management mechanism, so the result is attributable to it. Every number is read off
 the real usage object the API returns. Measured, not asserted: if OpenAI's compaction holds the list
-too, that is the finding, and it belongs in claude-feature-misses, not on the public radar.
+too, that is the finding, and it belongs in the internal both-directions analysis, not on the public radar.
 """
 
 from __future__ import annotations

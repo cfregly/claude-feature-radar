@@ -34,9 +34,8 @@ edges/retention-resume/
 # Internal design notes for in-progress edges (the both-directions hypothesis, named
 # competitor mechanisms) stay local until a measured win is ready for the wins-only README.
 edges/*/LEDGER_WORKLOAD.md
-briefs/*-edge-landscape.md
-briefs/*-edge-landscape-master.md
-briefs/2026-06-17-platform-edge.md
-briefs/2026-06-17-sharpest-edge.md
-briefs/2026-06-17-verified-picture.md
+# The whole briefs/ tree is the internal both-directions analysis (where Claude ties or
+# loses). The engine regenerates it locally and the canonical copies live in the private
+# companion repo. It never ships in this public engine, so the entire directory is ignored.
+briefs/
 landscape/CHANGELOG-*.md

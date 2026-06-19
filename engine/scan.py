@@ -11,9 +11,8 @@ landscape/landscape.json every run, and current_edges() below reads that landsca
 present, falling back to these constants on a fresh checkout that has not swept yet. The surface
 moves monthly, so re-run the sweep, do not cache a winner.
 
-Sources:
-  briefs/2026-06-17-platform-edge.md       the whole-platform capability sweep
-  briefs/2026-06-17-agentic-landscape.md   the agentic and long-horizon leaderboards
+Sources: the 2026-06-17 whole-platform capability sweep and the agentic and long-horizon
+leaderboards, kept in the internal both-directions analysis.
 """
 
 from __future__ import annotations
@@ -57,24 +56,27 @@ DIFFERENTIATORS = [
     {
         "key": "citations", "axis": "grounding", "rank": 2,
         "demoKind": "grounding_resolution",
-        "claim": "For a PDF or RAG chunks supplied directly in one request, an API-guaranteed-to-"
-                 "resolve source citation (page or block span plus the verbatim quote, free of output "
-                 "tokens) with no hosted vector store. OpenAI and Gemini cite only through a persisted, "
-                 "pre-indexed store, with no documented resolve guarantee and no free quote.",
-        "why": "The wedge is NOT char granularity and NOT 'they cannot cite'. On clean text the DIY "
-               "path (model quote plus your own str.find) resolves 8/8 on every vendor, and char-level "
-               "holds only for plain text: on PDFs Claude is page-level, the same coarseness as Gemini "
-               "File Search. Three subfeatures survive a skeptic. (1) The API guarantees every returned "
-               "pointer resolves to a real source span; the DIY quote-plus-find cannot, because a "
-               "paraphrase makes str.find return -1 and the citation is silently dropped. (2) cited_text "
-               "is free of output tokens and of input tokens on replay (308 vs 563 measured). (3) The "
-               "global edge: one request cites a directly-supplied PDF plus developer-supplied RAG "
-               "chunks plus inline text with zero persisted objects, while OpenAI (file_citation) and "
-               "Gemini (File Search, page-level) both require a hosted vector store with upload and "
-               "index, cannot cite a directly-supplied inline PDF, and Gemini File Search cannot be "
-               "combined with another tool in one call. GA, no beta header. Measured (make citations); "
-               "the paraphrase-resolution arm that retires the 'not measured on clean text' objection "
-               "is the next demonstrator step.",
+        "claim": "Native, in-request source citations with no hosted vector store: one call cites a "
+                 "directly-supplied PDF (page span) plus developer-supplied RAG chunks plus inline text, "
+                 "the verbatim cited_text free of output tokens, zero persisted objects. OpenAI "
+                 "(file_citation) and Gemini (File Search) cite only through a persisted, pre-indexed "
+                 "store and cannot cite a directly-supplied inline PDF.",
+        "why": "The wedge is convenience and the no-store bundle, NOT a correctness guarantee over a "
+               "competent do-it-yourself path. Two parts were refuted, measured both ways. char-level "
+               "granularity holds only for plain text (PDFs are page-level, the same coarseness as "
+               "Gemini File Search). And the resolve GUARANTEE is PARITY: the paraphrase-resolution arm "
+               "tested it across three regimes (frontier gpt-5.5/gemini-3.1-pro, the cheapest tiers, and "
+               "30-document scale), and a steel-manned DIY, where the model paraphrases the answer but "
+               "copies a verbatim supporting quote and you resolve it with a normalized str.find, "
+               "resolves as well as Claude on every tier. The paraphrase-DROP only appears against weaker "
+               "competitor models that paraphrase their own quote, so it is not best-to-best. What "
+               "survives best-to-best: (1) cited_text is free of output tokens and of input tokens on "
+               "replay, which no competitor documents; (2) the one-request, no-hosted-store, mixed-source "
+               "bundle, while OpenAI and Gemini both require a hosted vector store with upload and index, "
+               "neither cites a directly-supplied inline PDF, and Gemini File Search cannot be combined "
+               "with another tool in one call; (3) zero resolver code, a DX convenience. Where Claude "
+               "loses: Citations and Structured Outputs return a 400 together. GA, no beta header. See "
+               "docs/FINDINGS.md #8.",
         "fair_comparison": {
             "task_shape": "8 questions over 3 plain-text user documents",
             "claude_config": {"feature": "citations.enabled", "beta_on": False, "model": "haiku"},
@@ -327,7 +329,7 @@ def main():
     for g in GAPS:
         print(f"    - {g['note']}")
     print(f"\n  Anchor for the founder email:\n    {CHOSEN}")
-    print("\n  Sources: briefs/2026-06-17-platform-edge.md, briefs/2026-06-17-agentic-landscape.md\n")
+    print("\n  Sources: the internal 2026-06-17 platform sweep and agentic-landscape analysis\n")
 
 
 if __name__ == "__main__":

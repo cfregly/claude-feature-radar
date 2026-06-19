@@ -9,6 +9,7 @@ email turns the build red instead of slipping in. Stdlib only, offline, exits no
 
 import pathlib
 import re
+import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -19,6 +20,9 @@ SELF = "check_surface.py"
 FORBIDDEN = [
     (r"ship-on-claude", "names a private sibling repo"),
     (r"claude-overnight", "names a private sibling repo"),
+    (r"claude-feature-misses", "names a private sibling repo"),
+    (r"claude-founder-kit", "names a private sibling repo"),
+    (r"takehome-experiments", "names the private parent workspace"),
     (r"\bported from\b", "internal port provenance"),
     (r"\bPhase [2-5]\b", "internal build-phase label"),
     (r"the A and B harness", "internal consolidation letter-code"),
@@ -36,18 +40,40 @@ NEGATIVES = [
 ]
 
 # Raw fetched vendor docs and gitignored scratch are not authored surfaces, so they are out of scope.
-SKIP = ("/.venv/", "/__pycache__/", "/sources/", "/data/", "/.git/", "/.benchmarks/", "/node_modules/")
+# briefs/ is internal, gitignored, both-directions scratch (the analytical record stays local), so a
+# locally regenerated brief is not a shipped surface and is skipped here.
+SKIP = ("/.venv/", "/__pycache__/", "/sources/", "/data/", "/briefs/", "/.git/", "/.benchmarks/", "/node_modules/")
+
+
+def _tracked_files():
+    """The files git tracks, the only ones that ship on a clone. A gitignored internal note (a
+    LEDGER_WORKLOAD, a local brief, a per-edge product alert) may name a private sibling because it
+    never ships, so the gate scans what is committed, not local scratch. Falls back to the working
+    tree if git is unavailable."""
+    try:
+        out = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT,
+                             capture_output=True, text=True, check=True).stdout
+        return [ROOT / rel for rel in out.split("\0") if rel]
+    except Exception:
+        files = []
+        for ext in ("*.py", "*.md", "*.json"):
+            files += ROOT.rglob(ext)
+        mk = ROOT / "Makefile"
+        if mk.exists():
+            files.append(mk)
+        return files
 
 
 def _source_files():
-    out = []
-    for ext in ("*.py", "*.md"):
-        out += ROOT.rglob(ext)
-    mk = ROOT / "Makefile"
-    if mk.exists():
-        out.append(mk)
-    return [p for p in out
-            if p.is_file() and p.name != SELF and not any(s in str(p) for s in SKIP)]
+    files = []
+    for p in _tracked_files():
+        if not p.is_file() or p.name == SELF:
+            continue
+        if any(s in str(p) for s in SKIP):
+            continue
+        if p.suffix in (".py", ".md", ".json") or p.name == "Makefile":
+            files.append(p)
+    return files
 
 
 def _founder_files():
