@@ -222,6 +222,36 @@ def _receipt_is_claude_win(receipt: dict) -> bool:
     return True
 
 
+def _committed_receipt(plan: BriefPlan) -> dict | None:
+    """The SHIPPED numbers, parsed from the committed receipt-of-record edges/<folder>/sample.txt, the
+    same file the receipt-drift gate (scripts/check_receipts.py) checks. This is the source of truth a
+    published brief quotes, NOT the gitignored transient data/last_<edge>.json, which drifts to whatever
+    the last local run happened to bill. So a republish keeps the brief's numbers identical to the
+    committed receipt instead of following the latest scratch run. Returns None when no committed receipt
+    exists yet (then the templates show 'run it yourself' with no fabricated number). token_accounting
+    only: the grounding_resolution brief quotes no receipt numbers, so it never calls this."""
+    folder = next((k for k, v in PLANS.items() if v is plan), plan.slug)
+    s = ROOT / "edges" / folder / "sample.txt"
+    if not s.exists():
+        return None
+    text = s.read_text()
+    a = re.search(r"Mode A:.*?([\d,]+)\s+\d+\s+(\S+)\s+\$[\d.]+", text)
+    b = re.search(r"Mode B:.*?([\d,]+)\s+\d+\s+(\S+)\s+\$[\d.]+", text)
+    if not (a and b):
+        return None
+    a_tok = int(a.group(1).replace(",", ""))
+    b_tok = int(b.group(1).replace(",", ""))
+    win = re.search(r"True winner.*?:\s*([^\s.]+)", text)
+    winner = win.group(1) if win else None
+    return {
+        "mode_a": {"billed_input": a_tok},
+        "mode_b": {"billed_input": b_tok},
+        "pct_input_reduction": round((1 - b_tok / a_tok) * 100, 2) if a_tok else 0.0,
+        "mode_a_correct": winner is not None and a.group(2) == winner,
+        "mode_b_correct": winner is not None and b.group(2) == winner,
+    }
+
+
 # --------------------------------------------------------------------------- the verdict gate
 
 
@@ -1388,7 +1418,7 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
         run_src = _run_tokens_source(plan.slug)
         _assert_no_dangling(run_src, "run_tokens.py")  # the generated run entry must be closure-clean
         (brief_dir / "run_tokens.py").write_text(run_src)
-        (brief_dir / "README.md").write_text(_readme_source(plan, gate.edge or {}, gate.receipt))
+        (brief_dir / "README.md").write_text(_readme_source(plan, gate.edge or {}, _committed_receipt(plan)))
     elif plan.slug == "citations":
         # The grounding_resolution brief: a docs/ corpus as the edit surface, cite.py as the run.
         docs = brief_dir / plan.edit_surface
@@ -1405,7 +1435,7 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
     # The demo gif's source: a generated tape that replays a generated, honest, wins-only receipt
     # snapshot for $0. `make gif` renders the binary from the tape, so the whole demo regenerates and
     # nothing about the gif is hand-written or lost on a republish.
-    (brief_dir / "sample.txt").write_text(_sample_source(plan, gate.receipt))
+    (brief_dir / "sample.txt").write_text(_sample_source(plan, _committed_receipt(plan)))
     (brief_dir / "demo.tape").write_text(_demo_tape_source(plan))
 
     (brief_dir / "PROVENANCE.md").write_text(_provenance_source(plan, gate, command))
@@ -1459,7 +1489,7 @@ def publish(edge_key: str, briefs_root: pathlib.Path, command: str) -> int:
     emails_dir.mkdir(exist_ok=True)
     email_path = emails_dir / f"{plan.slug}_FOUNDER_EMAIL.md"
     email_src = (_citations_founder_email_source(plan) if plan.slug == "citations"
-                 else _founder_email_source(plan, gate.receipt))
+                 else _founder_email_source(plan, _committed_receipt(plan)))
     email_path.write_text(email_src)
 
     files = sorted(p.relative_to(briefs_root) for p in brief_dir.rglob("*") if p.is_file())
