@@ -143,6 +143,79 @@ def test_interface_score_routes_claude_ahead_only_when_every_cross_vendor_arm_ra
     assert receipt.fairness.get("lead_basis") == "head-to-head"
 
 
+# ----- the HEADLINE cross-vendor feature gate: Claude citations vs OpenAI file_search vs Gemini File Search -----
+
+NQ = 6
+
+
+def _feat_arm(provider, *, pointer_kind, resolved=NQ, source_correct=NQ, persisted=0, ran=True, errors=None):
+    name = {"anthropic": "claude citations:sonnet", "openai": "openai file_search:gpt-top",
+            "gemini": "gemini File Search:gem-pro"}[provider]
+    return {"name": name, "provider": provider, "model": f"{provider}-m", "mechanism": "x",
+            "pointer_kind": pointer_kind, "resolved": f"{resolved}/{NQ}", "source_correct": f"{source_correct}/{NQ}",
+            "persisted_objects": persisted, "setup_calls": persisted, "cost": 0.01, "errors": errors or [], "ran": ran}
+
+
+def _feat(arms):
+    return {"n_questions": NQ, "cost": 0.1, "skipped": [], "arms": arms}
+
+
+def test_feature_comparison_promotes_when_claude_char_span_zero_objects_vs_hosted_competitors():
+    feat = _feat([
+        _feat_arm("anthropic", pointer_kind="char-span", persisted=0),
+        _feat_arm("openai", pointer_kind="file-level", persisted=4),
+        _feat_arm("gemini", pointer_kind="chunk-level", persisted=4),
+    ])
+    v = pr.score_feature_comparison(feat)
+    assert v["promotable_edge"] is True
+    assert v["claude_char_span_into_supplied_docs"] is True
+    assert v["claude_persisted_objects"] == 0
+    assert v["competitor_total_persisted_objects"] == 8
+
+
+def test_feature_comparison_holds_if_a_competitor_cites_without_a_hosted_store():
+    feat = _feat([
+        _feat_arm("anthropic", pointer_kind="char-span", persisted=0),
+        _feat_arm("openai", pointer_kind="file-level", persisted=0),   # no hosted store -> parity on data residency
+        _feat_arm("gemini", pointer_kind="chunk-level", persisted=4),
+    ])
+    v = pr.score_feature_comparison(feat)
+    assert v["promotable_edge"] is False
+    assert any("without a hosted store" in r for r in v["why_not_promotable"])
+
+
+def test_feature_comparison_holds_if_a_competitor_returns_a_char_span():
+    feat = _feat([
+        _feat_arm("anthropic", pointer_kind="char-span", persisted=0),
+        _feat_arm("openai", pointer_kind="char-span", persisted=4),    # parity on granularity
+        _feat_arm("gemini", pointer_kind="chunk-level", persisted=4),
+    ])
+    v = pr.score_feature_comparison(feat)
+    assert v["promotable_edge"] is False
+    assert any("char-span pointer" in r for r in v["why_not_promotable"])
+
+
+def test_feature_comparison_holds_if_claude_needs_hosted_objects():
+    feat = _feat([
+        _feat_arm("anthropic", pointer_kind="char-span", persisted=1),
+        _feat_arm("openai", pointer_kind="file-level", persisted=4),
+        _feat_arm("gemini", pointer_kind="chunk-level", persisted=4),
+    ])
+    v = pr.score_feature_comparison(feat)
+    assert v["promotable_edge"] is False
+
+
+def test_feature_comparison_holds_if_a_competitor_arm_did_not_run():
+    feat = _feat([
+        _feat_arm("anthropic", pointer_kind="char-span", persisted=0),
+        _feat_arm("openai", pointer_kind="file-level", persisted=4),
+        _feat_arm("gemini", pointer_kind="none", resolved=0, ran=False, errors=["setup failed"]),
+    ])
+    v = pr.score_feature_comparison(feat)
+    assert v["promotable_edge"] is False
+    assert v["all_competitors_ran"] is False
+
+
 def test_glue_grader_drops_line_wrapped_quote_naively_and_recovers_normalized():
     # The PDF glue-code teaching point: a verbatim quote carrying a PDF line-wrap newline fails the
     # developer's naive str.find but resolves after the one-line whitespace normalization.

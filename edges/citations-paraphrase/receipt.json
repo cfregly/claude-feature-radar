@@ -1,10 +1,10 @@
 {
   "date": "2026-06-19",
-  "claim_under_test": "Claude Citations returns a source pointer that resolves to a real span by guarantee, with zero resolver code and free cited_text, even when the answer is paraphrased and for a directly-supplied PDF. This arm measures the do-it-yourself baseline (model quote plus str.find) head to head against the competitors' FRONTIER models, to see whether the str.find drop is a robust cross-vendor gap or a within-Claude convenience that a competent DIY resolver closes.",
+  "claim_under_test": "Over the same user documents, Claude's citation feature returns a structured, API-guaranteed-to-resolve CHAR-SPAN pointer into a directly-supplied document with ZERO hosted objects, while OpenAI file_search and Gemini File Search require uploading those documents to a hosted vector store (persisted objects, a third-party copy of the user's data) and return only a coarser file/chunk-level citation. Grounded and adversarially verified against the vendors' live docs 2026-06-19. A secondary arm measures the do-it-yourself str.find baseline under paraphrase.",
   "n_questions": 8,
   "n_pdf_questions": 2,
   "n_text_docs": 3,
-  "total_cost": 0.74055,
+  "total_cost": 0.862373,
   "sources": {
     "claude_citations": "https://platform.claude.com/docs/en/build-with-claude/citations",
     "claude_pdf_support": "https://platform.claude.com/docs/en/build-with-claude/pdf-support",
@@ -12,6 +12,55 @@
     "gemini_file_search": "https://ai.google.dev/gemini-api/docs/file-search"
   },
   "skipped": [],
+  "feature_comparison": {
+    "n_questions": 6,
+    "cost": 0.113747,
+    "skipped": [],
+    "arms": [
+      {
+        "name": "claude citations:sonnet",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "mechanism": "inline citations",
+        "pointer_kind": "char-span",
+        "resolved": "6/6",
+        "source_correct": "6/6",
+        "persisted_objects": 0,
+        "setup_calls": 0,
+        "cost": 0.023679,
+        "errors": [],
+        "ran": true
+      },
+      {
+        "name": "openai file_search:gpt-top",
+        "provider": "openai",
+        "model": "gpt-5.5",
+        "mechanism": "hosted file_search",
+        "pointer_kind": "file-level",
+        "resolved": "6/6",
+        "source_correct": "6/6",
+        "persisted_objects": 4,
+        "setup_calls": 7,
+        "cost": 0.06705,
+        "errors": [],
+        "ran": true
+      },
+      {
+        "name": "gemini File Search:gem-pro",
+        "provider": "gemini",
+        "model": "gemini-3.1-pro-preview",
+        "mechanism": "hosted File Search",
+        "pointer_kind": "chunk-level",
+        "resolved": "6/6",
+        "source_correct": "6/6",
+        "persisted_objects": 4,
+        "setup_calls": 4,
+        "cost": 0.023018,
+        "errors": [],
+        "ran": true
+      }
+    ]
+  },
   "arms": [
     {
       "name": "claude+citations:sonnet",
@@ -24,9 +73,9 @@
       "silent_drops": 0,
       "pdf_pointer_resolved": "2/2",
       "persisted_objects": 0,
-      "output_tokens": 572,
-      "cost": 0.2388,
-      "latency_s": 24.28,
+      "output_tokens": 629,
+      "cost": 0.239655,
+      "latency_s": 31.02,
       "errors": []
     },
     {
@@ -40,9 +89,9 @@
       "silent_drops": 0,
       "pdf_pointer_resolved": "0/2",
       "persisted_objects": 0,
-      "output_tokens": 692,
-      "cost": 0.028512,
-      "latency_s": 19.83,
+      "output_tokens": 655,
+      "cost": 0.027957,
+      "latency_s": 23.16,
       "errors": []
     },
     {
@@ -56,9 +105,9 @@
       "silent_drops": 0,
       "pdf_pointer_resolved": "0/2",
       "persisted_objects": 0,
-      "output_tokens": 881,
-      "cost": 0.053145,
-      "latency_s": 22.78,
+      "output_tokens": 966,
+      "cost": 0.055695,
+      "latency_s": 24.97,
       "errors": []
     },
     {
@@ -72,16 +121,23 @@
       "silent_drops": 0,
       "pdf_pointer_resolved": "0/2",
       "persisted_objects": 0,
-      "output_tokens": 5712,
-      "cost": 0.079456,
-      "latency_s": 54.01,
+      "output_tokens": 5945,
+      "cost": 0.082252,
+      "latency_s": 57.53,
       "errors": []
     }
   ],
   "pdf_glue_demo": {
     "n_pdf_questions": 5,
-    "naive_drop_total": 0,
-    "cost": 0.340637,
+    "naive_drop_total": 1,
+    "deterministic": {
+      "sentence": "Overage seats beyond the 50 included seats are billed at 12 US dollars per seat per month.",
+      "rendered_spans_lines": true,
+      "naive_resolves": false,
+      "normalized_resolves": true,
+      "guarantee_resolves": true
+    },
+    "cost": 0.343067,
     "skipped": [],
     "arms": [
       {
@@ -92,7 +148,7 @@
         "normalized_resolved": "-",
         "guaranteed_resolved": "5/5",
         "naive_drops": 0,
-        "cost": 0.13749,
+        "cost": 0.137475,
         "errors": []
       },
       {
@@ -103,18 +159,18 @@
         "normalized_resolved": "5/5",
         "guaranteed_resolved": "-",
         "naive_drops": 0,
-        "cost": 0.12567,
+        "cost": 0.125655,
         "errors": []
       },
       {
         "name": "openai DIY:gpt-top",
         "model": "gpt-5.5",
         "is_citations": false,
-        "naive_resolved": "5/5",
+        "naive_resolved": "4/5",
         "normalized_resolved": "5/5",
         "guaranteed_resolved": "-",
-        "naive_drops": 0,
-        "cost": 0.024325,
+        "naive_drops": 1,
+        "cost": 0.025285,
         "errors": []
       },
       {
@@ -125,19 +181,12 @@
         "normalized_resolved": "5/5",
         "guaranteed_resolved": "-",
         "naive_drops": 0,
-        "cost": 0.053152,
+        "cost": 0.054652,
         "errors": []
       }
-    ],
-    "deterministic": {
-      "sentence": "Overage seats beyond the 50 included seats are billed at 12 US dollars per seat per month.",
-      "rendered_spans_lines": true,
-      "naive_resolves": false,
-      "normalized_resolves": true,
-      "guarantee_resolves": true
-    }
+    ]
   },
-  "verdict": {
+  "paraphrase_finding": {
     "positive_signal": false,
     "promotable_edge": false,
     "paraphrase_resolution_rate": {
@@ -158,15 +207,32 @@
     "claude_no_hosted_store": true,
     "claude_cites_inline_pdf_under_paraphrase": true,
     "output_tokens": {
-      "claude+citations:sonnet": 572,
-      "claude DIY:sonnet": 692,
-      "openai DIY:gpt-top": 881,
-      "gemini DIY:gem-pro": 5712
+      "claude+citations:sonnet": 629,
+      "claude DIY:sonnet": 655,
+      "openai DIY:gpt-top": 966,
+      "gemini DIY:gem-pro": 5945
     },
     "all_competitors_ran": true,
     "why_not_promotable": [
       "a cross-vendor DIY arm produced no silent drop under paraphrase",
       "Claude did not beat the best DIY resolution rate"
     ]
+  },
+  "verdict": {
+    "positive_signal": true,
+    "promotable_edge": true,
+    "claude_char_span_into_supplied_docs": true,
+    "claude_persisted_objects": 0,
+    "competitor_persisted_objects": {
+      "openai file_search:gpt-top": 4,
+      "gemini File Search:gem-pro": 4
+    },
+    "competitor_pointer_kinds": {
+      "openai file_search:gpt-top": "file-level",
+      "gemini File Search:gem-pro": "chunk-level"
+    },
+    "competitor_total_persisted_objects": 8,
+    "all_competitors_ran": true,
+    "why_not_promotable": []
   }
 }

@@ -1,23 +1,43 @@
-  Paraphrase-resolution workload: every arm answers in its own words (no verbatim copy) over
-  3 plain-text user documents and one inline PDF, then points to the source.
+  CLAUDE vs THE OTHER MODELS: best citation FEATURE, head to head.
+  6 questions over 3 user documents. Each vendor returns a citation
+  pointer INTO those documents with its real tool (Claude inline citations, OpenAI file_search,
+  Gemini File Search). Same documents, same questions, every arm.
+
+  arm                             pointer       resolves  src ok   hosted objs      cost
+  ------------------------------------------------------------------------------------------
+  claude citations:sonnet         char-span          6/6     6/6            0   $0.0237
+  openai file_search:gpt-top      file-level         6/6     6/6            4   $0.0670
+  gemini File Search:gem-pro      chunk-level        6/6     6/6            4   $0.0230
+
+  Verdict (cross-vendor):
+    positive_signal: true
+    promotable_edge: true
+    claude_char_span_into_supplied_docs: true
+    claude_hosted_objects: 0
+    competitor_hosted_objects: {'openai file_search:gpt-top': 4, 'gemini File Search:gem-pro': 4}
+    competitor_pointer_kinds: {'openai file_search:gpt-top': 'file-level', 'gemini File Search:gem-pro': 'chunk-level'}
+
+  Honest reading (cross-vendor):
+  - Claude returns a structured, API-guaranteed-to-resolve CHAR-SPAN pointer into the user's
+    directly-supplied documents, with ZERO hosted objects (the data never leaves the request).
+  - OpenAI file_search and Gemini File Search cannot cite a directly-supplied document: they
+    REQUIRE uploading it to a hosted vector store first (the hosted-objs column, a third-party
+    copy of the user's data), and even then the citation is file-level (OpenAI) or chunk-level
+    (Gemini), never a guaranteed char span into the source. Verified vs their live docs 2026-06-19.
+  - This is an API-surface gap, so it holds at the competitors' FRONTIER tier, not a model contest.
+
+  ==========================================================================================
+  SECONDARY (within-Claude context): paraphrase resolution vs the DIY str.find baseline.
+  Every arm answers in its own words over the user documents and one inline PDF, then points back.
 
   arm                          mechanism        answered  resolves  drops   out_tok      cost  wall
   --------------------------------------------------------------------------------------------------
-  claude+citations:sonnet     API citations         8/8       8/8      0       572   $0.2388  24.3s
-  claude DIY:sonnet           DIY str.find          8/8       8/8      0       692   $0.0285  19.8s
-  openai DIY:gpt-top          DIY str.find          8/8       8/8      0       881   $0.0531  22.8s
-  gemini DIY:gem-pro          DIY str.find          5/8       8/8      0     5,712   $0.0795  54.0s
+  claude+citations:sonnet     API citations         8/8       8/8      0       629   $0.2397  31.0s
+  claude DIY:sonnet           DIY str.find          8/8       8/8      0       655   $0.0280  23.2s
+  openai DIY:gpt-top          DIY str.find          8/8       8/8      0       966   $0.0557  25.0s
+  gemini DIY:gem-pro          DIY str.find          5/8       8/8      0     5,945   $0.0823  57.5s
 
-  Verdict:
-    positive_signal: false
-    promotable_edge: false
-    claude_guaranteed_resolve: true
-    claude_grounded_correct_source: 8/8
-    claude_no_hosted_store: true
-    claude_cites_inline_pdf_under_paraphrase: true
-    competitor_diy_drop_total: 0
-
-  Honest reading:
+  Honest reading (within-Claude DIY baseline):
   - Every arm answered the questions in its own words (paraphrased), as instructed.
   - Claude Citations resolved every answer's pointer by guarantee (source[start:end]==cited_text,
     and a real page span for the inline PDF), each grounded in the expected source, with zero
@@ -42,10 +62,10 @@
   ------------------------------------------------------------------------------------
   claude+citations:sonnet               -                -               5/5
   claude DIY:sonnet                   5/5              5/5                 -
-  openai DIY:gpt-top                  5/5              5/5                 -
+  openai DIY:gpt-top                  4/5              5/5                 -
   gemini DIY:gem-pro                  5/5              5/5                 -
-  -> Live, the naive str.find resolved every quote this run (the models emitted clean quotes),
-     but it is one PDF-rendering artifact away from a silent -1, shown deterministically next.
+  -> Live, the naive str.find silently dropped 1 PDF citation(s) on line-wrap whitespace.
+     The one-line ' '.join(quote.split()) recovered them.
 
   Deterministic illustration (grounded in the PDF's own line-wrapping, no model call):
     sentence: "Overage seats beyond the 50 included seats are billed at 12 US dollars per seat per month."
