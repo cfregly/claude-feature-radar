@@ -62,7 +62,6 @@ guarantees. An earlier version of
   capability absence. Rechecked 2026-06-18 against the live changelog: Gemini File Search is still
   public preview (launched 2025-11-06, still preview on the 2026-05-28 entry, no GA entry), so Claude
   Citations being GA is an additional live edge today. It can flip, so recheck before quoting.
-  Sourced in [`../briefs/2026-06-17-platform-edge.md`](../briefs/2026-06-17-platform-edge.md).
 
 ## Long-horizon autonomy (the second pillar)
 
@@ -203,6 +202,5 @@ tier, every id present and matching.
 
 - A "roughly 84% context reduction" figure for context editing circulates online but was not found
   on the current doc page. This repo measures its own reduction instead of quoting that number.
-- Competitor capabilities are cited from the competitors' own docs in
-  [`../briefs/2026-06-17-verified-picture.md`](../briefs/2026-06-17-verified-picture.md),
-  dated 2026-06-17. They move monthly. Re-run the scan before reusing them.
+- Competitor capabilities are cited from the competitors' own docs, dated 2026-06-17. They move
+  monthly. Re-run the scan before reusing them.

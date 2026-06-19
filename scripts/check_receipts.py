@@ -104,26 +104,6 @@ def check_ptc_drift(fail, warn):
                 fail.append(f"PTC token drift: {p.relative_to(ROOT)} has {m.group(1)}, receipt Mode A is {a_tok:,}")
 
 
-def check_eval(fail, warn):
-    """The eval-quality receipt total must match the public edge README that quotes it."""
-    s = _read("edges/eval-quality/sample.txt")
-    m = re.search(r"RUN 1.*?total spend this run: \$(\d+\.\d{2,4})", s, re.S)
-    if not m:
-        warn.append("eval: could not parse the RUN 1 total from sample.txt")
-        return
-    total = float(m.group(1))
-    # The public-facing edge README quotes the run total, so gate it against the receipt
-    # (the README total drifted to a stale $0.4090 precisely because it was ungated here).
-    for rel in ["edges/eval-quality/README.md"]:
-        for i, line in enumerate(_read(rel).splitlines(), 1):
-            if "total" not in line.lower():
-                continue
-            for c in _dollars(line):
-                if 0.30 < c < 0.60 and abs(c - total) > 0.005:
-                    fail.append(f"eval cost: {rel}:{i} says ${c:.4f}, receipt total is "
-                                f"${total:.4f}; reconcile them")
-
-
 def check_price_provenance(fail, warn):
     """Every model price carries a verified date so the table self-documents, and the gate warns when
     a price is older than the staleness window (a re-verify reminder, never a hard failure offline)."""
@@ -143,7 +123,6 @@ def main():
     fail, warn = [], []
     check_ptc(fail, warn)
     check_ptc_drift(fail, warn)
-    check_eval(fail, warn)
     check_price_provenance(fail, warn)
     for w in warn:
         print(f"  receipt gate: WARN {w}")

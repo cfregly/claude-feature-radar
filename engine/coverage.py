@@ -107,12 +107,20 @@ def coverage() -> list[dict]:
 # is by design, not a gap. The coverage status marks it "exists" for exactly this reason.
 _INTRINSIC_KINDS = {"discovery_loop"}
 
+# These kinds run as internal demonstrators only. The engine's publish gate
+# (engine/publish_brief.py) refuses them as regime-bounded (cost) or doc-grounded parity
+# (eval_quality, retention_resume, other), so they ship no public edges/<key>/ bundle: the
+# analysis runs and is kept locally, but the public tree carries only verified wins. A missing
+# public bundle for these is by design, not a gap, the same way the "other" holding pen always was.
+_INTERNAL_KINDS = {"cost", "eval_quality", "retention_resume", "other"}
+
 
 def gaps(rows: list[dict] | None = None) -> list[str]:
     """The kinds the engine cannot fully prove yet: no registered demonstrator (for a plugin kind), or
-    no built bundle. discovery_loop is intrinsic (the cadence itself proves it, not a plugin), and
-    "other" is a parity-gated holding pen with no bundle by design, so neither is counted a gap.
-    Returns a list of one-line gap descriptions, empty when every kind is covered."""
+    no built bundle. discovery_loop is intrinsic (the cadence itself proves it, not a plugin), and the
+    internal kinds (cost, eval_quality, retention_resume, other) ship no public bundle by design (the
+    publish gate refuses them), so none of those is counted a gap. Returns a list of one-line gap
+    descriptions, empty when every kind is covered."""
     rows = rows or coverage()
     out = []
     for r in rows:
@@ -120,7 +128,7 @@ def gaps(rows: list[dict] | None = None) -> list[str]:
             continue  # proven by the cadence, not a registry plugin
         if not r["registered"]:
             out.append(f"{r['demo_kind']}: no demonstrator registered ({r['port_status']})")
-        elif not r["has_bundle"] and r["demo_kind"] != "other":
+        elif not r["has_bundle"] and r["demo_kind"] not in _INTERNAL_KINDS:
             out.append(f"{r['demo_kind']}: demonstrator registered but no built edges/ bundle yet")
     return out
 

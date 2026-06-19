@@ -19,14 +19,18 @@ def test_coverage_reports_every_canonical_demokind():
     assert len(rows) == len(DEMO_KINDS)
 
 
-def test_built_kinds_report_a_bundle_and_a_registered_demonstrator():
+def test_public_kinds_report_a_bundle_and_internal_kinds_register_without_one():
     register_all()
     by_kind = {r["demo_kind"]: r for r in cov.coverage()}
-    for kind in ("token_accounting", "grounding_resolution", "long_horizon_survival",
-                 "eval_quality", "retention_resume", "cost"):
+    # The public kinds ship a built bundle (README + sample + emails) and a registered demonstrator.
+    for kind in ("token_accounting", "grounding_resolution", "long_horizon_survival"):
         assert by_kind[kind]["registered"] is True
         assert by_kind[kind]["has_bundle"] is True
         assert by_kind[kind]["bundle"]                # the edges/<dir> name
+    # The internal kinds have a registered demonstrator but ship no public bundle (the publish gate
+    # refuses them as regime-bounded or parity); the analysis runs and is kept local, never a gap.
+    for kind in ("eval_quality", "retention_resume", "cost", "other"):
+        assert by_kind[kind]["registered"] is True
 
 
 def test_port_status_labels_match_the_framework_asset_mapping():
@@ -38,14 +42,15 @@ def test_port_status_labels_match_the_framework_asset_mapping():
     assert by_kind["other"]["port_status"] == "build"
 
 
-def test_gaps_do_not_flag_discovery_loop_or_other():
+def test_gaps_do_not_flag_discovery_loop_or_internal_kinds():
     register_all()
     rows = cov.coverage()
     g = cov.gaps(rows)
-    # discovery_loop is intrinsic (the cadence proves it, not a plugin); "other" is a parity-gated
-    # holding pen with no bundle by design. Neither is a gap.
+    # discovery_loop is intrinsic (the cadence proves it, not a plugin); the internal kinds ship no
+    # public bundle by design (the publish gate refuses them). None of these is a gap.
     assert not any("discovery_loop" in line for line in g)
-    assert not any(line.startswith("other:") for line in g)
+    for kind in ("other", "cost", "eval_quality", "retention_resume"):
+        assert not any(line.startswith(f"{kind}:") for line in g)
 
 
 def test_manifest_summarizes_by_port_status_and_lists_gaps():

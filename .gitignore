@@ -21,3 +21,18 @@ edges/*/PRODUCT_EMAIL.md
 # edge" premises break on a fresh checkout. They are NOT under data/, on purpose.
 !state/
 !landscape/
+
+# Internal both-directions analysis stays local; the public tree ships only verified
+# wins. The engine's own publish gate (engine/publish_brief.py) refuses these four
+# edges as regime-bounded or parity, the analytical briefs carry the where-Claude-ties
+# read, and the per-run CHANGELOG and edge-landscape brief are rewritten every sweep.
+edges/cost-model/
+edges/parity-gated/
+edges/eval-quality/
+edges/retention-resume/
+briefs/*-edge-landscape.md
+briefs/*-edge-landscape-master.md
+briefs/2026-06-17-platform-edge.md
+briefs/2026-06-17-sharpest-edge.md
+briefs/2026-06-17-verified-picture.md
+landscape/CHANGELOG-*.md

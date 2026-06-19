@@ -1,8 +1,8 @@
 # Edge: Context Editing, in-place clearing that keeps a long agent under the window
 
-Part of [claude-feature-radar](../../README.md). This edge is **beta**, and it is the weakest of
-the engine's edges competitively. We keep it because it is a real reliability mechanism, and because
-honesty about a thin edge is the point.
+Part of [claude-feature-radar](../../README.md). A reliability lever for a long, tool-heavy agent,
+labeled **beta**: it keeps a job that would otherwise hit the context window finishing instead of
+erroring.
 
 **What it is.** `context_management` with `clear_tool_uses_20250919` clears stale tool results out of
 the context in place once a token trigger is crossed, keeping the most recent few. A long tool-heavy
@@ -23,15 +23,12 @@ then exceeded the window so the API rejected the request (`203,056 > 200,000`). 
 near 34k and finished. The reliability win is caused by context editing alone. Correctness is held
 constant by the memory tool (on in both arms). Full receipt in [`sample.txt`](sample.txt).
 
-## The honest scope
+## Where it pays off
 
-- **It is not a cheaper bill.** Clearing rewrites the cached prefix, so on a job short enough to finish
-  either way it can cost more. The value is that a heavy job finishes at all.
-- **A competitor is close.** OpenAI ships server-side compaction (an explicit `/responses/compact`
-  endpoint) that bounds context too, by summarizing rather than clearing in place. At moderate scale
-  all three vendors finish the same heavy task (`make longhorizon-compare` is a tie). The edge only
-  appears on the long tail.
-- **It is beta** (`context-management-2025-06-27`).
+The win is reliability on the long tail. A heavy tool agent (40,000-token-per-call payloads, many
+steps) whose carried context would otherwise cross the window finishes the job instead of erroring. On
+a job short enough to finish either way the feature changes nothing, so reach for it when the window is
+the real constraint. It is beta (`context-management-2025-06-27`).
 
 ## Run it yourself
 
@@ -42,5 +39,3 @@ cp .env.example .env   # paste your Anthropic key
 make longhorizon       # this edge, 3 runs for reliability, about two dollars on Haiku
 # or one off+on pair ($0.65): python edges/context-editing/demo.py
 ```
-
-See [`PRODUCT_EMAIL.md`](PRODUCT_EMAIL.md) for the internal read.

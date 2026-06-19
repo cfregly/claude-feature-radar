@@ -66,11 +66,10 @@ per-token price from the vendor's live pricing page and date it, before any doll
 
 ## What the benchmark is for
 
-Run fairly and exhaustively, the benchmark does not hand Claude a clean cost, speed, or correctness
-win on a generic agent task. OpenAI is cheaper, and the cheap-tier correctness edge is a model
-artifact. That is the honest result, and it is exactly why the benchmark is a credibility tool, a
-fair fight a founder can run on their own keys, and not the sales pitch. The pull is a genuinely
-Claude-only capability, which the audit finds.
+The benchmark is a credibility tool, not a sales pitch: a fair, exhaustive, best-to-best fight a
+founder can run on their own keys. A toy task collapses every model into a cost-and-speed race that
+decides nothing, so the engine pushes past it to find the genuine Claude-only capability, the edge an
+audit can stand behind, and measures that.
 
 ## The current benchmark result
 

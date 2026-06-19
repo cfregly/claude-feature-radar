@@ -120,6 +120,12 @@ is global, and it can come from anywhere on the platform.
   API primitive (prompt caching, the Batch API, the memory tool, code execution, citations, extended
   thinking, the 1M-token window), the Agent SDK, Agent Skills, MCP, Claude Code, or an economics
   lever. Do not stop at the first measurable Claude-only feature.
+- Search below the feature name. A wedge is often a subfeature, not the headline capability. Break a
+  surface into parameters, modes, beta headers, response fields, billing behavior, lifecycle rules,
+  failure modes, and where it sits inside an agent loop. Do not call "web search", "files", "tools",
+  "agents", "caching", or "code execution" parity until the subfeatures have been compared. The
+  current web-search lesson is the rule: generic web search is parity, but pre-context dynamic
+  filtering plus result-block exclusion may still be a real candidate edge.
 - Rank by value times genuine lead. Score every differentiator by how much a founder building a
   product cares, times how clearly Claude leads after the live competitor-parity check, and anchor on
   the global maximum, not the easiest thing to measure. Drop anything a competitor already matches.
@@ -164,6 +170,21 @@ what lets you design a REAL workload where the difference shows up as a number a
   real-world condition where the edge exists, never manufacturing a rigged one. The comparison stays
   best-to-best and the workload stays honest and stated.
 
+## Compare features at subfeature depth
+The comparison unit is the smallest meaningful mechanism that changes builder value. Do not compare
+feature labels when the implementation details differ. Compare the exact subfeature, the exact knob,
+and the exact output the developer receives.
+
+- For every candidate, write the subfeature claim before writing the benchmark: what changes in the
+  API call, what the model sees, what the client receives, and which tokens, latency, correctness, or
+  reliability number should move.
+- Compare the competitor's closest subfeature, not just the competitor's headline feature. If the
+  competitor has the umbrella capability but lacks the specific mode, field, or lifecycle behavior,
+  record the candidate as parity-gated and test it.
+- Do not bury the subfeature in private notes. If it survives, the public artifact must explain the
+  subfeature in public-reader language with public docs and a receipt, so a reader can understand the
+  wedge without access to this workspace or any internal repo.
+
 ## Put the workload, cost, and time on every outbound surface
 The internal receipt is recorded above. What ships to a reader carries the same facts, up front, in
 the reader's words, never buried:
@@ -197,8 +218,9 @@ Name the feature, then show what the founder gets from it on that workload, meas
 competitor at its best. A feature name is not a value.
 
 ## Persist every synthesis to a committed file, never re-derive it from a transcript
-A run that fans out (the audit, a review panel) writes its synthesis to a committed file: the
-verified brief in `briefs/` and the structured `engine/scan.py`, never only a workflow transcript or
+A run that fans out (the audit, a review panel) writes its synthesis to a file: the structured
+`engine/scan.py` and the committed `landscape/landscape.json`, plus the verified brief in `briefs/`
+(written locally, the analytical both-directions briefs stay internal), never only a workflow transcript or
 a truncated return value. The next step reads the file. This keeps a result from being lost to a
 truncated log, and lets a stranger see exactly what the audit concluded.
 
@@ -256,9 +278,10 @@ and runs in CI with no key and no network.
 committed `engine/sources_registry.py` with a stdlib `urllib` conditional GET (ETag and Last-Modified,
 no new dependency), writes a dated `sources/<vendor>_<key>_<date>.txt` in the same header format
 `engine/cite_facts.py` consumes, normalizes each page to a best-effort capability record, diffs against
-`landscape/landscape.json`, ranks by value times genuine lead, and persists three tracked artifacts:
-the overwritten `landscape/landscape.json` baseline, a `landscape/CHANGELOG-<date>.md` delta, and a
-regenerated `briefs/<date>-edge-landscape.md`. No model call, no benchmark, no spend. The optional
+`landscape/landscape.json`, ranks by value times genuine lead, and persists the overwritten
+`landscape/landscape.json` baseline as the one tracked durable artifact. The `landscape/CHANGELOG-<date>.md`
+delta and the regenerated `briefs/<date>-edge-landscape.md` are written locally and gitignored, as
+internal both-directions analysis that never ships on the public surface. No model call, no benchmark, no spend. The optional
 Claude `--normalize` pass on changed pages only is deferred, so the default loop stays $0.
 - The deterministic normalizer is best-effort, and it is honest about its limits. A maturity it cannot
   read off the feature line is recorded `unverified`, never asserted `ga` off page navigation, and an
@@ -295,7 +318,10 @@ not a swipe.
 
 ## Keep it forkable
 Cloned and edited by a stranger. No secrets in git (`.env` is ignored), no machine-specific
-paths, no references to anything outside this repo.
+paths, no references to anything outside this repo. Assume a public reader has only this repo, the
+generated public brief, and public URLs. They do not have this private parent workspace, private
+receipts, private plans, or any internal repository. Any instruction, claim, source, or reproduction
+path needed to understand the edge must ship inside the public repo or link to a public source.
 
 ## The public surface shows only wins, the internal analysis stays honest both ways
 
