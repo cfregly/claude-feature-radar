@@ -155,5 +155,5 @@ def test_run_writes_the_coverage_view_into_the_manifest(temp_repo):
     result = cadence.run(do_sweep=False)
     manifest = json.loads((temp_repo / result["manifest"]).read_text())
     assert "coverage" in manifest
-    assert manifest["coverage"]["demo_kinds_total"] >= 9
+    assert manifest["coverage"]["demo_kinds_total"] >= 8
     assert manifest["coverage"]["gaps"] == []          # the engine reports no gaps about itself

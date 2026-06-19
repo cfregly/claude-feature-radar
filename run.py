@@ -44,8 +44,6 @@ def main():
         from engine.managed import main as m; raise SystemExit(m())
     elif cmd in ("other", "parity-gated"):
         from engine.demonstrators.other_parity_gated import main as m; raise SystemExit(m())
-    elif cmd in ("agentic", "agentic-grading"):
-        from engine.demonstrators.agentic_grading import main as m; m()
     elif cmd in ("eval", "eval-quality"):
         from engine.demonstrators.eval_quality import main as m; m()
     elif cmd == "scan":

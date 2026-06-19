@@ -88,11 +88,11 @@ DIFFERENTIATORS = [
         "claim": "Longest autonomous task horizon of any released model on the independent referee.",
         "why": "METR's 50% task time-horizon (neutral, not a vendor): the top released Claude model "
                "is the only one flagged top, about 1.9x the best non-Claude before reliability falls "
-               "to 50% (Claude about 12 hr, Gemini 3.1 Pro about 6.4 hr, GPT-5.2 about 5.9 hr). "
-               "Claude does NOT lead the headline coding boards, so this is the dimension where "
-               "'finishes long jobs' survives a skeptic on neutral data. The runnable receipt (make "
-               "longhorizon) is a within-Claude context-editing reliability isolation; the LEADERSHIP "
-               "anchor is METR, not context editing, which is parity with OpenAI compaction.",
+               "to 50% (Claude about 12 hr, Gemini 3.1 Pro about 6.4 hr, GPT-5.2 about 5.9 hr). This "
+               "is the dimension where 'finishes long jobs' survives a skeptic on neutral data. The "
+               "runnable receipt (make longhorizon) is a within-Claude context-editing reliability "
+               "isolation; the LEADERSHIP anchor is METR, not context editing, which is parity with "
+               "OpenAI compaction.",
         "fair_comparison": {
             "task_shape": "a chain of 8 incident reports, each about 40,000 tokens",
             "claude_config": {"feature": "context_management/clear_tool_uses", "beta_on": True, "model": "haiku"},
@@ -108,8 +108,6 @@ DIFFERENTIATORS = [
 
 # Refuted, parity, or behind after the live check. Do NOT pitch these as a Claude lead.
 PARITY = [
-    {"note": "SWE-bench Verified: a ceiling tie at 79.2 percent, no clean three-way, no 90+ is real."},
-    {"note": "Terminal-Bench 2.0 and 2.1: GPT-5.5 leads or ties at the top."},
     {"note": "Context editing vs server-side compaction: parity. Both vendors ship GA server-side "
              "context management (Claude additionally ships beta in-place context editing), so the "
              "make-longhorizon receipt is a within-Claude reliability isolation, not a head-to-head "
@@ -130,8 +128,6 @@ PARITY = [
 # Where Claude is behind. Feeds the product-team email.
 GAPS = [
     {"note": "OpenAI is cheaper per token on the fair cost/speed benchmark (and faster)."},
-    {"note": "Terminal-Bench coding-agent leaderboards: GPT-5.5 ahead."},
-    {"note": "BrowseComp agentic web search: GPT-5.5 Pro leads at about 90 percent."},
     {"note": "Cache retention: Gemini arbitrary TTL, OpenAI 24h, vs Claude fixed 5m or 1h."},
     {"note": "Citations cannot be combined with Structured Outputs (the API returns a 400)."},
 ]

@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps app app-check ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges cadence coverage managed parity-gated scan verify verify-live validate agentic agentic-smoke eval eval-smoke eval-judge retention retention-live cost draft check-claims check-docs core-imports test ci deslop gif clean
+.PHONY: setup compare-deps app app-check ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges cadence coverage managed parity-gated scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -82,15 +82,6 @@ verify: ## the skeptic pass: ask Claude to break each candidate, keep what survi
 verify-live: ## live-claim re-prover: re-check the model access, knobs, and prices against real calls (spends cents)
 	$(PY) scripts/verify_live.py
 
-validate: ## EDGE agentic_grading: prove the local no-Docker grader by resolving every human gold patch (needs compare-deps + uv on PATH, $0 model spend)
-	$(PY) engine/demonstrators/agentic_grading.py --validate
-
-agentic: ## EDGE: SWE-bench repo-repair head-to-head, symmetric multi-turn loop, local no-Docker grading (needs compare-deps + uv + keys, about $4-5)
-	$(PY) engine/demonstrators/agentic_grading.py
-
-agentic-smoke: ## a 1-instance, Claude-only smoke of the agentic grader (cents)
-	$(PY) engine/demonstrators/agentic_grading.py --limit 1 --models opus
-
 eval: ## EDGE eval_quality: the cost x effort grid on a labeled slice, held-out test split, all providers (needs compare-deps + keys, about $3-4)
 	$(PY) engine/demonstrators/eval_quality.py
 
@@ -111,6 +102,9 @@ cost: ## EDGE cost: the pure pricing-model edge over swept dated prices, both wi
 
 draft: ## draft the founder email from the measured receipt
 	$(PY) run.py draft
+
+publish-brief: ## generate a self-contained public brief for a VERIFIED Claude-win edge into ../claude-feature-briefs (offline, $0, writes files only, never pushes/sends)
+	$(PY) -m engine.publish_brief --edge=$(EDGE)
 
 check-claims: ## verify the citations reproduction cost still matches the summed receipt
 	$(PY) scripts/cost_claim_check.py

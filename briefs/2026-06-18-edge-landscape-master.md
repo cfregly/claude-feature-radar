@@ -33,9 +33,9 @@ never-evaluated sweep is compelling enough to displace them.
 
 One nuance the user should carry: if the email needs a head-to-head leadership claim from an
 independent referee, the METR 50% task time-horizon is the only one Claude wins with a real margin
-(about 1.9x) and a citable data file. It is built as the live repo-repair harness. So the honest
-hierarchy is PTC and Citations as the platform-feature edges, METR as the agentic head-to-head
-anchor, and context editing as the within-Claude reliability receipt.
+(about 1.9x) and a citable data file. The runnable receipt is the context-editing long-horizon
+isolation. So the honest hierarchy is PTC and Citations as the platform-feature edges, METR as the
+long-horizon head-to-head anchor, and context editing as the within-Claude reliability receipt.
 
 ## Master ranked landscape (every evaluated capability)
 
@@ -64,7 +64,6 @@ Verdict legend: claude-ahead, parity, claude-behind, retired, never-evaluated.
 | 19 | Managed Agents runtime bundle (multi-agent, Outcomes-native, agent Memory, vault creds, scheduling) | parity (richer than the aggregate verdict, needs a fresh per-feature pass) | no |
 | 20 | OSWorld-Verified (computer-use benchmark) | parity (narrow, contested, vendor-self-reported) | no |
 | 21 | Computer use (the capability) | parity (all three beta or preview) | no |
-| 22 | SWE-bench Verified (headline coding board) | parity (at the 79.2% ceiling, no clean three-way) | no |
 | 23 | 1M-token context window (raw size) | parity (Gemini matches or exceeds the number) | no |
 | 24 | Tool search (defers tool definitions, the discovery layer) | parity (OpenAI matches on gpt-5.4-plus) | no |
 | 25 | Agent Skills (SKILL.md) | parity (open standard rivals adopted, cuts against a moat) | no |
@@ -84,8 +83,6 @@ Verdict legend: claude-ahead, parity, claude-behind, retired, never-evaluated.
 | 39 | 50% Batch API discount | parity (matched) | no |
 | 40 | 90%-off cached reads (0.1x multiplier) | parity (identical multiplier across all three) | no |
 | 41 | Fast mode (speed parameter, premium-priced, preview) | claude-behind (Claude is not the fastest, paid latency knob) | no |
-| 42 | Terminal-Bench 2.0 and 2.1 | claude-behind (2.0 behind, 2.1 tied) | no |
-| 43 | BrowseComp (agentic web search) | claude-behind (GPT-5.5 Pro leads, Claude trails) | no |
 | 44 | Structured Outputs | claude-behind (OpenAI shipped it first, incompatible with Citations) | no |
 | 45 | Raw cost per token | claude-behind (most expensive tier, hard cut) | no |
 | 46 | Raw speed and latency | claude-behind (proven not fastest, hard cut) | no |
@@ -135,9 +132,6 @@ hours, single-run anecdotes, no shared protocol, color only behind the METR numb
 - Web search and web fetch, code execution sandbox, extended thinking, PDF and vision, Files API:
   all matched across vendors.
 - Memory tool: client-side, so a competitor can hand-roll the same loop.
-- SWE-bench Verified: parity at the 79.2% ceiling, no clean three-way head-to-head exists.
-- Terminal-Bench 2.0 and 2.1: behind on 2.0, tied on 2.1.
-- BrowseComp: GPT-5.5 Pro leads, Claude trails.
 - Fast mode: a premium-priced preview latency knob, not an edge. Keep the speed-loss narrative
   honest.
 - Effort dial, Agent SDK, Claude Code build surface: parity as headlines, kept as supporting
@@ -201,6 +195,6 @@ ai.google.dev/gemini-api/docs/file-search and /changelog. OpenAI: developers.ope
 function-calling, and Responses-API guides.
 
 Built edges verified in the repo: edges/citations/demo.py with data/last_citations.json (make
-citations), the PTC two-run receipt in engine/ with data/last_ptc.json (make ptc), the
+citations), the PTC two-run receipt in engine/ with data/last_ptc.json (make ptc), and the
 context-editing long-horizon receipt engine/longhorizon_compare.py with data/last_longhorizon.json
-(make longhorizon), and the METR repo-repair harness behind the agentic brief.
+(make longhorizon), which is also the runnable receipt behind the METR long-horizon brief.

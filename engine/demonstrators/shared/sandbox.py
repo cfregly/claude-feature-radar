@@ -1,9 +1,8 @@
 """Run model-generated code against a problem's hidden tests, in a sandboxed subprocess.
 
 Ported from ship-on-claude edges/cost-and-effort/grader.py, the no-Docker sandboxed executor for the
-eval_quality and agentic_grading demonstrators. The score() gate of a code edge runs the SAME machine
-check on every arm by feeding each arm's program through grade(), so the verdict is the test suite,
-never a rubric.
+eval_quality demonstrator. The score() gate of a code edge runs the SAME machine check on every arm
+by feeding each arm's program through grade(), so the verdict is the test suite, never a rubric.
 
 SECURITY: this executes code written by a model. Each run is a fresh subprocess with a wall-clock
 timeout, a new session (so a runaway can be killed), and best-effort resource limits (CPU seconds and

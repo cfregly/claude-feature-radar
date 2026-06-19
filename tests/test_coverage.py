@@ -23,7 +23,7 @@ def test_built_kinds_report_a_bundle_and_a_registered_demonstrator():
     register_all()
     by_kind = {r["demo_kind"]: r for r in cov.coverage()}
     for kind in ("token_accounting", "grounding_resolution", "long_horizon_survival",
-                 "agentic_grading", "eval_quality", "retention_resume", "cost"):
+                 "eval_quality", "retention_resume", "cost"):
         assert by_kind[kind]["registered"] is True
         assert by_kind[kind]["has_bundle"] is True
         assert by_kind[kind]["bundle"]                # the edges/<dir> name
@@ -32,7 +32,6 @@ def test_built_kinds_report_a_bundle_and_a_registered_demonstrator():
 def test_port_status_labels_match_the_framework_asset_mapping():
     by_kind = {r["demo_kind"]: r for r in cov.coverage()}
     assert by_kind["token_accounting"]["port_status"] == "exists"
-    assert by_kind["agentic_grading"]["port_status"] == "adapt"
     assert by_kind["eval_quality"]["port_status"] == "adapt"
     assert by_kind["retention_resume"]["port_status"] == "adapt"
     assert by_kind["cost"]["port_status"] == "build"
@@ -52,10 +51,10 @@ def test_gaps_do_not_flag_discovery_loop_or_other():
 def test_manifest_summarizes_by_port_status_and_lists_gaps():
     m = cov.manifest()
     assert m["demo_kinds_total"] == len(DEMO_KINDS)
-    assert m["registered"] >= 8                       # every plugin kind registers
+    assert m["registered"] >= 7                       # every plugin kind registers
     assert set(m["by_port_status"]) == {"exists", "adapt", "build"}
     assert "cost" in m["by_port_status"]["build"]
-    assert "agentic_grading" in m["by_port_status"]["adapt"]
+    assert "eval_quality" in m["by_port_status"]["adapt"]
     assert isinstance(m["gaps"], list)
 
 

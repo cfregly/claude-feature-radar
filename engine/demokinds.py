@@ -9,7 +9,7 @@ registering it under its demoKind. Discovery, ranking, the gate, drafting, and p
 This module holds three things, all deterministic and offline:
 
   DEMO_KINDS      the canonical list of demoKind strings the engine knows how to talk about.
-  KEY_TO_DEMOKIND the seed table mapping a source key (ptc, citations, swebench) to its demoKind.
+  KEY_TO_DEMOKIND the seed table mapping a source key (ptc, citations, pricing) to its demoKind.
   demokind_for()  the resolver: the seed table first, then a best-effort axis guess for an unknown
                   key, so a brand-new edge still routes instead of crashing.
 
@@ -26,7 +26,6 @@ from __future__ import annotations
 #   grounding_resolution a guaranteed-valid, output-token-free source pointer into the user's doc.
 #   long_horizon_survival a long, tool-heavy load FINISHES and stays correct where the other errors.
 #   retention_resume    a stateful feature survives a kill and re-attach, with a negative control.
-#   agentic_grading     the model iterates against a real test suite and resolves where the field ties.
 #   eval_quality        one (model, effort, prompt) cell wins on the believable held-out test number.
 #   cost                a workload-shaped pure-pricing-model edge, no model call, both regimes shown.
 #   discovery_loop      the fetch-diff-rank-persist landscape loop runs unattended for $0.
@@ -36,7 +35,6 @@ DEMO_KINDS = [
     "grounding_resolution",
     "long_horizon_survival",
     "retention_resume",
-    "agentic_grading",
     "eval_quality",
     "cost",
     "discovery_loop",
@@ -69,12 +67,6 @@ KEY_TO_DEMOKIND = {
     # bundle and time-axis win, never a Claude-only capability (see engine/scan.py).
     "memory_tool": "retention_resume",
     "managed_agents": "retention_resume",
-    # agentic_grading: the model iterates against a real test suite.
-    "swebench": "agentic_grading",
-    "agentic-coding": "agentic_grading",
-    "computer_use": "agentic_grading",
-    "swebench_pro": "agentic_grading",
-    "mcp_atlas": "agentic_grading",
     # eval_quality: a (model, effort, prompt) cell wins on the held-out test number.
     "cost-and-effort": "eval_quality",
     "cost_and_effort": "eval_quality",
@@ -107,8 +99,8 @@ AXIS_TO_DEMOKIND = {
     "long-horizon": "long_horizon_survival",
     "retention": "retention_resume",
     "grounding": "grounding_resolution",
-    "agentic-success": "agentic_grading",
-    "correctness": "agentic_grading",
+    "agentic-success": "long_horizon_survival",
+    "correctness": "eval_quality",
     "throughput": "token_accounting",
     "speed": "token_accounting",
     "observability": "other",

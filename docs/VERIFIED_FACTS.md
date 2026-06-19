@@ -70,9 +70,8 @@ Source: METR task time-horizon, [metr.org/time-horizons](https://metr.org/time-h
 pulled 2026-06-17 (page updated 2026-05-08). On the 50% task time-horizon, the top released Claude
 model carries the only `is_sota` flag at about 12 hours, versus Gemini 3.1 Pro about 6.4 hours and
 GPT-5.2 about 5.9 hours, roughly 1.9x the best non-Claude model. METR is an independent referee, not
-a vendor. Claude does NOT lead the headline coding boards (SWE-bench Verified is a 79.2% ceiling tie,
-GPT-5.5 leads both Terminal-Bench tracks), so this is the only long-horizon claim that survives a
-skeptic on neutral data. Full reconciliation, with every source and date, in
+a vendor, so this is a long-horizon claim that survives a skeptic on neutral data. Full
+reconciliation, with every source and date, in
 [`../briefs/2026-06-17-agentic-landscape.md`](../briefs/2026-06-17-agentic-landscape.md).
 
 ## Context editing (a demoted within-Claude value-add)
@@ -163,11 +162,24 @@ The cross-platform view ([`../engine/compare.py`](../engine/compare.py),
 runs OpenAI on the Responses API (compaction plus caching) and Gemini on the google-genai SDK
 (implicit caching, no server-side trimming), each best-config. Verified 2026-06-17.
 
-- OpenAI prices per 1M tokens (developers.openai.com): `gpt-5.4-mini` is $0.75 input, $0.075 cached,
-  $4.50 output. `gpt-5.4-nano` is $0.20 / $0.02 / $1.25.
-- Gemini prices per 1M tokens, paid tier (ai.google.dev/gemini-api/docs/pricing): `gemini-3.5-flash`
-  is $1.50 input, $0.15 cached, $9.00 output. `gemini-3.1-flash-lite` is $0.25 / $0.025 / $1.50.
-  `gemini-3.1-pro-preview` is $2.00 / $0.20 / $12.00.
+Every competitor price lives once, in [`../common/models.py`](../common/models.py). The OpenAI and
+Gemini arms above and the citations DIY arms all read their rate off that one table through
+`common.pricing.cost_from_buckets`, so there is no second copy to drift. The input, cached-input, and
+output rates below were re-verified live on 2026-06-18 against the providers' pricing pages, Standard
+tier, every id present and matching.
+
+- OpenAI prices per 1M tokens (developers.openai.com/api/docs/pricing), input / cached / output:
+  `gpt-5.4-nano` $0.20 / $0.02 / $1.25, `gpt-5.4-mini` $0.75 / $0.075 / $4.50, `gpt-5.4` $2.50 / $0.25 /
+  $15.00, `gpt-5.5` $5.00 / $0.50 / $30.00. `gpt-5.4-mini` is the default OpenAI model for the citations
+  DIY arm and the legacy long-horizon arm, the cheapest tier the docs recommend as a capable multi-step
+  tool driver, so it is a first-class registry row.
+- Gemini prices per 1M tokens, paid tier Standard (ai.google.dev/gemini-api/docs/pricing), input /
+  cached / output: `gemini-3.1-flash-lite` $0.25 / $0.025 / $1.50, `gemini-3.5-flash` $1.50 / $0.15 /
+  $9.00, `gemini-3.1-pro-preview` $2.00 / $0.20 / $12.00 (the prompts-under-200k text rate).
+- The cached column is each provider's discounted cached-input tier, billed only on a cache hit. Neither
+  provider charges a separate cache-write fee (OpenAI automatic caching, Gemini implicit caching), so the
+  cache-write fields in the table are 0 by design, not a missing number. Because both providers' reported
+  input field already counts the cached tokens, the cost split is fresh = reported input minus cached.
 - The tool-use loop is `client.chat.completions.create(model, messages, tools, parallel_tool_calls=False)`.
   `parallel_tool_calls=False` forces one step per turn, matching the Claude run.
 - Cost reads from `response.usage`: `prompt_tokens` (input, includes cached), `completion_tokens`

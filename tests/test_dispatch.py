@@ -25,7 +25,6 @@ def test_seed_table_maps_the_built_edges():
     assert demokinds.demokind_for("citations") == "grounding_resolution"
     assert demokinds.demokind_for("context_editing") == "long_horizon_survival"
     assert demokinds.demokind_for("managed_agents") == "retention_resume"
-    assert demokinds.demokind_for("swebench") == "agentic_grading"
     assert demokinds.demokind_for("pricing") == "cost"
 
 
