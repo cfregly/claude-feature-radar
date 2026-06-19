@@ -70,7 +70,7 @@ def ground(client, model_id, source_text, claim):
     prompt = (f'Quote the exact sentence or phrase from the document that supports this claim, and '
               f'nothing else: "{claim}". If the document does not support it, reply with exactly NONE.')
     msg = client.messages.create(
-        model=model_id, max_tokens=400,
+        model=model_id, max_tokens=1024,
         messages=[{"role": "user", "content": [doc, {"type": "text", "text": prompt}]}])
     cites = []
     for b in msg.content:
@@ -88,8 +88,12 @@ def ground(client, model_id, source_text, claim):
 def main():
     load_env()
     client = get_client()
-    model_id = get("haiku").id
-    print(f"\n  Grounding {len(FACTS)} shipped facts through Claude's own Citations API ({get('haiku').label}).\n")
+    # Grounding is verbatim-span extraction over ~18 facts per run, and the Citations API already
+    # guarantees the char pointer. That is mid-tier extraction, not a judgment call, so it runs on
+    # Sonnet (a real tier bump from Haiku) without adaptive thinking, which keeps the per-fact loop
+    # fast. Bump to Opus only if a grounding miss ever traces to model reasoning rather than the source.
+    model_id = get("sonnet").id
+    print(f"\n  Grounding {len(FACTS)} shipped facts through Claude's own Citations API ({get('sonnet').label}).\n")
 
     rows = []
     for f in FACTS:

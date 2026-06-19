@@ -12,7 +12,7 @@ from __future__ import annotations
 import json
 
 from common.client import get_client, repo_root
-from common.models import get
+from common.models import get, request_kwargs
 from engine.scan import current_anchor
 
 # A demonstrator persists its standard Receipt to one of these, newest-wins. demoKind-agnostic: the
@@ -89,11 +89,15 @@ def main():
         f"two-minute demo on their own key. Give a subject line and a body. Use {{repo_link}} as "
         f"the placeholder for the link."
     )
+    # The founder email is the highest-stakes outbound surface, written once per run. It runs on the
+    # top tier with adaptive thinking so the voice, the single claim, and the one proof are nailed.
+    # The mandatory outbound panel still scrutinizes whatever this drafts. Stakes x reasoning, not
+    # "default to cheap". max_tokens leaves room for the thinking budget plus the short email.
     msg = client.messages.create(
-        model=get("haiku").id,
-        max_tokens=900,
+        max_tokens=4000,
         system=BASE_SYSTEM + "\n\nUse this persistent voice guide:\n\n" + _voice_guide(),
         messages=[{"role": "user", "content": prompt}],
+        **request_kwargs("opus", effort="high", adaptive_thinking=True),
     )
     text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text").strip()
     print("\n" + text + "\n")

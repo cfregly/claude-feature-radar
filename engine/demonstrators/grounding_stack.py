@@ -240,6 +240,40 @@ class GsRun:
     skipped: list = field(default_factory=list)
 
 
+def score_run(run: GsRun) -> dict:
+    claude = next((a for a in run.arms if a.provider == "anthropic"), None)
+    competitors = [a for a in run.arms if a.provider in ("openai", "gemini")]
+    expected_kinds = {"char_location", "page_location", "search_result_location"}
+    claude_stack = bool(
+        claude
+        and claude.ran
+        and claude.answered == 3
+        and claude.sources_cited == 3
+        and set(claude.pointer_kinds) == expected_kinds
+        and claude.persisted_objects == 0
+    )
+    all_competitors_ran = len(competitors) >= 2 and all(a.ran and not a.errors for a in competitors)
+    competitors_answered = bool(competitors) and all(a.answered == 3 for a in competitors)
+    competitors_returned_no_inline_pointer = bool(competitors) and all(a.sources_cited == 0 for a in competitors)
+    positive = claude_stack and all_competitors_ran and competitors_answered and competitors_returned_no_inline_pointer
+    return {
+        "positive_signal": positive,
+        "promotable_edge": positive,
+        "claude_cited_all_three_inline_source_types": claude_stack,
+        "all_competitors_ran": all_competitors_ran,
+        "competitors_answered_all": competitors_answered,
+        "competitors_returned_no_inline_pointer": competitors_returned_no_inline_pointer,
+        "why_not_promotable": [] if positive else [
+            reason for reason, failed in [
+                ("Claude did not cite all three inline source types with typed pointers", not claude_stack),
+                ("not every competitor inline arm ran cleanly", not all_competitors_ran),
+                ("not every competitor answered all three facts", not competitors_answered),
+                ("a competitor returned a pointer into the inline mixed sources", not competitors_returned_no_inline_pointer),
+            ] if failed
+        ],
+    }
+
+
 def _clients():
     from common.client import get_client
     from common.runner import get_gemini_client, get_openai_client
@@ -397,6 +431,148 @@ def _print_run(run: GsRun) -> None:
         print(f"  arms not run: {', '.join(run.skipped)}")
 
 
+def _receipt_dict(run: GsRun) -> dict:
+    verdict = score_run(run)
+    return {
+        "date": "2026-06-19",
+        "claim_under_test": (
+            "Claude can cite an inline text document, directly supplied PDF, and developer-supplied "
+            "search_result chunk in one request, returning the correct typed pointer for each source "
+            "without a hosted store."
+        ),
+        "total_cost": round(run.total_cost, 6),
+        "sources": {
+            "claude_citations": "https://platform.claude.com/docs/en/build-with-claude/citations",
+            "claude_search_results": "https://platform.claude.com/docs/en/build-with-claude/search-results",
+            "claude_pdf_support": "https://platform.claude.com/docs/en/build-with-claude/pdf-support",
+            "openai_file_search": "https://developers.openai.com/api/docs/guides/tools-file-search",
+            "gemini_file_search": "https://ai.google.dev/gemini-api/docs/file-search",
+        },
+        "skipped": run.skipped,
+        "arms": [{"name": a.name, "provider": a.provider, "model": a.model,
+                  "answered": f"{a.answered}/3",
+                  "source_types_cited_in_one_request": f"{a.sources_cited}/3",
+                  "pointer_kinds": a.pointer_kinds,
+                  "persisted_objects": a.persisted_objects,
+                  "cost": round(a.cost, 6),
+                  "latency_s": round(a.latency, 2),
+                  "errors": a.errors}
+                 for a in run.arms],
+        "verdict": verdict,
+    }
+
+
+def _sample_text(receipt: dict) -> str:
+    rows = [
+        "  Grounding-stack combination workload: one request carrying three mixed inline sources",
+        "  (a plain-text document, a directly-supplied PDF, and a developer-supplied search_result chunk)",
+        "  plus a three-part question, one fact unique to each source.",
+        "",
+        "  platform              answered   source types cited /1 request   hosted objects     cost  wall time",
+        "  ------------------------------------------------------------------------------------------------------",
+    ]
+    for arm in receipt["arms"]:
+        cited = arm["source_types_cited_in_one_request"]
+        if arm["pointer_kinds"]:
+            cited += " (" + "+".join(k.replace("_location", "") for k in arm["pointer_kinds"]) + ")"
+        else:
+            cited += " (inline)"
+        rows.append(
+            f"  {arm['name']:<22}{arm['answered']:>10}   {cited:<36}"
+            f"{arm['persisted_objects']:>6}{('$' + format(arm['cost'], '.4f')):>10}"
+            f"{arm['latency_s']:>8.1f}s"
+        )
+    verdict = receipt["verdict"]
+    rows.extend([
+        "",
+        "  Verdict:",
+        f"    positive_signal: {str(verdict['positive_signal']).lower()}",
+        f"    promotable_edge: {str(verdict['promotable_edge']).lower()}",
+        "",
+        "  Honest reading:",
+        "  - All three answered every part correctly.",
+        "  - Only Claude returned a pointer into the supplied content, and returned all three location types",
+        "    (char_location + page_location + search_result_location) in one response.",
+        "  - On the one-request inline path, OpenAI and Gemini returned no pointer into the inline sources.",
+        "  - The competitors' hosted file-search path is measured separately in the search-results edge.",
+        "  - Citations and structured outputs cannot combine, so the grounded answer is free text.",
+        "",
+        "  Reproduce:",
+        "    make grounding-stack",
+        "",
+        "  Machine receipt:",
+        "    data/last_grounding_stack.json",
+    ])
+    return "\n".join(rows) + "\n"
+
+
+def write_edge_bundle(receipt: dict) -> pathlib.Path:
+    from common.client import repo_root
+
+    edge_dir = repo_root() / "edges" / "grounding-stack"
+    edge_dir.mkdir(parents=True, exist_ok=True)
+    (edge_dir / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
+    (edge_dir / "sample.txt").write_text(_sample_text(receipt))
+    (edge_dir / "demo.py").write_text(
+        '"""grounding-stack: wrapper for the mixed-inline-source citation edge."""\n\n'
+        "from engine.demonstrators.grounding_stack import main\n\n\n"
+        'if __name__ == "__main__":\n'
+        "    raise SystemExit(main())\n"
+    )
+    rows = [
+        "| arm | answered | source types cited in one request | hosted objects | cost |",
+        "|---|:---:|:---:|:---:|---:|",
+    ]
+    for arm in receipt["arms"]:
+        ptr = ""
+        if arm["pointer_kinds"]:
+            ptr = " (" + " + ".join(k.replace("_location", "") for k in arm["pointer_kinds"]) + ")"
+        rows.append(
+            f"| {arm['name']} | {arm['answered']} | {arm['source_types_cited_in_one_request']}{ptr} | "
+            f"{arm['persisted_objects']} | ${arm['cost']:.4f} |"
+        )
+    (edge_dir / "README.md").write_text(
+        "# Edge: Grounding stack, three mixed sources cited in one request\n\n"
+        "Part of [claude-feature-radar](../../README.md). This is a measured combination edge: the "
+        "single-source grounding wins stacked into one request over mixed sources.\n\n"
+        "## What It Is\n\n"
+        "A doc-QA agent often answers over more than one kind of source at once: a plain-text note, "
+        "a PDF the user just uploaded, and a chunk the app's own retriever returned. In one "
+        "`client.messages.create` call you can supply all three with citations enabled, and Claude "
+        "cites each with the location type that fits it: `char_location`, `page_location`, and "
+        "`search_result_location`.\n\n"
+        "## The Measured Proof\n\n"
+        f"Run: `make grounding-stack`, {receipt['date']}, one request per arm carrying the same three "
+        "inline sources and a three-part question.\n\n"
+        + "\n".join(rows)
+        + "\n\n"
+        "All three answered every part correctly. Only Claude returned a pointer into the supplied "
+        "content, and it returned all three location types in one response. On the one-request inline "
+        "path, OpenAI and Gemini returned no pointer into the inline sources.\n\n"
+        "Full receipt: [`sample.txt`](sample.txt). Machine receipt: [`receipt.json`](receipt.json).\n\n"
+        "## Honest Scope\n\n"
+        "- This is the one-request, inline, mixed-source path.\n"
+        "- The competitors can cite their own content through hosted file-search vector stores. That "
+        "path is measured separately in the search-results edge.\n"
+        "- Citations cannot be combined with structured outputs, so the grounded answer here is free text.\n\n"
+        "## Run It Yourself\n\n"
+        "```bash\n"
+        "git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar\n"
+        "make setup\n"
+        "make compare-deps\n"
+        "cp .env.example .env   # paste ANTHROPIC_API_KEY, OPENAI_API_KEY, and GEMINI_API_KEY\n"
+        "make grounding-stack   # cents-scale\n"
+        "```\n\n"
+        "Sources:\n\n"
+        f"- Claude citations: {receipt['sources']['claude_citations']}\n"
+        f"- Claude search results: {receipt['sources']['claude_search_results']}\n"
+        f"- Claude PDF support: {receipt['sources']['claude_pdf_support']}\n"
+        f"- OpenAI file search: {receipt['sources']['openai_file_search']}\n"
+        f"- Gemini file search: {receipt['sources']['gemini_file_search']}\n"
+    )
+    return edge_dir
+
+
 def main(argv=None) -> int:
     from common.client import load_env, repo_root
 
@@ -411,21 +587,12 @@ def main(argv=None) -> int:
     run = run_benchmark(progress=True)
     _print_run(run)
 
-    out = {
-        "total_cost": round(run.total_cost, 6), "skipped": run.skipped,
-        "arms": [{"name": a.name, "provider": a.provider, "model": a.model,
-                  "answered": f"{a.answered}/3", "source_types_cited_in_one_request": f"{a.sources_cited}/3",
-                  "pointer_kinds": a.pointer_kinds, "persisted_objects": a.persisted_objects,
-                  "cost": round(a.cost, 6), "latency_s": round(a.latency, 2), "errors": a.errors}
-                 for a in run.arms],
-    }
+    out = _receipt_dict(run)
     (repo_root() / "data").mkdir(exist_ok=True)
     (repo_root() / "data" / "last_grounding_stack.json").write_text(json.dumps(out, indent=2) + "\n")
     if a.emit_edge:
-        edge_dir = repo_root() / "edges" / "grounding-stack"
-        edge_dir.mkdir(parents=True, exist_ok=True)
-        (edge_dir / "receipt.json").write_text(json.dumps(out, indent=2) + "\n")
-        print("\n  wrote edges/grounding-stack/receipt.json")
+        write_edge_bundle(out)
+        print("\n  wrote edges/grounding-stack/{README.md,demo.py,sample.txt,receipt.json}")
     print("\n  (per-run detail in gitignored data/last_grounding_stack.json)")
     return 0
 

@@ -1,4 +1,4 @@
-"""grounding-stack: wrapper for the mixed-source one-request citation combination edge."""
+"""grounding-stack: wrapper for the mixed-inline-source citation edge."""
 
 from engine.demonstrators.grounding_stack import main
 

@@ -11,7 +11,7 @@ from __future__ import annotations
 import json
 
 from common.client import get_client, repo_root
-from common.models import get
+from common.models import get, request_kwargs
 
 SYSTEM = (
     "You write a short, factual internal note to the Anthropic product team. Plain words. No "
@@ -40,9 +40,13 @@ def _from_receipt() -> bool:
              f"Verdict claude-behind. Numbers: {metric}. Cost ${r.get('cost_usd',0.0):.5f}. "
              f"Reproduction: {r.get('repro_command','')} in this repo.")
     client = get_client()
+    # The product-team note is the internal both-directions surface, written once per run only when a
+    # competitor wins. Top tier with adaptive thinking so the honest signal is sharp and exact, not a
+    # cheap summary that softens where Claude lost. Stakes x reasoning, not "default to cheap".
     msg = client.messages.create(
-        model=get("haiku").id, max_tokens=700, system=SYSTEM,
+        max_tokens=4000, system=SYSTEM,
         messages=[{"role": "user", "content": f"Draft the note. Facts: {facts}"}],
+        **request_kwargs("opus", effort="high", adaptive_thinking=True),
     )
     text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text").strip()
     print("\n" + text + "\n")
@@ -74,9 +78,11 @@ def main():
         f"correct (answer {gold}). Cost OpenAI ${o['cost']:.5f} vs Claude ${c['cost']:.5f}. Time "
         f"OpenAI {o['time']:.1f}s vs Claude {c['time']:.1f}s. Reproduction: make compare in this repo."
     )
+    # Same judgment seat as the receipt path above: top tier with adaptive thinking, written once.
     msg = client.messages.create(
-        model=get("haiku").id, max_tokens=700, system=SYSTEM,
+        max_tokens=4000, system=SYSTEM,
         messages=[{"role": "user", "content": f"Draft the note. Facts: {facts}"}],
+        **request_kwargs("opus", effort="high", adaptive_thinking=True),
     )
     text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text").strip()
     print("\n" + text + "\n")

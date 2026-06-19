@@ -1,0 +1,40 @@
+{
+  "n_entries": 3000,
+  "total_cost": 3.773489,
+  "skipped": [],
+  "arms": [
+    {
+      "name": "openai:gpt-top",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "output_tokens": 764,
+      "truncated": false,
+      "stop_reason": "completed",
+      "cost": 0.023475,
+      "latency_s": 15.1,
+      "errors": []
+    },
+    {
+      "name": "gemini:gem-flash",
+      "provider": "gemini",
+      "model": "gemini-3.5-flash",
+      "output_tokens": 32263,
+      "truncated": false,
+      "stop_reason": "STOP",
+      "cost": 0.29054,
+      "latency_s": 141.3,
+      "errors": []
+    },
+    {
+      "name": "claude:sonnet",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-6",
+      "output_tokens": 230607,
+      "truncated": false,
+      "stop_reason": "end_turn",
+      "cost": 3.459474,
+      "latency_s": 1402.6,
+      "errors": []
+    }
+  ]
+}

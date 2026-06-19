@@ -183,6 +183,19 @@ These are why the output is trusted. Break one and the trust is gone.
     not skimming ten. Managed Agents is a capability this engine may anchor an edge on, never the
     machinery that runs it. Parallel processing is earned by the search space, not taken by default.
 
+16. **Model tier tracks stakes, not cost.** Pick the tier by stakes times reasoning difficulty times
+    volume, never "default to cheap". The judgment seats decide what is true and what ships, so they
+    run on the top tier (Opus) with adaptive thinking on: the skeptic pass (`engine/verify.py`), the
+    founder email, and the product-team note. Extraction and mid-tier work that an API already
+    guarantees runs on Sonnet, like the Citations grounding loop (`engine/cite_facts.py`), where
+    thinking adds latency over many calls for no judgment gain. The deterministic discovery loop stays
+    a $0 pass with no model call at all. Almost nothing here runs on Haiku, and the one place it would
+    is a benchmark arm that deliberately races Claude's cheap tier against the competitor's equivalent
+    cheap tier (GPT and Gemini), tier-matched on purpose, never a judgment call. Haiku cannot take the
+    effort knob or adaptive thinking, which is exactly why it is wrong for any seat whose job is to
+    think. When in doubt, go up a tier: the judgment calls are low-volume, so the cost of the top tier
+    is pennies and the cost of a lenient skeptic is the whole asset.
+
 ## The steps
 
 ### 1. Audit the live docs (sweep the whole platform surface for the global edge)
@@ -213,6 +226,7 @@ make longhorizon # the regime where managed context pays off: unmanaged degrades
 make ledger     # exact-list long stream, Claude vs OpenAI vs Gemini, data-backed edge when promotable
 make pdf-citations # direct-PDF page citations, data-backed edge when promotable
 make search-results # BYO RAG chunk citations, data-backed edge when promotable
+make grounding-stack # text + PDF + RAG chunk citations in one request, data-backed edge when promotable
 make cache-diagnostics # cache-miss root-cause observability, data-backed edge when promotable
 make task-budget # full-loop budget marker, stop-before-tool-call edge when promotable
 make fast-mode  # fast-mode access and speed validation, held if org has 0 fast-mode ITPM

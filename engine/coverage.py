@@ -126,10 +126,11 @@ _INTRINSIC_KINDS = {"discovery_loop"}
 # (eval_quality, retention_resume, other), so they ship no public edges/<key>/ bundle: the
 # analysis runs and is kept locally, but the public tree carries only verified wins. A missing
 # public bundle for these is by design, not a gap, the same way the "other" holding pen always was.
-# advisor_routing and extended_output are held the same way: the mechanism is confirmed live, but the
-# measured value did not reproduce on the built slice yet, so they ship no public bundle until the
-# value is measured.
-_INTERNAL_KINDS = {"cost", "eval_quality", "retention_resume", "other", "advisor_routing", "extended_output"}
+# advisor_routing is held the same way: the mechanism is confirmed live, but the measured value did
+# not reproduce on the built slice yet, so it ships no public bundle until the value is measured.
+# extended_output was promoted on 2026-06-19 (Claude emitted 230,607 output tokens in one batch turn,
+# above every competitor's documented single-request cap), so it now carries a public edges/ bundle.
+_INTERNAL_KINDS = {"cost", "eval_quality", "retention_resume", "other", "advisor_routing"}
 
 
 def gaps(rows: list[dict] | None = None) -> list[str]:

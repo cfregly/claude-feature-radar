@@ -1,47 +1,30 @@
 # Edge: Grounding stack, three mixed sources cited in one request
 
-Part of [claude-feature-radar](../../README.md). This is a measured COMBINATION edge: the single-source
-grounding wins (citations, pdf-citations, search-results) stacked into one request over mixed sources.
+Part of [claude-feature-radar](../../README.md). This is a measured combination edge: the single-source grounding wins stacked into one request over mixed sources.
 
 ## What It Is
 
-A doc-QA agent often answers over more than one kind of source at once: a plain-text note, a PDF the
-user just uploaded, and a chunk the app's own retriever returned. In one `client.messages.create` call
-you can supply all three with `citations: {"enabled": true}`, and Claude cites each with the location
-type that fits it:
-
-- inline plain-text document → `char_location` (character range)
-- a directly-supplied PDF → `page_location` (page range)
-- a developer-supplied RAG chunk (`search_result`) → `search_result_location` (chunk + block span)
-
-Each pointer carries the verbatim quote free of output tokens, guaranteed to resolve, with no hosted
-vector store, no upload or index step, no persisted copy of the user's data, and no resolver code.
+A doc-QA agent often answers over more than one kind of source at once: a plain-text note, a PDF the user just uploaded, and a chunk the app's own retriever returned. In one `client.messages.create` call you can supply all three with citations enabled, and Claude cites each with the location type that fits it: `char_location`, `page_location`, and `search_result_location`.
 
 ## The Measured Proof
 
-Run: `make grounding-stack`, 2026-06-19, one request per arm carrying the same three inline sources and
-a three-part question (one fact unique to each source).
+Run: `make grounding-stack`, 2026-06-19, one request per arm carrying the same three inline sources and a three-part question.
 
 | arm | answered | source types cited in one request | hosted objects | cost |
 |---|:---:|:---:|:---:|---:|
-| Claude Haiku 4.5 | 3/3 | 3/3 (char + page + search_result) | 0 | $0.0102 |
-| OpenAI GPT-5.4 inline | 3/3 | 0/3 | 0 | $0.0028 |
-| Gemini 3.5 Flash inline | 3/3 | 0/3 | 0 | $0.0094 |
+| claude:haiku | 3/3 | 3/3 (char + page + search_result) | 0 | $0.0101 |
+| openai:gpt-mid | 3/3 | 0/3 | 0 | $0.0028 |
+| gemini:gem-flash | 3/3 | 0/3 | 0 | $0.0087 |
 
-All three answered every part correctly. Only Claude returned a pointer into the supplied content, and
-it returned all three location types in one response. On the one-request inline path, OpenAI and Gemini
-returned no pointer into the inline sources. Machine receipt: [`receipt.json`](receipt.json).
+All three answered every part correctly. Only Claude returned a pointer into the supplied content, and it returned all three location types in one response. On the one-request inline path, OpenAI and Gemini returned no pointer into the inline sources.
+
+Full receipt: [`sample.txt`](sample.txt). Machine receipt: [`receipt.json`](receipt.json).
 
 ## Honest Scope
 
-- This is the one-request, inline, mixed-source path. The win is citing all three source types in one
-  call with zero hosted objects and a typed pointer per source.
-- The competitors can cite their own content through a hosted file-search vector store. That path is
-  measured separately in the [`search-results`](../search-results/README.md) edge: it is file or
-  chunk-level, needs six persisted objects, and cannot cite a directly-supplied PDF. Gemini's file
-  search also cannot combine with another tool in the same call.
-- Citations cannot be combined with structured outputs (the API returns a 400), so the grounded answer
-  here is free text. A workload that also needs strict JSON must choose.
+- This is the one-request, inline, mixed-source path.
+- The competitors can cite their own content through hosted file-search vector stores. That path is measured separately in the search-results edge.
+- Citations cannot be combined with structured outputs, so the grounded answer here is free text.
 
 ## Run It Yourself
 
@@ -53,9 +36,7 @@ cp .env.example .env   # paste ANTHROPIC_API_KEY, OPENAI_API_KEY, and GEMINI_API
 make grounding-stack   # cents-scale
 ```
 
-`make grounding-stack` writes the latest local machine receipt to `data/last_grounding_stack.json`.
-
-Sources, fetched 2026-06-19:
+Sources:
 
 - Claude citations: https://platform.claude.com/docs/en/build-with-claude/citations
 - Claude search results: https://platform.claude.com/docs/en/build-with-claude/search-results

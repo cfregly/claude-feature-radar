@@ -1,0 +1,28 @@
+  Bulk extended-output workload: one request asking for a 3,000-entry enumerated document with a
+  strict no-abbreviation instruction. The gate is the output tokens produced in ONE request.
+
+  arm                         output tokens   finished           documented cap
+  -------------------------------------------------------------------------------
+  claude:sonnet (batch+beta)        230,607   yes (end_turn)            300,000
+  openai:gpt-top (gpt-5.5)              764   yes, stopped early        128,000
+  gemini:gem-flash                   32,263   yes, stopped early         65,536
+
+  Verdict:
+    positive_signal: true
+    promotable_edge: true
+
+  Honest reading:
+  - Claude emitted 230,607 output tokens in ONE request and finished the deliverable un-truncated,
+    about 1.8x GPT-5.5's documented 128k ceiling and 3.5x Gemini's 65,536.
+  - On the same prompt the competitors returned short answers (764 and 32,263 tokens), well inside
+    their caps. Frontier models decline to enumerate to their cap, so these are short answers, not
+    truncations. The comparison is against their documented single-request output ceilings.
+  - The win is the single un-truncated turn above 128k output, not the dollar figure. Per output
+    token at the 50% batch discount the three are close.
+  - Beta (output-300k-2026-03-24), batch-only, and the Batch API is asynchronous (minutes, not seconds).
+
+  Reproduce:
+    make bulk-output
+
+  Machine receipt:
+    data/last_bulk_extended_output.json

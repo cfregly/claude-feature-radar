@@ -1,5 +1,14 @@
 {
-  "total_cost": 0.022382,
+  "date": "2026-06-19",
+  "claim_under_test": "Claude can cite an inline text document, directly supplied PDF, and developer-supplied search_result chunk in one request, returning the correct typed pointer for each source without a hosted store.",
+  "total_cost": 0.021635,
+  "sources": {
+    "claude_citations": "https://platform.claude.com/docs/en/build-with-claude/citations",
+    "claude_search_results": "https://platform.claude.com/docs/en/build-with-claude/search-results",
+    "claude_pdf_support": "https://platform.claude.com/docs/en/build-with-claude/pdf-support",
+    "openai_file_search": "https://developers.openai.com/api/docs/guides/tools-file-search",
+    "gemini_file_search": "https://ai.google.dev/gemini-api/docs/file-search"
+  },
   "skipped": [],
   "arms": [
     {
@@ -14,8 +23,8 @@
         "search_result_location"
       ],
       "persisted_objects": 0,
-      "cost": 0.010166,
-      "latency_s": 2.19,
+      "cost": 0.010121,
+      "latency_s": 2.3,
       "errors": []
     },
     {
@@ -27,7 +36,7 @@
       "pointer_kinds": [],
       "persisted_objects": 0,
       "cost": 0.002848,
-      "latency_s": 7.06,
+      "latency_s": 4.37,
       "errors": []
     },
     {
@@ -38,9 +47,18 @@
       "source_types_cited_in_one_request": "0/3",
       "pointer_kinds": [],
       "persisted_objects": 0,
-      "cost": 0.009369,
-      "latency_s": 4.25,
+      "cost": 0.008667,
+      "latency_s": 3.87,
       "errors": []
     }
-  ]
+  ],
+  "verdict": {
+    "positive_signal": true,
+    "promotable_edge": true,
+    "claude_cited_all_three_inline_source_types": true,
+    "all_competitors_ran": true,
+    "competitors_answered_all": true,
+    "competitors_returned_no_inline_pointer": true,
+    "why_not_promotable": []
+  }
 }

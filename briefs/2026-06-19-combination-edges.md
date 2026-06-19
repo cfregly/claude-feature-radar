@@ -36,20 +36,27 @@ so the grounded answer is free text.
 
 ## Remaining candidates, HELD with a concrete blocker (probed, not cheaply promotable)
 
-### bulk-economics stack (Batch + 1h cache + 300k extended output) -> HELD, needs an expensive proof
+### bulk-extended-output (Batch + 300k extended output) -> PROMOTED, claude-ahead
 
 Documented capability-cap gap: a single batch turn emits up to 300k output tokens on Claude (beta
-`output-300k-2026-03-24`, batch-only) vs 128k on GPT-5.5 and 65,536 on Gemini 3.5 Flash / 3.1 Pro. All
-three give a 50% batch discount and compose caching plus structured outputs into batch, so per-token
-cost is parity. The edge is one un-truncated deliverable per request, no chunk-and-stitch, above 128k
-output. Probed live 2026-06-19, and the cheap proof FAILED to settle it: the Claude batch accepts
-`max_tokens=300000` at create time even without the beta header (validation is per-item at processing,
-not at create), and BOTH OpenAI (`max_output_tokens=200000`) and Gemini (`max_output_tokens=200000`)
-ACCEPT an above-cap value at request validation and return `ok` on a tiny prompt. So no vendor rejects
-the parameter cheaply. The cap only binds when output actually reaches it, so the only honest proof is
-an expensive run that generates past 128k tokens (a few dollars of output per side, and a Claude batch
-can take up to an hour). HELD: promotable only behind an explicit go for that heavyweight generation
-receipt. Risk even then: beta header, value only above 128k output, Gemini Flash is cheaper per token.
+`output-300k-2026-03-24`, batch-only) vs 128k on GPT-5.5 and 65,536 on Gemini 3.5 Flash. The cheap
+parameter-validation proof failed to settle it (every vendor accepts an above-cap `max_output_tokens`
+at request validation, and the cap binds only at generation), so it was run for real on 2026-06-19 behind
+an explicit go (`make bulk-output`, $3.77):
+
+| arm | output tokens in one request | finished | documented cap |
+|---|--:|:---:|--:|
+| Claude Sonnet 4.6, batch + 300k beta | 230,607 | yes (`end_turn`) | 300,000 |
+| OpenAI GPT-5.5 | 764 | stopped early | 128,000 |
+| Gemini 3.5 Flash | 32,263 | stopped early | 65,536 |
+
+Claude emitted 230,607 output tokens in one request and finished un-truncated, about 1.8x GPT-5.5's
+documented ceiling and 3.5x Gemini's. Frontier models declined to enumerate to their cap, so the
+competitor numbers are short answers, not truncations, and the claim is against their documented
+single-request output ceilings (which Claude's measured 230,607 exceeds). Edge bundle:
+`edges/bulk-extended-output/`. Honest scope: beta, batch-only (async, minutes), value only above 128k
+output, and per-token cost is parity at the 50% batch discount (the win is the un-truncated single
+turn, not the dollar figure).
 
 ### token/cost stack (PTC + code execution + web_search dynamic filtering) -> HELD, SDK-ahead + PTC already ships the input half
 
@@ -64,13 +71,12 @@ PTC-alone. Not a clean new promotable edge today.
 
 ## What stands after this round
 
-New combination edge shipped this round: grounding-stack (claude-ahead, verified live, all arms ran).
-The two remaining combination candidates are HELD with concrete blockers above: bulk-economics needs a
-heavyweight generation receipt behind an explicit go, and the token/cost stack is SDK-ahead on its only
-increment over the already-shipped PTC edge. The cheaply-verifiable combination space is dry for this
-round: every other stack examined (citations + structured outputs, prompt caching + context editing,
-tool search + MCP) is a conflict or parity. The loop converges here until the SDK ships
-`response_inclusion` or a go authorizes the bulk-economics generation run.
+Two edges shipped this round: grounding-stack (combination, claude-ahead, verified live) and
+bulk-extended-output (promoted after the authorized generation run, claude-ahead). One candidate
+remains HELD: the token/cost stack is SDK-ahead on its only increment over the already-shipped PTC edge
+(re-evaluate when `response_inclusion` ships). The cheaply-verifiable combination space is dry: every
+other stack examined (citations + structured outputs, prompt caching + context editing, tool search +
+MCP) is a conflict or parity.
 
 ## Sources (fetched 2026-06-19)
 

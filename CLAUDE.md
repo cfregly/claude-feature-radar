@@ -91,6 +91,20 @@ and the reason for each choice. Put the why in a comment next to the choice (why
 this task shape, why this feature is on). No silent knobs. A reader sees, in the code and in the
 receipt, exactly what ran, what it cost, how long it took, and why.
 
+## Model tier tracks stakes, not cost
+Pick the model tier by stakes times reasoning difficulty times volume, never "default to cheap". The
+seats that decide what is true and what ships run on the top tier with adaptive thinking on: the
+skeptic pass (`engine/verify.py`), the founder email (`engine/draft_email.py`), and the product-team
+note (`engine/product_alert.py`) all run Opus with `request_kwargs("opus", effort="high",
+adaptive_thinking=True)`. Extraction that the API already guarantees runs on Sonnet, like the
+Citations grounding loop (`engine/cite_facts.py`), where thinking would add latency across many calls
+for no judgment gain. The deterministic discovery loop stays a $0 pass with no model call. Almost
+nothing here runs on Haiku, and the one place it does is a benchmark arm that races Claude's cheap
+tier against the competitor's equivalent cheap tier, tier-matched on purpose, never a judgment call.
+Haiku cannot take the effort knob or adaptive thinking, so it is wrong for any seat whose job is to
+think. The judgment calls are low-volume, so the top tier costs pennies and a lenient skeptic costs
+the whole asset. When in doubt, go up a tier.
+
 ## Lead with what the result is worth to the reader
 Every result this repo puts in front of a reader (the benchmark table, the founder email, the
 README, the product note) says what it means for that reader before it says how it was made. A

@@ -2,9 +2,9 @@
 
 This is the human vetting pass over the widened 2026-06-19 source sweep and the first live
 subfeature receipts. It promotes the exact-list ledger edge, the cache diagnostics edge, the task
-budgets edge, the PDF citations edge, and the search results edge, because all five receipts cleared
-their best-to-best gates. The other candidates stay held with the parity risk and exact proof needed
-to move from held to measured.
+budgets edge, the PDF citations edge, the search results edge, and the grounding-stack edge, because
+all six receipts cleared their best-to-best gates. The other candidates stay held with the parity risk
+and exact proof needed to move from held to measured.
 
 Update: the exact-list ledger workload below did clear the promotable gate. A new edge bundle now
 lives at `edges/exact-list-ledger/`.
@@ -20,6 +20,9 @@ Update: the direct-PDF citations workload cleared the promotable gate. A new edg
 
 Update: the BYO RAG search-results workload cleared the promotable gate. A new edge bundle now lives
 at `edges/search-results/`.
+
+Update: the mixed-source grounding-stack workload cleared the promotable gate. A new edge bundle now
+lives at `edges/grounding-stack/`.
 
 ## Promoted edge: exact-list ledger
 
@@ -123,6 +126,33 @@ hosted store, upload, indexing step, or persisted third-party copy on this workl
 Primary sources:
 - Claude search results: https://platform.claude.com/docs/en/build-with-claude/search-results
 - Claude citations: https://platform.claude.com/docs/en/build-with-claude/citations
+- OpenAI file search: https://developers.openai.com/api/docs/guides/tools-file-search
+- Gemini file search: https://ai.google.dev/gemini-api/docs/file-search
+
+## Promoted edge: grounding stack
+
+The new workload tests a combination, not a single feature label. One request carries three inline
+source types: a plain-text document, a directly supplied PDF, and a developer-supplied `search_result`
+chunk. The question asks for one fact unique to each source. The gate checks whether the response
+returns typed pointers into all three supplied sources in the same request.
+
+Live receipt: `make grounding-stack` wrote `data/last_grounding_stack.json`, and the committed edge
+receipt is `edges/grounding-stack/receipt.json`. Claude Haiku 4.5 answered 3/3, returned 3/3 inline
+source-type pointers in one response, and created 0 hosted objects. The pointer kinds were
+`char_location`, `page_location`, and `search_result_location`. OpenAI GPT-5.4 and Gemini 3.5 Flash
+both answered 3/3 on the same inline inputs but returned 0/3 inline-source pointers. Claude cost
+$0.0101 and took 2.3s, OpenAI cost $0.0028 and took 4.4s, and Gemini cost $0.0087 and took 3.9s.
+Verdict: `positive_signal: true`, `promotable_edge: true`.
+
+Why this can ship: it is a best-to-best one-request inline mixed-source grounding comparison. The
+claim is scoped: Claude is not the only platform that can answer over mixed content, and hosted
+file-search paths are measured separately. Claude is the one that returned typed pointers into the
+plain text, direct PDF, and developer-supplied RAG chunk in one response without a hosted store.
+
+Primary sources:
+- Claude citations: https://platform.claude.com/docs/en/build-with-claude/citations
+- Claude search results: https://platform.claude.com/docs/en/build-with-claude/search-results
+- Claude PDF support: https://platform.claude.com/docs/en/build-with-claude/pdf-support
 - OpenAI file search: https://developers.openai.com/api/docs/guides/tools-file-search
 - Gemini file search: https://ai.google.dev/gemini-api/docs/file-search
 

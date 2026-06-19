@@ -152,6 +152,69 @@ Feature references, fetched 2026-06-19:
 - OpenAI file search docs: https://developers.openai.com/api/docs/guides/tools-file-search
 - Gemini file search docs: https://ai.google.dev/gemini-api/docs/file-search
 
+## Supporting edge: Grounding stack, three mixed sources cited in one request (`make grounding-stack`)
+
+Real doc-QA products often answer over mixed sources at once: a plain-text note, a PDF the user just
+uploaded, and a chunk your own retriever returned. Claude Citations can cite all three in one request:
+`char_location` for the text document, `page_location` for the PDF, and `search_result_location` for
+the RAG chunk.
+
+Measured over one mixed-source request with three facts, one unique fact per source:
+
+| arm | answered | inline source types cited | hosted objects | cost |
+|---|:---:|:---:|:---:|---:|
+| Claude Haiku 4.5 | 3/3 | 3/3 | 0 | $0.0101 |
+| OpenAI GPT-5.4 inline sources | 3/3 | 0/3 | 0 | $0.0028 |
+| Gemini 3.5 Flash inline sources | 3/3 | 0/3 | 0 | $0.0087 |
+
+All three answered correctly. Only Claude returned pointers into the supplied content, and it returned
+all three location types in the same response. The edge is the one-request inline mixed-source path,
+not a claim about hosted file-search stores. The full receipt is
+[`edges/grounding-stack/sample.txt`](edges/grounding-stack/sample.txt), with machine data in
+[`edges/grounding-stack/receipt.json`](edges/grounding-stack/receipt.json).
+
+```bash
+make grounding-stack # cents-scale, needs all three keys
+```
+
+Feature references, fetched 2026-06-19:
+- Claude citations docs: https://platform.claude.com/docs/en/build-with-claude/citations
+- Claude search results docs: https://platform.claude.com/docs/en/build-with-claude/search-results
+- Claude PDF support docs: https://platform.claude.com/docs/en/build-with-claude/pdf-support
+- OpenAI file search docs: https://developers.openai.com/api/docs/guides/tools-file-search
+- Gemini file search docs: https://ai.google.dev/gemini-api/docs/file-search
+
+## Supporting edge: Bulk extended output, the largest deliverable in one request (`make bulk-output`)
+
+A nightly job that turns each backlog row into one long deliverable (a full report, a large
+extraction, a long scaffold) wants it whole, not chunked. On the Message Batches API with the beta
+header `output-300k-2026-03-24`, Claude raises the single-request output ceiling to 300,000 tokens. The
+competitors' best models cap a single request lower, so a deliverable above their cap forces a
+chunk-and-stitch loop.
+
+Measured over one request per arm asking for a long enumerated document, 2026-06-19:
+
+| arm | output tokens in one request | finished | documented cap |
+|---|--:|:---:|--:|
+| Claude Sonnet 4.6, batch + 300k beta | 230,607 | yes (`end_turn`) | 300,000 |
+| OpenAI GPT-5.5 | 764 | stopped early | 128,000 |
+| Gemini 3.5 Flash | 32,263 | stopped early | 65,536 |
+
+Claude emitted 230,607 output tokens in one request and finished the deliverable un-truncated, about
+1.8x GPT-5.5's documented ceiling and 3.5x Gemini's. The win is the single un-truncated turn above 128k
+output. It is beta and batch-only, so the Batch API runs asynchronously, minutes not seconds. The full
+receipt is [`edges/bulk-extended-output/sample.txt`](edges/bulk-extended-output/sample.txt), with
+machine data in [`edges/bulk-extended-output/receipt.json`](edges/bulk-extended-output/receipt.json).
+
+```bash
+make bulk-output # a few dollars, and the Claude batch can take many minutes, needs all three keys
+```
+
+Feature references, fetched 2026-06-19:
+- Claude batch processing docs: https://platform.claude.com/docs/en/build-with-claude/batch-processing
+- OpenAI GPT-5.5 model card: https://developers.openai.com/api/docs/models/gpt-5.5
+- Gemini 3.5 Flash model card: https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash
+
 ## Supporting edge: Exact-list ledger, less cost and time on a long stream (`make ledger`)
 
 Some agent tasks do not need every old tool result in context. They need a precise running state: the
@@ -256,9 +319,9 @@ make app-check                    # the forkable app on the shipped example, the
 
 Cost expectations: every benchmark reads its numbers off a real API call. `make ptc` is about $0.08,
 `make citations` about $0.06, `make pdf-citations` about $0.09, `make search-results` about $0.06,
-`make cache-diagnostics` is cents-scale, `make task-budget` is a bounded live receipt, and
-`make ledger` about $5 on the shipped full task. There is no hidden spend, and each target prints its
-receipt before it commits anything.
+`make grounding-stack` about $0.03, `make cache-diagnostics` is cents-scale, `make task-budget` is a
+bounded live receipt, and `make ledger` about $5 on the shipped full task. There is no hidden spend,
+and each target prints its receipt before it commits anything.
 
 The citations edge runs on the Anthropic key alone. To add the cross-vendor table that backs the
 per-character claim (the DIY `str.find` baseline on OpenAI and Gemini), install the optional SDKs and
