@@ -3194,6 +3194,54 @@
       "raw_lead_score": 2,
       "raw_score": 2,
       "held_reason": "no vetted seed comparison and measured demonstrator for this source yet"
+    },
+    {
+      "key": "code-exec-state",
+      "vendor": "claude",
+      "axis": "reliability",
+      "status": "beta",
+      "beta_header": "code-execution-2025-08-25",
+      "fetched_date": "2026-06-19",
+      "evidence_quote": "Code execution tool - Claude API Docs. The code execution tool runs in a sandboxed container; capture the container id to reuse it across requests. Containers persist for 30 days.",
+      "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool",
+      "value_score": 3,
+      "lead_score": 2,
+      "score": 6,
+      "verdict": "claude-ahead",
+      "demoKind": "retention_resume",
+      "fair_comparison": {
+        "task_shape": "write a nonce to /tmp/state.txt, reuse the container, re-read after a 31-min idle",
+        "claude_config": {
+          "feature": "container reuse (container.id)",
+          "beta_on": true,
+          "model": "sonnet"
+        },
+        "competitor_arms": [
+          {
+            "vendor": "openai",
+            "surface": "code_interpreter",
+            "best_config": true
+          },
+          {
+            "vendor": "gemini",
+            "surface": "code_execution",
+            "best_config": true
+          }
+        ],
+        "isolate": "same write-then-reread workload on each arm; only container lifetime differs",
+        "score_gate": "claude reads the nonce back from the reused container after the documented idle",
+        "lead_basis": "absence-of-evidence",
+        "maturity": {
+          "claude": "beta",
+          "beta_header": "code-execution-2025-08-25",
+          "fetched_date": "2026-06-19"
+        },
+        "repro": {
+          "command": "make code-exec-state",
+          "est_cost_usd": 0.05,
+          "est_time_s": 60
+        }
+      }
     }
   ],
   "coverage": {}

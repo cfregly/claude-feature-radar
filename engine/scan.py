@@ -112,6 +112,33 @@ DIFFERENTIATORS = [
             "repro": {"command": "make longhorizon", "est_cost_usd": 2.0, "est_time_s": 150},
         },
     },
+    {
+        "key": "code-exec-state", "axis": "reliability", "rank": 4,
+        "demoKind": "retention_resume",
+        "claim": "The code-execution sandbox keeps its container and files across separate requests and "
+                 "for 30 days, so a multi-step agent's state survives between turns and across a long idle.",
+        "why": "Claude returns a reusable container id (response.container.id); pass it as container=<id> "
+               "on the next call and a file written in one request is readable in the next. Measured "
+               "(make code-exec-state then make code-exec-state-verify): a nonce written to /tmp/state.txt "
+               "read back from the SAME container after a 31.1-minute idle. No named OpenAI or Google "
+               "equivalent keeps a developer's sandbox files across a long idle: OpenAI's code_interpreter "
+               "container is discarded after 20 minutes idle (documented, unrecoverable) and Gemini exposes "
+               "no reusable container handle, an absence-of-evidence lead. Warm reuse is parity; the edge is "
+               "durability and cross-request persistence. Code execution is beta and not ZDR-eligible.",
+        "fair_comparison": {
+            "task_shape": "write a nonce to /tmp/state.txt, reuse the container, re-read after a 31-min idle",
+            "claude_config": {"feature": "container reuse (container.id)", "beta_on": True, "model": "sonnet"},
+            "competitor_arms": [
+                {"vendor": "openai", "surface": "code_interpreter", "best_config": True},
+                {"vendor": "gemini", "surface": "code_execution", "best_config": True},
+            ],
+            "isolate": "same write-then-reread workload on each arm; only container lifetime differs",
+            "score_gate": "claude reads the nonce back from the reused container after the documented idle",
+            "lead_basis": "absence-of-evidence",
+            "maturity": {"claude": "beta", "beta_header": "code-execution-2025-08-25", "fetched_date": "2026-06-19"},
+            "repro": {"command": "make code-exec-state", "est_cost_usd": 0.05, "est_time_s": 60},
+        },
+    },
 ]
 
 # Refuted, parity, or behind after the live check. Do NOT pitch these as a Claude lead.

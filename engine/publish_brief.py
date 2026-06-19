@@ -137,6 +137,25 @@ PLANS: dict[str, BriefPlan] = {
         make_help="build .venv, install anthropic, answer questions over your docs with citations (~$0.01)",
         edit_surface="docs",  # the corpus folder a forker fills with their own .txt files
     ),
+    # code-exec-state: the stateful-sandbox edge. A multi-step agent that runs code needs its sandbox to
+    # keep files and state across turns. The brief needs only the anthropic-free client/models/pricing
+    # trio (flattened to a local common/). The run entry is a generated run.py: write a unique value to
+    # /tmp/state.txt in a fresh container, capture container.id, then read it back from the REUSED
+    # container on a separate request, plus a --check self-test. Claude-only, wins-only, no competitor arm
+    # on the public surface. The slug is underscored so `python -m code_exec_state.run` imports cleanly.
+    "code-exec-state": BriefPlan(
+        slug="code_exec_state",
+        title="code execution state",
+        demo_kind="retention_resume",
+        doc_url="https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool",
+        files=(
+            VendorFile("common/client.py", "common/client.py"),
+            VendorFile("common/models.py", "common/models.py"),
+            VendorFile("common/pricing.py", "common/pricing.py"),
+        ),
+        make_help="build .venv, install anthropic, write a file in your agent's sandbox and read it back from the reused container (~$0.05)",
+        edit_surface=None,  # no single edit surface: the README explains adapting the workload
+    ),
 }
 
 # A publish-time alias from a landscape/seed key to its publish plan, so both the live sweep slug (ptc)
@@ -209,9 +228,18 @@ def _receipt_path(edge_key: str) -> pathlib.Path | None:
 
 def _receipt_is_claude_win(receipt: dict) -> bool:
     """Does the receipt indicate a Claude win? True when an explicit verdict says claude-ahead, OR a
-    passed/mode_b_correct flag is truthy. A receipt with an explicit non-win verdict, or a false
-    passed/mode_b_correct, is NOT a win and vetoes the publish."""
+    structured verdict marks promotable_edge, OR a passed/mode_b_correct flag is truthy. A receipt with
+    an explicit non-win verdict, a promotable_edge of false, or a false passed/mode_b_correct, is NOT a
+    win and vetoes the publish."""
     verdict = receipt.get("verdict")
+    if isinstance(verdict, dict):
+        # A structured verdict (the retention_resume demonstrator writes one): promotable_edge is the
+        # win flag, with positive_signal as the fallback. A false flag still vetoes.
+        if "promotable_edge" in verdict:
+            return bool(verdict.get("promotable_edge"))
+        if "positive_signal" in verdict:
+            return bool(verdict.get("positive_signal"))
+        return True
     if verdict is not None:
         return verdict == "claude-ahead"
     if "passed" in receipt:
@@ -961,6 +989,288 @@ supported on every active model except Haiku 3.
 """
 
 
+def _codeexec_run_source(slug: str) -> str:
+    """The generated run entry for the code-exec-state brief: write a unique value to /tmp/state.txt in a
+    fresh container, capture container.id, then read it back from the REUSED container on a separate
+    request, plus a --check self-test. Claude-only, no competitor arm. Imports the flattened common/
+    package; anthropic is imported lazily so importing this module needs no SDK."""
+    return f'''"""run: write a file in your agent's sandbox, then read it back from the reused container.
+
+The founder-facing artifact for the {slug} brief. A multi-step agent that runs code needs its sandbox to
+keep state between turns. Claude's code execution sandbox keeps its container and its files across
+separate Messages API requests: capture response.container.id from one call, pass it as container=<id>
+on the next, and a file written in turn 1 is there in turn 2. Containers live 30 days. Source,
+re-fetched 2026-06-18: https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool
+
+  python -m {slug}.run            write a value, then read it back from the reused container
+  python -m {slug}.run --check    the self-test: ASSERT the value reads back from the reused container
+  python -m {slug}.run --model opus    use Opus 4.8 instead of the default Sonnet 4.6
+
+This costs about $0.05 on Sonnet 4.6. The model calls are the only spend, the code runs server-side in
+Anthropic's sandbox. anthropic is imported lazily, inside the run path, so importing this module needs no
+SDK.
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import sys
+import time
+from pathlib import Path
+
+# Make the repo root importable when run as a file, not just as a module.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from .common.models import get  # noqa: E402  the verified id + price registry, anthropic-free
+from .common.pricing import cost_usd  # noqa: E402  real usage object -> real dollars, anthropic-free
+
+# Code execution is a beta: set this header and add the code_execution tool (verified 2026-06-18 against
+# the live doc). The container id comes back on the response and is reusable for 30 days.
+CODE_EXEC_BETA = "code-execution-2025-08-25"
+CODE_EXEC_TOOL = "code_execution_20250825"
+MODELS = {{"sonnet": "claude-sonnet-4-6", "opus": "claude-opus-4-8"}}
+
+
+def _nonce() -> str:
+    return f"NONCE{{int(time.time())}}{{os.urandom(2).hex()}}"
+
+
+def _text(resp) -> str:
+    return "".join(b.text for b in resp.content if getattr(b, "type", None) == "text")
+
+
+def write_and_reread(client, model_key: str) -> dict:
+    """Write a unique value to /tmp/state.txt in a fresh container, then read it back from the REUSED
+    container on a second, separate request. The container id is the whole trick: capture it from the
+    first response and pass it as container=<id> on the next call."""
+    model_id = get(model_key).id
+    nonce = _nonce()
+    tools = [{{"type": CODE_EXEC_TOOL, "name": "code_execution"}}]
+
+    r1 = client.beta.messages.create(
+        model=model_id, max_tokens=1024, betas=[CODE_EXEC_BETA], tools=tools,
+        messages=[{{"role": "user", "content":
+                   f"Run python: write the exact text {{nonce}} to /tmp/state.txt, then print done."}}])
+    cost = cost_usd(model_key, r1.usage)
+    container_id = getattr(getattr(r1, "container", None), "id", None)
+
+    read_back = False
+    if container_id:
+        r2 = client.beta.messages.create(
+            model=model_id, max_tokens=1024, betas=[CODE_EXEC_BETA], container=container_id, tools=tools,
+            messages=[{{"role": "user", "content": "Run python: print the contents of /tmp/state.txt"}}])
+        cost += cost_usd(model_key, r2.usage)
+        read_back = nonce in _text(r2)
+
+    return {{"model_key": model_key, "nonce": nonce, "container_id": container_id,
+            "read_back": read_back, "cost": cost}}
+
+
+def fmt_usd(x: float) -> str:
+    return f"${{x:,.6f}}" if x < 0.01 else f"${{x:,.4f}}"
+
+
+def print_table(result: dict) -> None:
+    cid = result["container_id"] or "(none returned)"
+    short = (cid[:22] + "...") if len(cid) > 25 else cid
+    back = "read back, matches" if result["read_back"] else "not read back"
+    print()
+    print("  step                                              result")
+    print("  " + "-" * 64)
+    print("  write the value to /tmp/state.txt (request 1)     done")
+    print(f"  reuse container {{short:<34}}{{back}}")
+    print("  " + "-" * 64)
+    print()
+    print("  The file written in request 1 was read back from the SAME container in request 2,")
+    print("  because the container persists (30-day life). Capture response.container.id and pass")
+    print(f"  container=<id> on the next call. Live cost {{fmt_usd(result['cost'])}} on {{get(result['model_key']).label}}.")
+    print()
+
+
+def cmd_run(model_key: str) -> int:
+    from .common.client import get_client  # lazy: anthropic only imported when we actually call
+
+    print(f"\\n  Code execution state: write a file in your agent's sandbox, then read it back from the")
+    print(f"  reused container on a separate request, on {{get(model_key).label}}.")
+    print(f"  Upfront: about $0.05 and roughly 40 seconds on your key. The model calls are the only spend,")
+    print(f"  the code runs server-side in Anthropic's sandbox.\\n")
+    client = get_client()
+    print_table(write_and_reread(client, model_key))
+    return 0
+
+
+def cmd_check(model_key: str) -> int:
+    """The self-test: assert the value written in request 1 reads back from the REUSED container in
+    request 2. No container id, or no read-back, is a failure."""
+    from .common.client import get_client  # lazy
+
+    print(f"\\n  --check: writing a value in one request and asserting it reads back from the reused")
+    print(f"  container in a separate request, on {{get(model_key).label}}. About $0.05.\\n")
+    client = get_client()
+    result = write_and_reread(client, model_key)
+    print_table(result)
+    if not result["container_id"]:
+        print("  CHECK FAILED: no container id was returned to reuse.\\n")
+        return 1
+    if not result["read_back"]:
+        print("  CHECK FAILED: the value did not read back from the reused container.\\n")
+        return 1
+    print("  CHECK PASSED: the file persisted across two separate requests on the same container.")
+    print("  Containers live 30 days, so the state is there even after your user steps away.\\n")
+    return 0
+
+
+def main() -> int:
+    p = argparse.ArgumentParser(
+        description="Write a file in the code-execution sandbox and read it back from the reused container.")
+    p.add_argument("--model", default="sonnet", choices=sorted(MODELS),
+                   help="sonnet (default) or opus")
+    p.add_argument("--check", action="store_true",
+                   help="self-test: assert the value reads back from the reused container")
+    a = p.parse_args()
+    return cmd_check(a.model) if a.check else cmd_run(a.model)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+'''
+
+
+def _codeexec_readme_source(plan: BriefPlan) -> str:
+    """The public, wins-only README for the code-exec-state brief. Generated, no internal backrefs, no
+    competitor named, doc link from the plan's doc_url."""
+    return f"""# Keep your agent's sandbox state between turns with code execution
+
+![demo](demo.gif)
+
+A multi-step agent that runs code does real work across several turns: it ingests a file, cleans it,
+builds intermediate tables, fits a model, renders a chart. The hard part is state. If the sandbox does
+not persist between turns, you re-upload the file and re-run setup on every call, and you write your own
+checkpointing glue.
+
+## What you get
+
+Claude's code execution sandbox keeps its container and its files across separate Messages API requests.
+Capture `response.container.id` from one call, pass it as `container=<id>` on the next, and a file
+written in one turn is there in the next. This brief writes a unique value to `/tmp/state.txt`, then
+reads it back from the reused container on a separate request, so you see the state persist on a live
+call. Containers live 30 days, so the state is there even after your user steps away: a file written
+here read back from the same container after a 31-minute idle.
+
+```python
+r1 = client.beta.messages.create(
+    model="claude-sonnet-4-6", betas=["code-execution-2025-08-25"],
+    tools=[{{"type": "code_execution_20250825", "name": "code_execution"}}],
+    messages=[{{"role": "user", "content": "...write /tmp/state.txt..."}}])
+container_id = r1.container.id                        # capture it
+
+r2 = client.beta.messages.create(
+    model="claude-sonnet-4-6", betas=["code-execution-2025-08-25"],
+    container=container_id,                           # reuse it: the file from r1 is still here
+    tools=[{{"type": "code_execution_20250825", "name": "code_execution"}}],
+    messages=[{{"role": "user", "content": "...read /tmp/state.txt..."}}])
+```
+
+## Run it (about $0.05)
+
+```
+export ANTHROPIC_API_KEY=your-key   # https://console.anthropic.com/
+make {plan.slug}        # build the venv, install anthropic, write a file and read it back from the reused container
+```
+
+`make {plan.slug}` is self-bootstrapping: it creates `.venv`, installs `anthropic`, and runs the write then reread.
+
+## Run it on your own agent
+
+Open `{plan.slug}/run.py`, the file you edit. Change the two `messages` payloads to your agent's real
+steps: write whatever your first step produces into the container in request one, then do the next step
+in request two with `container=<id>` set. The state your first step wrote is still there. Keep the
+container id and pass it on every follow-up call.
+
+## The honest scope
+
+The edge is durability and cross-request persistence: the container and its files survive between
+separate requests and for 30 days, so a long-running agent keeps its state without re-uploading or
+re-running setup. Code execution is beta, so set `betas=["code-execution-2025-08-25"]`, and it is not
+ZDR-eligible.
+
+## Learn more
+
+- [Code execution docs]({plan.doc_url})
+"""
+
+
+def _codeexec_sample_source() -> str:
+    """The committed receipt snapshot the demo gif replays (cat by demo.tape). Wins-only, Claude-only,
+    deterministic, no competitor named. Shows the value written in one request read back from the reused
+    container, and the measured 31-minute-idle durability."""
+    return (
+        "\n  Code execution state: your agent's sandbox keeps its files between requests.\n\n"
+        "  Workload: write a unique value to /tmp/state.txt, capture the container id, then read it\n"
+        "  back from the REUSED container on a separate request. Same container, a later call.\n\n"
+        "  step                                            result\n"
+        "  --------------------------------------------------------------------\n"
+        "  write the value to /tmp/state.txt (request 1)   done\n"
+        "  read it back from the reused container (req 2)   read back, matches\n"
+        "  re-read after a 31-minute idle                   read back (30-day container life)\n"
+        "  --------------------------------------------------------------------\n\n"
+        "  -> the file written in one request is there in the next, and survives a long idle,\n"
+        "     because the container persists for 30 days. Capture response.container.id and\n"
+        '     pass container=<id> on the next call.\n\n'
+        '  The change: betas=["code-execution-2025-08-25"], add the code_execution tool, and carry\n'
+        "  the container id between calls.\n\n"
+        "  Runnable code and the full brief: code_exec_state/README.md\n"
+    )
+
+
+def _codeexec_founder_email_source(plan: BriefPlan) -> str:
+    """The code-exec-state founder email, written to the ENGINE repo (never the public briefs repo).
+    Wins-only, plain language, the real code, one reproduce path."""
+    return f"""Subject: Keep your agent's sandbox state between turns
+
+Hey {{first_name}},
+
+Congrats on getting into YC! Quick tip if you are building a multi-step agent that runs code over your users' files.
+
+A real agent runs across several turns: it ingests a file, cleans it, builds intermediate tables, fits a
+model, renders a chart. The annoying part is state. If the sandbox does not persist between turns, you
+re-upload the file and re-run setup on every call, and you write your own checkpointing glue.
+
+[Code execution]({plan.doc_url}) keeps its container and its files across separate requests. Capture
+response.container.id from one call, pass it back as container=<id> on the next, and a file written in
+one turn is there in the next. Containers live 30 days, so the state is there even after your user steps away.
+
+```python
+r1 = client.beta.messages.create(model="claude-sonnet-4-6", betas=["code-execution-2025-08-25"],
+    tools=[{{"type": "code_execution_20250825", "name": "code_execution"}}], messages=[...])
+container_id = r1.container.id                       # keep this
+
+r2 = client.beta.messages.create(model="claude-sonnet-4-6", betas=["code-execution-2025-08-25"],
+    container=container_id,                          # reuse it: the file from r1 is still here
+    tools=[{{"type": "code_execution_20250825", "name": "code_execution"}}], messages=[...])
+```
+
+Want to watch it first, no clone needed? The brief opens with a gif of the run:
+https://github.com/cfregly/claude-feature-briefs/blob/main/{plan.slug}/README.md
+
+See it run (about a minute):
+
+```
+git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
+export ANTHROPIC_API_KEY=your-key
+make {plan.slug}     # write a file and read it back from the reused container, $0.05
+```
+
+To run it on your own agent, open {plan.slug}/run.py and change the two messages payloads to your
+agent's real steps, then run make {plan.slug} again.
+
+Happy building! 🚀
+{{your_name}}
+Building with Claude
+"""
+
+
 def _readme_source(plan: BriefPlan, edge: dict, receipt: dict | None) -> str:
     """The public, wins-only README for the brief. Generated from the engine truth: the measured receipt
     numbers when present, the doc link from the landscape source_url (the plan's doc_url), no internal
@@ -1069,10 +1379,14 @@ def _demo_tape_source(plan: BriefPlan) -> str:
     sample.txt, so `make gif` replays the receipt for $0 (no API call, deterministic). Generated here, so
     a republish reproduces it, and the gif binary is rendered from this tape by `make gif` (vhs + ffmpeg)."""
     slug = plan.slug
-    width, height = (1240, 820) if slug == "citations" else (1200, 640)
-    headline = ("# Citations: a verifiable source pointer for every answer, resolved in your own code"
-                if slug == "citations"
-                else "# programmatic tool calling: about 28% fewer billed input tokens on a fan-out task")
+    _dims = {"citations": (1240, 820), "code_exec_state": (1200, 720)}
+    width, height = _dims.get(slug, (1200, 640))
+    _headlines = {
+        "citations": "# Citations: a verifiable source pointer for every answer, resolved in your own code",
+        "code_exec_state": "# code execution state: your agent's sandbox keeps its files between requests",
+    }
+    headline = _headlines.get(
+        slug, "# programmatic tool calling: about 28% fewer billed input tokens on a fan-out task")
     return (
         f"# VHS tape for the {slug} brief gif (https://github.com/charmbracelet/vhs).\n"
         f"# Regenerate from the repo root with:  make gif    (needs vhs and ffmpeg).\n"
@@ -1120,6 +1434,8 @@ def _sample_source(plan: BriefPlan, receipt: dict | None) -> str:
     """The committed receipt snapshot that the demo gif replays (cat by demo.tape). Wins-only, honest,
     deterministic. The token_accounting brief shows the billed-input table token-only (no answer-correctness
     claim, since plain tool use can miss on 240 rows); grounding_resolution shows the per-pointer table."""
+    if plan.slug == "code_exec_state":
+        return _codeexec_sample_source()
     if plan.slug == "citations":
         return _citations_sample_source()
     a_in = b_in = pct = None
@@ -1319,7 +1635,7 @@ def _ensure_makefile_entry(makefile: pathlib.Path, plan: BriefPlan) -> bool:
     """Idempotently add the brief's make target to the briefs-root Makefile. Returns True if it appended,
     False if the entry was already present. Never duplicates: it keys on the target name."""
     text = makefile.read_text() if makefile.exists() else ""
-    run_module = "cite" if plan.slug == "citations" else "run_tokens"
+    run_module = {"citations": "cite", "code_exec_state": "run"}.get(plan.slug, "run_tokens")
     recipe = f"\t$(PY) -m {plan.slug}.{run_module}"
     # Refresh an existing target's recipe (its run module may have been renamed on republish), so a
     # republished brief never leaves make pointed at a deleted module.
@@ -1364,7 +1680,10 @@ def _ensure_readme_entry(readme: pathlib.Path, plan: BriefPlan) -> bool:
         if refreshed != text:
             readme.write_text(refreshed)
         return refreshed != text
-    if plan.slug == "citations":
+    if plan.slug == "code_exec_state":
+        blurb = ("Keep a multi-step agent's sandbox state between turns by reusing the code-execution "
+                 "container, so a file written in one request is there in the next.")
+    elif plan.slug == "citations":
         blurb = ("Answer questions over your own documents and get a verifiable source pointer for "
                  "every answer, resolved in your own code.")
     else:
@@ -1437,6 +1756,13 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
         _assert_no_dangling(run_src, "cite.py")
         (brief_dir / "cite.py").write_text(run_src)
         (brief_dir / "README.md").write_text(_citations_readme_source(plan))
+    elif plan.slug == "code_exec_state":
+        # The retention_resume brief: no edit surface, run.py writes a value to the container and reads
+        # it back from the reused container on a separate request.
+        run_src = _codeexec_run_source(plan.slug)
+        _assert_no_dangling(run_src, "run.py")
+        (brief_dir / "run.py").write_text(run_src)
+        (brief_dir / "README.md").write_text(_codeexec_readme_source(plan))
     else:  # pragma: no cover - a plan with no assembler is a programming error, not a publish path
         raise PublishRefused(f"no assembler for brief slug {plan.slug!r}")
 
@@ -1496,8 +1822,12 @@ def publish(edge_key: str, briefs_root: pathlib.Path, command: str) -> int:
     emails_dir = ROOT / "emails"
     emails_dir.mkdir(exist_ok=True)
     email_path = emails_dir / f"{plan.slug}_FOUNDER_EMAIL.md"
-    email_src = (_citations_founder_email_source(plan) if plan.slug == "citations"
-                 else _founder_email_source(plan, _committed_receipt(plan)))
+    if plan.slug == "code_exec_state":
+        email_src = _codeexec_founder_email_source(plan)
+    elif plan.slug == "citations":
+        email_src = _citations_founder_email_source(plan)
+    else:
+        email_src = _founder_email_source(plan, _committed_receipt(plan))
     email_path.write_text(email_src)
     # This publisher writes only the engine's working draft, not the public briefs repo.
 
