@@ -1,4 +1,4 @@
-"""citations-paraphrase: wrapper for the paraphrase-robustness citation-resolution edge."""
+"""citations-paraphrase: wrapper for the Claude-vs-competitors citation feature edge."""
 
 from engine.demonstrators.paraphrase_resolution import main
 

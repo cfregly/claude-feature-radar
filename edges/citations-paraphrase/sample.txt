@@ -1,15 +1,15 @@
-  CLAUDE vs THE OTHER MODELS: best citation FEATURE, head to head.
+  Claude vs the other models: best citation FEATURE, head to head.
   6 questions over 3 user documents. Each vendor returns a citation
   pointer INTO those documents with its real tool (Claude inline citations, OpenAI file_search,
-  Gemini File Search). Same documents, same questions, every arm.
+  Gemini File Search). Same documents, same questions, every arm reads its own API's citation.
 
   arm                             pointer       resolves  src ok   hosted objs      cost
   ------------------------------------------------------------------------------------------
   claude citations:sonnet         char-span          6/6     6/6            0   $0.0237
-  openai file_search:gpt-top      file-level         6/6     6/6            4   $0.0670
-  gemini File Search:gem-pro      chunk-level        6/6     6/6            4   $0.0230
+  openai file_search:gpt-top      file-level         6/6     6/6            4   $0.0729
+  gemini File Search:gem-pro      chunk-level        6/6     6/6            4   $0.0220
 
-  Verdict (cross-vendor):
+  Verdict:
     positive_signal: true
     promotable_edge: true
     claude_char_span_into_supplied_docs: true
@@ -17,7 +17,7 @@
     competitor_hosted_objects: {'openai file_search:gpt-top': 4, 'gemini File Search:gem-pro': 4}
     competitor_pointer_kinds: {'openai file_search:gpt-top': 'file-level', 'gemini File Search:gem-pro': 'chunk-level'}
 
-  Honest reading (cross-vendor):
+  Honest reading:
   - Claude returns a structured, API-guaranteed-to-resolve CHAR-SPAN pointer into the user's
     directly-supplied documents, with ZERO hosted objects (the data never leaves the request).
   - OpenAI file_search and Gemini File Search cannot cite a directly-supplied document: they
@@ -25,56 +25,6 @@
     copy of the user's data), and even then the citation is file-level (OpenAI) or chunk-level
     (Gemini), never a guaranteed char span into the source. Verified vs their live docs 2026-06-19.
   - This is an API-surface gap, so it holds at the competitors' FRONTIER tier, not a model contest.
-
-  ==========================================================================================
-  SECONDARY (within-Claude context): paraphrase resolution vs the DIY str.find baseline.
-  Every arm answers in its own words over the user documents and one inline PDF, then points back.
-
-  arm                          mechanism        answered  resolves  drops   out_tok      cost  wall
-  --------------------------------------------------------------------------------------------------
-  claude+citations:sonnet     API citations         8/8       8/8      0       629   $0.2397  31.0s
-  claude DIY:sonnet           DIY str.find          8/8       8/8      0       655   $0.0280  23.2s
-  openai DIY:gpt-top          DIY str.find          8/8       8/8      0       966   $0.0557  25.0s
-  gemini DIY:gem-pro          DIY str.find          5/8       8/8      0     5,945   $0.0823  57.5s
-
-  Honest reading (within-Claude DIY baseline):
-  - Every arm answered the questions in its own words (paraphrased), as instructed.
-  - Claude Citations resolved every answer's pointer by guarantee (source[start:end]==cited_text,
-    and a real page span for the inline PDF), each grounded in the expected source, with zero
-    hosted or persisted objects, on the lower Sonnet tier.
-  - The cross-vendor DIY path also resolved: the FRONTIER models returned verbatim quotes (even
-    while paraphrasing the answer), and a whitespace-tolerant str.find resolves those, so on this
-    workload resolution is PARITY against a competent DIY resolver.
-  - So the durable Claude value here is the GUARANTEE, the free cited_text, and zero resolver code,
-    a within-Claude value-add, not a cross-vendor capability the others lack. The str.find drop
-    appears only with a weaker model or a naive resolver, both of which a founder can avoid.
-  - The robust cross-vendor PDF win (OpenAI and Gemini return NO citation pointer for a directly-
-    supplied inline PDF without a hosted vector store) is measured in the pdf-citations and
-    grounding-stack edges, not in str.find resolution.
-  - cited_text is free of output tokens, so the Citations arm carries no quote-token cost.
-  - Citations cannot be combined with Structured Outputs (the API returns a 400 together).
-
-  PDF glue-code demo: read the SAME PDF natively, ask for a verbatim quote, 5 questions.
-  A model quotes the sentence as the PDF renders it (line-wrapped), so the developer's naive
-  str.find in their stored canonical text can return -1. The one-line fix is whitespace-normalize.
-
-  arm                          naive str.find   + ws-normalized   Claude guarantee
-  ------------------------------------------------------------------------------------
-  claude+citations:sonnet               -                -               5/5
-  claude DIY:sonnet                   5/5              5/5                 -
-  openai DIY:gpt-top                  4/5              5/5                 -
-  gemini DIY:gem-pro                  5/5              5/5                 -
-  -> Live, the naive str.find silently dropped 1 PDF citation(s) on line-wrap whitespace.
-     The one-line ' '.join(quote.split()) recovered them.
-
-  Deterministic illustration (grounded in the PDF's own line-wrapping, no model call):
-    sentence: "Overage seats beyond the 50 included seats are billed at 12 US dollars per seat per month."
-    rendered as the PDF wraps it (with an interior line break), then located three ways:
-      developer naive str.find        -> DROP (-1, silent)
-      + one-line whitespace normalize -> resolves
-      Claude page_location guarantee  -> resolves
-  Claude's page_location resolved every quote by guarantee with zero resolver code. That
-  normalization is exactly what the guarantee buys: the glue a founder would otherwise own.
 
   Reproduce:
     make citations-paraphrase

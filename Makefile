@@ -28,7 +28,7 @@ citations: ## EDGE: verifiable citations vs the DIY str.find baseline, all three
 citations-quick: ## a 3-question, cents-scale smoke of the citations edge
 	$(PY) edges/citations/demo.py --quick
 
-citations-paraphrase: ## EDGE: Claude citations vs OpenAI file_search vs Gemini File Search over the user's own documents (feature vs feature), plus the DIY str.find baseline + PDF glue demo (needs 3 keys, about $1.10)
+citations-paraphrase: ## EDGE: Claude inline citations vs OpenAI file_search vs Gemini File Search over a user's own documents, feature vs feature (needs 3 keys, about $0.15)
 	$(PY) run.py citations-paraphrase --emit-edge
 
 pdf-citations: ## EDGE: page citations into a directly supplied PDF, Claude vs direct PDF/file inputs (needs 3 keys, cents)
