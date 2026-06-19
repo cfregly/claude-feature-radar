@@ -22,7 +22,7 @@ app-check: ## the app self-test: run the shipped example and assert the PTC inva
 ptc: ## EDGE: programmatic tool calling, the input-token receipt on a fan-out task (needs ANTHROPIC_API_KEY, about $0.08)
 	$(PY) edges/programmatic-tool-calling/demo.py
 
-citations: ## EDGE: verifiable citations vs the DIY str.find baseline, all three vendors (needs compare-deps + 3 keys, $0.06)
+citations: ## EDGE: Claude Citations, a verifiable per-character source pointer into your user's own documents, one Claude arm (needs ANTHROPIC_API_KEY, $0.01)
 	$(PY) edges/citations/demo.py
 
 citations-quick: ## a 3-question, cents-scale smoke of the citations edge

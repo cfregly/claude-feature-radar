@@ -1,9 +1,9 @@
 """A cost-claim gate: the citations cost in the prose and the README table matches the receipt.
 
-The `make citations` run cost is a sum of four arms dominated by the Gemini arm's token count, so it
-moves whenever the benchmark is re-run. The figure is quoted in two layers, both of which can rot:
+The `make citations` edge runs one Claude Citations arm, so its cost moves a little whenever the
+benchmark is re-run. The figure is quoted in two layers, both of which can rot:
 
-  1. the total dollar figure, in three prose spots: FOUNDER_EMAIL.md, README.md, and the Makefile.
+  1. the total dollar figure, in two prose spots: README.md and the Makefile.
   2. the per-arm cost and output-token columns of the README measured-proof table.
 
 This gate re-sums the committed receipt (edges/citations/sample.txt) and checks both layers against
@@ -22,10 +22,10 @@ TABLE_COST_TOL = 0.001
 # (file, regex with one capturing group for the dollar total). Each is anchored tightly enough to
 # match only the citations cost claim, not another "$X" figure in the same file.
 # NOTE: edges/citations/FOUNDER_EMAIL.md is NOT listed here on purpose. That email tells the reader to
-# clone claude-feature-briefs and run the BRIEF's single-arm `make citations` (~$0.01), not the engine's
-# 4-arm cross-vendor sweep (~$0.06). Its cost is the brief's, gated by the briefs repo's own number gate.
+# clone claude-feature-briefs and run the BRIEF's `make citations`, gated by the briefs repo's own
+# number gate. Both that brief and this engine edge now run a single Claude Citations arm (~$0.01).
 CLAIMS = [
-    {"file": "edges/citations/README.md", "pattern": r"on your own keys, \$(\d+\.\d{2})"},
+    {"file": "edges/citations/README.md", "pattern": r"on your own keys?, \$(\d+\.\d{2})"},
     {"file": "Makefile", "pattern": r"^citations:.*\$(\d+\.\d{2})"},
 ]
 

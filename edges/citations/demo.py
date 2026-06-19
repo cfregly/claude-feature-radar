@@ -1,32 +1,22 @@
-"""citations: the verifiable-source-pointer edge, measured honestly against the real DIY baseline.
+"""citations: the verifiable-source-pointer feature, demonstrated on a founder's own documents.
 
-The anchor, after a scrutiny panel killed the first (rigged) version of this benchmark. Claude's
-Citations feature returns, for each claim, a structured pointer (a character range for plain text, a
-page range for a PDF) plus the verbatim quote it points to, EXTRACTED BY THE API. The docs guarantee
-it: "citations are guaranteed to contain valid pointers to the provided documents," and the
-`cited_text` "does not count towards output tokens." No competitor exposes a pointer into a
-user-supplied document. OpenAI and Google only annotate web-search URLs. Source, re-fetched
-2026-06-17: https://platform.claude.com/docs/en/build-with-claude/citations
+Claude's Citations feature returns, for each claim, a structured pointer (a character range for plain
+text) plus the verbatim quote it points to, EXTRACTED BY THE API. The docs guarantee it: "citations
+are guaranteed to contain valid pointers to the provided documents," and the `cited_text` "does not
+count towards output tokens." Source, re-fetched 2026-06-17:
+https://platform.claude.com/docs/en/build-with-claude/citations
 
-What this measures, and the trap it now avoids. An earlier version asked the competitor models to emit
-the character offset themselves, scored that 0/8, and called it a competitor failure. That was a
-strawman: a tokenizer cannot count characters, and no real founder would ask it to. The honest DIY
-path, the one you actually build without the feature, is to have the model return the verbatim quote
-and resolve it yourself with `source.find(quote)`. So that is the baseline here:
+This edge demonstrates the feature value a founder gets: a guaranteed per-character source pointer into
+the user's own document, the verbatim quote extracted for you and free of output tokens, with zero
+resolver code to own. Among the three platforms only Claude returns a per-character document pointer
+(Gemini File Search is page-level, OpenAI file_search is file-level), so on granularity Claude is the
+finest. The head-to-head CROSS-VENDOR comparison, where OpenAI and Gemini cannot cite a directly
+supplied document at all without a hosted vector store, is measured in the sibling edges
+(citations-paraphrase, pdf-citations, search-results, grounding-stack).
 
-  Claude + Citations       the primitive. The API returns the pointer AND the quote, the pointer is
-                           guaranteed to resolve, and the quote is free of output tokens.
-  DIY (Claude/OpenAI/Gemini)  the realistic baseline: ask the model for the verbatim quote, then
-                           resolve it in your own code with str.find. You own that code, you pay
-                           output tokens for every quote, and it resolves only as well as the model
-                           quotes verbatim (it returns -1 the moment the model paraphrases).
-
-The honest finding: on clean text the DIY path resolves about as well as Citations, because the
-quotes come back verbatim. The edge is not "they cannot do it." The edge is that Claude does it FOR
-you, guaranteed, with the quote free of output tokens and zero resolver code, and only Claude ships a
-per-character document pointer (Gemini File Search is page-level and still preview, OpenAI cites its
-own output). Every number is read off the real usage object. The OpenAI and Gemini arms degrade
-gracefully if their key or SDK is absent.
+Every number is read off the real `usage` object. There is no string matching here: the grader checks
+the API's own char offsets against the source (source[start:end] == cited_text, the documented
+guarantee), which is verification of the pointer, not a do-it-yourself resolver.
 """
 
 from __future__ import annotations
@@ -37,12 +27,11 @@ _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[2]))  # repo root, 
 
 import argparse
 import json
-import re
 import time
 
 from common.client import fmt_usd, get_client, load_env, repo_root
 from common.models import get
-from common.pricing import cost_from_buckets, cost_usd
+from common.pricing import cost_usd
 from engine.demonstrators.base import Arm, BaseDemonstrator, CostEstimate, Verdict
 from engine.demonstrators.registry import register
 
@@ -94,32 +83,6 @@ QUESTIONS = [
     "How quickly do Enterprise support tickets get a first response?",
 ]
 
-# The DIY path a founder actually builds without the feature: ask for the verbatim quote (NOT an
-# offset, which a tokenizer cannot produce), then resolve it yourself with str.find.
-QUOTE_INSTRUCTIONS = (
-    "Answer the question using ONLY the source documents below. Then give the single exact "
-    "supporting sentence, copied VERBATIM character for character from the documents, and the exact "
-    "title of the document it came from. Respond with ONLY a JSON object and nothing else: "
-    '{"answer": "...", "doc_title": "...", "quote": "..."}.'
-)
-
-
-def _docs_as_text(corpus) -> str:
-    return "\n\n".join(f"=== DOCUMENT: {d['title']} ===\n{d['text']}" for d in corpus)
-
-
-def _parse_json(raw: str):
-    """Pull the first JSON object out of a model reply, tolerating code fences and prose."""
-    if not raw:
-        return None
-    m = re.search(r"\{.*\}", raw, re.DOTALL)
-    if not m:
-        return None
-    try:
-        return json.loads(m.group(0))
-    except json.JSONDecodeError:
-        return None
-
 
 # ------------------------------------------------------------------- the Claude Citations arm
 
@@ -136,8 +99,9 @@ def _doc_blocks(corpus):
 
 
 def run_claude_citations(client, model_key, corpus, questions):
-    """The primitive. citations.enabled=true, no beta header. The pointer is guaranteed valid and
-    the cited_text does not count toward output tokens."""
+    """citations.enabled=true, no beta header. The pointer is guaranteed valid and the cited_text does
+    not count toward output tokens. The grader verifies the API's own offsets: source[start:end] ==
+    cited_text. This is verification of the returned pointer, not a do-it-yourself string search."""
     model = get(model_key).id
     rows = []
     for q in questions:
@@ -161,7 +125,8 @@ def run_claude_citations(client, model_key, corpus, questions):
             if 0 <= di < len(corpus) and corpus[di]["text"][s:e] == txt
         )
         rows.append({
-            "has_citation": len(cites) > 0, "resolved": 1 if resolved and resolved == len(cites) else (1 if resolved else 0),
+            "has_citation": len(cites) > 0,
+            "resolved": 1 if resolved and resolved == len(cites) else (1 if resolved else 0),
             "resolver": "the API", "quote_free": True,
             "cost": cost_usd(model_key, msg.usage),
             "output_tokens": getattr(msg.usage, "output_tokens", 0) or 0, "latency_s": dt,
@@ -169,95 +134,11 @@ def run_claude_citations(client, model_key, corpus, questions):
     return rows
 
 
-# --------------------------------------------------------- the realistic DIY baseline (any vendor)
-
-def _grade_diy(corpus, raw_text, cost, out_tok, dt):
-    """The model returned a quote. We resolve it ourselves with str.find, the real DIY path."""
-    obj = _parse_json(raw_text) or {}
-    quote = (obj.get("quote") or "").strip()
-    title = (obj.get("doc_title") or "").strip()
-    doc = next((d for d in corpus
-                if title and (d["title"].lower() in title.lower() or title.lower() in d["title"].lower())),
-               None)
-    # str.find: resolves iff the quote is a verbatim substring of the named document.
-    idx = doc["text"].find(quote) if (doc and quote) else -1
-    return {
-        "has_citation": quote != "", "resolved": 1 if idx != -1 else 0,
-        "resolver": "your code", "quote_free": False,
-        "cost": cost, "output_tokens": out_tok, "latency_s": dt,
-    }
-
-
-def run_claude_diy(client, model_key, corpus, questions):
-    model = get(model_key).id
-    src = _docs_as_text(corpus)
-    rows = []
-    for q in questions:
-        prompt = f"{QUOTE_INSTRUCTIONS}\n\nSOURCE DOCUMENTS:\n{src}\n\nQUESTION: {q}"
-        t0 = time.perf_counter()
-        msg = client.messages.create(model=model, max_tokens=400,
-                                     messages=[{"role": "user", "content": prompt}])
-        dt = time.perf_counter() - t0
-        text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text")
-        rows.append(_grade_diy(corpus, text, cost_usd(model_key, msg.usage),
-                               getattr(msg.usage, "output_tokens", 0) or 0, dt))
-    return rows
-
-
-def run_openai_diy(corpus, questions, model):
-    # One client builder and one price table: the OpenAI client comes from engine.providers and the
-    # cost from common.pricing.cost_from_buckets, which reads the verified rate off common/models.py.
-    from engine.providers.openai_provider import get_openai_client
-    client = get_openai_client()
-    if client is None:
-        raise SystemExit("OPENAI_API_KEY is not set.")
-    src = _docs_as_text(corpus)
-    rows = []
-    for q in questions:
-        prompt = f"{QUOTE_INSTRUCTIONS}\n\nSOURCE DOCUMENTS:\n{src}\n\nQUESTION: {q}"
-        t0 = time.perf_counter()
-        resp = client.responses.create(model=model, input=prompt)
-        dt = time.perf_counter() - t0
-        u = resp.usage
-        inp = getattr(u, "input_tokens", 0) or 0
-        out = getattr(u, "output_tokens", 0) or 0
-        det = getattr(u, "input_tokens_details", None)
-        cached = (getattr(det, "cached_tokens", 0) or 0) if det else 0
-        # OpenAI's input_tokens already counts the cached tokens, so fresh = input - cached.
-        cost = cost_from_buckets(model, fresh_input=max(0, inp - cached), cached=cached, output=out)
-        rows.append(_grade_diy(corpus, getattr(resp, "output_text", "") or "", cost, out, dt))
-    return rows
-
-
-def run_gemini_diy(corpus, questions, model):
-    # One client builder and one price table: the Gemini client comes from engine.providers and the
-    # cost from common.pricing.cost_from_buckets, which reads the verified rate off common/models.py.
-    from engine.providers.gemini_provider import get_gemini_client
-    client = get_gemini_client()
-    if client is None:
-        raise SystemExit("GEMINI_API_KEY is not set.")
-    src = _docs_as_text(corpus)
-    rows = []
-    for q in questions:
-        prompt = f"{QUOTE_INSTRUCTIONS}\n\nSOURCE DOCUMENTS:\n{src}\n\nQUESTION: {q}"
-        t0 = time.perf_counter()
-        resp = client.models.generate_content(model=model, contents=prompt)
-        dt = time.perf_counter() - t0
-        um = resp.usage_metadata
-        prompt_tok = getattr(um, "prompt_token_count", 0) or 0
-        cached = getattr(um, "cached_content_token_count", 0) or 0
-        out = (getattr(um, "candidates_token_count", 0) or 0) + (getattr(um, "thoughts_token_count", 0) or 0)
-        # Gemini's prompt_token_count already counts the cached tokens, so fresh = prompt - cached.
-        cost = cost_from_buckets(model, fresh_input=max(0, prompt_tok - cached), cached=cached, output=out)
-        rows.append(_grade_diy(corpus, getattr(resp, "text", "") or "", cost, out, dt))
-    return rows
-
-
 # --------------------------------------------------------------------------------------- runner
 
-def _roll(name, rows, n, primitive=False):
+def _roll(name, rows, n):
     return {
-        "arm": name, "questions": n, "primitive": primitive,
+        "arm": name, "questions": n,
         "resolved": sum(r["resolved"] for r in rows),
         "resolver": rows[0]["resolver"] if rows else "",
         "quote_free": rows[0]["quote_free"] if rows else False,
@@ -270,20 +151,18 @@ def _roll(name, rows, n, primitive=False):
 # --------------------------------------------------------------- the Demonstrator interface
 #
 # grounding_resolution: Claude returns a guaranteed-valid, output-token-free, character-level source
-# pointer into the user's own document, where the DIY path on any vendor must str.find and breaks on
-# paraphrase. The Claude arm is Citations; the competitor arms are the DIY paths (Claude DIY, OpenAI
-# DIY, Gemini DIY), each access-probed and never faked. The same machine gate runs on every arm: a
-# Citations pointer must satisfy source[start:end]==cited_text, a DIY quote must satisfy
-# source.find(quote)!=-1. The honest verdict: on clean text the DIY arms resolve about as well, so the
-# edge is a within-Claude value-add (the in-API guarantee, the free quote, char granularity), not a
-# capability the others lack. The base honesty contract keeps it from over-claiming a head-to-head win.
+# pointer into the user's own document, verified by source[start:end] == cited_text. This edge
+# demonstrates that feature on a single Claude arm: the value is the in-API guarantee, the free quote,
+# and char granularity, a within-Claude value-add, not a head-to-head claim. The cross-vendor head-to-
+# head (the competitors cannot cite a directly supplied document without a hosted store) lives in the
+# citations-paraphrase, pdf-citations, search-results, and grounding-stack edges. The base honesty
+# contract keeps a single-arm feature demonstration from being pitched as a head-to-head win.
 
 def _arm_from_summary(provider, model_id, s, ran=True, note=""):
     return Arm(provider=provider, model=model_id, ran=ran,
                output_tokens=s["output_tokens"], cost_usd=s["cost"], latency_s=s["time"],
                metric={"resolved": s["resolved"], "questions": s["questions"],
-                       "resolver": s["resolver"], "quote_free": s["quote_free"],
-                       "primitive": s.get("primitive", False)}, note=note)
+                       "resolver": s["resolver"], "quote_free": s["quote_free"]}, note=note)
 
 
 class CitationsDemonstrator(BaseDemonstrator):
@@ -291,8 +170,8 @@ class CitationsDemonstrator(BaseDemonstrator):
 
     def estimate(self, edge, spec):
         n = 3 if spec.get("quick") else len(QUESTIONS)
-        return CostEstimate(usd=0.06, wall_clock_s=120.0, command="make citations",
-                            note=f"{n} questions x up to four arms; OpenAI/Gemini arms run only with their keys")
+        return CostEstimate(usd=0.02, wall_clock_s=60.0, command="make citations",
+                            note=f"{n} questions, one Claude Citations arm, cents")
 
     def _questions(self, spec):
         return QUESTIONS[:3] if spec.get("quick") else QUESTIONS
@@ -302,52 +181,26 @@ class CitationsDemonstrator(BaseDemonstrator):
         model_key = spec.get("claude_model", "haiku")
         qs = self._questions(spec)
         rows = run_claude_citations(client, model_key, CORPUS, qs)
-        s = _roll("Claude + Citations (the primitive)", rows, len(qs), primitive=True)
+        s = _roll("Claude + Citations", rows, len(qs))
         return _arm_from_summary("claude", get(model_key).id, s,
                                  note="Citations: the API resolves the pointer and guarantees it, the quote is free of output tokens")
 
     def run_competitor_arms(self, edge, spec):
-        client = spec.get("client") or get_client()
-        model_key = spec.get("claude_model", "haiku")
-        qs = self._questions(spec)
-        arms = []
-        # The realistic DIY baseline on Claude itself: the path a founder builds WITHOUT the feature.
-        cd = _roll("Claude DIY (model quote + your str.find)", run_claude_diy(client, model_key, CORPUS, qs), len(qs))
-        arms.append(_arm_from_summary("claude", get(model_key).id, cd,
-                                      note="DIY: model returns a verbatim quote, your own str.find resolves it"))
-        # OpenAI and Gemini DIY arms, each access-probed: a missing key or SDK is ran=False, never faked.
-        for provider, runner, model in [
-            ("openai", run_openai_diy, spec.get("openai_model", "gpt-5.4-mini")),
-            ("gemini", run_gemini_diy, spec.get("gemini_model", "gemini-3.5-flash")),
-        ]:
-            try:
-                s = _roll(f"{provider} DIY", runner(CORPUS, qs, model), len(qs))
-                arms.append(_arm_from_summary(provider, model, s))
-            except SystemExit as e:
-                arms.append(Arm(provider=provider, model=model, ran=False, note=str(e)[:120]))
-            except Exception as e:  # noqa: BLE001
-                arms.append(Arm(provider=provider, model=model, ran=False, note=str(e)[:120]))
-        return arms
+        # No do-it-yourself str.find baseline: this edge demonstrates the Citations feature itself. The
+        # cross-vendor head-to-head against OpenAI file_search and Gemini File Search is measured in the
+        # citations-paraphrase, pdf-citations, search-results, and grounding-stack edges.
+        return []
 
     def score(self, claude, competitors, spec):
-        # The SAME machine gate on every arm: resolve rate, by construction for Citations, by str.find
-        # for the DIY arms. On clean text the DIY arms resolve about as well, so the honest verdict is a
-        # within-Claude value-add, not a head-to-head capability win. The pass condition is that the
-        # primitive resolves every question it cited.
         n = claude.metric.get("questions", 0)
         passed = n > 0 and claude.metric.get("resolved", 0) == n
-        ran = [a for a in competitors if a.ran]
-        diy_match = ran and all(a.metric.get("resolved", 0) == n for a in ran)
-        verdict = "within-claude-only" if (passed and diy_match) else ("claude-ahead" if passed else "never-evaluated")
         return Verdict(
-            verdict=verdict, passed=passed,
+            verdict="within-claude-only" if passed else "never-evaluated", passed=passed,
             metric={"claude_resolved": f"{claude.metric.get('resolved')}/{n}",
-                    "claude_output_tokens": claude.output_tokens,
-                    "diy_arms_also_resolve": bool(diy_match),
-                    "competitor_output_tokens": {a.provider: a.output_tokens for a in ran}},
-            note="Citations resolves every cited question and is free of output tokens; on clean text "
-                 "the DIY arms also resolve, so the edge is the in-API guarantee, the free quote, and "
-                 "char granularity, a within-Claude value-add, not a capability the others lack",
+                    "claude_output_tokens": claude.output_tokens},
+            note="Citations resolves every cited question with the quote free of output tokens; the value "
+                 "is the in-API guarantee, the free quote, and char granularity, a within-Claude value-add. "
+                 "The cross-vendor head-to-head is in the sibling citations edges",
         )
 
     def receipt(self, edge, claude, competitors, verdict, spec):
@@ -356,15 +209,18 @@ class CitationsDemonstrator(BaseDemonstrator):
             workload={
                 "task_shape": f"{len(self._questions(spec))} questions over {len(CORPUS)} plain-text user documents",
                 "model": claude.model, "features_on": ["citations.enabled"],
-                "assumptions": "clean plain text resolves on every arm; the edge is the in-API "
-                               "guarantee, the free quote, and char granularity, not a missing "
-                               "competitor capability; Citations is incompatible with Structured Outputs (400)",
+                "assumptions": "the value is the in-API guarantee, the verbatim quote free of output tokens, "
+                               "and char granularity, with zero resolver code; among the three platforms only "
+                               "Claude returns a per-character document pointer (Gemini File Search is "
+                               "page-level, OpenAI file_search is file-level); Citations is incompatible with "
+                               "Structured Outputs (400)",
             },
             grounding=[{"claim": "citations are guaranteed to contain valid pointers; cited_text does not count toward output tokens",
                         "source_url": "https://platform.claude.com/docs/en/build-with-claude/citations",
                         "date": "2026-06-18"}],
-            fairness={"best_to_best": "the DIY arms run each vendor's latest model at full strength",
-                      "isolate": "same documents and questions on every arm; only the resolve mechanism differs"},
+            fairness={"best_to_best": "a single Claude Citations arm demonstrating the feature; the cross-vendor "
+                                      "comparison is run in the sibling citations edges",
+                      "isolate": "same documents and questions; the grader verifies the API's own offsets against the source"},
         )
 
 
@@ -372,11 +228,9 @@ register(CitationsDemonstrator())
 
 
 def main():
-    p = argparse.ArgumentParser(description="Citations vs the real DIY baseline, the verifiable-pointer edge.")
+    p = argparse.ArgumentParser(description="Citations: the verifiable per-character source pointer, demonstrated.")
     p.add_argument("--quick", action="store_true", help="first 3 questions, a cents-scale smoke")
     p.add_argument("--claude-model", default="haiku")
-    p.add_argument("--openai-model", default="gpt-5.4-mini")
-    p.add_argument("--gemini-model", default="gemini-3.5-flash")
     a = p.parse_args()
 
     load_env()
@@ -386,49 +240,29 @@ def main():
     label = get(a.claude_model).label
 
     print(f"\n  Verifiable source citations: {len(CORPUS)} of your own documents, {n} questions.")
-    print(f"  Claude Citations needs no beta header. Only Claude ships a per-character document pointer")
-    print(f"  (Gemini File Search is page-level and still preview, OpenAI cites its own output), and the")
-    print(f"  honest baseline without it is the DIY path: ask the model for the verbatim quote, then resolve")
-    print(f"  it yourself with str.find. The grader checks that the quote resolves to the real source.\n")
+    print("  Claude Citations needs no beta header. Among the three platforms only Claude ships a per-character")
+    print("  document pointer (Gemini File Search is page-level, OpenAI file_search is file-level). The grader")
+    print("  verifies the API's own offsets against the source (source[start:end] == cited_text).\n")
 
-    summaries = []
     cit = run_claude_citations(client, a.claude_model, CORPUS, questions)
-    summaries.append(_roll(f"{label} + Citations (the primitive)", cit, n, primitive=True))
-    cd = run_claude_diy(client, a.claude_model, CORPUS, questions)
-    summaries.append(_roll(f"{label} DIY (model quote + your str.find)", cd, n))
+    s = _roll(f"{label} + Citations", cit, n)
 
-    for name, runner, model in [
-        (f"OpenAI {a.openai_model} DIY", run_openai_diy, a.openai_model),
-        (f"Gemini {a.gemini_model} DIY", run_gemini_diy, a.gemini_model),
-    ]:
-        try:
-            rows = runner(CORPUS, questions, model)
-            summaries.append(_roll(name, rows, n))
-        except Exception as e:  # noqa: BLE001
-            print(f"  ({name} skipped: {str(e)[:80]})")
+    print("  what a founder building over their own documents gets")
+    print(f"  {'arm':<34}{'resolves':>9}{'resolver':>11}{'quote free':>12}{'out_tok':>9}{'cost':>9}")
+    print("  " + "-" * 84)
+    print(f"  {s['arm']:<34}{str(s['resolved'])+'/'+str(s['questions']):>9}{s['resolver']:>11}"
+          f"{('yes' if s['quote_free'] else 'no'):>12}{s['output_tokens']:>9,}{fmt_usd(s['cost']):>9}")
 
-    print("  what a founder building over their own documents pays for")
-    print(f"  {'arm':<42}{'resolves':>9}{'resolver':>11}{'quote free':>12}{'out_tok':>9}{'cost$':>9}")
-    print("  " + "-" * 92)
-    for s in summaries:
-        print(f"  {s['arm']:<42}{str(s['resolved'])+'/'+str(s['questions']):>9}{s['resolver']:>11}"
-              f"{('yes' if s['quote_free'] else 'no'):>12}{s['output_tokens']:>9,}{s['cost']:>9.5f}")
-
-    base = summaries[0]
     print("\n  Honest reading:")
-    print(f"  - {base['arm']}: {base['resolved']}/{n} pointers resolve, the API does the resolving and "
-          f"guarantees it, and the quote is free of output tokens. Zero resolver code.")
-    for s in summaries[1:]:
-        print(f"  - {s['arm']}: {s['resolved']}/{n} resolve via str.find (it returns -1 the moment the "
-              f"model paraphrases), you own that code, and you pay {s['output_tokens']:,} output tokens "
-              f"for the quotes.")
-    print("  - On clean text the DIY path resolves about as well, so the edge is not 'they cannot do it.'")
-    print("    The edge is that Claude does it FOR you, guaranteed, free of output tokens, zero code, and")
-    print("    only Claude ships a per-character document pointer (Gemini File Search is page-level and")
-    print("    still preview, OpenAI cites its own output).\n")
+    print(f"  - {s['arm']}: {s['resolved']}/{n} pointers resolve, the API does the resolving and guarantees")
+    print("    it, and the quote is free of output tokens. Zero resolver code.")
+    print("  - The value is the in-API guarantee, the free quote, and char granularity, a within-Claude")
+    print("    value-add. Among the three platforms only Claude returns a per-character document pointer")
+    print("    (Gemini File Search is page-level, OpenAI file_search is file-level).")
+    print("  - The cross-vendor head-to-head, where OpenAI and Gemini cannot cite a directly supplied")
+    print("    document without a hosted vector store, is in the sibling citations edges.\n")
 
-    out = {"corpus_titles": [d["title"] for d in CORPUS], "questions": questions,
-           "summaries": summaries}
+    out = {"corpus_titles": [d["title"] for d in CORPUS], "questions": questions, "summaries": [s]}
     (repo_root() / "data").mkdir(exist_ok=True)
     (repo_root() / "data" / "last_citations.json").write_text(json.dumps(out, indent=2))
     print("  (per-turn detail cached in gitignored data/last_citations.json; this printout is the receipt)\n")

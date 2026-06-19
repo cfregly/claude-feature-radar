@@ -1,27 +1,22 @@
 
   Verifiable source citations: 3 of your own documents, 8 questions.
-  Claude Citations is GA, no beta header. Only Claude ships a per-character document pointer
-  (Gemini File Search is page-level and still preview, OpenAI cites its own output), and the
-  honest baseline without it is the DIY path: ask the model for the verbatim quote, then resolve
-  it yourself with str.find. The grader checks that the quote resolves to the real source.
+  Claude Citations is GA, no beta header. Among the three platforms only Claude ships a per-character
+  document pointer (Gemini File Search is page-level, OpenAI file_search is file-level). The grader
+  verifies the API's own offsets against the source (source[start:end] == cited_text).
 
-  what a founder building over their own documents pays for
-  arm                                        resolves   resolver  quote free  out_tok    cost$
-  --------------------------------------------------------------------------------------------
-  Claude Haiku 4.5 + Citations (the primitive)      8/8    the API         yes      308  0.01112
-  Claude Haiku 4.5 DIY (model quote + your str.find)      8/8  your code          no      563  0.00632
-  OpenAI gpt-5.4-mini DIY                         8/8  your code          no      392  0.00403
-  Gemini gemini-3.5-flash DIY                     8/8  your code          no    3,654  0.03749
+  what a founder building over their own documents gets
+  arm                                  resolves   resolver  quote free  out_tok     cost$
+  ----------------------------------------------------------------------------------------
+  Claude Haiku 4.5 + Citations              8/8    the API         yes      308  0.01112
 
   Honest reading:
-  - Claude Haiku 4.5 + Citations (the primitive): 8/8 pointers resolve, the API does the resolving and guarantees it, and the quote is free of output tokens. Zero resolver code.
-  - Claude Haiku 4.5 DIY (model quote + your str.find): 8/8 resolve via str.find (it returns -1 the moment the model paraphrases), you own that code, and you pay 563 output tokens for the quotes.
-  - OpenAI gpt-5.4-mini DIY: 8/8 resolve via str.find (it returns -1 the moment the model paraphrases), you own that code, and you pay 392 output tokens for the quotes.
-  - Gemini gemini-3.5-flash DIY: 8/8 resolve via str.find (it returns -1 the moment the model paraphrases), you own that code, and you pay 3,654 output tokens for the quotes.
-  - On clean text the DIY path resolves about as well, so the edge is not 'they cannot do it.'
-    The edge is that Claude does it FOR you, guaranteed, free of output tokens, zero code, and
-    only Claude ships a per-character document pointer (Gemini File Search is page-level and
-    still preview, OpenAI cites its own output).
+  - Claude Haiku 4.5 + Citations: 8/8 pointers resolve, the API does the resolving and guarantees it,
+    and the quote is free of output tokens. Zero resolver code.
+  - The value is the in-API guarantee, the free quote, and char granularity, a within-Claude value-add.
+    Among the three platforms only Claude returns a per-character document pointer (Gemini File Search
+    is page-level, OpenAI file_search is file-level).
+  - The cross-vendor head-to-head, where OpenAI and Gemini cannot cite a directly supplied document
+    without a hosted vector store, is measured in the sibling citations edges (citations-paraphrase,
+    pdf-citations, search-results, grounding-stack).
 
   wrote receipts to data/last_citations.json
-
