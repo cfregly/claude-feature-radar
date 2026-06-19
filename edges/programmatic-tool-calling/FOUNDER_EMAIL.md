@@ -38,7 +38,7 @@ does.
 {repo_link}
 
 Run it yourself: `make setup`, then `cp .env.example .env` and paste your Anthropic key, then `make
-ptc`. $0.06 on Sonnet for the two runs, every token off the real API.
+ptc`. $0.08 on Sonnet for the two runs, every token off the real API.
 
 Go build,
 

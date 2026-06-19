@@ -45,7 +45,7 @@ re-fetched 2026-06-18.
 git clone <this-repo> && cd claude-competitive-engine
 make setup
 cp .env.example .env   # paste your Anthropic key
-make ptc               # this edge, on your own key, $0.06 on Sonnet 4.6
+make ptc               # this edge, on your own key, $0.08 on Sonnet 4.6
 # or directly: python edges/programmatic-tool-calling/demo.py
 ```
 

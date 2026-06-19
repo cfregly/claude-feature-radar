@@ -18,7 +18,7 @@
 
   mode                                      billed input tok  round-trips    answer       cost
   --------------------------------------------------------------------------------------------
-  Mode A: plain tool use                               9,451            2      None    $0.0351
+  Mode A: plain tool use                               9,451            2      None    $0.0602
   Mode B: programmatic (allowed_callers)               6,828            5      east    $0.0233
 
   Honest reading:

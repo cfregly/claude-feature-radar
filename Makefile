@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps app app-check ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges cadence coverage managed parity-gated scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports check-surface test ci deslop gif clean
+.PHONY: setup compare-deps app app-check ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare compare alert edges cadence coverage managed parity-gated scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports check-surface check-receipts test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -13,13 +13,13 @@ compare-deps: ## install the OpenAI + Gemini SDKs into the SAME venv, for compar
 	$(PY) -m pip install --quiet -r requirements-compare.txt
 	@echo "Compare deps installed into .venv. Now paste OPENAI_API_KEY and GEMINI_API_KEY into .env."
 
-app: ## FORKABLE APP: run the fan-out task over your own tool (app/my_tool.py), print your before-and-after token bill (needs ANTHROPIC_API_KEY, about $0.06)
+app: ## FORKABLE APP: run the fan-out task over your own tool (app/my_tool.py), print your before-and-after token bill (needs ANTHROPIC_API_KEY, about $0.08)
 	$(PY) -m app.run_tokens
 
-app-check: ## the app self-test: run the shipped example and assert the PTC invariant (Mode B bills fewer input tokens AND answers correctly) before you trust it on your own tool (about $0.06)
+app-check: ## the app self-test: run the shipped example and assert the PTC invariant (Mode B bills fewer input tokens AND answers correctly) before you trust it on your own tool (about $0.08)
 	$(PY) -m app.run_tokens --check
 
-ptc: ## EDGE: programmatic tool calling, the input-token receipt on a fan-out task (needs ANTHROPIC_API_KEY, about $0.06)
+ptc: ## EDGE: programmatic tool calling, the input-token receipt on a fan-out task (needs ANTHROPIC_API_KEY, about $0.08)
 	$(PY) edges/programmatic-tool-calling/demo.py
 
 citations: ## EDGE: verifiable citations vs the DIY str.find baseline, all three vendors (needs compare-deps + 3 keys, $0.06)
@@ -118,13 +118,16 @@ core-imports: ## one-dependency gate: the core imports with anthropic alone, the
 check-surface: ## surface gate: no internal/private-repo leakage in source, no Claude negative on a founder email (offline, $0)
 	$(PY) scripts/check_surface.py
 
+check-receipts: ## receipt-drift gate: every measured number in the prose traces to a committed receipt (offline, $0)
+	$(PY) scripts/check_receipts.py
+
 test: ## the offline test suite (the gate boundary, the dispatch seam, the shared infra; no key, no network)
 	$(PY) -m pytest -q
 
 deslop: check-claims ## prose gate (em-dashes, en-dashes, semicolons) plus the citations cost-claim gate
 	$(PY) scripts/deslop_check.py
 
-ci: deslop check-docs core-imports check-surface test ## the full offline gate chain, the same one CI runs ($0)
+ci: deslop check-docs core-imports check-surface check-receipts test ## the full offline gate chain, the same one CI runs ($0)
 	@echo "ci: all offline gates passed."
 
 gif: ## regenerate docs/demo.gif from demo.tape (needs vhs, ffmpeg, ttyd)

@@ -31,7 +31,7 @@ Same task and model (Sonnet 4.6), with and without it:
 | | input tokens billed | why |
 |---|---:|---|
 | without PTC | 9,451 | every record lands in the model's context |
-| with PTC | 6,819 | only the relevant records reach the model |
+| with PTC | 6,828 | only the relevant records reach the model |
 
 28% cheaper on this demo, and it compounds across every fan-out.
 
@@ -40,7 +40,7 @@ See it run (about two minutes):
 ```
 git clone {repo_url} && cd claude-feature-briefs
 export ANTHROPIC_API_KEY=your-key
-make ptc        # the example, $0.06
+make ptc        # the example, $0.08
 ```
 
 To run it on your own tool, open [ptc/my_tool.py]({repo_url}/blob/main/ptc/my_tool.py),

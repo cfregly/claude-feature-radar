@@ -37,7 +37,7 @@ A 28% input-token cut, and the sandbox returns the exact winner. This pays off w
 a tool many times over data it then crunches (the fan-out shape). The full receipt is [`edges/programmatic-tool-calling/sample.txt`](edges/programmatic-tool-calling/sample.txt).
 
 ```bash
-make ptc          # about $0.06 on Sonnet, needs ANTHROPIC_API_KEY
+make ptc          # about $0.08 on Sonnet, needs ANTHROPIC_API_KEY
 ```
 
 Reproduce it on your own tool: edit ONE file, [`app/my_tool.py`](app/my_tool.py), paste your
@@ -85,7 +85,7 @@ Feature references, fetched 2026-06-18:
 git clone <this-repo> && cd claude-competitive-engine   # the public URL lands on publish
 make setup                        # the venv and the one dependency (anthropic)
 cp .env.example .env              # paste your ANTHROPIC_API_KEY
-make ptc                          # the lead edge, about $0.06 (needs ANTHROPIC_API_KEY)
+make ptc                          # the lead edge, about $0.08 (needs ANTHROPIC_API_KEY)
 make app-check                    # the forkable app on the shipped example, then edit app/my_tool.py
 ```
 

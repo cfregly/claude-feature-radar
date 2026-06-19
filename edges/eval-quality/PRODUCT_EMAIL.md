@@ -21,7 +21,7 @@ The grid sweeps every model tier x two effort levels (low and high), and a judge
 each execution-passed program with the writer never its own grader, so a too-trusting execution grade
 would show up as a code-vs-judge disagreement.
 
-The measured outcome (8 tasks, 4 held-out, 7 models, judge on, $0.4090 total off the usage object):
+The measured outcome (8 tasks, 4 held-out, 7 models, judge on, $0.4285 total off the usage object):
 
 - Every model resolved the held-out split 4 of 4. Claude Haiku, Sonnet, and Opus, GPT-5.4 and GPT-5.5,
   and Gemini 3.5 Flash and 3.1 Pro. All tied at 100%.
@@ -45,8 +45,8 @@ often clears the bar, so a team can stop overpaying), and the credibility is the
 the judge cross-check. We should not lead with a Claude correctness lead on this slice, because there
 is not one. The durable contribution is the methodology: a held-out overfit guard, an execution gate,
 and a writer-is-never-the-grader judge panel, all runnable on a stranger's own JSONL. If we want an
-eval-quality capability anchor, we need the full cross-vendor run on the hard slice, with credits to
-finish it, and the number to hold.
+eval-quality capability anchor, the full cross-vendor run on the hard slice now holds it: every arm
+ran, and the judge panel, not the execution pass rate, is what separates the field.
 
 To reproduce: `make setup`, `make compare-deps`, paste three keys into `.env`, then `make eval-smoke`
 (cents) or `make eval` (about $3 to $4), and `EVAL_LCB=1 make eval` for the hard slice. The receipt is

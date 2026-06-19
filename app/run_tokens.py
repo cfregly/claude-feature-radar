@@ -27,7 +27,7 @@ fan-out. When you swap in your own tool, keep the task fan-out shaped or the num
                                    trust it on your own tool
   python -m app.run_tokens --model opus    use Opus 4.8 instead of the default Sonnet 4.6
 
-This costs about $0.06 on the shipped example on Sonnet 4.6. The model arms are the only spend. The
+This costs about $0.08 on the shipped example on Sonnet 4.6. The model arms are the only spend. The
 code runs server-side in Anthropic's sandbox, so there is no Docker and nothing to install for the
 sandbox itself. anthropic is imported lazily, inside main(), so importing this module needs no SDK.
 """
@@ -106,7 +106,7 @@ def cmd_run(model_key: str) -> int:
     print(f"\n  Token bill: the same fan-out task two ways over your tool ({tool.TOOL_SPEC['name']}),")
     print(f"  on {label}. Mode A calls the tool directly, Mode B (programmatic tool calling) runs it")
     print(f"  from a sandbox so the outputs stay out of the model's context.")
-    print(f"  Upfront: this run makes 2 task runs over {n} inputs and costs about $0.06 and roughly")
+    print(f"  Upfront: this run makes 2 task runs over {n} inputs and costs about $0.08 and roughly")
     print(f"  90 seconds on your key. The model arms are the only spend, the sandbox is server-side.\n")
     client = get_client()
     result = run_token_compare(client, model_key)
@@ -125,7 +125,7 @@ def cmd_check(model_key: str) -> int:
 
     expected = getattr(tool, "EXPECTED_ANSWER", None)
     print(f"\n  --check: running the shipped example on {get(model_key).label} and asserting the PTC")
-    print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). About $0.06.\n")
+    print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). About $0.08.\n")
     client = get_client()
     result = run_token_compare(client, model_key)
     print_table(result)

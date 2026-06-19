@@ -26,6 +26,7 @@ class Model:
     effort_levels: tuple[str, ...]   # () means the model has no effort knob
     thinking_mode: str               # "adaptive" | "manual" | "none"
     provider: str = "anthropic"      # "anthropic" | "openai" | "gemini"
+    verified: str = "2026-06-18"     # date this table's prices were last checked against the live pages
 
 
 # Verified 2026-06-17 against docs.claude.com (pricing, effort, adaptive-thinking) and a live call.

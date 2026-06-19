@@ -92,7 +92,7 @@ class PTCDemonstrator(BaseDemonstrator):
 
     def estimate(self, edge, spec):
         model = (self.fair_comparison(edge).get("claude_config") or {}).get("model", "sonnet")
-        return CostEstimate(usd=0.06, wall_clock_s=90.0, command="make ptc",
+        return CostEstimate(usd=0.08, wall_clock_s=90.0, command="make ptc",
                             note=f"two fan-out runs on {model}, the only spend is the model arms")
 
     def run_claude_arm(self, edge, spec):

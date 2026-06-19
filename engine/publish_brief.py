@@ -116,7 +116,7 @@ PLANS: dict[str, BriefPlan] = {
             VendorFile("common/models.py", "common/models.py"),
             VendorFile("common/pricing.py", "common/pricing.py"),
         ),
-        make_help="build .venv, install anthropic, run the PTC token-bill comparison on the region_sales example (~$0.06)",
+        make_help="build .venv, install anthropic, run the PTC token-bill comparison on the region_sales example (~$0.08)",
         edit_surface="my_tool.py",
     ),
     # citations: the verifiable-source-pointer edge. The brief needs only the anthropic-free
@@ -502,7 +502,7 @@ https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-
                                    (Mode B bills fewer input tokens AND answers correctly)
   python -m {slug}.run_tokens --model opus    use Opus 4.8 instead of the default Sonnet 4.6
 
-This costs about $0.06 on the shipped example on Sonnet 4.6. The model arms are the only spend, the code
+This costs about $0.08 on the shipped example on Sonnet 4.6. The model arms are the only spend, the code
 runs server-side in Anthropic's sandbox. anthropic is imported lazily, inside main(), so importing this
 module needs no SDK.
 """
@@ -1122,7 +1122,7 @@ See it run (about two minutes):
 ```
 git clone {{repo_url}} && cd claude-feature-briefs
 export ANTHROPIC_API_KEY=your-key
-make ptc        # the example, $0.06
+make ptc        # the example, $0.08
 ```
 
 To run it on your own tool, open [{plan.slug}/{plan.edit_surface}]({{repo_url}}/blob/main/{plan.slug}/{plan.edit_surface}),
@@ -1186,10 +1186,15 @@ def _ensure_makefile_entry(makefile: pathlib.Path, plan: BriefPlan) -> bool:
     """Idempotently add the brief's make target to the briefs-root Makefile. Returns True if it appended,
     False if the entry was already present. Never duplicates: it keys on the target name."""
     text = makefile.read_text() if makefile.exists() else ""
-    target = f"{plan.slug}:"
-    if re.search(rf"^{re.escape(plan.slug)}:", text, re.MULTILINE):
-        return False
     run_module = "cite" if plan.slug == "citations" else "run_tokens"
+    recipe = f"\t$(PY) -m {plan.slug}.{run_module}"
+    # Refresh an existing target's recipe (its run module may have been renamed on republish), so a
+    # republished brief never leaves make pointed at a deleted module.
+    block_re = re.compile(rf"^{re.escape(plan.slug)}:.*\n(?:[ \t].*\n)*", re.MULTILINE)
+    if block_re.search(text):
+        refreshed = block_re.sub(f"{plan.slug}: $(VENV)/.installed\n{recipe}\n", text, count=1)
+        makefile.write_text(refreshed)
+        return refreshed != text
     block = (
         f"\n# {plan.title}: {plan.make_help}\n"
         f"{plan.slug}: $(VENV)/.installed\n"

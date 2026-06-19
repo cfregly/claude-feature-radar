@@ -31,7 +31,7 @@ Three qualifiers we should carry, not bury.
    Reproduce before quoting either, per numbers-are-receipts. It also adds model round-trips, so on a
    fast tool it can be slower even while it bills fewer tokens.
 
-To reproduce: `make setup`, paste your Anthropic key, `make ptc`, $0.06 on Sonnet 4.6
+To reproduce: `make setup`, paste your Anthropic key, `make ptc`, $0.08 on Sonnet 4.6
 (it is not supported on Haiku). Receipt: `edges/programmatic-tool-calling/sample.txt`.
 
 {your_name}
