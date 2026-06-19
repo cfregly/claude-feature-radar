@@ -13,58 +13,69 @@
   Execution-graded, no Docker. Judge panel ON: each execution-passed program cross-checked
   by a different model.
 
-  model                 effort     overall  held-out    suite $    $/task    judge
-  --------------------------------------------------------------------------------
-  Claude Haiku 4.5      (none)        100%      100%   $0.003740 $0.000468     100%
-  Claude Sonnet 4.6     low           100%      100%   $0.008280 $0.001035     100%
-  GPT-5.4               low           100%      100%   $0.011800 $0.001477     100%
-  Claude Sonnet 4.6     high          100%      100%   $0.014200 $0.001776     100%
-  Claude Opus 4.8       low           100%      100%   $0.017300 $0.002168     100%
-  GPT-5.4               high          100%      100%   $0.020100 $0.002507     100%
-  Claude Opus 4.8       high          100%      100%   $0.021600 $0.002703     100%
-  GPT-5.5               low           100%      100%   $0.026500 $0.003314     100%
-  Gemini 3.5 Flash      low           100%      100%   $0.034200 $0.004276     100%
-  GPT-5.5               high          100%      100%   $0.036200 $0.004522     100%
-  Gemini 3.1 Pro        low           100%      100%   $0.039000 $0.004877     100%
-  Gemini 3.5 Flash      high          100%      100%   $0.067400 $0.008420     100%
-  Gemini 3.1 Pro        high          100%      100%   $0.108800 $0.013600     100%
+  model                effort  overall held-out      suite $     $/task   judge
+  ------------------------------------------------------------------------------
+  Claude Haiku 4.5    (none)    100%      100%    $0.003750  $0.000469     100%
+  Claude Sonnet 4.6   low       100%      100%    $0.008220  $0.001027     100%
+  GPT-5.4             low       100%      100%    $0.010663  $0.001333     100%
+  Claude Sonnet 4.6   high      100%      100%    $0.014055  $0.001757     100%
+  Claude Opus 4.8     low       100%      100%    $0.017345  $0.002168     100%
+  GPT-5.4             high      100%      100%    $0.018493  $0.002312     100%
+  Claude Opus 4.8     high      100%      100%    $0.020645  $0.002581     100%
+  GPT-5.5             low       100%      100%    $0.027175  $0.003397     100%
+  Gemini 3.5 Flash    low       100%      100%    $0.035553  $0.004444     100%
+  GPT-5.5             high      100%      100%    $0.039025  $0.004878     100%
+  Gemini 3.1 Pro      low       100%      100%    $0.051556  $0.006444     100%
+  Gemini 3.5 Flash    high      100%      100%    $0.056802  $0.007100     100%
+  Gemini 3.1 Pro      high      100%      100%    $0.125176  $0.015647      88%
 
-  total spend this run: $0.4090 (read off each usage object)
+  total spend this run: $0.4285 (read off each usage object)
 
   Recommendation:
-    On the HELD-OUT test split the top pass rate was 100% (4/4), first reached by haiku @
-    (none) for $0.003740 on the slice. That is the believable number: it is the split no cell
-    was tuned against.
-    gem-pro @ high reached the same held-out pass rate for $0.108800, about 29.8x more, so
-    paying for the bigger cell bought cost, not capability, on this slice.
-    Judge cross-check: the panel agreed with every execution-passed program, so the execution
-    grade is not silently too trusting on this slice.
+    On the HELD-OUT test split every arm reached 100% (4/4), first by haiku @ (none) for
+    $0.003750 on the slice. That is the believable number: it is the split no cell was
+    tuned against. Gemini 3.1 Pro @ high reached the same held-out rate for
+    $0.125176, about 33x more, so paying for the bigger cell bought cost, not
+    capability, on this slice.
+    Judge cross-check: the panel agreed with every execution-passed program except Gemini 3.1 Pro
+    @ high (agreement 88%), so the grade is essentially not too trusting here.
 
 
-  === RUN 2: the LiveCodeBench hard slice (EVAL_LCB=1), where the tiers separate ===
+  === RUN 2: the LiveCodeBench hard slice (EVAL_LCB=1), full cross-vendor ===
 
   The built-in slice above is saturated, so it makes the cost-tie point but not the
   separation point. On a harder slice (a pinned LiveCodeBench hard set, fetched at run time)
-  the cells stop tying. This run was captured before the Anthropic key's credit ran out, so
-  the Gemini and GPT-5.5 arms did not run; it corroborates that the harness separates, it is
-  not a complete cross-vendor verdict.
+  the picture changes. This is the complete cross-vendor table (every arm ran).
 
   Sweeping 5 tasks (3 dev, 2 held-out test) across the models x efforts (low, high).
 
-    Claude Haiku 4.5       @ (none)  overall   40%  held-out   50%   $0.0314  judge-agree 100%
-    Claude Sonnet 4.6      @ low     overall   60%  held-out    0%   $0.1682  judge-agree 100%
-    Claude Sonnet 4.6      @ high    overall  100%  held-out  100%   $0.6323  judge-agree 100%
-    Claude Opus 4.8        @ low     overall  100%  held-out  100%   $0.1761  judge-agree 100%
-    Claude Opus 4.8        @ high    overall  100%  held-out  100%   $0.5169  judge-agree  80%
-    GPT-5.4                @ low     overall  100%  held-out  100%   $0.0792  judge-agree 100%
+  model                effort  overall held-out      suite $     $/task   judge
+  ------------------------------------------------------------------------------
+  Claude Haiku 4.5    (none)     40%       50%    $0.041801  $0.008360      50%
+  Claude Sonnet 4.6   high      100%      100%    $0.622428  $0.124486     100%
+  Claude Sonnet 4.6   low        80%       50%    $0.123183  $0.024637     100%
+  Claude Opus 4.8     high      100%      100%    $0.427660  $0.085532     100%
+  Claude Opus 4.8     low       100%      100%    $0.197685  $0.039537      80%
+  GPT-5.4             high      100%      100%    $0.427960  $0.085592      50%
+  GPT-5.4             low       100%      100%    $0.097735  $0.019547       0%
+  GPT-5.5             high      100%      100%    $0.402800  $0.080560      40%
+  GPT-5.5             low       100%      100%    $0.112760  $0.022552       0%
+  Gemini 3.5 Flash    high      100%      100%    $0.304773  $0.060955      40%
+  Gemini 3.5 Flash    low       100%      100%    $0.115782  $0.023156      60%
+  Gemini 3.1 Pro      high      100%      100%    $0.335516  $0.067103      40%
+  Gemini 3.1 Pro      low       100%      100%    $0.130964  $0.026193      20%
 
-  The read on the hard slice: Haiku resolves 40% (the cheap tier hits its limit on hard
-  problems), and Sonnet at LOW effort scores 60% overall but 0% on the held-out hard problem,
-  the overfit-style signal the dev number alone would have hidden. Sonnet at HIGH effort and
-  both Opus cells reach 100%, so on hard work effort and tier earn their cost, the opposite of
-  the saturated built-in slice where they did not. The judge panel disagreed with one Opus-high
-  program (agreement 80%), the one place an execution pass did not read as fully on-spec to an
-  independent grader.
+  total spend this run: $3.3410 (read off each usage object)
 
-  Note: the credit ran out mid-run, so this LCB table is partial (no Gemini, no GPT-5.5). Re-run
-  `EVAL_LCB=1 make eval` on your own keys for the full cross-vendor hard-slice table.
+  The read on the hard slice:
+  - Execution pass rate alone barely separates the field: only Haiku (40%) and Sonnet at LOW
+    effort (80% overall, 50% held-out, the dev-vs-test gap a single number would hide) fall
+    short. Every other cell passes 100%, so the bare pass rate saturates here too.
+  - The JUDGE panel is what separates. On the passing cells, the Claude programs hold high judge
+    agreement (Sonnet high 100%, Opus 80 to 100%), while the competitor passing programs
+    draw low agreement (GPT 0 to 50%, Gemini 20 to 60%). That is
+    the too-trusting-grader payoff: several competitor programs pass the tests but read as
+    off-spec to an independent grader, where the Claude programs read as on-spec.
+  - Scope: 5 problems, and the judge is itself a model, so this corroborates a pattern, it is
+    not a verdict. Re-run `EVAL_LCB=1 make eval` on your own keys to confirm.
+

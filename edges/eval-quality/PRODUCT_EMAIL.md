@@ -25,18 +25,20 @@ The measured outcome (8 tasks, 4 held-out, 7 models, judge on, $0.4090 total off
 
 - Every model resolved the held-out split 4 of 4. Claude Haiku, Sonnet, and Opus, GPT-5.4 and GPT-5.5,
   and Gemini 3.5 Flash and 3.1 Pro. All tied at 100%.
-- The cost spread was the only separation: Haiku at $0.0037 vs Gemini 3.1 Pro at high effort at $0.1088,
-  about 30x, for the identical held-out result.
-- The judge panel agreed with every execution-passed program (100% agreement), so the execution grade
-  is not silently too trusting on this slice.
+- The cost spread was the only separation: Haiku at $0.0037 vs Gemini 3.1 Pro at high effort at $0.1252,
+  about 33x, for the identical held-out result.
+- The judge panel agreed with all but one execution-passed program (Gemini 3.1 Pro at high, 88%), so
+  the execution grade is essentially not too trusting on this slice.
 
 What this slice does NOT let us claim. It is saturated, so it does not separate the field on capability,
 and we must not pitch a Claude eval-quality lead off it. I ran a harder slice too (a pinned
-LiveCodeBench hard set, `EVAL_LCB=1`) and there the cells stop tying: Claude Haiku resolved 40%, and
-Claude Sonnet at LOW effort scored 60% overall but 0% on the held-out hard problem, the overfit signal
-the dev number alone would have hidden, while Sonnet at HIGH effort and both Opus cells reached 100%.
-That run was cut short when the test key's credit ran out, so its Gemini and GPT-5.5 arms did not run,
-and I am holding it as corroboration that the harness separates, not as a cross-vendor verdict.
+LiveCodeBench hard set, `EVAL_LCB=1`) and ran it complete cross-vendor. Execution pass rate barely separates even there: only Claude Haiku
+(40%) and Claude Sonnet at LOW effort (80% overall, 50% on the held-out hard problem, the dev-vs-test
+gap a single number would hide) fall short, every other cell passes 100%. What separates the field is
+the judge panel: the Claude programs hold high judge agreement (Sonnet high 100%, Opus 80 to 100%)
+while the competitor passing programs draw low agreement (GPT 0 to 50%, Gemini 20 to 60%), so several
+competitor programs pass the tests but read as off-spec to an independent grader. With 5 problems and a
+model judge, I am holding this as a corroborating pattern, not a cross-vendor verdict.
 
 Why it matters for the pitch. The founder-facing value here is the cost-axis finding (the cheap tier
 often clears the bar, so a team can stop overpaying), and the credibility is the held-out split plus
