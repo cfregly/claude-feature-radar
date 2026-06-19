@@ -228,6 +228,7 @@ make pdf-citations # direct-PDF page citations, data-backed edge when promotable
 make search-results # BYO RAG chunk citations, data-backed edge when promotable
 make grounding-stack # text + PDF + RAG chunk citations in one request, data-backed edge when promotable
 make web-citations # live-web citations with a verbatim source quote, data-backed edge when promotable
+make citations-paraphrase # paraphrase-robust citation resolution, Claude guaranteed-resolve vs the DIY str.find drop, data-backed edge when promotable
 make bulk-output # largest single-request deliverable, data-backed edge when promotable
 make cache-diagnostics # cache-miss root-cause observability, data-backed edge when promotable
 make task-budget # full-loop budget marker, stop-before-tool-call edge when promotable

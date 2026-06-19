@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps app app-check ptc citations citations-quick cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports check-surface check-receipts test ci deslop gif clean
+.PHONY: setup compare-deps app app-check ptc citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports check-surface check-receipts test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -27,6 +27,9 @@ citations: ## EDGE: verifiable citations vs the DIY str.find baseline, all three
 
 citations-quick: ## a 3-question, cents-scale smoke of the citations edge
 	$(PY) edges/citations/demo.py --quick
+
+citations-paraphrase: ## EDGE: paraphrase-robustness of citation resolution, Claude guaranteed-resolve vs the DIY str.find drop rate (needs 3 keys, cents)
+	$(PY) run.py citations-paraphrase --emit-edge
 
 pdf-citations: ## EDGE: page citations into a directly supplied PDF, Claude vs direct PDF/file inputs (needs 3 keys, cents)
 	$(PY) run.py pdf-citations --emit-edge

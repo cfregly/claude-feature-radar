@@ -62,6 +62,8 @@ def main():
         from engine.demonstrators.search_results_grounding import main as m; raise SystemExit(m())
     elif cmd in ("grounding-stack", "grounding_stack"):
         from engine.demonstrators.grounding_stack import main as m; raise SystemExit(m())
+    elif cmd in ("citations-paraphrase", "paraphrase", "paraphrase-resolution"):
+        from engine.demonstrators.paraphrase_resolution import main as m; raise SystemExit(m())
     elif cmd in ("web-citations", "web_citations"):
         from engine.demonstrators.web_citations import main as m; raise SystemExit(m())
     elif cmd in ("bulk-output", "bulk-extended-output", "bulk_extended_output"):
