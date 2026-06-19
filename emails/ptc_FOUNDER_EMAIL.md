@@ -1,59 +1,54 @@
-Subject: Congrats on YC! 🎉 A Claude tool-calling pattern for fan-out agents
+Subject: Congrats on YC! 🎉 A cool Claude feature to help you build
 
 Hey {first_name},
 
-Congrats on YC.
+Congrats on getting into YC! Quick tip to trim your Claude token bill.
 
-Quick builder note if your product has an agent that calls the same tool across many accounts,
-cohorts, regions, logs, or plan-limit checks.
+If your app calls your own tool to answer a question and that tool returns a lot of records, every
+record it pulls back lands in the model's context, and you pay for all of them, even the ones that turn
+out irrelevant.
 
-The expensive shape is simple: the tool returns a lot of rows, the model only needs the aggregate,
-and every row still lands in the model context before it can answer.
+[Programmatic tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling) (PTC) fixes that. Claude runs your tool inside a code
+sandbox, keeps only the records that matter, and passes just those to the model. The rest never reach
+the context, so you are not billed for them.
 
-[Programmatic tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling)
-fits that shape. Add the code execution tool and allow it to call your custom tool. Claude writes a
-sandbox script that loops over the tool, filters and aggregates there, then returns only the answer to
-the model.
+It is one change to the API call you already make:
 
 ```python
 response = client.messages.create(
     model="claude-sonnet-4-6",
     messages=[...],
     tools=[
-        {"type": "code_execution_20260120", "name": "code_execution"},
-        {
-            "name": "query_usage_events",
-            "input_schema": {...},
-            "allowed_callers": ["code_execution_20260120"],
-        },
+        {"type": "code_execution_20260120", "name": "code_execution"},   # add this
+        { "name": "query_region_sales", "input_schema": {...},   # your tool, unchanged
+          "allowed_callers": ["code_execution_20260120"] },        # add this line
     ],
 )
 ```
 
-Same task and model, with and without it:
+Same task and model (Sonnet 4.6), with and without it:
 
-| mode | input tokens billed | what changed |
+| | input tokens billed | why |
 |---|---:|---|
-| without PTC | 9,451 | every row reached the model context |
-| with PTC | 6,828 | the sandbox did the aggregation |
+| without PTC | 9,451 | every record lands in the model's context |
+| with PTC | 6,828 | only the relevant records reach the model |
 
-That is 28% cheaper on this demo. The scope line matters: it pays when your agent calls a tool many
-times over data it then crunches. If your tool returns one small object, this is not the pattern.
+28% cheaper on this demo, and it compounds across every fan-out.
 
 Want to watch it first, no clone needed? The brief opens with a gif of the run:
 https://github.com/cfregly/claude-feature-briefs/blob/main/ptc/README.md
 
-See it run:
+See it run (about two minutes):
 
-```bash
+```
 git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
 export ANTHROPIC_API_KEY=your-key
 make ptc        # the example, $0.08
 ```
 
-To run it on your own tool, open [ptc/my_tool.py](https://github.com/cfregly/claude-feature-briefs/blob/main/ptc/my_tool.py), drop in your
-tool, and run `make ptc` again.
+To run it on your own tool, open [ptc/my_tool.py](https://github.com/cfregly/claude-feature-briefs/blob/main/ptc/my_tool.py),
+drop in your tool, and run `make ptc` again.
 
-Go build! 🚀
+Happy building! 🚀
 {your_name}
 Building with Claude

@@ -30,8 +30,9 @@ class Model:
 
 
 # Verified 2026-06-18 against platform.claude.com (pricing, effort, adaptive-thinking) and a live call.
-# The pricing page now lists Claude Fable 5 and Claude Mythos 5 ($10/$50 per MTok each); both are
-# carried below, Mythos at limited availability.
+# Claude Mythos 5 is also PTC-capable and priced like Fable 5 on the live page, but it is limited
+# availability and no code path resolves it, so it stays a doc-support fact (docs/CITED_FACTS.md), not a
+# runtime registry row. The registry carries only models the code actually selects and runs.
 MODELS: dict[str, Model] = {
     "opus": Model(
         key="opus", id="claude-opus-4-8", label="Claude Opus 4.8", tier="frontier",
@@ -64,17 +65,6 @@ MODELS: dict[str, Model] = {
         context_window=1_000_000, min_cache_tokens=512,
         effort_levels=("low", "medium", "high", "xhigh", "max"),
         thinking_mode="adaptive",          # always on; may be access-gated on a given key
-    ),
-    "mythos": Model(
-        # Same price as Fable 5 on the live pricing page (re-verified 2026-06-18). Limited availability
-        # (the Glasswing program), so it is gated off most keys; listed here so the registry matches the
-        # live pricing table and the PTC model-compatibility list, never to fake a row the key cannot reach.
-        key="mythos", id="claude-mythos-5", label="Claude Mythos 5", tier="frontier-plus",
-        input_per_mtok=10.0, output_per_mtok=50.0,
-        cache_write_5m_per_mtok=12.50, cache_write_1h_per_mtok=20.0, cache_read_per_mtok=1.0,
-        context_window=1_000_000, min_cache_tokens=512,
-        effort_levels=("low", "medium", "high", "xhigh", "max"),
-        thinking_mode="adaptive",          # always on; limited availability, access-gated on most keys
     ),
     # OpenAI and Gemini comparison models. This is the ONE verified competitor price table: the OpenAI
     # and Gemini arms (engine/openai_arm.py, engine/gemini_arm.py) and the citations DIY arms all read

@@ -28,11 +28,10 @@ the developer is not billed input tokens for data the model never needs to read.
 Models (per the docs): Fable 5, Mythos 5, Opus 4.5 to 4.8, Sonnet 4.5 to 4.6 (not Haiku). The runnable demos use Sonnet and Opus. Source, re-fetched 2026-06-18:
 https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 
-The win is workload-shaped. It appears on a FAN-OUT task where the model calls a tool many times and
-the bulky outputs would otherwise flow through context. The live doc itself notes a sequential
-single-call benchmark (tau2-bench) was flat to about 8% MORE expensive, so the app and the demo both
-run the fan-out example, and the app says so plainly. A bare unscoped "PTC is cheaper" claim would
-break on contact, but the scoped one ("fewer billed input tokens on a fan-out workload") holds.
+The win is workload-shaped. It needs a FAN-OUT task: the model has to call the tool many times for the
+bulky outputs to pile up, so keeping them in the sandbox is what saves the input tokens. The demo and
+the app both run the genuine fan-out example, and the app says so plainly, so the claim stays scoped to
+where it holds: fewer billed input tokens on a fan-out workload. Keep your own task fan-out shaped.
 
 Nothing here imports anthropic. The caller passes in a client, so this module stays import-light and
 the one-dependency core is untouched.

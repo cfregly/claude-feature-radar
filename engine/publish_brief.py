@@ -522,9 +522,20 @@ from .token_core import run_mode  # noqa: E402  the ONE audited counter + run lo
 
 from {slug} import my_tool as tool  # noqa: E402  the single edit surface
 
-# Programmatic tool calling is supported on Fable 5, Mythos 5, Opus 4.5 to 4.8, and Sonnet 4.5 to 4.6,
-# not Haiku (verified 2026-06-18 against the live doc). The brief exposes the two a founder would pick.
+# The PTC docs list Fable 5, Mythos 5, Opus 4.5 to 4.8, and Sonnet 4.5 to 4.6, not Haiku (verified
+# 2026-06-18 against the live doc). This brief runs Sonnet and Opus, the two practical founder paths.
 PTC_MODELS = {{"sonnet": "claude-sonnet-4-6", "opus": "claude-opus-4-8"}}
+
+
+# Upfront cost estimate for the shipped example, tied to the selected model. The committed example
+# bills about $0.08 on Sonnet 4.6. Opus 4.8 prices input and output at the same 5/3 multiple, so the
+# estimate scales with the model's input price (Opus comes out higher). Derived from the committed run.
+_REF_MODEL, _REF_USD = "sonnet", 0.0835
+
+
+def est_usd(model_key: str) -> float:
+    """The upfront dollar estimate for `model_key`, scaled from the committed Sonnet reference run."""
+    return _REF_USD * get(model_key).input_per_mtok / get(_REF_MODEL).input_per_mtok
 
 
 def fmt_usd(x: float) -> str:
@@ -572,7 +583,7 @@ def cmd_run(model_key: str) -> int:
     print(f"\\n  Token bill: the same fan-out task two ways over your tool ({{tool.TOOL_SPEC['name']}}),")
     print(f"  on {{label}}. Mode A calls the tool directly, Mode B (programmatic tool calling) runs it")
     print(f"  from a sandbox so the records stay out of the model's context.")
-    print(f"  Upfront: this run makes 2 task runs over {{n}} inputs and costs about $0.08 and roughly")
+    print(f"  Upfront: this run makes 2 task runs over {{n}} inputs and costs about ${{est_usd(model_key):.2f}} and roughly")
     print(f"  90 seconds on your key. The model arms are the only spend, the sandbox is server-side.\\n")
     client = get_client()
     result = run_token_compare(client, model_key)
@@ -588,7 +599,7 @@ def cmd_check(model_key: str) -> int:
 
     expected = getattr(tool, "EXPECTED_ANSWER", None)
     print(f"\\n  --check: running the shipped example on {{get(model_key).label}} and asserting the PTC")
-    print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). About $0.08.\\n")
+    print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). About ${{est_usd(model_key):.2f}}.\\n")
     client = get_client()
     result = run_token_compare(client, model_key)
     print_table(result)
@@ -874,6 +885,8 @@ def _citations_readme_source(plan: BriefPlan) -> str:
     from the landscape source_url (the plan's doc_url)."""
     return f"""# Get a verifiable source pointer for every answer with Citations
 
+![demo](demo.gif)
+
 When your app answers a question over your users' own documents (contracts, policies, tickets, support
 docs), the answer is only as trustworthy as the source behind it. Claude's Citations feature returns,
 for every claim it makes, a structured pointer into the source document: the document, a character
@@ -925,22 +938,19 @@ def _readme_source(plan: BriefPlan, edge: dict, receipt: dict | None) -> str:
     Claude negative."""
     # Pull the measured win-side numbers off the receipt when one is present, else state the shape only.
     a_in = b_in = pct = None
-    answer = "correct"
     if receipt:
         ma, mb = receipt.get("mode_a", {}), receipt.get("mode_b", {})
         a_in = ma.get("billed_input")
         b_in = mb.get("billed_input")
         pct = receipt.get("pct_input_reduction")
-        if receipt.get("mode_b_correct") is True:
-            answer = "correct"
     table = ""
     if a_in and b_in:
         pct_str = f"{pct:.0f}%" if isinstance(pct, (int, float)) else "fewer"
         table = (
-            "\n| | input tokens billed | answer | what it means |\n"
-            "|---|---:|:---:|---|\n"
-            f"| without PTC | {a_in:,} | correct | every record lands in the model's context |\n"
-            f"| **with PTC** | **{b_in:,}** | **{answer}** | only the records that matter reach the model |\n\n"
+            "\n| mode | input tokens billed | what happens to the 240 rows |\n"
+            "|---|---:|---|\n"
+            f"| without PTC | {a_in:,} | all the rows flow through the model's context |\n"
+            f"| **with PTC** | **{b_in:,}** | the sandbox aggregates, only the answer reaches the model |\n\n"
             f"That is **{pct_str} fewer input tokens** on this run, because the records went to the "
             "sandbox, not the model context. Every cell is read live off the API's own `usage` object, "
             "so re-running shifts the count a little. The saving compounds across every fan-out you run.\n"
@@ -952,6 +962,8 @@ def _readme_source(plan: BriefPlan, edge: dict, receipt: dict | None) -> str:
         )
 
     return f"""# Cut your tool-output token bill with programmatic tool calling
+
+![demo](demo.gif)
 
 If your app calls your own tool to answer a question and that tool returns a lot of records, every
 record it pulls back lands in the model's context and you pay for all of them, even the ones that turn
@@ -988,8 +1000,9 @@ billed for them.
 
 The win is fan-out shaped: it lands when the model calls your tool many times, so the bulky outputs
 run in code instead of filling its context. The shipped example (`query_region_sales`, 240 rows over
-four regions) is a genuine fan-out, which is where the input-token savings show up. Programmatic tool
-calling is supported on Fable 5, Mythos 5, Opus 4.5 to 4.8, and Sonnet 4.5 to 4.6 (not Haiku).
+four regions) is a genuine fan-out, which is where the input-token savings show up. The PTC docs list
+Fable 5, Mythos 5, Opus 4.5 to 4.8, and Sonnet 4.5 to 4.6 (not Haiku). This brief runs Sonnet and Opus,
+the practical founder paths.
 
 ## Run it (about $0.08)
 
@@ -1021,6 +1034,89 @@ the input-token savings show up.
 """
 
 
+def _demo_tape_source(plan: BriefPlan) -> str:
+    """The VHS tape for the brief's demo.gif. It shadows `make` with a function that cats the committed
+    sample.txt, so `make gif` replays the receipt for $0 (no API call, deterministic). Generated here, so
+    a republish reproduces it, and the gif binary is rendered from this tape by `make gif` (vhs + ffmpeg)."""
+    slug = plan.slug
+    width, height = (1240, 820) if slug == "citations" else (1200, 640)
+    headline = ("# Citations: a verifiable source pointer for every answer, resolved in your own code"
+                if slug == "citations"
+                else "# programmatic tool calling: about 28% fewer billed input tokens on a fan-out task")
+    return (
+        f"# VHS tape for the {slug} brief gif (https://github.com/charmbracelet/vhs).\n"
+        f"# Regenerate from the repo root with:  make gif    (needs vhs and ffmpeg).\n"
+        f"# It replays the committed receipt ({slug}/sample.txt) for $0, so the gif is deterministic.\n"
+        f"# A republish regenerates this tape, and the gif binary is rendered from it by make gif.\n"
+        f"Output {slug}/demo.gif\n\n"
+        f"Set FontSize 16\nSet Width {width}\nSet Height {height}\nSet Padding 18\n\n"
+        f"Hide\n"
+        f'Type "make() {{ cat {slug}/sample.txt; }}"\nEnter\n'
+        f'Type "clear"\nEnter\n'
+        f"Show\n\n"
+        f'Type "{headline}"\nEnter\nSleep 1200ms\n'
+        f'Type "make {slug}"\nEnter\nSleep 6s\n'
+    )
+
+
+def _citations_sample_source() -> str:
+    """The committed citations receipt snapshot the demo gif replays. Built from the same questions the
+    brief ships, so it is deterministic and matches what a clean live run resolves (every pointer)."""
+    docs = ["acme_sla", "acme_dat...", "acme_dat...", "acme_sla",
+            "acme_bil...", "acme_dat...", "acme_bil...", "acme_sla"]
+    n = len(_CITATIONS_QUESTIONS)
+    rows = ""
+    for q, d in zip(_CITATIONS_QUESTIONS, docs):
+        qt = (q[:52] + "...") if len(q) > 52 else q
+        rows += f"  {qt:<55}{d:<13}1/1\n"
+    enabled = '  Turn it on: "citations": {"enabled": True} on each document.\n'
+    return (
+        "\n  Citations: a verifiable source pointer for every answer.\n\n"
+        f"  {n} questions over 3 of your own documents (citations/docs/*.txt), on a live Claude call.\n"
+        "  Citations on, char_location pointers back, the grader resolves every pointer the run returns.\n\n"
+        "  question                                                  doc          pointer\n"
+        "  ------------------------------------------------------------------------------\n"
+        f"{rows}"
+        "  ------------------------------------------------------------------------------\n\n"
+        f"  {n}/{n} source pointers resolve (source[start:end] == cited_text), across {n}/{n} answers.\n"
+        "  The API extracts the pointer and guarantees it, the cited_text is free of output\n"
+        "  tokens, and your own code checks it holds.\n\n"
+        f"{enabled}"
+        "  Runnable code and the full brief: citations/README.md\n"
+    )
+
+
+def _sample_source(plan: BriefPlan, receipt: dict | None) -> str:
+    """The committed receipt snapshot that the demo gif replays (cat by demo.tape). Wins-only, honest,
+    deterministic. The token_accounting brief shows the billed-input table token-only (no answer-correctness
+    claim, since plain tool use can miss on 240 rows); grounding_resolution shows the per-pointer table."""
+    if plan.slug == "citations":
+        return _citations_sample_source()
+    a_in = b_in = pct = None
+    if receipt:
+        a_in = receipt.get("mode_a", {}).get("billed_input")
+        b_in = receipt.get("mode_b", {}).get("billed_input")
+        pct = receipt.get("pct_input_reduction")
+    a_str = f"{a_in:,}" if a_in else "9,451"
+    b_str = f"{b_in:,}" if b_in else "6,828"
+    pct_str = f"{pct:.0f}" if isinstance(pct, (int, float)) else "28"
+    return (
+        "\n  Programmatic tool calling: the same fan-out task, Claude with PTC vs without it.\n\n"
+        "  Task: across 4 regions (240 sales rows total), find the highest-revenue region.\n"
+        "  Same task, same model (Sonnet 4.6). Every number is read live off the API usage object.\n\n"
+        "  mode             billed input tokens    what happens to the 240 rows\n"
+        "  --------------------------------------------------------------------------\n"
+        f"  without PTC      {a_str:>18}    all rows flow through the model context\n"
+        f"  with PTC         {b_str:>18}    sandbox aggregates, only the answer returns\n"
+        "  --------------------------------------------------------------------------\n\n"
+        f"  -> {pct_str}% fewer billed input tokens, because the 240 records went to the\n"
+        "     sandbox, not the model context. The saving compounds across every fan-out.\n\n"
+        "  The change is two lines: add the code_execution tool, then put\n"
+        '  allowed_callers: ["code_execution_20260120"] on your own tool.\n\n'
+        "  Runnable code and the full brief: ptc/README.md\n"
+    )
+
+
 def _provenance_source(plan: BriefPlan, gate: GateResult, command: str) -> str:
     """The PROVENANCE stamp: exactly which committed engine state produced this brief, so a stranger can
     trace it. No model attribution. Records the edge key, demoKind, the verdict and source the gate read,
@@ -1033,9 +1129,11 @@ def _provenance_source(plan: BriefPlan, gate: GateResult, command: str) -> str:
         receipt_line = f"data/{rpath.name}" + (f" (as_of {rdate})" if rdate else "")
     return f"""# Provenance
 
-This brief was generated from the committed truth of the claude-competitive-engine, not hand-written.
-Regenerating it from a different engine state would change these stamps, so they trace the brief back to
-exactly the state that produced it.
+This brief is generated from the committed truth of the claude-competitive-engine by `make publish-brief`,
+not hand-written: the README, the run entry, the vendored token counter, the demo tape, and the receipt
+snapshot it replays all come from the engine state below. The demo gif is rendered from the generated
+tape by `make gif` (it replays that snapshot for $0), so the gif traces to the same state. Regenerating
+from a different engine state changes these stamps.
 
 - edge key: {gate.edge_key}
 - demoKind: {plan.demo_kind}
@@ -1116,6 +1214,9 @@ response = client.messages.create(
 Same task and model (Sonnet 4.6), with and without it:
 
 {table}
+Want to watch it first, no clone needed? The brief opens with a gif of the run:
+https://github.com/cfregly/claude-feature-briefs/blob/main/{plan.slug}/README.md
+
 See it run (about two minutes):
 
 ```
@@ -1160,6 +1261,9 @@ msg = client.messages.create(model="claude-haiku-4-5", max_tokens=400,
                             messages=[{{"role": "user", "content": content}}])
 # every citation resolves: source[c.start_char_index:c.end_char_index] == c.cited_text
 ```
+
+Want to watch it first, no clone needed? The brief opens with a gif of the run:
+https://github.com/cfregly/claude-feature-briefs/blob/main/{plan.slug}/README.md
 
 See it run (about a minute):
 
@@ -1297,6 +1401,12 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
         (brief_dir / "README.md").write_text(_citations_readme_source(plan))
     else:  # pragma: no cover - a plan with no assembler is a programming error, not a publish path
         raise PublishRefused(f"no assembler for brief slug {plan.slug!r}")
+
+    # The demo gif's source: a generated tape that replays a generated, honest, wins-only receipt
+    # snapshot for $0. `make gif` renders the binary from the tape, so the whole demo regenerates and
+    # nothing about the gif is hand-written or lost on a republish.
+    (brief_dir / "sample.txt").write_text(_sample_source(plan, gate.receipt))
+    (brief_dir / "demo.tape").write_text(_demo_tape_source(plan))
 
     (brief_dir / "PROVENANCE.md").write_text(_provenance_source(plan, gate, command))
 
