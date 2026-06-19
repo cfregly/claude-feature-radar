@@ -41,7 +41,7 @@ That is 28% cheaper on this demo. The scope line matters: it pays when your agen
 times over data it then crunches. If your tool returns one small object, this is not the pattern.
 
 Want to watch it first, no clone needed? The brief opens with a gif of the run:
-https://github.com/cfregly/claude-feature-briefs/tree/main/ptc
+https://github.com/cfregly/claude-feature-briefs/blob/main/ptc/README.md
 
 See it run:
 
