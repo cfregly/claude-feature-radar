@@ -1208,12 +1208,12 @@ def _founder_email_source(plan: BriefPlan, receipt: dict | None) -> str:
             "|---|---:|---|\n"
             f"| without PTC | {a_in:,} | every record lands in the model's context |\n"
             f"| with PTC | {b_in:,} | only the relevant records reach the model |\n\n"
-            f"{pct_str} cheaper on this demo, and it compounds across every fan-out.\n"
+            f"{pct_str} fewer billed input tokens on this demo, and the saving grows with the size of the fan-out.\n"
         )
     else:
         table = "Run `make ptc` to print your own before/after from a live call.\n"
 
-    return f"""Subject: Congrats on YC! 🎉 A cool Claude feature to help you build
+    return f"""Subject: Congrats on YC! 🎉 A Claude tool-calling pattern for fan-out agents
 
 Hey {{first_name}},
 
@@ -1227,7 +1227,7 @@ out irrelevant.
 sandbox, keeps only the records that matter, and passes just those to the model. The rest never reach
 the context, so you are not billed for them.
 
-It is one change to the API call you already make:
+It is two small additions to the API call you already make:
 
 ```python
 response = client.messages.create(
@@ -1267,7 +1267,7 @@ Building with Claude
 def _citations_founder_email_source(plan: BriefPlan) -> str:
     """The citations founder email, written to the ENGINE repo (never the public briefs repo). Wins-only,
     plain language, the real code, one reproduce path."""
-    return f"""Subject: Congrats on YC! 🎉 A cool Claude feature to help you build
+    return f"""Subject: Congrats on YC! 🎉 A Claude pattern for answers over user docs
 
 Hey {{first_name}},
 
@@ -1389,6 +1389,28 @@ def _ensure_readme_entry(readme: pathlib.Path, plan: BriefPlan) -> bool:
     return True
 
 
+_OUTREACH_README = """# Outreach examples
+
+Example founder emails you can adapt. Each one is a short, warm note to a builder: it names the workload,
+shows the one Claude feature and the small code change, gives a real before and after number from the
+matching brief, and links the one-command run. They are templates, not sent mail. The `{first_name}` and
+`{your_name}` placeholders and the neutral sign-off are meant to be filled in.
+
+- [ptc-email.md](ptc-email.md): the programmatic-tool-calling brief, for an agent that calls a tool a lot.
+- [citations-email.md](citations-email.md): the Citations brief, for a product that answers over user docs.
+
+Every number in these matches the brief it points at, and the repo's number gate checks that, so you can
+send one knowing the reader sees the same figure when they run it.
+"""
+
+
+def _ensure_outreach_readme(readme: pathlib.Path) -> None:
+    """Write the framing README for the outreach-examples folder if it is missing. Idempotent, so a
+    republish never churns it. It marks the emails as adaptable examples, not sent mail."""
+    if not readme.exists():
+        readme.write_text(_OUTREACH_README)
+
+
 # --------------------------------------------------------------------------- the generator
 
 
@@ -1492,13 +1514,21 @@ def publish(edge_key: str, briefs_root: pathlib.Path, command: str) -> int:
     made_mk = _ensure_makefile_entry(briefs_root / "Makefile", plan)
     made_rd = _ensure_readme_entry(briefs_root / "README.md", plan)
 
-    # The founder email goes to the ENGINE repo, never into the public briefs repo.
+    # The full founder email is the engine's working draft, kept here under emails/.
     emails_dir = ROOT / "emails"
     emails_dir.mkdir(exist_ok=True)
     email_path = emails_dir / f"{plan.slug}_FOUNDER_EMAIL.md"
     email_src = (_citations_founder_email_source(plan) if plan.slug == "citations"
                  else _founder_email_source(plan, _committed_receipt(plan)))
     email_path.write_text(email_src)
+
+    # The same email also ships into the public briefs as a labeled, adaptable OUTREACH EXAMPLE. It is
+    # generic by construction (templated names, neutral sign-off, links only to the public repo), and the
+    # one template keeps the example and the engine draft from drifting apart.
+    examples_dir = briefs_root / "outreach-examples"
+    examples_dir.mkdir(exist_ok=True)
+    (examples_dir / f"{plan.slug}-email.md").write_text(email_src)
+    _ensure_outreach_readme(examples_dir / "README.md")
 
     files = sorted(p.relative_to(briefs_root) for p in brief_dir.rglob("*") if p.is_file())
     print(f"\n  PUBLISHED brief {plan.slug!r} for edge {gate.edge_key!r} ({plan.demo_kind})")

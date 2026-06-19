@@ -1,4 +1,4 @@
-Subject: Congrats on YC! 🎉 A cool Claude feature to help you build
+Subject: Congrats on YC! 🎉 A Claude tool-calling pattern for fan-out agents
 
 Hey {first_name},
 
@@ -12,7 +12,7 @@ out irrelevant.
 sandbox, keeps only the records that matter, and passes just those to the model. The rest never reach
 the context, so you are not billed for them.
 
-It is one change to the API call you already make:
+It is two small additions to the API call you already make:
 
 ```python
 response = client.messages.create(
@@ -33,7 +33,7 @@ Same task and model (Sonnet 4.6), with and without it:
 | without PTC | 9,451 | every record lands in the model's context |
 | with PTC | 6,828 | only the relevant records reach the model |
 
-28% cheaper on this demo, and it compounds across every fan-out.
+28% fewer billed input tokens on this demo, and the saving grows with the size of the fan-out.
 
 Want to watch it first, no clone needed? The brief opens with a gif of the run:
 https://github.com/cfregly/claude-feature-briefs/blob/main/ptc/README.md

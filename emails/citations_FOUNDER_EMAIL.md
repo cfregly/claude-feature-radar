@@ -1,4 +1,4 @@
-Subject: Congrats on YC! 🎉 A cool Claude feature to help you build
+Subject: Congrats on YC! 🎉 A Claude pattern for answers over user docs
 
 Hey {first_name},
 
