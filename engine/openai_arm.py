@@ -24,18 +24,14 @@ Verified 2026-06-17 against developers.openai.com. `openai` is an optional depen
 from __future__ import annotations
 
 import json
-import os
 import time
 
+from common.pricing import cost_from_buckets  # the one verified price table lives in common/models.py
 from engine.demo import build_chain, task_prompt  # the exact same task
 
-# per 1M tokens, verified 2026-06-17 (developers.openai.com/api/docs/pricing)
-OPENAI_PRICES = {
-    "gpt-5.4-mini": {"input": 0.75, "cached": 0.075, "output": 4.50},
-    "gpt-5.4-nano": {"input": 0.20, "cached": 0.02, "output": 1.25},
-}
 # why gpt-5.4-mini: the cheapest tier the docs recommend as a capable multi-step tool driver.
-# nano is cheaper but a weaker driver. The choice is documented so a founder can swap it.
+# nano is cheaper but a weaker driver. The choice is documented so a founder can swap it. Its price
+# (and gpt-5.4-nano's) lives once in common/models.py, re-verified live 2026-06-18, never copied here.
 DEFAULT_OPENAI_MODEL = "gpt-5.4-mini"
 
 READ_TOOL_OAI = {
@@ -52,23 +48,28 @@ READ_TOOL_OAI = {
 
 
 def _client():
-    try:
-        from openai import OpenAI
-    except ImportError:
-        raise SystemExit("The comparison needs the OpenAI SDK. Run: pip install openai")
-    if not os.environ.get("OPENAI_API_KEY"):
+    """The OpenAI client for the legacy long-horizon chain, shared with the demonstrator path.
+
+    Delegates to engine.providers.get_openai_client (the single client builder), then preserves this
+    arm's contract: raise SystemExit when the key is unset, so compare/sweep/longhorizon stop loudly
+    rather than running a half comparison. The provider builder raises its own SystemExit when the SDK
+    is missing. Imported lazily so importing this module never pulls `openai`.
+    """
+    from engine.providers.openai_provider import get_openai_client
+    client = get_openai_client()
+    if client is None:
         raise SystemExit("OPENAI_API_KEY is not set. Add it to .env or export it.")
-    return OpenAI()
+    return client
 
 
 def _cost(model, usage):
-    p = OPENAI_PRICES.get(model, OPENAI_PRICES[DEFAULT_OPENAI_MODEL])
+    # OpenAI's input_tokens INCLUDES the cached tokens, so fresh = input - cached. Rates come from the
+    # one verified table in common/models.py via cost_from_buckets, never a copy in this file.
     inp = getattr(usage, "input_tokens", 0) or 0
     out = getattr(usage, "output_tokens", 0) or 0
     det = getattr(usage, "input_tokens_details", None)
     cached = (getattr(det, "cached_tokens", 0) or 0) if det else 0
-    fresh = max(0, inp - cached)
-    cost = (fresh * p["input"] + cached * p["cached"] + out * p["output"]) / 1e6
+    cost = cost_from_buckets(model, fresh_input=max(0, inp - cached), cached=cached, output=out)
     return cost, inp, cached
 
 

@@ -21,17 +21,13 @@ counts from usage_metadata, priced by the verified table below. See docs/VERIFIE
 
 from __future__ import annotations
 
-import os
 import time
 
+from common.pricing import cost_from_buckets  # the one verified price table lives in common/models.py
 from engine.demo import build_chain, task_prompt  # the exact same task
 
-# per 1M tokens, paid tier, verified 2026-06-17 against ai.google.dev/gemini-api/docs/pricing
-GEMINI_PRICES = {
-    "gemini-3.5-flash": {"input": 1.50, "cached": 0.15, "output": 9.00},
-    "gemini-3.1-flash-lite": {"input": 0.25, "cached": 0.025, "output": 1.50},
-    "gemini-3.1-pro-preview": {"input": 2.00, "cached": 0.20, "output": 12.00},
-}
+# The Gemini comparison prices (paid tier, Standard) live once in common/models.py, re-verified live
+# 2026-06-18 against ai.google.dev/gemini-api/docs/pricing, never copied here.
 DEFAULT_GEMINI_MODEL = "gemini-3.5-flash"
 
 READ_TOOL_GEMINI = {
@@ -48,23 +44,28 @@ READ_TOOL_GEMINI = {
 
 
 def _client():
-    try:
-        from google import genai  # noqa: F401
-    except ImportError:
-        raise SystemExit("The Gemini comparison needs the SDK. Run: pip install google-genai")
-    if not os.environ.get("GEMINI_API_KEY"):
+    """The Gemini client for the legacy long-horizon chain, shared with the demonstrator path.
+
+    Delegates to engine.providers.get_gemini_client (the single client builder), then preserves this
+    arm's contract: raise SystemExit when the key is unset, so compare/sweep/longhorizon stop loudly
+    rather than running a half comparison. The provider builder raises its own SystemExit when the SDK
+    is missing. Imported lazily so importing this module never pulls `google-genai`.
+    """
+    from engine.providers.gemini_provider import get_gemini_client
+    client = get_gemini_client()
+    if client is None:
         raise SystemExit("GEMINI_API_KEY is not set. Add it to .env or export it.")
-    from google import genai
-    return genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+    return client
 
 
 def _cost(model, um):
-    p = GEMINI_PRICES.get(model, GEMINI_PRICES[DEFAULT_GEMINI_MODEL])
+    # Gemini's prompt_token_count INCLUDES the cached tokens, so fresh = prompt - cached, and thinking
+    # bills at the output rate. Rates come from the one verified table in common/models.py via
+    # cost_from_buckets, never a copy in this file.
     prompt = getattr(um, "prompt_token_count", 0) or 0
     cached = getattr(um, "cached_content_token_count", 0) or 0
     out = (getattr(um, "candidates_token_count", 0) or 0) + (getattr(um, "thoughts_token_count", 0) or 0)
-    fresh = max(0, prompt - cached)
-    cost = (fresh * p["input"] + cached * p["cached"] + out * p["output"]) / 1e6
+    cost = cost_from_buckets(model, fresh_input=max(0, prompt - cached), cached=cached, output=out)
     return cost, prompt, cached, out
 
 

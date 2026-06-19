@@ -177,6 +177,27 @@ Each email leads with what the reader gets, names the workload (the agent shape 
 each side), and states the cost and time to reproduce up front. It passes the reader-point-of-view
 review, read cold as a busy founder, before it is allowed out.
 
+### 4b. Publish a verified edge to the public briefs repo
+
+```
+make publish-brief EDGE=programmatic-tool-calling   # generate a self-contained public brief, offline, $0
+```
+
+`make publish-brief EDGE=<key>` (`engine/publish_brief.py`) is the one-source-of-truth fix for the drift
+between this engine and the public claude-feature-briefs repo: instead of hand-maintaining a second copy
+of a brief, it generates the public brief FROM the engine's own committed truth. It is fail-closed. The
+verdict gate refuses to publish unless the edge reads as a clean Claude win in the engine's own records:
+the landscape edge must be verdict `claude-ahead` with `lead_score > 0` (falling back to the
+`scan.DIFFERENTIATORS` seed leads on a fresh checkout), any present `data/last_<edge>.json` receipt must
+agree, and the `fair_comparison.lead_basis` must be a non-regime-bounded basis (head-to-head,
+absence-of-evidence, or within-claude-only), so a cost-model or doc-grounded-parity edge is refused. On
+refusal it prints the verdict it read and the source, exits non-zero, and writes nothing. On success it
+vendors the engine modules the brief needs (rewriting imports by a deterministic prefix swap, refusing
+any dangling import), writes a wins-only README and a PROVENANCE stamp, makes idempotent appends to the
+briefs-root Makefile and README, and writes the founder email to the engine's own `emails/`. It makes no
+model call, never spends, never pushes, and never sends. The default `--briefs-root` is
+`../claude-feature-briefs`.
+
 ### 5. Ship the reproducible bundle
 A self-contained, dated bundle with both platforms' code, the receipts (cost, time, answers), clear
 key placement, the exact cost and time to reproduce, and the constraints, so a founder can swap in

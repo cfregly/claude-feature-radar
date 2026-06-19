@@ -60,3 +60,21 @@ def cost_breakdown(model: str, usage) -> CostBreakdown:
 def cost_usd(model: str, usage) -> float:
     """Total dollar cost of one response."""
     return cost_breakdown(model, usage).total
+
+
+def cost_from_buckets(model: str, *, fresh_input: int, cached: int, output: int) -> float:
+    """Dollar cost from already-separated token buckets, reading the rates from the one registry.
+
+    For the inclusive-input providers (OpenAI, Gemini) the reported input field already counts the
+    cached tokens, so the caller passes fresh_input = reported_input - cached. The cached bucket bills
+    at the model's cache-read rate (those providers' discounted cached-input tier), the fresh and
+    output buckets at the input and output rates. This is the single cost model the OpenAI and Gemini
+    arms (engine/openai_arm.py, engine/gemini_arm.py) and the citations DIY arms now share, so a
+    competitor price lives in exactly one place, common/models.py.
+    """
+    m = get(model)
+    return (
+        fresh_input * m.input_per_mtok
+        + cached * m.cache_read_per_mtok
+        + output * m.output_per_mtok
+    ) / 1e6

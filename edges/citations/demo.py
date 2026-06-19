@@ -37,13 +37,12 @@ _sys.path.insert(0, str(_pl.Path(__file__).resolve().parents[2]))  # repo root, 
 
 import argparse
 import json
-import os
 import re
 import time
 
 from common.client import fmt_usd, get_client, load_env, repo_root
 from common.models import get
-from common.pricing import cost_usd
+from common.pricing import cost_from_buckets, cost_usd
 from engine.demonstrators.base import Arm, BaseDemonstrator, CostEstimate, Verdict
 from engine.demonstrators.registry import register
 
@@ -206,15 +205,12 @@ def run_claude_diy(client, model_key, corpus, questions):
 
 
 def run_openai_diy(corpus, questions, model):
-    from engine.openai_arm import OPENAI_PRICES, DEFAULT_OPENAI_MODEL
-    try:
-        from openai import OpenAI
-    except ImportError:
-        raise SystemExit("The OpenAI arm needs the SDK. Run: make compare-deps")
-    if not os.environ.get("OPENAI_API_KEY"):
+    # One client builder and one price table: the OpenAI client comes from engine.providers and the
+    # cost from common.pricing.cost_from_buckets, which reads the verified rate off common/models.py.
+    from engine.providers.openai_provider import get_openai_client
+    client = get_openai_client()
+    if client is None:
         raise SystemExit("OPENAI_API_KEY is not set.")
-    client = OpenAI()
-    p = OPENAI_PRICES.get(model, OPENAI_PRICES[DEFAULT_OPENAI_MODEL])
     src = _docs_as_text(corpus)
     rows = []
     for q in questions:
@@ -227,21 +223,19 @@ def run_openai_diy(corpus, questions, model):
         out = getattr(u, "output_tokens", 0) or 0
         det = getattr(u, "input_tokens_details", None)
         cached = (getattr(det, "cached_tokens", 0) or 0) if det else 0
-        cost = (max(0, inp - cached) * p["input"] + cached * p["cached"] + out * p["output"]) / 1e6
+        # OpenAI's input_tokens already counts the cached tokens, so fresh = input - cached.
+        cost = cost_from_buckets(model, fresh_input=max(0, inp - cached), cached=cached, output=out)
         rows.append(_grade_diy(corpus, getattr(resp, "output_text", "") or "", cost, out, dt))
     return rows
 
 
 def run_gemini_diy(corpus, questions, model):
-    from engine.gemini_arm import GEMINI_PRICES, DEFAULT_GEMINI_MODEL
-    try:
-        from google import genai
-    except ImportError:
-        raise SystemExit("The Gemini arm needs the SDK. Run: make compare-deps")
-    if not os.environ.get("GEMINI_API_KEY"):
+    # One client builder and one price table: the Gemini client comes from engine.providers and the
+    # cost from common.pricing.cost_from_buckets, which reads the verified rate off common/models.py.
+    from engine.providers.gemini_provider import get_gemini_client
+    client = get_gemini_client()
+    if client is None:
         raise SystemExit("GEMINI_API_KEY is not set.")
-    client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
-    p = GEMINI_PRICES.get(model, GEMINI_PRICES[DEFAULT_GEMINI_MODEL])
     src = _docs_as_text(corpus)
     rows = []
     for q in questions:
@@ -253,7 +247,8 @@ def run_gemini_diy(corpus, questions, model):
         prompt_tok = getattr(um, "prompt_token_count", 0) or 0
         cached = getattr(um, "cached_content_token_count", 0) or 0
         out = (getattr(um, "candidates_token_count", 0) or 0) + (getattr(um, "thoughts_token_count", 0) or 0)
-        cost = (max(0, prompt_tok - cached) * p["input"] + cached * p["cached"] + out * p["output"]) / 1e6
+        # Gemini's prompt_token_count already counts the cached tokens, so fresh = prompt - cached.
+        cost = cost_from_buckets(model, fresh_input=max(0, prompt_tok - cached), cached=cached, output=out)
         rows.append(_grade_diy(corpus, getattr(resp, "text", "") or "", cost, out, dt))
     return rows
 

@@ -62,32 +62,47 @@ MODELS: dict[str, Model] = {
         effort_levels=("low", "medium", "high", "xhigh", "max"),
         thinking_mode="adaptive",          # always on; may be access-gated on a given key
     ),
-    # OpenAI and Gemini comparison models, merged from ship-on-claude common/models.py so every
-    # demonstrator's competitor arm reads one verified price table. Prices verified 2026-06-17 against
-    # the providers' live pricing pages (developers.openai.com, ai.google.dev), the same date and
-    # values the engine's edges/citations receipt already shipped. These rows only run when the
-    # matching key is set, and the cross-vendor runner pulls the SDK lazily, so the one-dependency core
-    # is untouched. The cache fields are 0 because those providers bill no separate cache tier, and
-    # effort is the harness label sent straight through (OpenAI reasoning_effort, Gemini thinking_level,
-    # both take low/medium/high). "minimal" is excluded: OpenAI rejects it with a 400.
+    # OpenAI and Gemini comparison models. This is the ONE verified competitor price table: the OpenAI
+    # and Gemini arms (engine/openai_arm.py, engine/gemini_arm.py) and the citations DIY arms all read
+    # cost from these rows, never a local copy. Input, cached-input, and output prices re-verified live
+    # 2026-06-18 against the providers' pricing pages (developers.openai.com/api/docs/pricing,
+    # ai.google.dev/gemini-api/docs/pricing), Standard tier, every id present and matching. cache_read
+    # is the providers' discounted cached-input tier (the cached column on those pages). The cache_write
+    # fields stay 0 on purpose: OpenAI automatic caching and Gemini implicit caching charge no separate
+    # cache-WRITE fee, only the cheaper read on a hit, so there is nothing to bill there. These rows run
+    # only when the matching key is set, and the cross-vendor runner pulls the SDK lazily, so the
+    # one-dependency core is untouched. effort is the harness label sent straight through (OpenAI
+    # reasoning_effort, Gemini thinking_level, both take low/medium/high). "minimal" is excluded: OpenAI
+    # rejects it with a 400. Gemini's long-context (>200k) and audio rate tiers are not modeled here; the
+    # benchmark workloads are text under 200k, so the Standard text rate is the one that bills.
     "gpt-nano": Model(
         key="gpt-nano", id="gpt-5.4-nano", label="GPT-5.4 nano", tier="fast", provider="openai",
         input_per_mtok=0.20, output_per_mtok=1.25,
-        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.0,
+        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.02,
+        context_window=400_000, min_cache_tokens=0,
+        effort_levels=("low", "medium", "high"), thinking_mode="none",
+    ),
+    "gpt-mini": Model(
+        # The citations DIY arm's default OpenAI model and the legacy long-horizon arm's default: the
+        # cheapest tier the docs recommend as a capable multi-step tool driver (nano is cheaper but a
+        # weaker driver). It produced the committed edges/citations receipt, so it is a first-class row.
+        key="gpt-mini", id="gpt-5.4-mini", label="GPT-5.4 mini", tier="fast-mid", provider="openai",
+        input_per_mtok=0.75, output_per_mtok=4.50,
+        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.075,
         context_window=400_000, min_cache_tokens=0,
         effort_levels=("low", "medium", "high"), thinking_mode="none",
     ),
     "gpt-mid": Model(
         key="gpt-mid", id="gpt-5.4", label="GPT-5.4", tier="balanced", provider="openai",
         input_per_mtok=2.50, output_per_mtok=15.0,
-        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.0,
+        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.25,
         context_window=1_050_000, min_cache_tokens=0,
         effort_levels=("low", "medium", "high"), thinking_mode="none",
     ),
     "gpt-top": Model(
         key="gpt-top", id="gpt-5.5", label="GPT-5.5", tier="frontier", provider="openai",
         input_per_mtok=5.0, output_per_mtok=30.0,
-        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.0,
+        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.50,
         context_window=1_050_000, min_cache_tokens=0,
         effort_levels=("low", "medium", "high"), thinking_mode="none",
     ),
@@ -95,7 +110,7 @@ MODELS: dict[str, Model] = {
         key="gem-lite", id="gemini-3.1-flash-lite", label="Gemini 3.1 Flash-Lite", tier="fast",
         provider="gemini",
         input_per_mtok=0.25, output_per_mtok=1.50,
-        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.0,
+        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.025,
         context_window=1_000_000, min_cache_tokens=0,
         effort_levels=("low", "medium", "high"), thinking_mode="none",
     ),
@@ -103,7 +118,7 @@ MODELS: dict[str, Model] = {
         key="gem-flash", id="gemini-3.5-flash", label="Gemini 3.5 Flash", tier="balanced",
         provider="gemini",
         input_per_mtok=1.50, output_per_mtok=9.0,
-        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.0,
+        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.15,
         context_window=1_000_000, min_cache_tokens=0,
         effort_levels=("low", "medium", "high"), thinking_mode="none",
     ),
@@ -111,7 +126,7 @@ MODELS: dict[str, Model] = {
         key="gem-pro", id="gemini-3.1-pro-preview", label="Gemini 3.1 Pro", tier="frontier",
         provider="gemini",
         input_per_mtok=2.0, output_per_mtok=12.0,
-        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.0,
+        cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.20,
         context_window=1_000_000, min_cache_tokens=0,
         effort_levels=("low", "medium", "high"), thinking_mode="none",
     ),
