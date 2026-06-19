@@ -1,4 +1,4 @@
-Subject: Congrats on YC! 🎉 A Claude primitive for grounded answers you verify in code
+Subject: A Claude primitive for grounded answers you verify in code
 
 Hey {first_name},
 

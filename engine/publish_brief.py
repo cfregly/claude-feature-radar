@@ -977,11 +977,11 @@ def _readme_source(plan: BriefPlan, edge: dict, receipt: dict | None) -> str:
     if a_in and b_in:
         pct_str = f"{pct:.0f}%" if isinstance(pct, (int, float)) else "fewer"
         table = (
-            "\n| mode | input tokens billed | what happens to the 240 rows |\n"
+            "\n| mode | input tokens billed | what happens to the 240 results |\n"
             "|---|---:|---|\n"
-            f"| without PTC | {a_in:,} | all the rows flow through the model's context |\n"
+            f"| without PTC | {a_in:,} | all the results flow through the model's context |\n"
             f"| **with PTC** | **{b_in:,}** | the sandbox aggregates, only the answer reaches the model |\n\n"
-            f"That is **{pct_str} fewer input tokens** on this run, because the records went to the "
+            f"That is **{pct_str} fewer input tokens** on this run, because the results went to the "
             "sandbox, not the model context. Every cell is read live off the API's own `usage` object, "
             "so re-running shifts the count a little. The saving compounds across every fan-out you run.\n"
         )
@@ -995,17 +995,17 @@ def _readme_source(plan: BriefPlan, edge: dict, receipt: dict | None) -> str:
 
 ![demo](demo.gif)
 
-If your app calls your own tool to answer a question and that tool returns a lot of records, every
-record it pulls back lands in the model's context and you pay for all of them, even the ones that turn
+If your app calls your own tool to answer a question and that tool returns a lot of results, every
+result it pulls back lands in the model's context and you pay for all of them, even the ones that turn
 out irrelevant. Programmatic tool calling (PTC) runs your tool inside a code sandbox, keeps only the
-records that matter, and passes just those to the model. The rest never reach the context, so you are
+results that matter, and passes just those to the model. The rest never reach the context, so you are
 not billed for them.
 
 ## The same task, Claude with PTC vs Claude without it
 
-The same fan-out task two ways on the same model (Sonnet 4.6): across four regions of about 60 sales
-rows each (240 rows), find the highest-revenue region. The only thing that changes between the two rows
-is programmatic tool calling, on or off.
+The same fan-out task two ways on the same model (Sonnet 4.6): across four regions of about 60 results
+each (240 results), find the highest-revenue region. The only thing that changes between the two is
+programmatic tool calling, on or off.
 {table}
 ## The change is two lines
 
@@ -1023,13 +1023,13 @@ response = client.messages.create(
 
 Add `allowed_callers: ["code_execution_20260120"]` to your tool and include the code execution tool.
 Claude writes one script in a server-side sandbox that loops over the inputs, calls your tool for each,
-and keeps only the records that matter. The irrelevant records stay in the sandbox, so you are not
+and keeps only the results that matter. The irrelevant results stay in the sandbox, so you are not
 billed for them.
 
 ## The honest scope
 
 The win is fan-out shaped: it lands when the model calls your tool many times, so the bulky outputs
-run in code instead of filling its context. The shipped example (`query_region_sales`, 240 rows over
+run in code instead of filling its context. The shipped example (`query_region_sales`, 240 results over
 four regions) is a genuine fan-out, which is where the input-token savings show up. The PTC docs list
 Fable 5, Mythos 5, Opus 4.5 to 4.8, and Sonnet 4.5 to 4.6 (not Haiku). This brief runs Sonnet and Opus,
 the practical founder paths.
@@ -1132,14 +1132,14 @@ def _sample_source(plan: BriefPlan, receipt: dict | None) -> str:
     pct_str = f"{pct:.0f}" if isinstance(pct, (int, float)) else "28"
     return (
         "\n  Programmatic tool calling: the same fan-out task, Claude with PTC vs without it.\n\n"
-        "  Task: across 4 regions (240 sales rows total), find the highest-revenue region.\n"
+        "  Task: across 4 regions (240 results total), find the highest-revenue region.\n"
         "  Same task, same model (Sonnet 4.6). Every number is read live off the API usage object.\n\n"
-        "  mode             billed input tokens    what happens to the 240 rows\n"
+        "  mode             billed input tokens    what happens to the 240 results\n"
         "  --------------------------------------------------------------------------\n"
-        f"  without PTC      {a_str:>18}    all rows flow through the model context\n"
+        f"  without PTC      {a_str:>18}    all results flow through the model context\n"
         f"  with PTC         {b_str:>18}    sandbox aggregates, only the answer returns\n"
         "  --------------------------------------------------------------------------\n\n"
-        f"  -> {pct_str}% fewer billed input tokens, because the 240 records went to the\n"
+        f"  -> {pct_str}% fewer billed input tokens, because the 240 results went to the\n"
         "     sandbox, not the model context. The saving compounds across every fan-out.\n\n"
         "  The change is two lines: add the code_execution tool, then put\n"
         '  allowed_callers: ["code_execution_20260120"] on your own tool.\n\n'
@@ -1213,7 +1213,7 @@ def _founder_email_source(plan: BriefPlan, receipt: dict | None) -> str:
     else:
         table = "Run `make ptc` to print your own before/after from a live call.\n"
 
-    return f"""Subject: Token Thinning: removing unused tool results from your context window
+    return f"""Subject: Token MINNing: removing unused tool results from your context window
 
 Hey {{first_name}},
 
@@ -1267,7 +1267,7 @@ Building with Claude
 def _citations_founder_email_source(plan: BriefPlan) -> str:
     """The citations founder email, written to the ENGINE repo (never the public briefs repo). Wins-only,
     plain language, the real code, one reproduce path."""
-    return f"""Subject: Congrats on YC! 🎉 A Claude primitive for grounded answers you verify in code
+    return f"""Subject: A Claude primitive for grounded answers you verify in code
 
 Hey {{first_name}},
 
@@ -1389,28 +1389,6 @@ def _ensure_readme_entry(readme: pathlib.Path, plan: BriefPlan) -> bool:
     return True
 
 
-_OUTREACH_README = """# Outreach examples
-
-Example founder emails you can adapt. Each one is a short, warm note to a builder: it names the workload,
-shows the one Claude feature and the small code change, gives a real before and after number from the
-matching brief, and links the one-command run. They are templates, not sent mail. The `{first_name}` and
-`{your_name}` placeholders and the neutral sign-off are meant to be filled in.
-
-- [ptc-email.md](ptc-email.md): the programmatic-tool-calling brief, for an agent that calls a tool a lot.
-- [citations-email.md](citations-email.md): the Citations brief, for a product that answers over user docs.
-
-Every number in these matches the brief it points at, and the repo's number gate checks that, so you can
-send one knowing the reader sees the same figure when they run it.
-"""
-
-
-def _ensure_outreach_readme(readme: pathlib.Path) -> None:
-    """Write the framing README for the outreach-examples folder if it is missing. Idempotent, so a
-    republish never churns it. It marks the emails as adaptable examples, not sent mail."""
-    if not readme.exists():
-        readme.write_text(_OUTREACH_README)
-
-
 # --------------------------------------------------------------------------- the generator
 
 
@@ -1521,14 +1499,8 @@ def publish(edge_key: str, briefs_root: pathlib.Path, command: str) -> int:
     email_src = (_citations_founder_email_source(plan) if plan.slug == "citations"
                  else _founder_email_source(plan, _committed_receipt(plan)))
     email_path.write_text(email_src)
-
-    # The same email also ships into the public briefs as a labeled, adaptable OUTREACH EXAMPLE. It is
-    # generic by construction (templated names, neutral sign-off, links only to the public repo), and the
-    # one template keeps the example and the engine draft from drifting apart.
-    examples_dir = briefs_root / "outreach-examples"
-    examples_dir.mkdir(exist_ok=True)
-    (examples_dir / f"{plan.slug}-email.md").write_text(email_src)
-    _ensure_outreach_readme(examples_dir / "README.md")
+    # The adaptable outreach EXAMPLE lives in claude-founder-kit/launch/outreach-examples/, not here and
+    # not in the public briefs repo. This publisher writes only the engine's working draft.
 
     files = sorted(p.relative_to(briefs_root) for p in brief_dir.rglob("*") if p.is_file())
     print(f"\n  PUBLISHED brief {plan.slug!r} for edge {gate.edge_key!r} ({plan.demo_kind})")

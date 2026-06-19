@@ -1,4 +1,4 @@
-Subject: Token Thinning: removing unused tool results from your context window
+Subject: Token MINNing: removing unused tool results from your context window
 
 Hey {first_name},
 
