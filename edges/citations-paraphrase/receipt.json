@@ -4,7 +4,7 @@
   "n_questions": 8,
   "n_pdf_questions": 2,
   "n_text_docs": 3,
-  "total_cost": 0.378424,
+  "total_cost": 0.39592,
   "sources": {
     "claude_citations": "https://platform.claude.com/docs/en/build-with-claude/citations",
     "claude_pdf_support": "https://platform.claude.com/docs/en/build-with-claude/pdf-support",
@@ -24,9 +24,9 @@
       "silent_drops": 0,
       "pdf_pointer_resolved": "2/2",
       "persisted_objects": 0,
-      "output_tokens": 594,
-      "cost": 0.23913,
-      "latency_s": 26.21,
+      "output_tokens": 626,
+      "cost": 0.23961,
+      "latency_s": 27.7,
       "errors": []
     },
     {
@@ -34,77 +34,82 @@
       "provider": "anthropic",
       "model": "claude-sonnet-4-6",
       "mechanism": "DIY str.find",
-      "answered": "8/8",
-      "resolved": "2/8",
-      "grounded_correct_source": "0/8",
-      "silent_drops": 6,
-      "pdf_pointer_resolved": "0/2",
-      "persisted_objects": 0,
-      "output_tokens": 708,
-      "cost": 0.028056,
-      "latency_s": 23.42,
-      "errors": []
-    },
-    {
-      "name": "openai DIY:gpt-mid",
-      "provider": "openai",
-      "model": "gpt-5.4",
-      "mechanism": "DIY str.find",
       "answered": "7/8",
-      "resolved": "0/8",
+      "resolved": "7/8",
       "grounded_correct_source": "0/8",
-      "silent_drops": 8,
+      "silent_drops": 0,
       "pdf_pointer_resolved": "0/2",
       "persisted_objects": 0,
-      "output_tokens": 453,
-      "cost": 0.019613,
-      "latency_s": 11.75,
+      "output_tokens": 595,
+      "cost": 0.024789,
+      "latency_s": 19.11,
+      "errors": [
+        "How much is each overage: OverloadedError: Error code: 529 - {'type': 'error', 'error': {'type': 'overloaded_error', 'messa"
+      ]
+    },
+    {
+      "name": "openai DIY:gpt-top",
+      "provider": "openai",
+      "model": "gpt-5.5",
+      "mechanism": "DIY str.find",
+      "answered": "8/8",
+      "resolved": "8/8",
+      "grounded_correct_source": "0/8",
+      "silent_drops": 0,
+      "pdf_pointer_resolved": "0/2",
+      "persisted_objects": 0,
+      "output_tokens": 899,
+      "cost": 0.053685,
+      "latency_s": 20.79,
       "errors": []
     },
     {
-      "name": "gemini DIY:gem-flash",
+      "name": "gemini DIY:gem-pro",
       "provider": "gemini",
-      "model": "gemini-3.5-flash",
+      "model": "gemini-3.1-pro-preview",
       "mechanism": "DIY str.find",
-      "answered": "8/8",
-      "resolved": "0/8",
+      "answered": "5/8",
+      "resolved": "8/8",
       "grounded_correct_source": "0/8",
-      "silent_drops": 8,
+      "silent_drops": 0,
       "pdf_pointer_resolved": "0/2",
       "persisted_objects": 0,
-      "output_tokens": 9306,
-      "cost": 0.091626,
-      "latency_s": 48.26,
+      "output_tokens": 5577,
+      "cost": 0.077836,
+      "latency_s": 51.5,
       "errors": []
     }
   ],
   "verdict": {
-    "positive_signal": true,
-    "promotable_edge": true,
+    "positive_signal": false,
+    "promotable_edge": false,
     "paraphrase_resolution_rate": {
       "claude+citations:sonnet": "8/8",
-      "claude DIY:sonnet": "2/8",
-      "openai DIY:gpt-mid": "0/8",
-      "gemini DIY:gem-flash": "0/8"
+      "claude DIY:sonnet": "7/8",
+      "openai DIY:gpt-top": "8/8",
+      "gemini DIY:gem-pro": "8/8"
     },
     "claude_guaranteed_resolve": true,
     "claude_grounded_correct_source": "8/8",
     "diy_silent_drops": {
-      "claude DIY:sonnet": 6,
-      "openai DIY:gpt-mid": 8,
-      "gemini DIY:gem-flash": 8
+      "claude DIY:sonnet": 0,
+      "openai DIY:gpt-top": 0,
+      "gemini DIY:gem-pro": 0
     },
-    "competitor_diy_drop_total": 16,
-    "claude_beats_best_diy": true,
+    "competitor_diy_drop_total": 0,
+    "claude_beats_best_diy": false,
     "claude_no_hosted_store": true,
     "claude_cites_inline_pdf_under_paraphrase": true,
     "output_tokens": {
-      "claude+citations:sonnet": 594,
-      "claude DIY:sonnet": 708,
-      "openai DIY:gpt-mid": 453,
-      "gemini DIY:gem-flash": 9306
+      "claude+citations:sonnet": 626,
+      "claude DIY:sonnet": 595,
+      "openai DIY:gpt-top": 899,
+      "gemini DIY:gem-pro": 5577
     },
     "all_competitors_ran": true,
-    "why_not_promotable": []
+    "why_not_promotable": [
+      "a cross-vendor DIY arm produced no silent drop under paraphrase",
+      "Claude did not beat the best DIY resolution rate"
+    ]
   }
 }

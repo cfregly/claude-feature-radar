@@ -50,8 +50,11 @@ pdf_citations), so the repo stays forkable with no PDF dependency.
 
 MODEL TIER. The arms answer and ground over the user's documents, a seat that decides correctness, so
 the Claude arm runs on Sonnet (never Haiku, which cannot take the effort knob or adaptive thinking) and
-the competitor DIY arms run on their balanced tier, tier-matched. The grader itself is deterministic
-code (source[start:end]==cited_text and source.find(quote)), no model judgment.
+the competitor DIY arms run on their FRONTIER tier (run the stronger competitor before a correctness
+claim). Claude on the lower Sonnet tier still resolves every pointer, because the resolve guarantee is
+a structural API feature, not a model-quality contest, so the disadvantage only strengthens the win.
+The grader itself is deterministic code (source[start:end]==cited_text and source.find(quote)), no
+model judgment.
 """
 
 from __future__ import annotations
@@ -84,9 +87,9 @@ CLAUDE_MODEL = os.environ.get("PARA_CLAUDE_MODEL", "sonnet")
 OPENAI_MODEL = os.environ.get("PARA_OPENAI_MODEL", "gpt-top")     # gpt-5.5, frontier
 GEMINI_MODEL = os.environ.get("PARA_GEMINI_MODEL", "gem-pro")     # gemini-3.1-pro, frontier
 MAX_TOKENS = int(os.environ.get("PARA_MAX_TOKENS", "400"))        # the Citations arm: a short paraphrased answer
-# The DIY arms emit a JSON answer plus quote. Gemini 3.5 Flash thinks by default, so give the DIY arms
-# enough output budget that extended thinking is never starved. Thinking stays ON (best config, never
-# handicapped); the budget only keeps a thinking model from running out of room before it answers.
+# The DIY arms emit a JSON answer plus quote. The frontier Gemini and OpenAI models think by default, so
+# give the DIY arms enough output budget that extended thinking is never starved. Thinking stays ON (best
+# config, never handicapped); the budget only keeps a thinking model from running out of room before it answers.
 DIY_MAX_TOKENS = int(os.environ.get("PARA_DIY_MAX_TOKENS", "1536"))
 # A per-request wall-clock cap so one stuck network read can never hang an unattended run. A failed or
 # slow call is recorded as an arm error (never faked), and a missing arm holds the verdict, never pitched.
@@ -755,8 +758,10 @@ class ParaphraseResolutionDemonstrator(BaseDemonstrator):
             ],
             fairness={
                 "best_to_best": "every arm gets the same documents, the same questions, and the same "
-                                "paraphrase instruction, each on its balanced-tier model; the DIY arms are "
-                                "the realistic path a founder builds without the feature, not a strawman",
+                                "paraphrase instruction; the competitors run their FRONTIER tier while "
+                                "Claude runs the lower Sonnet tier, so the resolve win is not a model-quality "
+                                "edge; the DIY arms are the realistic path a founder builds without the "
+                                "feature, not a strawman",
                 "isolate": "same documents, questions, and paraphrase rule on every arm; only the resolve "
                            "mechanism differs (API citations vs model-quote plus str.find), so the "
                            "paraphrase-resolution gap is attributable to the mechanism",
