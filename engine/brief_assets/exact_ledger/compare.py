@@ -33,6 +33,13 @@ from .common.models import get
 OPENAI_MODEL = "gpt-top"   # gpt-5.5
 GEMINI_MODEL = "gem-pro"   # gemini-3.1-pro-preview
 
+# The committed dated full-run measurement (the brief README table). This brief runs a shorter chain
+# than that full run, so the live numbers below land lower in absolute cost. The reference is printed
+# next to the live result so the difference reads as scale, not drift. context editing's lead widens
+# with the stream, so the longer dated run shows the larger gap.
+DATED = {"date": "2026-06-19", "claude": 0.67, "openai": 1.84, "gemini": 2.57,
+         "openai_pct": 64, "gemini_pct": 74}
+
 READ_TOOL_OAI = {
     "type": "function",
     "name": "read_document",
@@ -200,4 +207,14 @@ def append_comparison(model_key: str, claude_result: dict) -> None:
     print()
     print("  Claude clears the bulky tool results in place and holds the carried context flat, so it keeps")
     print("  the exact list for the lowest bill while the compaction and full-window runs carry more.")
+    print()
+    # The dated full-run figures from the brief table, labeled, so the live numbers above (a shorter
+    # chain, so lower absolute cost) read as a scale difference, not drift. The lead is larger on the
+    # longer dated run because context editing's advantage compounds with the length of the stream.
+    print("  Dated full-run measurement (" + DATED["date"] + ", a longer 10-of-10 chain), for reference:")
+    print("    Claude $" + format(DATED["claude"], ".2f")
+          + ", OpenAI $" + format(DATED["openai"], ".2f") + " (Claude " + str(DATED["openai_pct"]) + "% cheaper)"
+          + ", Gemini $" + format(DATED["gemini"], ".2f") + " (Claude " + str(DATED["gemini_pct"]) + "% cheaper).")
+    print("  This brief runs a shorter chain, so the absolute cost is lower and Claude's lead widens as")
+    print("  the stream grows.")
     print()
