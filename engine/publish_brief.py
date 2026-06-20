@@ -1319,8 +1319,7 @@ container id and pass it on every follow-up call.
 
 The edge is durability and cross-request persistence: the container and its files survive between
 separate requests and for 30 days, so a long-running agent keeps its state without re-uploading or
-re-running setup. Code execution is beta, so set `betas=["code-execution-2025-08-25"]`, and it is not
-ZDR-eligible.
+re-running setup. Code execution is beta, so set `betas=["code-execution-2025-08-25"]`.
 
 ## Learn more
 

@@ -37,7 +37,20 @@ NEGATIVES = [
     "table stakes", "parity on", "is parity", "claude loses", "loses on", "where that flips",
     "lose regime", "got it wrong", "failed to produce", "is not a cheaper bill",
     "not a claude-only", "measured it honestly", "the honest part", "the honest one",
+    # Folded in from the public repo's old phrase-list gate, so the move loses no coverage:
+    "8% more", "8 percent more", "competitors can match", "competitors already match",
+    "competitor can match", "competitor already matches", "claude is slower", "claude is worse",
+    "claude slower", "claude worse", "claude lags",
 ]
+
+# The public briefs' authored prose stays wins-only too. Its sources live in THIS repo under
+# brief_assets/ (always present, so the engine's own CI scans them), and the generated public briefs
+# live in the sibling claude-feature-briefs checkout (scanned too when it is present locally). This is
+# the enforcement the public repo's old no_negative_check phrase-list gate used to do, moved here so the
+# negative-phrase list lives only in this private engine, never on the public surface.
+BRIEF_ASSET_GLOBS = ["brief_assets/*/README.md", "brief_assets/*/run.py", "brief_assets/*/email.md"]
+SIBLING_BRIEFS = ROOT.parent / "claude-feature-briefs"
+SIBLING_BRIEF_GLOBS = ["README.md", "*/README.md", "*/run.py", "*/run_tokens.py", "*/cite.py", "*/my_tool.py"]
 
 # Raw fetched vendor docs and gitignored scratch are not authored surfaces, so they are out of scope.
 # briefs/ is internal, gitignored, both-directions scratch (the analytical record stays local), so a
@@ -88,6 +101,35 @@ def _founder_files():
     return files
 
 
+def _brief_surfaces():
+    """The authored public-brief prose: the in-repo sources under brief_assets/ (always present), plus
+    the generated public briefs in the sibling claude-feature-briefs checkout when it exists locally.
+    These get the same wins-only scan the engine's own founder emails get."""
+    out, seen = [], set()
+    for g in BRIEF_ASSET_GLOBS:
+        for p in sorted(ROOT.glob(g)):
+            if p.is_file() and p not in seen:
+                seen.add(p)
+                out.append(p)
+    if SIBLING_BRIEFS.exists():
+        for g in SIBLING_BRIEF_GLOBS:
+            for p in sorted(SIBLING_BRIEFS.glob(g)):
+                if p.is_file() and p not in seen and "/.venv/" not in str(p):
+                    seen.add(p)
+                    out.append(p)
+    return out
+
+
+def _label(p):
+    """A readable path for a hit, relative to whichever repo the file lives in."""
+    for base in (ROOT, SIBLING_BRIEFS):
+        try:
+            return str(p.relative_to(base))
+        except ValueError:
+            continue
+    return str(p)
+
+
 def main():
     bad = []
     for p in _source_files():
@@ -96,18 +138,18 @@ def main():
             for m in re.finditer(pat, text, re.IGNORECASE):
                 line = text[: m.start()].count("\n") + 1
                 bad.append(f"{p.relative_to(ROOT)}:{line}: leakage ({why}): {m.group(0)!r}")
-    for p in _founder_files():
+    for p in _founder_files() + _brief_surfaces():
         for i, line in enumerate(p.read_text(errors="ignore").splitlines(), 1):
             low = line.lower()
             for neg in NEGATIVES:
                 if neg in low:
-                    bad.append(f"{p.relative_to(ROOT)}:{i}: founder-surface negative: {neg!r}")
+                    bad.append(f"{_label(p)}:{i}: founder-surface negative: {neg!r}")
     if bad:
         print("surface gate: FAIL")
         print("\n".join(bad))
         sys.exit(1)
     print(f"surface gate: clean ({len(_source_files())} source files, "
-          f"{len(_founder_files())} founder surfaces)")
+          f"{len(_founder_files())} founder surfaces, {len(_brief_surfaces())} brief surfaces)")
 
 
 if __name__ == "__main__":
