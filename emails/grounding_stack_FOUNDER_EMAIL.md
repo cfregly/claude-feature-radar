@@ -30,7 +30,7 @@ into each one (char, page, and chunk) in the same response. No vector store, no 
 the user's data, and the cited text does not count against your output tokens. Measured
 2026-06-19 on Claude Haiku 4.5 for $0.0101.
 
-Demo and code: https://github.com/cfregly/claude-feature-briefs/blob/main/grounding_stack/README.md
+Demo and code: https://github.com/cfregly/claude-feature-hits/blob/main/grounding_stack/README.md
 
 Run it in about a minute for roughly $0.01:
 

@@ -43,7 +43,7 @@ API-extracted verbatim quote and no resolver code to own.
 Run it yourself:
 
 ```bash
-git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
+git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
 export ANTHROPIC_API_KEY=your-key
 make citations
 ```

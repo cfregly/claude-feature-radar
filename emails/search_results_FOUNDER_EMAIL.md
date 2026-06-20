@@ -24,7 +24,7 @@ and the verbatim cited text. No hosted store, no upload, no copy of your users' 
 I measured it over five questions across five chunks: 5 of 5 answered, 5 of 5 cited to the correct
 chunk, block-level pointer, 0 hosted objects, $0.0067 on Claude Haiku 4.5.
 
-Demo and code: https://github.com/cfregly/claude-feature-briefs/blob/main/search_results/README.md
+Demo and code: https://github.com/cfregly/claude-feature-hits/blob/main/search_results/README.md
 
 Run it in about a minute for $0.05:
 

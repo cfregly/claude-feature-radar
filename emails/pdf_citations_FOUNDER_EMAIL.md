@@ -16,7 +16,7 @@ doc = {"type": "document",
 
 Every answer comes back with a page_location pointer: the page number plus the quoted source text. The quote is free of output tokens, so it does not add to your bill. On my key, over a five-page agreement PDF with five questions, Claude answered all five and returned the correct page for all five (5 of 5), for $0.05 on Haiku 4.5.
 
-Here is the run and the table: https://github.com/cfregly/claude-feature-briefs/blob/main/pdf_citations/README.md
+Here is the run and the table: https://github.com/cfregly/claude-feature-hits/blob/main/pdf_citations/README.md
 
 Run it in about a minute for roughly $0.02:
 

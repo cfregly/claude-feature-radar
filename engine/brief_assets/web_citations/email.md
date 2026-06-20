@@ -18,7 +18,7 @@ The measured result, on my key: I ran 3 web-research questions on claude-sonnet-
 Run it yourself: clone the repo and run `make web_citations` (about $0.12, under a minute). To try your own questions, edit the `QUESTIONS` list in `web_citations/run.py` and run `python web_citations/run.py`.
 
 The full brief, code, and a short demo:
-https://github.com/cfregly/claude-feature-briefs/blob/main/web_citations/README.md
+https://github.com/cfregly/claude-feature-hits/blob/main/web_citations/README.md
 
 Happy building! 🚀
 {your_name}

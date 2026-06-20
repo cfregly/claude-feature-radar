@@ -155,7 +155,7 @@ cost: ## EDGE cost: the pure pricing-model edge over swept dated prices, both wi
 draft: ## draft the founder email from the measured receipt
 	$(PY) run.py draft
 
-publish-brief: ## generate a self-contained public brief for a VERIFIED Claude-win edge into ../claude-feature-briefs (offline, $0, writes files only, never pushes/sends)
+publish-brief: ## generate a self-contained public brief for a VERIFIED Claude-win edge into ../claude-feature-hits (offline, $0, writes files only, never pushes/sends)
 	$(PY) -m engine.publish_brief --edge=$(EDGE)
 
 check-claims: ## verify the citations reproduction cost still matches the summed receipt

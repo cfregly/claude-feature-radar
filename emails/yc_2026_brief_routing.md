@@ -27,4 +27,4 @@ builder edge, so a cold email would be noise.
 Each email has `{first_name}` and `{your_name}` placeholders. Fill the founder's first name, set your
 own sign-off, and the email already carries the brief link, the one-line code change, the measured
 receipt, and the one-command reproduce path. Every brief is public and runnable at
-`cfregly/claude-feature-briefs`.
+`cfregly/claude-feature-hits`.

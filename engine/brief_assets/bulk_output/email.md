@@ -19,7 +19,7 @@ batch = client.beta.messages.batches.create(
 
 On my key, 2026-06-19, one request emitted 230,607 output tokens and finished clean, about 1.8x a 128k ceiling. One un-truncated turn, no stitching. It runs at the 50% batch discount, and the batch takes a few minutes, so it fits a nightly job, not a live request.
 
-Demo and runnable code: https://github.com/cfregly/claude-feature-briefs/blob/main/bulk_output/README.md
+Demo and runnable code: https://github.com/cfregly/claude-feature-hits/blob/main/bulk_output/README.md
 
 Run the live check (about $0.20):
 

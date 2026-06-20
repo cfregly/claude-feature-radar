@@ -1,4 +1,4 @@
-Subject: Congrats on YC! 🎉 A Claude tool-calling pattern for fan-out agents
+Subject: Congrats on YC! A Claude tool-calling pattern for fan-out agents
 
 Hey {first_name},
 
@@ -40,7 +40,7 @@ this is not the pattern.
 Run it yourself:
 
 ```bash
-git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
+git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
 export ANTHROPIC_API_KEY=your-key
 make programmatic_tool_calling
 ```

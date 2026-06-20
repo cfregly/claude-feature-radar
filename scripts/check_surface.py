@@ -45,11 +45,11 @@ NEGATIVES = [
 
 # The public briefs' authored prose stays wins-only too. Its sources live in THIS repo under
 # brief_assets/ (always present, so the engine's own CI scans them), and the generated public briefs
-# live in the sibling claude-feature-briefs checkout (scanned too when it is present locally). This is
+# live in the sibling claude-feature-hits checkout (scanned too when it is present locally). This is
 # the enforcement the public repo's old no_negative_check phrase-list gate used to do, moved here so the
 # negative-phrase list lives only in this private engine, never on the public surface.
 BRIEF_ASSET_GLOBS = ["brief_assets/*/README.md", "brief_assets/*/run.py", "brief_assets/*/email.md"]
-SIBLING_BRIEFS = ROOT.parent / "claude-feature-briefs"
+SIBLING_BRIEFS = ROOT.parent / "claude-feature-hits"
 SIBLING_BRIEF_GLOBS = ["README.md", "*/README.md", "*/run.py", "*/run_tokens.py", "*/cite.py", "*/my_tool.py"]
 
 # Raw fetched vendor docs and gitignored scratch are not authored surfaces, so they are out of scope.
@@ -103,7 +103,7 @@ def _founder_files():
 
 def _brief_surfaces():
     """The authored public-brief prose: the in-repo sources under brief_assets/ (always present), plus
-    the generated public briefs in the sibling claude-feature-briefs checkout when it exists locally.
+    the generated public briefs in the sibling claude-feature-hits checkout when it exists locally.
     These get the same wins-only scan the engine's own founder emails get."""
     out, seen = [], set()
     for g in BRIEF_ASSET_GLOBS:

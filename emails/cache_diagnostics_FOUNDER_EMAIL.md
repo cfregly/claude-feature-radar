@@ -23,7 +23,7 @@ On my key (2026-06-19) Claude named the changed surface as `system_changed` and 
 
 Beta note: set the beta header `cache-diagnosis-2026-04-07`, as shown above.
 
-A 1.5-second demo: https://github.com/cfregly/claude-feature-briefs/blob/main/cache_diagnostics/README.md
+A 1.5-second demo: https://github.com/cfregly/claude-feature-hits/blob/main/cache_diagnostics/README.md
 
 Run it (about $0.02): `make cache_diagnostics`
 

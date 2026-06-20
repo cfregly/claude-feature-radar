@@ -12,7 +12,7 @@ numbers off a real API call. Do not trust the writeup, re-run it.
 
 Each edge below is proven on a real task, with the receipt committed in `edges/<edge>/sample.txt`.
 The distilled, founder-facing versions, the ones a founder clones and reproduces in a single
-command, live in the companion repo [`claude-feature-briefs`](https://github.com/cfregly/claude-feature-briefs).
+command, live in the companion repo [`claude-feature-hits`](https://github.com/cfregly/claude-feature-hits).
 
 Every edge here is verified before it ships. The engine runs a skeptic pass on each comparison, best
 to best and latest to latest across vendors, and keeps only the differentiators that survive it, so a
@@ -75,7 +75,7 @@ Measured over 8 questions on 3 plain-text documents, each citation graded agains
 Claude returns a per-character pointer into your user's own document, guaranteed to resolve, with the
 verbatim quote free of output tokens and no resolver code to maintain. The per-edge writeup is
 [`edges/citations/README.md`](edges/citations/README.md). The founder-facing brief is
-[`claude-feature-briefs/citations`](https://github.com/cfregly/claude-feature-briefs). The full receipt
+[`claude-feature-hits/citations`](https://github.com/cfregly/claude-feature-hits). The full receipt
 is [`edges/citations/sample.txt`](edges/citations/sample.txt).
 
 ```bash

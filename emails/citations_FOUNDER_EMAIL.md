@@ -24,12 +24,12 @@ msg = client.messages.create(model="claude-haiku-4-5", max_tokens=400,
 ```
 
 Want to watch it first, no clone needed? The brief opens with a gif of the run:
-https://github.com/cfregly/claude-feature-briefs/blob/main/citations/README.md
+https://github.com/cfregly/claude-feature-hits/blob/main/citations/README.md
 
 See it run (about a minute):
 
 ```
-git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
+git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
 export ANTHROPIC_API_KEY=your-key
 make citations     # answer the questions and resolve every pointer, $0.01
 ```

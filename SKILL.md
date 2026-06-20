@@ -285,7 +285,7 @@ make publish-brief EDGE=programmatic-tool-calling   # generate a self-contained 
 ```
 
 `make publish-brief EDGE=<key>` (`engine/publish_brief.py`) exports to the optional public
-`claude-feature-briefs` companion repo. The engine itself is still self-contained: a normal clone does
+`claude-feature-hits` companion repo. The engine itself is still self-contained: a normal clone does
 not need that sibling checkout unless the user is publishing a brief. Instead of hand-maintaining a
 second copy of a brief, it generates the public brief FROM the engine's own committed truth. It is
 fail-closed. The verdict gate refuses to publish unless the edge reads as a clean Claude win in the engine's own records:
@@ -298,7 +298,7 @@ vendors the engine modules the brief needs (rewriting imports by a deterministic
 any dangling import), writes a wins-only README and a PROVENANCE stamp, makes idempotent appends to the
 briefs-root Makefile and README, and writes the founder email to the engine's own `emails/`. It makes no
 model call, never spends, never pushes, and never sends. Pass `--briefs-root=<path>` when the companion
-repo is not checked out at the default `../claude-feature-briefs` location.
+repo is not checked out at the default `../claude-feature-hits` location.
 
 ### 5. Ship the reproducible bundle
 A self-contained, dated bundle with both platforms' code, the receipts (cost, time, answers), clear

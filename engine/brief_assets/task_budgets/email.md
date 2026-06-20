@@ -15,7 +15,7 @@ betas=["task-budgets-2026-03-13"],                                   # add this
 
 I measured it on a budget-sensitive 12-record audit, same prompt both times. With the budget near zero, Claude made 0 tool calls and handed off before touching the first record. With budget to spare, the same agent started the loop. The agent stops at the right moment on its own. Live on claude-opus-4-8, 2026-06-19.
 
-Demo and runnable code: https://github.com/cfregly/claude-feature-briefs/blob/main/task_budgets/README.md
+Demo and runnable code: https://github.com/cfregly/claude-feature-hits/blob/main/task_budgets/README.md
 
 Run it in about a minute for roughly $0.01:
 

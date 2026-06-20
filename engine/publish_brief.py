@@ -1,6 +1,6 @@
 """publish_brief: turn a VERIFIED Claude-win edge into a self-contained public brief, offline, for $0.
 
-This is the one-source-of-truth fix for the drift between this engine and the public claude-feature-briefs
+This is the one-source-of-truth fix for the drift between this engine and the public claude-feature-hits
 repo. The engine holds the committed truth (the swept landscape, the per-edge demonstrator, the measured
 receipt). A hand-edited public brief drifts from that truth the moment a number, a model id, or a verdict
 moves here and nobody copies it across. So we generate the public brief FROM the engine's own committed
@@ -1378,12 +1378,12 @@ r2 = client.beta.messages.create(model="claude-sonnet-4-6", betas=["code-executi
 ```
 
 Want to watch it first, no clone needed? The brief opens with a gif of the run:
-https://github.com/cfregly/claude-feature-briefs/blob/main/{plan.slug}/README.md
+https://github.com/cfregly/claude-feature-hits/blob/main/{plan.slug}/README.md
 
 See it run (about a minute):
 
 ```
-git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
+git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
 export ANTHROPIC_API_KEY=your-key
 make {plan.slug}     # write a file and read it back from the reused container, $0.05
 ```
@@ -1689,17 +1689,17 @@ Same task and model (Sonnet 4.6), with and without it:
 
 {table}
 Want to watch it first, no clone needed? The brief opens with a gif of the run:
-https://github.com/cfregly/claude-feature-briefs/blob/main/{plan.slug}/README.md
+https://github.com/cfregly/claude-feature-hits/blob/main/{plan.slug}/README.md
 
 See it run (about two minutes):
 
 ```
-git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
+git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
 export ANTHROPIC_API_KEY=your-key
 make programmatic_tool_calling        # the example, $0.08
 ```
 
-To run it on your own tool, open [{plan.slug}/{plan.edit_surface}](https://github.com/cfregly/claude-feature-briefs/blob/main/{plan.slug}/{plan.edit_surface}),
+To run it on your own tool, open [{plan.slug}/{plan.edit_surface}](https://github.com/cfregly/claude-feature-hits/blob/main/{plan.slug}/{plan.edit_surface}),
 drop in your tool, and run `make programmatic_tool_calling` again.
 
 Happy building! 🚀
@@ -1737,12 +1737,12 @@ msg = client.messages.create(model="claude-haiku-4-5", max_tokens=400,
 ```
 
 Want to watch it first, no clone needed? The brief opens with a gif of the run:
-https://github.com/cfregly/claude-feature-briefs/blob/main/{plan.slug}/README.md
+https://github.com/cfregly/claude-feature-hits/blob/main/{plan.slug}/README.md
 
 See it run (about a minute):
 
 ```
-git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
+git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
 export ANTHROPIC_API_KEY=your-key
 make {plan.slug}     # answer the questions and resolve every pointer, $0.01
 ```
@@ -2016,11 +2016,11 @@ def main(argv: list[str] | None = None) -> int:
         description="Generate a self-contained public brief for a VERIFIED Claude-win edge (offline, $0).")
     p.add_argument("--edge", required=True, help="the edge key, e.g. programmatic-tool-calling")
     p.add_argument("--briefs-root", default=None,
-                   help="the public briefs repo root (default: ../claude-feature-briefs relative to the engine)")
+                   help="the public briefs repo root (default: ../claude-feature-hits relative to the engine)")
     a = p.parse_args(argv)
 
     briefs_root = (pathlib.Path(a.briefs_root).resolve() if a.briefs_root
-                   else (ROOT.parent / "claude-feature-briefs"))
+                   else (ROOT.parent / "claude-feature-hits"))
     command = f"make publish-brief EDGE={a.edge}"
     return publish(a.edge, briefs_root, command)
 
