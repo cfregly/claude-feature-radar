@@ -1590,6 +1590,11 @@ def publish(edge_key: str, briefs_root: pathlib.Path, command: str) -> int:
     made_mk = _ensure_makefile_entry(briefs_root / "Makefile", plan)
     made_rd = _ensure_readme_entry(briefs_root / "README.md", plan)
 
+    # Render the brief's demo.gif from its tape NOW, so a publish ALWAYS reproduces the gif in lockstep
+    # with the brief, never a stale or missing one. The tape replays the committed sample.txt for $0
+    # (no API call), so the gif stays deterministic and free.
+    gif_status = _render_gif(briefs_root, plan.slug)
+
     # The full founder email is the engine's working draft, kept here under emails/.
     emails_dir = ROOT / "emails"
     emails_dir.mkdir(exist_ok=True)
@@ -1609,9 +1614,30 @@ def publish(edge_key: str, briefs_root: pathlib.Path, command: str) -> int:
         print(f"      + {f}")
     print(f"    Makefile     : {'appended ' + plan.slug + ' target' if made_mk else 'entry already present'}")
     print(f"    README.md    : {'appended ' + plan.slug + ' entry' if made_rd else 'entry already present'}")
+    print(f"    demo.gif     : {gif_status}")
     print(f"    founder email: {email_path.relative_to(ROOT)} (engine repo only, never the public repo)")
     print("    no model call, no spend, no git, no send.\n")
     return 0
+
+
+def _render_gif(briefs_root: pathlib.Path, slug: str) -> str:
+    """Render <slug>/demo.gif from <slug>/demo.tape so every publish reproduces the gif in lockstep
+    with the brief, never a stale or missing one. The tape replays the committed sample.txt for $0 (no
+    API call). Scans the tape and sample for key material first and refuses to render on a hit, and
+    skips with a clear note if vhs is not installed, so a publish never hard-fails on a missing renderer."""
+    import shutil
+    import subprocess
+    brief = briefs_root / slug
+    tape, sample = brief / "demo.tape", brief / "sample.txt"
+    key = re.compile(r"sk-ant-|sk-proj-|AIza[0-9A-Za-z_-]{8}|xox[baprs]-|ghp_")
+    for f in (tape, sample):
+        if f.exists() and key.search(f.read_text(errors="ignore")):
+            return f"NOT rendered (key material in {f.name})"
+    if shutil.which("vhs") is None:
+        return "SKIPPED (install vhs + ffmpeg, then re-publish)"
+    subprocess.run(["vhs", f"{slug}/demo.tape"], cwd=str(briefs_root), capture_output=True, text=True)
+    gif = brief / "demo.gif"
+    return "rendered" if gif.exists() and gif.stat().st_size > 1000 else "render FAILED"
 
 
 def _rmtree(path: pathlib.Path) -> None:
