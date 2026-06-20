@@ -29,6 +29,8 @@ git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hi
 make web_citations
 ```
 
+Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make web_citations COMPARE=1`. It runs Claude, OpenAI, and Gemini side by side on the same questions, so you see the verbatim source quote come back from Claude and not the others, on your own keys for a few cents.
+
 To try your own questions, edit the `QUESTIONS` list in `web_citations/run.py` and run it again.
 
 Happy building!

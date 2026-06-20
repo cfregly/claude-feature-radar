@@ -32,6 +32,8 @@ Reproduce it in about a minute for $0.010. One clone, one command:
     git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
     make grounding_stack
 
+Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make grounding_stack COMPARE=1`. It runs Claude, OpenAI, and Gemini side by side on the same three sources, so you see all three answer and only Claude return an inline pointer for each, on your own keys for a few cents.
+
 To run it on your own sources, edit `grounding_stack/run.py`: swap in your note, your PDF, and one retriever chunk, then re-run.
 
 Happy building!

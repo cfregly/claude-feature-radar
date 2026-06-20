@@ -37,6 +37,8 @@ git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hi
 make pdf_citations
 ```
 
+Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make pdf_citations COMPARE=1`. It runs Claude, OpenAI, and Gemini side by side on the same questions, so the page pointer comes back from Claude and not the others, on your own keys for a few cents.
+
 To run it on your own data, open `pdf_citations/run.py` and swap the sample pages and questions for your document and the questions your users ask. Your PDF needs extractable text, since the page pointers come from the text Claude reads.
 
 Happy building

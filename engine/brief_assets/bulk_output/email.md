@@ -36,6 +36,8 @@ git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hi
 make bulk_output
 ```
 
+Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make bulk_output COMPARE=1`. It confirms each competitor's single-request output ceiling next to Claude's extended output, on your own keys for a few cents.
+
 To try it on your own deliverable, edit the prompt in `bulk_output/run.py` and re-run `make bulk_output`.
 
 One note you have to act on: extended output needs the beta header `output-300k-2026-03-24` and runs on the Batch API only (Opus 4.8/4.7/4.6 and Sonnet 4.6). The SDK call above sets the header for you.

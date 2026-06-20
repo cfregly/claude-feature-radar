@@ -33,6 +33,8 @@ git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hi
 make search_results
 ```
 
+Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make search_results COMPARE=1`. It runs Claude, OpenAI, and Gemini side by side on the same chunks, so you see Claude cite inline with zero stored objects while the others stand up a hosted store, on your own keys for a few cents.
+
 To run it on your own data, edit search_results/run.py with your retriever's chunks and questions, then run make search_results again.
 
 Have fun building

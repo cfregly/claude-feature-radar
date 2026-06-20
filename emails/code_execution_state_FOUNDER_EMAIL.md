@@ -40,6 +40,8 @@ export ANTHROPIC_API_KEY=your-key
 make code_execution_state
 ```
 
+Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make code_execution_state COMPARE=1`. It runs Claude, OpenAI, and Gemini side by side on the same write-then-reread, so you see Claude reuse its container while the others lose the state, on your own keys for a few cents.
+
 To run it on your own agent, open `code_execution_state/run.py` and change the two `messages` payloads to your agent's real steps, then run `make code_execution_state` again.
 
 Happy building 🚀

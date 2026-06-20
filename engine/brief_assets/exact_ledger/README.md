@@ -30,6 +30,8 @@ Measured head-to-head (2026-06-19). All three returned the exact list, so this i
 | OpenAI, compaction | $1.84 | Claude 64% cheaper, 63% faster |
 | Gemini, full window | $2.57 | Claude 74% cheaper |
 
+These are the full-run figures on the longer chain. `make exact_ledger` runs a shorter self-test, and `make exact_ledger COMPARE=1` reproduces this head-to-head at that shorter scale: the absolute cost comes out lower, Claude still keeps the exact list for the lowest bill, and Claude's lead widens as the stream grows.
+
 ## Run it (about $0.17)
 
 ```bash

@@ -37,6 +37,8 @@ git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hi
 make exact_ledger
 ```
 
+Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make exact_ledger COMPARE=1`. It runs all three side by side on the same chain, a few dollars and several minutes since each competitor runs the full agent. The table above is the longer full run, so a quick reproduce lands lower in absolute cost while Claude still keeps the exact list for the lowest bill, and the lead widens as the stream grows.
+
 To run it on your own data, edit `exact_ledger/run.py`: point the reader at your records and your flag rule, then run `make exact_ledger` again.
 
 One note: context editing is in beta, so set the header on the request, `anthropic-beta: context-management-2025-06-27`.
