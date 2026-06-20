@@ -100,7 +100,7 @@ TOOLS: tuple[ToolSpec, ...] = (
              "Run the $0 discovery loop: sweep live docs, diff, rank, draft to the inert outbox, "
              "update coverage, audit the boundary. No spend, no send, no push."),
     ToolSpec("publish_brief", gate.ASK, True, False, True, "scaffold_edge",
-             "Generate a public brief for a verified-win edge into the sibling briefs repo. ASK: "
+             "Generate a public brief for a verified-win edge into the sibling hits repo. ASK: "
              "writes files, so it refuses until confirm=True. Never pushes, never sends."),
     ToolSpec("run_benchmark", gate.ASK, True, True, True, "run_benchmark",
              "Run a paid proof for an edge. ASK: spends credits, so it surfaces the estimate and "
@@ -310,13 +310,13 @@ def run_discovery(sweep: bool = True) -> dict:
 
 
 def _briefs_root() -> pathlib.Path:
-    """The public briefs repo the publisher writes into (the sibling claude-feature-hits checkout)."""
+    """The public hits repo the publisher writes into (the sibling claude-feature-hits checkout)."""
     return repo_root().parent / "claude-feature-hits"
 
 
 def publish_brief(edge: str, confirm: bool = False) -> dict:
     """Generate a public brief for a verified-win edge. ASK tier: this writes files into the public
-    briefs repo, so it does nothing until the caller passes confirm=True.
+    hits repo, so it does nothing until the caller passes confirm=True.
 
     With confirm=False (the default) it runs the fail-closed verdict gate and returns a PREVIEW: would
     it publish, the gate reason, and the target repo. It writes nothing, $0. With confirm=True and a
@@ -355,7 +355,7 @@ def publish_brief(edge: str, confirm: bool = False) -> dict:
             "would_write_slug": plan.slug if plan else None,
             "would_write_doc": plan.doc_url if plan else None,
             "message": "PREVIEW only. The verdict gate passes. Re-call with confirm=true to write the "
-                       "brief into the briefs repo. This writes files. It never pushes or sends.",
+                       "brief into the hits repo. This writes files. It never pushes or sends.",
         }
     briefs_root = _briefs_root()
     command = f"make publish-brief EDGE={edge}"
@@ -376,7 +376,7 @@ def publish_brief(edge: str, confirm: bool = False) -> dict:
         "message": (f"Published {slug} into {briefs_root}. Files were written locally. Nothing was "
                     "pushed or sent: review the diff and push by hand if you want it public.")
                    if rc == 0 else
-                   (f"Publish refused or failed (exit {rc}). Wrote nothing. If the briefs repo is "
+                   (f"Publish refused or failed (exit {rc}). Wrote nothing. If the hits repo is "
                     f"missing, clone it next to the engine at {briefs_root}."),
     }
 

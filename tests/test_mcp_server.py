@@ -112,7 +112,7 @@ def test_publish_brief_refuses_a_regime_bounded_edge_even_with_confirm():
 
 
 def test_publish_brief_with_confirm_routes_to_the_writer_only_on_a_clean_gate(monkeypatch, tmp_path):
-    """confirm=True flips behavior: it calls the publisher. We stub the writer (so the real briefs repo
+    """confirm=True flips behavior: it calls the publisher. We stub the writer (so the real hits repo
     is untouched) and point the target at a temp dir, and assert the tool reports what the writer did.
     The point is that confirm is what unlocks the write, never an unattended call."""
     calls = {}

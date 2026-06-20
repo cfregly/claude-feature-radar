@@ -1884,7 +1884,7 @@ def publish(edge_key: str, briefs_root: pathlib.Path, command: str, compare_defa
     # briefs whose run code is still generated, so all 11 share one source of truth for the copy.
     email_src = _read_asset(plan, "email.md")
     email_path.write_text(email_src)
-    # This publisher writes only the engine's working draft, not the public briefs repo.
+    # This publisher writes only the engine's working draft, not the public hits repo.
 
     files = sorted(p.relative_to(briefs_root) for p in brief_dir.rglob("*") if p.is_file())
     print(f"\n  PUBLISHED brief {plan.slug!r} for edge {gate.edge_key!r} ({plan.demo_kind})")
@@ -1931,7 +1931,7 @@ def main(argv: list[str] | None = None) -> int:
         description="Generate a self-contained public brief for a VERIFIED Claude-win edge (offline, $0).")
     p.add_argument("--edge", required=True, help="the edge key, e.g. programmatic-tool-calling")
     p.add_argument("--briefs-root", default=None,
-                   help="the public briefs repo root (default: ../claude-feature-hits relative to the engine)")
+                   help="the public hits repo root (default: ../claude-feature-hits relative to the engine)")
     p.add_argument("--compare-default", choices=("off", "on"), default="off",
                    help="a head-to-head brief's comparison-gate default. off (the public hits brief: the "
                         "Claude side runs by default, COMPARE=1 reproduces the full table); on (a private "

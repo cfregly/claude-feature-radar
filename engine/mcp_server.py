@@ -123,7 +123,7 @@ def run_discovery(sweep: bool = True) -> dict:
 @mcp.tool()
 def publish_brief(edge: str, confirm: bool = False) -> dict:
     """Generate a public, self-contained brief for a verified-win edge. ASK tier: it writes files into
-    the sibling public briefs repo, so it does nothing until you pass confirm=true.
+    the sibling public hits repo, so it does nothing until you pass confirm=true.
 
     Call it first with confirm=false (the default) to preview: it runs the fail-closed verdict gate
     and tells you whether the edge would publish and why, writing nothing. Call it again with
