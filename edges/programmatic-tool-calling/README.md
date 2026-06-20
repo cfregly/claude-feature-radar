@@ -50,5 +50,3 @@ cp .env.example .env   # paste your Anthropic key
 make programmatic-tool-calling               # this edge, on your own key, $0.08 on Sonnet 4.6
 # or directly: python edges/programmatic-tool-calling/demo.py
 ```
-
-See [`FOUNDER_EMAIL.md`](FOUNDER_EMAIL.md).

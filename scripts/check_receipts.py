@@ -45,7 +45,7 @@ def check_programmatic_tool_calling(fail, warn):
 
     # the stable token numbers and percent must appear verbatim where the edge is pitched
     a_str, b_str = f"{a_tok:,}", f"{b_tok:,}"
-    for rel in ["README.md", "edges/programmatic-tool-calling/FOUNDER_EMAIL.md"]:
+    for rel in ["README.md", "emails/programmatic_tool_calling_FOUNDER_EMAIL.md"]:
         text = _read(rel)
         if a_str not in text or b_str not in text:
             fail.append(f"PTC tokens: {rel} does not carry the receipt's {a_str}/{b_str}")
@@ -54,9 +54,8 @@ def check_programmatic_tool_calling(fail, warn):
 
     # the run-cost claims must all agree with the receipt total (within a rounding tolerance)
     cost_files = [
-        "Makefile", "README.md", "FOUNDER_EMAIL.md", "app/run_tokens.py", "demo.tape",
+        "Makefile", "README.md", "app/run_tokens.py", "demo.tape",
         "edges/programmatic-tool-calling/README.md",
-        "edges/programmatic-tool-calling/FOUNDER_EMAIL.md",
         "emails/programmatic_tool_calling_FOUNDER_EMAIL.md",
     ]
     want = f"${total:.2f}"
@@ -94,7 +93,7 @@ def check_programmatic_tool_calling_drift(fail, warn):
         return
     a_tok, b_tok = int(a.group(1).replace(",", "")), int(b.group(1).replace(",", ""))
     programmatic_tool_calling_ctx = re.compile(r"programmatic tool calling|Token MINNing|allowed_callers|\bPTC\b", re.I)
-    files = [ROOT / "README.md", ROOT / "FOUNDER_EMAIL.md"]
+    files = [ROOT / "README.md"]
     files += sorted(ROOT.glob("edges/*/FOUNDER_EMAIL.md")) + sorted(ROOT.glob("emails/*.md"))
     for p in files:
         if not p.exists():

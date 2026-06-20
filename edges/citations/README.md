@@ -52,5 +52,4 @@ make citations                    # this edge, on your own key, $0.01
 # or directly: python edges/citations/demo.py
 ```
 
-Every number is read off the real API `usage` object. See [`FOUNDER_EMAIL.md`](FOUNDER_EMAIL.md) for
-the pitch.
+Every number is read off the real API `usage` object.

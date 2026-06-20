@@ -1,9 +1,10 @@
 # Measured Claude edges for builders
 
-A founder-facing menu of the edges in this repo. Each one is a real Claude capability, measured on a
-real task against OpenAI and Gemini at their best, with the receipt committed in `edges/<edge>/`. Do
-not trust the table, clone the repo and re-run the one command. If the number moves on your workload,
-that is the point.
+An internal operator menu of the edges in this engine repo, not a founder handout. Each one is a real
+Claude capability, measured on a real task against OpenAI and Gemini at their best, with the receipt
+committed in `edges/<edge>/`. It clones the private engine for the full three-arm comparison, so it
+stays internal. Do not trust the table, clone the repo and re-run the one command. If the number moves
+on the workload, that is the point.
 
 Every benchmark reads its numbers off a live API call. Costs are the actual run, not estimates.
 

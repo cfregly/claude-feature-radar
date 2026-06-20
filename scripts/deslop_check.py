@@ -13,7 +13,7 @@ EMOJI = re.compile(
     "[\U0001F300-\U0001FAFF\U00002600-\U000027BF\U0001F1E6-\U0001F1FF\U00002B00-\U00002BFF]"
 )
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DOCS = ["README.md", "CLAUDE.md", "CHRIS_FREGLY_VOICE.md", "SKILL.md", "FOUNDER_EMAIL.md",
+DOCS = ["README.md", "CLAUDE.md", "CHRIS_FREGLY_VOICE.md", "SKILL.md",
         "docs/VERIFIED_FACTS.md", "docs/FINDINGS.md"]
 
 
