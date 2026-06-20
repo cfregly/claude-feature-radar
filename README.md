@@ -423,7 +423,7 @@ at all, so a chat client can never trigger them.
 | `show_coverage` | Per-demoKind coverage plus the recent coverage ledger | Safe, unattended | $0 |
 | `show_boundary` | The gate lanes, the per-tool tier, and the audit (which must be empty) | Safe, unattended | $0 |
 | `run_discovery` | The discovery loop: sweep live docs, diff, rank, draft to the inert outbox, coverage | Safe, unattended | $0 |
-| `publish_brief` | Generate a public brief for a verified-win edge into the briefs repo | ASK, needs `confirm=true` | $0, writes files |
+| `publish_brief` | Generate a public brief for a verified-win edge into the hits repo | ASK, needs `confirm=true` | $0, writes files |
 | `run_benchmark` | A paid proof against real API calls, with the estimate surfaced and a cost cap | ASK, needs `confirm=true` | spends credits |
 
 `publish_brief` runs a fail-closed verdict gate first, so it refuses any edge that is not a clean,

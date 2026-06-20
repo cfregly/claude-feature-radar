@@ -36,8 +36,8 @@ I measured it on the same fan-out twice, same model (Sonnet 4.6), same answer re
 About 28% fewer billed input tokens, and the sandbox returned the exact winner. It pays off on the
 fan-out shape, many calls over data the model then crunches.
 
-Run it on your own tool: edit one file, app/my_tool.py, paste your tool dict and the Python that runs
-it, then `make programmatic-tool-calling` (about $0.08 on your key).
+Run it on your own tool: edit one file, programmatic_tool_calling/my_tool.py, paste your tool dict and
+the Python that runs it, then `make programmatic_tool_calling` (about $0.08 on your key).
 
 Docs: https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 

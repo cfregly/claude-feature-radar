@@ -155,7 +155,7 @@ These are why the output is trusted. Break one and the trust is gone.
     word that does not earn its place, warm but never awkward, proper grammar), make the
     run-it-on-your-own-data path explicit (the one file to edit and the one command to re-run), and sign
     neutrally as a sender placeholder plus "Building with Claude" unless the user provides an approved
-    real sender. Keep the signature in the email only and never inside the public briefs repo. Do not
+    real sender. Keep the signature in the email only and never inside the public hits repo. Do not
     editorialize about feature maturity in a founder email, so mention beta or
     a required header only when the founder must set it, and for a GA feature do not say "it is GA" at all. The
     subject line must clear spam filters, so use no money-and-urgency trigger words (cut, save, free, cheap,
@@ -278,7 +278,7 @@ Each email leads with what the reader gets, names the workload (the agent shape 
 each side), and states the cost and time to reproduce up front. It passes the reader-point-of-view
 review, read cold as a busy founder, before it is allowed out.
 
-### 4b. Publish a verified edge to the public briefs repo
+### 4b. Publish a verified edge to the public hits repo
 
 ```
 make publish-brief EDGE=programmatic-tool-calling   # generate a self-contained public brief, offline, $0

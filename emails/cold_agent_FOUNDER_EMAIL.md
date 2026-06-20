@@ -26,8 +26,8 @@ r2 = client.beta.messages.create(model=..., betas=["code-execution-2025-08-25"],
 I measured it: I wrote a file in one request, then read it back from the same container after a
 31-minute idle, and it was still there.
 
-Run it: `make code-execution-state`, wait past the idle window, then `make code-execution-state-verify` (cents on
-your key).
+Run it: `make code_execution_state` writes a file in one request, then reads it back from the same
+container in the next (cents on your key).
 
 Docs: https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool
 
