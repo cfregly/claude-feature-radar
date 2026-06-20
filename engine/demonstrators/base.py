@@ -91,7 +91,7 @@ class CostEstimate:
 
     usd: float
     wall_clock_s: float
-    command: str             # the one command that reproduces it (make ptc, make citations, ...)
+    command: str             # the one command that reproduces it (make programmatic-tool-calling, make citations, ...)
     note: str = ""
 
     def to_dict(self) -> dict:

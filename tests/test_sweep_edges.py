@@ -30,11 +30,11 @@ def test_registry_entries_are_well_formed():
 
 def test_snapshot_header_format(tmp_path, monkeypatch):
     monkeypatch.setattr(se, "repo_root", lambda: tmp_path)
-    src = Source("claude", "ptc", "https://example.test/ptc", "doc")
+    src = Source("claude", "programmatic_tool_calling", "https://example.test/programmatic_tool_calling", "doc")
     rel = se.write_snapshot(src, "Some verbatim doc text.", "2026-06-18")
     body = (tmp_path / rel).read_text()
     # cite_facts.py reads "Source: <url> / Snapshot fetched <date>." as the first lines.
-    assert body.startswith("Source: https://example.test/ptc\n")
+    assert body.startswith("Source: https://example.test/programmatic_tool_calling\n")
     assert "Snapshot fetched 2026-06-18." in body
     assert "Some verbatim doc text." in body
 
@@ -103,10 +103,75 @@ def test_fetch_304_is_unchanged_not_a_change(monkeypatch):
     def not_modified(*a, **k):
         raise urllib.error.HTTPError("u", 304, "Not Modified", {}, None)
     monkeypatch.setattr(se.urllib.request, "urlopen", not_modified)
-    src = Source("claude", "ptc", "https://x.test/p", "doc")
+    src = Source("claude", "programmatic_tool_calling", "https://x.test/p", "doc")
     res = se.fetch_one(src, {"hash": "h0", "etag": "e0", "last_modified": "lm"})
     assert res["status"] == "unchanged"
     assert res["hash"] == "h0"
+
+
+# ----- a feed source is fetched through the feed, cited at the canonical url -----
+
+class _FakeResp:
+    def __init__(self, body, headers=None):
+        self._body = body.encode("utf-8")
+        self.headers = headers or {}
+    def read(self):
+        return self._body
+    def __enter__(self):
+        return self
+    def __exit__(self, *a):
+        return False
+
+
+def test_feed_source_is_fetched_through_the_feed_url(monkeypatch):
+    # When a source carries a feed, the GET must target the feed (the readable bytes), while every
+    # key and the snapshot stay on src.url (the canonical citation). A page that only renders behind
+    # JavaScript is unreadable to a stdlib GET, so the feed is the only honest fetch path.
+    seen = {}
+
+    def capture(req, *a, **k):
+        seen["url"] = req.full_url
+        return _FakeResp("ClaudeDevs posted a real, substantial update " * 40)
+    monkeypatch.setattr(se.urllib.request, "urlopen", capture)
+    src = Source("anthropic", "claude_devs_x", "https://x.com/ClaudeDevs", "blog",
+                 feed="https://feed.test/ClaudeDevs/rss", min_chars=800)
+    res = se.fetch_one(src, None)
+    assert seen["url"] == "https://feed.test/ClaudeDevs/rss"
+    assert res["status"] == "fetched"
+
+
+def test_min_chars_rejects_a_thin_login_shell_as_unknown(monkeypatch):
+    # x.com returns HTTP 200 with only the logged-out chrome (a few hundred chars, no posts). Below
+    # the source's min_chars floor that is a fetch miss, never a real but empty capability. This is
+    # the honesty posture applied to a 200-with-chrome, the same as a block becoming unknown.
+    monkeypatch.setattr(se.urllib.request, "urlopen",
+                        lambda req, *a, **k: _FakeResp("Log in Sign up ClaudeDevs hasn't posted"))
+    src = Source("anthropic", "claude_devs_x", "https://x.com/ClaudeDevs", "blog",
+                 feed="https://feed.test/down", min_chars=800)
+    res = se.fetch_one(src, None)
+    assert res["status"] == "unknown"
+    assert res["hash"] is None
+    assert "min_chars" in res["error"]
+
+
+def test_snapshot_header_records_the_feed_fetch_endpoint(tmp_path, monkeypatch):
+    # When the bytes came from a feed, the snapshot header records it, so the citation page (url) and
+    # the actual fetch endpoint (feed) are both on the record, honestly.
+    monkeypatch.setattr(se, "repo_root", lambda: tmp_path)
+    src = Source("anthropic", "claude_devs_x", "https://x.com/ClaudeDevs", "blog",
+                 feed="https://feed.test/ClaudeDevs/rss", min_chars=800)
+    rel = se.write_snapshot(src, "A real post body.", "2026-06-19")
+    body = (tmp_path / rel).read_text()
+    assert body.startswith("Source: https://x.com/ClaudeDevs\n")
+    assert "Fetched via: https://feed.test/ClaudeDevs/rss" in body
+
+
+def test_registry_carries_the_claude_devs_feed():
+    cd = [s for s in sources() if s.key == "claude_devs_x"]
+    assert len(cd) == 1, "the ClaudeDevs developer account is a tracked source"
+    s = cd[0]
+    assert s.kind == "blog" and s.vendor == "anthropic"
+    assert s.feed and s.min_chars >= 800  # fetched through a feed, the thin login shell guarded out
 
 
 # ----- diff: new, changed, gone, unchanged, and unknown never poisons -----
@@ -118,15 +183,15 @@ def _cap(vendor, key, status="ga", h="h1", axis="cost"):
 
 def test_diff_flags_new_changed_gone():
     prior = {"capabilities": {
-        "claude:ptc": _cap("claude", "ptc", h="old"),
+        "claude:programmatic_tool_calling": _cap("claude", "programmatic_tool_calling", h="old"),
         "claude:gone_one": _cap("claude", "gone_one"),
     }}
     now = {
-        "claude:ptc": _cap("claude", "ptc", h="new"),       # changed (hash moved)
+        "claude:programmatic_tool_calling": _cap("claude", "programmatic_tool_calling", h="new"),       # changed (hash moved)
         "claude:citations": _cap("claude", "citations"),     # new
     }
     d = se.diff(now, prior)
-    assert [c["to"]["key"] for c in d["changed"]] == ["ptc"]
+    assert [c["to"]["key"] for c in d["changed"]] == ["programmatic_tool_calling"]
     assert [c["key"] for c in d["new"]] == ["citations"]
     assert [c["key"] for c in d["gone"]] == ["gone_one"]
 
@@ -153,14 +218,14 @@ def test_unknown_fetch_is_not_counted_as_gone_or_changed():
 # ----- the heart: lead_score never manufactures a lead from a fetch miss -----
 
 def test_lead_two_only_when_competitors_fetched():
-    claude = _cap("claude", "ptc")
+    claude = _cap("claude", "programmatic_tool_calling")
     # No competitor has the key AND every competitor source fetched: a real absence-of-evidence lead.
     lead, verdict = se._lead_score(claude, competitor_caps=[], all_fetched_ok=True)
     assert lead == 2 and verdict == "claude-ahead"
 
 
 def test_no_lead_manufactured_when_a_competitor_fetch_failed():
-    claude = _cap("claude", "ptc")
+    claude = _cap("claude", "programmatic_tool_calling")
     # Same empty competitor set, but a competitor source did NOT fetch. The absence is unknown, not a
     # lead. This is the single most important honesty assertion in the engine.
     lead, verdict = se._lead_score(claude, competitor_caps=[], all_fetched_ok=False)
@@ -196,16 +261,16 @@ def test_parity_and_behind_score_zero():
 # ----- rank sorts genuine leads above parity, and keeps parity in the list -----
 
 def test_rank_keeps_parity_but_below_leads():
-    # Use a built-edge key (ptc) for the lead: it carries a seed demoKind with a registered
+    # Use a built-edge key (programmatic_tool_calling) for the lead: it carries a seed demoKind with a registered
     # demonstrator, so it survives the never-evaluated demotion that an unbuilt guessed kind takes.
     caps = {
-        "claude:ptc": _cap("claude", "ptc", axis="cost"),             # no competitor: lead 2
+        "claude:programmatic_tool_calling": _cap("claude", "programmatic_tool_calling", axis="cost"),             # no competitor: lead 2
         "claude:parity": _cap("claude", "parity", axis="cost"),       # competitor parity: lead 0
         "openai:parity": _cap("openai", "parity"),
     }
     ranked = se.rank(caps, all_competitor_fetched_ok=True)
     keys = [e["key"] for e in ranked]
-    assert keys[0] == "ptc"
+    assert keys[0] == "programmatic_tool_calling"
     parity = next(e for e in ranked if e["key"] == "parity")
     assert parity["lead_score"] == 0  # kept in the landscape, never pitched
     assert ranked[0]["score"] > parity["score"]
@@ -225,13 +290,13 @@ def test_route_dispatches_a_built_edge_to_its_demonstrator():
     # A built edge keys to a registered demonstrator. The demonstrator spends a credit, so the gate is
     # ASK and its estimate is surfaced (no spend until a human sees the number). The demonstrator name
     # rides on the decision.
-    ranked = [{"key": "ptc", "lead_score": 2, "axis": "cost"}]
+    ranked = [{"key": "programmatic_tool_calling", "lead_score": 2, "axis": "cost"}]
     out = se.route(ranked, covered={"programmatic-tool-calling"})
     assert out[0]["covered"] is True
     assert out[0]["demonstrator"] == "PTCDemonstrator"
     assert out[0]["gate"] == "ask"               # PTC spends a credit, so it waits for approval
     assert out[0]["estimate_surfaced"] is True   # the estimate is shown before any spend
-    assert out[0]["estimate"]["command"] == "make ptc"
+    assert out[0]["estimate"]["command"] == "make programmatic-tool-calling"
 
 
 def test_route_files_an_ask_stub_for_a_new_held_key():
@@ -270,10 +335,10 @@ def test_route_never_routes_a_parity_edge():
 def test_landscape_round_trips(tmp_path, monkeypatch):
     monkeypatch.setattr(se, "repo_root", lambda: tmp_path)
     (tmp_path / "landscape").mkdir()
-    caps = {"claude:ptc": _cap("claude", "ptc")}
+    caps = {"claude:programmatic_tool_calling": _cap("claude", "programmatic_tool_calling")}
     ranked = se.rank(caps, all_competitor_fetched_ok=True)
-    se.write_landscape(caps, {"https://x.test/ptc": {"hash": "h1"}}, ranked, {}, "2026-06-18")
+    se.write_landscape(caps, {"https://x.test/programmatic_tool_calling": {"hash": "h1"}}, ranked, {}, "2026-06-18")
     land = json.loads((tmp_path / "landscape" / "landscape.json").read_text())
     assert land["as_of_date"] == "2026-06-18"
-    assert "claude:ptc" in land["capabilities"]
-    assert land["edges"][0]["key"] == "ptc"
+    assert "claude:programmatic_tool_calling" in land["capabilities"]
+    assert land["edges"][0]["key"] == "programmatic_tool_calling"

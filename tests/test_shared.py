@@ -255,8 +255,8 @@ def test_platform_marks_a_feature_once_and_recaps():
     P.reset()
     P.used("citations")
     P.used("citations")  # second call is a no-op
-    P.used("ptc")
-    assert P.exercised_keys() == ["ptc", "citations"]  # FEATURES order, deduped
+    P.used("programmatic_tool_calling")
+    assert P.exercised_keys() == ["programmatic_tool_calling", "citations"]  # FEATURES order, deduped
     assert "Citations" in P.summary() and "programmatic tool calling" in P.summary()
 
 

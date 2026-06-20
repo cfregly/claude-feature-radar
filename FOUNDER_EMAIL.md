@@ -42,11 +42,11 @@ Run it yourself:
 ```bash
 git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
 export ANTHROPIC_API_KEY=your-key
-make ptc
+make programmatic_tool_calling
 ```
 
-It costs about $0.08 on Sonnet for the two runs. To try your own tool, edit `ptc/my_tool.py` and run
-`make ptc` again.
+It costs about $0.08 on Sonnet for the two runs. To try your own tool, edit `programmatic_tool_calling/my_tool.py` and run
+`make programmatic_tool_calling` again.
 
 Go build! 🚀
 

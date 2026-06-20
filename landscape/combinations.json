@@ -16,7 +16,7 @@
       "conflict": "none",
       "id": "combo-1",
       "skeptic_verdict": "SURVIVES",
-      "skeptic_why": "OpenAI Code Interpreter/Gemini code-exec + function calling have no allowed_callers, so every one of the 200+ tool results re-enters context and tokens grow superlinearly, defeating any caching discount and beating the named cost currency."
+      "skeptic_why": "OpenAI Code Interpreter/Gemini code execution + function calling have no allowed_callers, so every one of the 200+ tool results re-enters context and tokens grow superlinearly, defeating any caching discount and beating the named cost currency."
     },
     {
       "features": [

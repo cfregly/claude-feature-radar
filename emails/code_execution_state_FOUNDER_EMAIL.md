@@ -23,18 +23,18 @@ r2 = client.beta.messages.create(model="claude-sonnet-4-6", betas=["code-executi
 ```
 
 Want to watch it first, no clone needed? The brief opens with a gif of the run:
-https://github.com/cfregly/claude-feature-briefs/blob/main/code_exec_state/README.md
+https://github.com/cfregly/claude-feature-briefs/blob/main/code_execution_state/README.md
 
 See it run (about a minute):
 
 ```
 git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
 export ANTHROPIC_API_KEY=your-key
-make code_exec_state     # write a file and read it back from the reused container, $0.05
+make code_execution_state     # write a file and read it back from the reused container, $0.05
 ```
 
-To run it on your own agent, open code_exec_state/run.py and change the two messages payloads to your
-agent's real steps, then run make code_exec_state again.
+To run it on your own agent, open code_execution_state/run.py and change the two messages payloads to your
+agent's real steps, then run make code_execution_state again.
 
 Happy building! 🚀
 {your_name}

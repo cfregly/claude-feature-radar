@@ -64,7 +64,7 @@ REGIME_BOUNDED_KEYS = {"cost-model", "cost_model", "cost"}
 #
 # Each publishable edge declares, statically, the engine files its brief needs and how the brief lays
 # them out, so the generated brief runs with one dependency (anthropic), exactly like the existing
-# public ptc and citations briefs. The copier flattens common/ into a local common/ package and rewrites
+# public programmatic_tool_calling and citations briefs. The copier flattens common/ into a local common/ package and rewrites
 # import lines by a DETERMINISTIC PREFIX SWAP only (no semantic rewrite):
 #
 #   from engine.demonstrators.token_core import   ->  from .token_core import
@@ -113,7 +113,7 @@ class BriefPlan:
 # anyway).
 PLANS: dict[str, BriefPlan] = {
     "programmatic-tool-calling": BriefPlan(
-        slug="ptc",
+        slug="programmatic_tool_calling",
         title="programmatic tool calling",
         demo_kind="token_accounting",
         doc_url="https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling",
@@ -144,14 +144,14 @@ PLANS: dict[str, BriefPlan] = {
         make_help="build .venv, install anthropic, answer questions over your docs with citations (~$0.01)",
         edit_surface="docs",  # the corpus folder a forker fills with their own .txt files
     ),
-    # code-exec-state: the stateful-sandbox edge. A multi-step agent that runs code needs its sandbox to
+    # code-execution-state: the stateful-sandbox edge. A multi-step agent that runs code needs its sandbox to
     # keep files and state across turns. The brief needs only the anthropic-free client/models/pricing
     # trio (flattened to a local common/). The run entry is a generated run.py: write a unique value to
     # /tmp/state.txt in a fresh container, capture container.id, then read it back from the REUSED
     # container on a separate request, plus a --check self-test. Claude-only, wins-only, no competitor arm
-    # on the public surface. The slug is underscored so `python -m code_exec_state.run` imports cleanly.
-    "code-exec-state": BriefPlan(
-        slug="code_exec_state",
+    # on the public surface. The slug is underscored so `python -m code_execution_state.run` imports cleanly.
+    "code-execution-state": BriefPlan(
+        slug="code_execution_state",
         title="code execution state",
         demo_kind="retention_resume",
         doc_url="https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool",
@@ -285,11 +285,11 @@ PLANS: dict[str, BriefPlan] = {
     ),
 }
 
-# A publish-time alias from a landscape/seed key to its publish plan, so both the live sweep slug (ptc)
+# A publish-time alias from a landscape/seed key to its publish plan, so both the live sweep slug (programmatic_tool_calling)
 # and the built-edge folder name (programmatic-tool-calling) resolve to the same plan. Mirrors the
 # scan._SEED_KEY_ALIAS direction but points at PLANS, which is keyed on the built-edge folder name.
 _PLAN_KEY_ALIAS = {
-    "ptc": "programmatic-tool-calling",
+    "programmatic_tool_calling": "programmatic-tool-calling",
 }
 
 
@@ -321,7 +321,7 @@ def _landscape_edges() -> tuple[list[dict], str]:
 
 def _find_edge(edge_key: str) -> tuple[dict | None, str]:
     """Find the edge record for a key in the landscape (or seed), resolving the slug<->folder alias both
-    directions so `ptc` and `programmatic-tool-calling` both hit the right record. Returns (record, src)."""
+    directions so `programmatic_tool_calling` and `programmatic-tool-calling` both hit the right record. Returns (record, src)."""
     edges, src = _landscape_edges()
     # The set of keys that should resolve to this edge: the key itself, its plan alias, and the reverse.
     wanted = {edge_key, edge_key.replace("_", "-"), edge_key.replace("-", "_")}
@@ -339,7 +339,7 @@ def _find_edge(edge_key: str) -> tuple[dict | None, str]:
 
 def _receipt_path(edge_key: str) -> pathlib.Path | None:
     """The data/last_<edge>.json receipt for this edge, if one is committed/present. Tries the edge key
-    and the plan slug (the engine writes data/last_ptc.json keyed on the short slug), returns the first
+    and the plan slug (the engine writes data/last_programmatic_tool_calling.json keyed on the short slug), returns the first
     that exists, else None. data/ is gitignored transient scratch, so a receipt is optional, but when it
     is present it gets a veto."""
     candidates = [edge_key]
@@ -543,7 +543,7 @@ def _my_tool_source() -> str:
 
 This is the edit surface. Out of the box it ships a worked example: a region_sales tool that returns
 about 60 sales rows per region, and a fan-out task that asks for the highest-revenue region across four
-regions (240 rows). That is the same fan-out the brief's token-bill comparison measures, so `make ptc`
+regions (240 rows). That is the same fan-out the brief's token-bill comparison measures, so `make programmatic_tool_calling`
 gives you a real before-and-after number before you change a line. Then swap in your own tool:
 
   1. Replace TOOL_SPEC with your own Messages-API tool dict (name, description, input_schema).
@@ -634,7 +634,7 @@ QUESTION = (
 
 
 # --------------------------------------------------------------------------- the example's check
-# Only the shipped example needs a machine-checkable true answer, so `make ptc` (with --check) can assert
+# Only the shipped example needs a machine-checkable true answer, so `make programmatic_tool_calling` (with --check) can assert
 # the model answered correctly. When you swap in your own tool, set EXPECTED_ANSWER to your task's known
 # answer (or leave it None and --check will only assert the token invariant, not correctness).
 
@@ -1117,7 +1117,7 @@ supported on every active model except Haiku 3.
 
 
 def _codeexec_run_source(slug: str) -> str:
-    """The generated run entry for the code-exec-state brief: write a unique value to /tmp/state.txt in a
+    """The generated run entry for the code-execution-state brief: write a unique value to /tmp/state.txt in a
     fresh container, capture container.id, then read it back from the REUSED container on a separate
     request, plus a --check self-test. Claude-only, no competitor arm. Imports the flattened common/
     package; anthropic is imported lazily so importing this module needs no SDK."""
@@ -1265,7 +1265,7 @@ if __name__ == "__main__":
 
 
 def _codeexec_readme_source(plan: BriefPlan) -> str:
-    """The public, wins-only README for the code-exec-state brief. Generated, no internal backrefs, no
+    """The public, wins-only README for the code-execution-state brief. Generated, no internal backrefs, no
     competitor named, doc link from the plan's doc_url."""
     return f"""# Keep your agent's sandbox state between turns with code execution
 
@@ -1347,12 +1347,12 @@ def _codeexec_sample_source() -> str:
         '     pass container=<id> on the next call.\n\n'
         '  The change: betas=["code-execution-2025-08-25"], add the code_execution tool, and carry\n'
         "  the container id between calls.\n\n"
-        "  Runnable code and the full brief: code_exec_state/README.md\n"
+        "  Runnable code and the full brief: code_execution_state/README.md\n"
     )
 
 
 def _codeexec_founder_email_source(plan: BriefPlan) -> str:
-    """The code-exec-state founder email, written to the ENGINE repo (never the public briefs repo).
+    """The code-execution-state founder email, written to the ENGINE repo (never the public briefs repo).
     Wins-only, plain language, the real code, one reproduce path."""
     return f"""Subject: Keep your agent's sandbox state between turns
 
@@ -1424,7 +1424,7 @@ def _readme_source(plan: BriefPlan, edge: dict, receipt: dict | None) -> str:
         )
     else:
         table = (
-            "\nRun `make ptc` to print your own before/after table from a live call. Every cell comes "
+            "\nRun `make programmatic_tool_calling` to print your own before/after table from a live call. Every cell comes "
             "from the real `usage` object the API returns, never from memory.\n"
         )
 
@@ -1475,15 +1475,15 @@ the practical founder paths.
 
 ```
 export ANTHROPIC_API_KEY=your-key   # https://console.anthropic.com/
-make ptc        # build the venv, install anthropic, run the token-bill comparison on the region_sales example
+make programmatic_tool_calling        # build the venv, install anthropic, run the token-bill comparison on the region_sales example
 ```
 
-`make ptc` is self-bootstrapping: it creates `.venv`, installs `anthropic`, and runs the before/after.
+`make programmatic_tool_calling` is self-bootstrapping: it creates `.venv`, installs `anthropic`, and runs the before/after.
 
 ## Run it on your own tool
 
 Open `{plan.slug}/{plan.edit_surface}`, the one file you edit. Replace three things, then run
-`make ptc` again:
+`make programmatic_tool_calling` again:
 
 1. `TOOL_SPEC` with your own Messages-API tool dict (the same `{{name, description, input_schema}}` you
    already pass in `tools=[...]`).
@@ -1506,11 +1506,11 @@ def _demo_tape_source(plan: BriefPlan) -> str:
     sample.txt, so `make gif` replays the receipt for $0 (no API call, deterministic). Generated here, so
     a republish reproduces it, and the gif binary is rendered from this tape by `make gif` (vhs + ffmpeg)."""
     slug = plan.slug
-    _dims = {"citations": (1240, 820), "code_exec_state": (1200, 720)}
+    _dims = {"citations": (1240, 820), "code_execution_state": (1200, 720)}
     width, height = _dims.get(slug, (1200, 720) if plan.from_assets else (1200, 640))
     _headlines = {
         "citations": "# Citations: a verifiable source pointer for every answer, resolved in your own code",
-        "code_exec_state": "# code execution state: your agent's sandbox keeps its files between requests",
+        "code_execution_state": "# code execution state: your agent's sandbox keeps its files between requests",
     }
     headline = plan.headline or _headlines.get(
         slug, "# programmatic tool calling: about 28% fewer billed input tokens on a fan-out task")
@@ -1563,7 +1563,7 @@ def _sample_source(plan: BriefPlan, receipt: dict | None) -> str:
     claim, since plain tool use can miss on 240 rows); grounding_resolution shows the per-pointer table."""
     if plan.from_assets:
         return _read_asset(plan, "sample.txt")
-    if plan.slug == "code_exec_state":
+    if plan.slug == "code_execution_state":
         return _codeexec_sample_source()
     if plan.slug == "citations":
         return _citations_sample_source()
@@ -1588,7 +1588,7 @@ def _sample_source(plan: BriefPlan, receipt: dict | None) -> str:
         "     sandbox, not the model context. The saving compounds across every fan-out.\n\n"
         "  The change is two lines: add the code_execution tool, then put\n"
         '  allowed_callers: ["code_execution_20260120"] on your own tool.\n\n'
-        "  Runnable code and the full brief: ptc/README.md\n"
+        "  Runnable code and the full brief: programmatic_tool_calling/README.md\n"
     )
 
 
@@ -1656,7 +1656,7 @@ def _founder_email_source(plan: BriefPlan, receipt: dict | None) -> str:
             f"{pct_str} fewer billed input tokens on this demo, and the saving grows with the size of the fan-out.\n"
         )
     else:
-        table = "Run `make ptc` to print your own before/after from a live call.\n"
+        table = "Run `make programmatic_tool_calling` to print your own before/after from a live call.\n"
 
     return f"""Subject: Token MINNing: removing unused tool results from your context window
 
@@ -1697,11 +1697,11 @@ See it run (about two minutes):
 ```
 git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
 export ANTHROPIC_API_KEY=your-key
-make ptc        # the example, $0.08
+make programmatic_tool_calling        # the example, $0.08
 ```
 
 To run it on your own tool, open [{plan.slug}/{plan.edit_surface}](https://github.com/cfregly/claude-feature-briefs/blob/main/{plan.slug}/{plan.edit_surface}),
-drop in your tool, and run `make ptc` again.
+drop in your tool, and run `make programmatic_tool_calling` again.
 
 Happy building! 🚀
 {{your_name}}
@@ -1764,7 +1764,7 @@ def _ensure_makefile_entry(makefile: pathlib.Path, plan: BriefPlan) -> bool:
     """Idempotently add the brief's make target to the briefs-root Makefile. Returns True if it appended,
     False if the entry was already present. Never duplicates: it keys on the target name."""
     text = makefile.read_text() if makefile.exists() else ""
-    run_module = "run" if plan.from_assets else {"citations": "cite", "code_exec_state": "run"}.get(plan.slug, "run_tokens")
+    run_module = "run" if plan.from_assets else {"citations": "cite", "code_execution_state": "run"}.get(plan.slug, "run_tokens")
     recipe = f"\t$(PY) -m {plan.slug}.{run_module}"
     # Refresh an existing target's recipe (its run module may have been renamed on republish), so a
     # republished brief never leaves make pointed at a deleted module.
@@ -1811,7 +1811,7 @@ def _ensure_readme_entry(readme: pathlib.Path, plan: BriefPlan) -> bool:
         return refreshed != text
     if plan.from_assets and plan.index_blurb:
         blurb = plan.index_blurb
-    elif plan.slug == "code_exec_state":
+    elif plan.slug == "code_execution_state":
         blurb = ("Keep a multi-step agent's sandbox state between turns by reusing the code-execution "
                  "container, so a file written in one request is there in the next.")
     elif plan.slug == "citations":
@@ -1898,7 +1898,7 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
         _assert_no_dangling(run_src, "run.py")  # the shipped run entry must import only from its closure
         (brief_dir / "run.py").write_text(run_src)
         (brief_dir / "README.md").write_text(_read_asset(plan, "README.md"))
-    elif plan.slug == "ptc":
+    elif plan.slug == "programmatic_tool_calling":
         # The token_accounting brief: the region_sales fixture as the edit surface (my_tool.py),
         # run_tokens.py as the run.
         (brief_dir / plan.edit_surface).write_text(_my_tool_source())
@@ -1916,7 +1916,7 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
         _assert_no_dangling(run_src, "cite.py")
         (brief_dir / "cite.py").write_text(run_src)
         (brief_dir / "README.md").write_text(_citations_readme_source(plan))
-    elif plan.slug == "code_exec_state":
+    elif plan.slug == "code_execution_state":
         # The retention_resume brief: no edit surface, run.py writes a value to the container and reads
         # it back from the reused container on a separate request.
         run_src = _codeexec_run_source(plan.slug)
@@ -1984,7 +1984,7 @@ def publish(edge_key: str, briefs_root: pathlib.Path, command: str) -> int:
     email_path = emails_dir / f"{plan.slug}_FOUNDER_EMAIL.md"
     if plan.from_assets:
         email_src = _read_asset(plan, "email.md")
-    elif plan.slug == "code_exec_state":
+    elif plan.slug == "code_execution_state":
         email_src = _codeexec_founder_email_source(plan)
     elif plan.slug == "citations":
         email_src = _citations_founder_email_source(plan)

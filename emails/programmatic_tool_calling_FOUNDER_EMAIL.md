@@ -36,18 +36,18 @@ Same task and model (Sonnet 4.6), with and without it:
 28% fewer billed input tokens on this demo, and the saving grows with the size of the fan-out.
 
 Want to watch it first, no clone needed? The brief opens with a gif of the run:
-https://github.com/cfregly/claude-feature-briefs/blob/main/ptc/README.md
+https://github.com/cfregly/claude-feature-briefs/blob/main/programmatic_tool_calling/README.md
 
 See it run (about two minutes):
 
 ```
 git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
 export ANTHROPIC_API_KEY=your-key
-make ptc        # the example, $0.08
+make programmatic_tool_calling        # the example, $0.08
 ```
 
-To run it on your own tool, open [ptc/my_tool.py](https://github.com/cfregly/claude-feature-briefs/blob/main/ptc/my_tool.py),
-drop in your tool, and run `make ptc` again.
+To run it on your own tool, open [programmatic_tool_calling/my_tool.py](https://github.com/cfregly/claude-feature-briefs/blob/main/programmatic_tool_calling/my_tool.py),
+drop in your tool, and run `make programmatic_tool_calling` again.
 
 Happy building! 🚀
 {your_name}

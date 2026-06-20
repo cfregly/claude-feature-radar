@@ -37,7 +37,7 @@ DIFFERENTIATORS = [
         "why": "No named OpenAI or Google equivalent keeps a developer's own custom-tool OUTPUTS out "
                "of context (allowed_callers). OpenAI ships a code interpreter and tool search but not "
                "this, an absence-of-evidence lead. GA, no beta header (2026-06-18). Measured (make "
-               "ptc): on a 240-row fan-out task billed input fell from 9,451 to 6,828 tokens, about "
+               "programmatic-tool-calling): on a 240-row fan-out task billed input fell from 9,451 to 6,828 tokens, about "
                "28% (Anthropic's own doc reports about 24%), and the sandbox code answered correctly "
                "where the in-context model failed. Fan-out-shaped (sequential tasks flat to +8%), it "
                "adds round-trips, and it is not on Bedrock or Vertex and not ZDR-eligible.",
@@ -50,7 +50,7 @@ DIFFERENTIATORS = [
             "score_gate": "answers_match AND mode_b_input < mode_a_input",
             "lead_basis": "absence-of-evidence",
             "maturity": {"claude": "ga", "beta_header": None, "fetched_date": "2026-06-18"},
-            "repro": {"command": "make ptc", "est_cost_usd": 0.08, "est_time_s": 90},
+            "repro": {"command": "make programmatic-tool-calling", "est_cost_usd": 0.08, "est_time_s": 90},
         },
     },
     {
@@ -113,13 +113,13 @@ DIFFERENTIATORS = [
         },
     },
     {
-        "key": "code-exec-state", "axis": "reliability", "rank": 4,
+        "key": "code-execution-state", "axis": "reliability", "rank": 4,
         "demoKind": "retention_resume",
         "claim": "The code-execution sandbox keeps its container and files across separate requests and "
                  "for 30 days, so a multi-step agent's state survives between turns and across a long idle.",
         "why": "Claude returns a reusable container id (response.container.id); pass it as container=<id> "
                "on the next call and a file written in one request is readable in the next. Measured "
-               "(make code-exec-state then make code-exec-state-verify): a nonce written to /tmp/state.txt "
+               "(make code-execution-state then make code-execution-state-verify): a nonce written to /tmp/state.txt "
                "read back from the SAME container after a 31.1-minute idle. No named OpenAI or Google "
                "equivalent keeps a developer's sandbox files across a long idle: OpenAI's code_interpreter "
                "container is discarded after 20 minutes idle (documented, unrecoverable) and Gemini exposes "
@@ -136,7 +136,7 @@ DIFFERENTIATORS = [
             "score_gate": "claude reads the nonce back from the reused container after the documented idle",
             "lead_basis": "absence-of-evidence",
             "maturity": {"claude": "beta", "beta_header": "code-execution-2025-08-25", "fetched_date": "2026-06-19"},
-            "repro": {"command": "make code-exec-state", "est_cost_usd": 0.05, "est_time_s": 60},
+            "repro": {"command": "make code-execution-state", "est_cost_usd": 0.05, "est_time_s": 60},
         },
     },
     {
@@ -226,7 +226,7 @@ GAPS = [
 CHOSEN = (
     "The sharpest edge is programmatic tool calling: add allowed_callers to a tool and Claude writes "
     "one sandbox script that calls it in a loop and keeps the bulky outputs out of the model context. "
-    "GA, no named competitor equivalent. Measured (make ptc): billed input fell about 28% on a 240-row "
+    "GA, no named competitor equivalent. Measured (make programmatic-tool-calling): billed input fell about 28% on a 240-row "
     "fan-out task (Anthropic's doc reports about 24%), and the code answered correctly where the "
     "in-context model failed. Fan-out-shaped, it adds round-trips, and it is not on Bedrock or Vertex "
     "or ZDR. The cleanest near-binary edge is Citations: the only GA API with a per-character source "
@@ -289,12 +289,12 @@ def _landscape_path() -> pathlib.Path:
     return pathlib.Path(__file__).resolve().parent.parent / "landscape" / "landscape.json"
 
 
-# The live sweep keys a source by its short doc slug (ptc, context_editing), while the seed
+# The live sweep keys a source by its short doc slug (programmatic_tool_calling, context_editing), while the seed
 # DIFFERENTIATORS key by the built-edge folder name (programmatic-tool-calling, long-horizon-autonomy).
 # This alias map resolves a live key to its seed so a built edge carries the vetted, measured claim
 # and why, not a bare placeholder line.
 _SEED_KEY_ALIAS = {
-    "ptc": "programmatic-tool-calling",
+    "programmatic_tool_calling": "programmatic-tool-calling",
     "citations": "citations",
     "context_editing": "long-horizon-autonomy",
 }

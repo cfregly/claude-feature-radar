@@ -6,10 +6,20 @@ code means the weekly sweep fetches the exact pages the hand-authored landscape 
 fetched fact stays citable by the same engine/cite_facts.py path and the diff tracks the real surface.
 
 Each entry is {vendor, key, url, kind} where kind is doc, changelog, blog, or pricing. An optional
-feed url is carried where a vendor ships an RSS or Atom changelog feed (cheaper conditional GET).
-None of these vendors publishes a documented machine feed for these pages as of 2026-06-19, so feed
-stays None and the sweep does a plain conditional GET on the page. Add a feed url here the day a
-vendor ships one.
+feed url is carried where a page is only readable through a machine feed, not a plain page GET. When
+feed is set the sweep fetches the feed (the bytes) but keeps url as the human citation link, so a
+reader still lands on the canonical page. Almost every doc page here serves real text to a plain
+conditional GET, so feed stays None and the sweep GETs the page directly.
+
+The one feed today is the ClaudeDevs developer account (vendor anthropic, kind blog). x.com renders
+its timeline with JavaScript after login, so a stdlib GET of the profile returns only the logged-out
+chrome ("Log in / Sign up", no posts) with HTTP 200, which would register as a real but empty
+capability. An RSS mirror returns the actual post text to a plain GET, so the feed points there and a
+min_chars guard (below) rejects the thin login shell if the mirror is ever down and the request
+falls back to the page. The mirror is a third-party service, so when it is down the sweep records a
+fetch miss (status unknown), never a false signal, and the docs and the Anthropic blog stay the
+grounded source. Swap the feed url to X's official API endpoint the day that path is wired (it needs
+a paid key, so it does not belong in the unattended $0 loop today).
 
 The sweep is read-only HTTP, so this registry spends nothing. It is the input to engine/sweep_edges.py.
 """
@@ -21,16 +31,18 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Source:
-    vendor: str   # claude, openai, gemini
+    vendor: str   # claude, openai, gemini, anthropic
     key: str      # short stable slug, also the sources/<vendor>_<key>_<date>.txt filename stem
-    url: str      # the live doc page the sweep fetches
+    url: str      # the canonical page, the human citation link, and the snapshot/diff key
     kind: str     # doc, changelog, blog, pricing
-    feed: str | None = None  # an RSS/Atom feed url where the vendor ships one, else None
+    feed: str | None = None  # a machine feed the sweep GETs instead of url (RSS/Atom), else None
+    min_chars: int = 0  # reject a fetched body thinner than this as unknown (a login shell, a dead
+                        # feed instance), so a 200-with-chrome never registers as a real capability
 
 
 # Seeded from the briefs' Sources sections, then widened to the official Claude feature overview,
 # Anthropic release blog, Claude Code docs/changelog, and matching OpenAI/Gemini parity pages. Keys
-# match existing sources/ snapshot stems where one already exists (claude_ptc, claude_citations,
+# match existing sources/ snapshot stems where one already exists (claude_programmatic_tool_calling, claude_citations,
 # claude_pricing, gemini_file_search, openai_compaction) so the sweep overwrites the hand-saved
 # snapshot in place rather than forking it.
 SOURCES: list[Source] = [
@@ -38,7 +50,7 @@ SOURCES: list[Source] = [
     Source("claude", "release_notes", "https://platform.claude.com/docs/en/release-notes/overview", "changelog"),
     Source("claude", "overview", "https://platform.claude.com/docs/en/build-with-claude/overview", "doc"),
     Source("claude", "beta_headers", "https://platform.claude.com/docs/en/api/beta-headers", "doc"),
-    Source("claude", "ptc", "https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling", "doc"),
+    Source("claude", "programmatic_tool_calling", "https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling", "doc"),
     Source("claude", "citations", "https://platform.claude.com/docs/en/build-with-claude/citations", "doc"),
     Source("claude", "context_editing", "https://platform.claude.com/docs/en/build-with-claude/context-editing", "doc"),
     Source("claude", "memory_tool", "https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool", "doc"),
@@ -82,6 +94,12 @@ SOURCES: list[Source] = [
     Source("anthropic", "fable_mythos_access", "https://www.anthropic.com/news/fable-mythos-access", "blog"),
     Source("anthropic", "claude_4", "https://www.anthropic.com/news/claude-4", "blog"),
     Source("anthropic", "claude_apps_release_notes", "https://support.claude.com/en/articles/12138966-release-notes", "changelog"),
+    # The official ClaudeDevs developer account: feature announcements, often ahead of the blog. The
+    # url is the canonical profile (the citation link), the feed is the RSS mirror the sweep actually
+    # GETs because x.com serves only logged-out chrome to a stdlib request (see module docstring), and
+    # min_chars rejects that ~700-char shell so a down mirror reads as a fetch miss, never a real post.
+    Source("anthropic", "claude_devs_x", "https://x.com/ClaudeDevs", "blog",
+           feed="https://nitter.net/ClaudeDevs/rss", min_chars=800),
     # Claude Code: official docs, changelog, digest, and the official Anthropic GitHub releases page.
     Source("claude", "claude_code_changelog", "https://code.claude.com/docs/en/changelog", "changelog"),
     Source("claude", "claude_code_whats_new", "https://code.claude.com/docs/en/whats-new", "changelog"),

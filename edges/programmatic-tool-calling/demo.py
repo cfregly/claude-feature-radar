@@ -1,4 +1,4 @@
-"""ptc: programmatic tool calling, the input-token receipt on a real fan-out task.
+"""programmatic_tool_calling: programmatic tool calling, the input-token receipt on a real fan-out task.
 
 The anchor. Programmatic tool calling (PTC) lets Claude write one script in a code-execution sandbox
 that calls the developer's OWN tools in a loop and filters the results before they ever reach the
@@ -62,7 +62,7 @@ def true_winner():
     return max(totals, key=totals.get), totals
 
 
-def run_ptc(client, model_key, *, programmatic):
+def run_programmatic_tool_calling(client, model_key, *, programmatic):
     """The PTC A/B run for this edge, on top of the one audited engine in token_core.run_mode.
 
     run_mode does the request loop and the apples-to-apples billed-input count (one counter, shared
@@ -92,15 +92,15 @@ class PTCDemonstrator(BaseDemonstrator):
 
     def estimate(self, edge, spec):
         model = (self.fair_comparison(edge).get("claude_config") or {}).get("model", "sonnet")
-        return CostEstimate(usd=0.08, wall_clock_s=90.0, command="make ptc",
+        return CostEstimate(usd=0.08, wall_clock_s=90.0, command="make programmatic-tool-calling",
                             note=f"two fan-out runs on {model}, the only spend is the model arms")
 
     def run_claude_arm(self, edge, spec):
         client = spec.get("client") or get_client()
         model_key = spec.get("model") or (self.fair_comparison(edge).get("claude_config") or {}).get("model", "sonnet")
         winner = spec.get("winner") or true_winner()[0]
-        a_run = run_ptc(client, model_key, programmatic=False)   # Mode A: plain tool use (the A/B baseline)
-        b_run = run_ptc(client, model_key, programmatic=True)    # Mode B: PTC (the Claude arm)
+        a_run = run_programmatic_tool_calling(client, model_key, programmatic=False)   # Mode A: plain tool use (the A/B baseline)
+        b_run = run_programmatic_tool_calling(client, model_key, programmatic=True)    # Mode B: PTC (the Claude arm)
         pct = (1 - b_run["billed_input"] / a_run["billed_input"]) * 100 if a_run["billed_input"] else 0.0
         return Arm(
             provider="claude", model=get(model_key).id, text=str(b_run["answer"]),
@@ -177,11 +177,11 @@ def main():
     print(f"  Same task and same model ({label}) both ways, the final answer must match or we fail.\n")
 
     print("  running Mode A (plain tool use, every row through context) ...", flush=True)
-    a_run = run_ptc(client, a.model, programmatic=False)
+    a_run = run_programmatic_tool_calling(client, a.model, programmatic=False)
     print(f"    Mode A done: {a_run['turns']} round-trips, {a_run['billed_input']:,} billed input tokens, "
           f"answer {a_run['answer']}.", flush=True)
     print("  running Mode B (programmatic, rows filtered in the sandbox) ...", flush=True)
-    b_run = run_ptc(client, a.model, programmatic=True)
+    b_run = run_programmatic_tool_calling(client, a.model, programmatic=True)
     print(f"    Mode B done: {b_run['turns']} round-trips, {b_run['billed_input']:,} billed input tokens, "
           f"answer {b_run['answer']}.\n", flush=True)
 
@@ -216,8 +216,8 @@ def main():
            "true_winner": winner, "mode_a": a_run, "mode_b": b_run,
            "pct_input_reduction": round(pct, 1), "mode_a_correct": a_correct, "mode_b_correct": b_correct}
     (repo_root() / "data").mkdir(exist_ok=True)
-    (repo_root() / "data" / "last_ptc.json").write_text(json.dumps(out, indent=2))
-    print("  (per-turn detail cached in gitignored data/last_ptc.json; this printout is the receipt)\n")
+    (repo_root() / "data" / "last_programmatic_tool_calling.json").write_text(json.dumps(out, indent=2))
+    print("  (per-turn detail cached in gitignored data/last_programmatic_tool_calling.json; this printout is the receipt)\n")
 
     if not (b_correct and fewer):
         raise SystemExit("PTC invariant failed: mode B (the code) must answer correctly AND bill fewer input tokens.")

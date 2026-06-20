@@ -48,10 +48,10 @@ Run it yourself:
 ```bash
 git clone https://github.com/cfregly/claude-feature-briefs && cd claude-feature-briefs
 export ANTHROPIC_API_KEY=your-key
-make ptc        # the example, $0.08 on Sonnet for the two runs
+make programmatic_tool_calling        # the example, $0.08 on Sonnet for the two runs
 ```
 
-To run it on your own tool, edit `ptc/my_tool.py` and run `make ptc` again.
+To run it on your own tool, edit `programmatic_tool_calling/my_tool.py` and run `make programmatic_tool_calling` again.
 
 Go build! 🚀
 

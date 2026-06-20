@@ -27,5 +27,5 @@
   - Honest cost of the approach: Mode B made 5 model round-trips to Mode A's 2 because the model called the tool serially from code, so on an INSTANT mock tool it runs slower. The token saving is the win, the latency depends on your real tool's per-call time (PTC saves the per-call model round-trip a real slow tool would cost).
   - Fan-out-shaped: the doc notes a sequential single-call task (tau2-bench) is flat to about 8% more expensive. No competitor keeps your custom-tool outputs out of context.
 
-  wrote receipts to data/last_ptc.json
+  wrote receipts to data/last_programmatic_tool_calling.json
 

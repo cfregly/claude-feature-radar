@@ -1,6 +1,6 @@
 # Optional. Only needed to run a competitor arm: the cross-platform comparison (make compare /
 # make sweep) and any demonstrator's OpenAI or Gemini arm through the provider-blind layer
-# (common/runner.py call() + engine/providers/). The core Claude path (make demo, make ptc,
+# (common/runner.py call() + engine/providers/). The core Claude path (make demo, make programmatic-tool-calling,
 # make citations, make edges) needs only anthropic; these SDKs are imported lazily, so a
 # Claude-only install never pulls them. The scripts/check_core_imports.py gate proves it.
 # Install with: make compare-deps  (installs these into the same .venv that make compare runs in).

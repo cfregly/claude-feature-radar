@@ -22,9 +22,9 @@
     ZDR-eligible.
 
   Reproduce:
-    make code-exec-state         # write phase
+    make code-execution-state         # write phase
     # wait > 20 minutes
-    make code-exec-state-verify  # re-read after the idle
+    make code-execution-state-verify  # re-read after the idle
 
   Machine receipt:
-    data/last_code_exec_state.json
+    data/last_code_execution_state.json

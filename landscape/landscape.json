@@ -37,9 +37,9 @@
       "evidence_quote": "Beta headers - Claude API Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K \ue104 Log in \ue0dd API reference \ue027 Beta headers Loading... Loading... Loading... Loading... Loading... Loading...",
       "content_hash": "7ac669b105448936840b023855bb8735ff4db9b250d08e88d9949ea5ce303969"
     },
-    "claude:ptc": {
+    "claude:programmatic_tool_calling": {
       "vendor": "claude",
-      "key": "ptc",
+      "key": "programmatic_tool_calling",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling",
       "kind": "doc",
       "fetched_date": "2026-06-19",
@@ -1468,7 +1468,7 @@
   },
   "edges": [
     {
-      "key": "ptc",
+      "key": "programmatic_tool_calling",
       "vendor": "claude",
       "axis": "cost",
       "status": "unverified",
@@ -1509,7 +1509,7 @@
           "fetched_date": "2026-06-18"
         },
         "repro": {
-          "command": "make ptc",
+          "command": "make programmatic-tool-calling",
           "est_cost_usd": 0.08,
           "est_time_s": 90
         }
@@ -3225,7 +3225,7 @@
       "held_reason": "no vetted seed comparison and measured demonstrator for this source yet"
     },
     {
-      "key": "code-exec-state",
+      "key": "code-execution-state",
       "vendor": "claude",
       "axis": "reliability",
       "status": "beta",
@@ -3266,7 +3266,7 @@
           "fetched_date": "2026-06-19"
         },
         "repro": {
-          "command": "make code-exec-state",
+          "command": "make code-execution-state",
           "est_cost_usd": 0.05,
           "est_time_s": 60
         }

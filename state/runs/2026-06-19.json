@@ -35,7 +35,7 @@
   ],
   "dispatch": [
     {
-      "key": "ptc",
+      "key": "programmatic_tool_calling",
       "demoKind": "token_accounting",
       "action": "ask-run-demonstrator",
       "gate": "ask",
@@ -45,7 +45,7 @@
       "estimate": {
         "usd": 0.08,
         "wall_clock_s": 90.0,
-        "command": "make ptc",
+        "command": "make programmatic-tool-calling",
         "note": "two fan-out runs on sonnet, the only spend is the model arms"
       },
       "edge_dir": "edges/programmatic-tool-calling"
@@ -67,8 +67,8 @@
       "edge_dir": "edges/citations"
     }
   ],
-  "anchor_edge": "ptc",
-  "outbox_draft": "state/outbox/2026-06-19-ptc.md",
+  "anchor_edge": "programmatic_tool_calling",
+  "outbox_draft": "state/outbox/2026-06-19-programmatic_tool_calling.md",
   "coverage": {
     "demo_kinds_total": 14,
     "registered": 13,

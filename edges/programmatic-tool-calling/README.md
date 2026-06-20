@@ -2,7 +2,7 @@
 
 Part of [claude-feature-radar](../../README.md), the internal engine. This note is the internal
 both-directions read, not founder copy. The wins-only founder brief is
-[`claude-feature-briefs/ptc`](https://github.com/cfregly/claude-feature-briefs). This is the sharpest
+[`claude-feature-briefs/programmatic_tool_calling`](https://github.com/cfregly/claude-feature-briefs). This is the sharpest
 edge the engine found, and it needs no beta header.
 
 **What it is.** Add `allowed_callers: ["code_execution_20260120"]` to one of your tools and include the
@@ -47,7 +47,7 @@ re-fetched 2026-06-18.
 git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make setup
 cp .env.example .env   # paste your Anthropic key
-make ptc               # this edge, on your own key, $0.08 on Sonnet 4.6
+make programmatic-tool-calling               # this edge, on your own key, $0.08 on Sonnet 4.6
 # or directly: python edges/programmatic-tool-calling/demo.py
 ```
 

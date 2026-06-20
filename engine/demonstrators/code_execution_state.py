@@ -1,4 +1,4 @@
-"""code_exec_state: Claude's code-execution sandbox keeps your files across requests, and keeps them
+"""code_execution_state: Claude's code-execution sandbox keeps your files across requests, and keeps them
 for 30 days, where the competitors lose them.
 
 THE EDGE, at lifecycle depth. Claude's code execution tool persists its sandbox CONTAINER and the
@@ -30,7 +30,7 @@ reused container. On OpenAI the state is gone if the user is idle 20 minutes; on
 re-sent every call. The founder pays that gap in re-upload bytes, repeated setup, and checkpoint glue.
 
 DEPENDENCIES. The Claude arm needs only anthropic. The OpenAI and Gemini arms need their optional SDKs
-and keys (lazy). State between the two phases is kept in data/code_exec_state_pending.json (gitignored),
+and keys (lazy). State between the two phases is kept in data/code_execution_state_pending.json (gitignored),
 which survives across loop ticks in a session. Not ZDR-eligible (code execution retains data).
 """
 
@@ -56,7 +56,7 @@ GEMINI_MODEL = os.environ.get("CES_GEMINI_MODEL", "gem-flash")
 CODE_EXEC_BETA = "code-execution-2025-08-25"
 CLAUDE_TOOL = "code_execution_20250825"
 OPENAI_IDLE_EXPIRY_MIN = 20  # documented: OpenAI code_interpreter container expires after 20 min idle
-STATE_PATH_REL = "data/code_exec_state_pending.json"
+STATE_PATH_REL = "data/code_execution_state_pending.json"
 
 
 def _state_path():
@@ -219,7 +219,7 @@ def _clients():
 
 def write_phase(progress=False) -> dict:
     clients = _clients()
-    platform.used("code_exec", "reusable container, files persist across requests")
+    platform.used("code_execution", "reusable container, files persist across requests")
     nonce = _nonce()
     state = {"nonce": nonce, "written_at": time.time(), "claude": {}, "openai": {}, "gemini": {}}
 
@@ -320,15 +320,15 @@ def _verdict(verify: dict) -> dict:
 def main(argv=None) -> int:
     from common.client import load_env, repo_root
 
-    p = argparse.ArgumentParser(description="code_exec_state: Claude's sandbox keeps files across "
+    p = argparse.ArgumentParser(description="code_execution_state: Claude's sandbox keeps files across "
                                             "requests and across a 20-min idle, vs OpenAI/Gemini.")
     p.add_argument("--verify", action="store_true", help="the durability re-read after the idle gap")
-    p.add_argument("--emit-edge", action="store_true", help="on verify, write edges/code-exec-state/")
+    p.add_argument("--emit-edge", action="store_true", help="on verify, write edges/code-execution-state/")
     a = p.parse_args(argv)
     load_env()
 
     if not a.verify:
-        print("\n  code_exec_state WRITE phase: each arm writes a nonce to its sandbox, then reads it")
+        print("\n  code_execution_state WRITE phase: each arm writes a nonce to its sandbox, then reads it")
         print("  back from a reused container (Claude/OpenAI) or a fresh call (Gemini).\n")
         state = write_phase(progress=True)
         print(f"\n  wrote pending state to {STATE_PATH_REL} (re-read it after a >20-min idle with --verify)")
@@ -337,7 +337,7 @@ def main(argv=None) -> int:
               f"gemini cross_call_persist={state.get('gemini',{}).get('cross_call_persisted')}")
         return 0
 
-    print("\n  code_exec_state VERIFY phase: re-read the SAME containers after the idle gap.\n")
+    print("\n  code_execution_state VERIFY phase: re-read the SAME containers after the idle gap.\n")
     verify = verify_phase(progress=True)
     if "error" in verify:
         print("  " + verify["error"])
@@ -359,12 +359,12 @@ def main(argv=None) -> int:
                    "claude_code_execution": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool",
                    "openai_code_interpreter": "https://developers.openai.com/api/docs/guides/tools-code-interpreter",
                    "gemini_code_execution": "https://ai.google.dev/gemini-api/docs/code-execution"}}
-    (repo_root() / "data" / "last_code_exec_state.json").write_text(json.dumps(receipt, indent=2) + "\n")
+    (repo_root() / "data" / "last_code_execution_state.json").write_text(json.dumps(receipt, indent=2) + "\n")
     if a.emit_edge and verdict["promotable_edge"]:
-        edge = repo_root() / "edges" / "code-exec-state"
+        edge = repo_root() / "edges" / "code-execution-state"
         edge.mkdir(parents=True, exist_ok=True)
         (edge / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
-        print("\n  wrote edges/code-exec-state/receipt.json")
+        print("\n  wrote edges/code-execution-state/receipt.json")
     elif a.emit_edge:
         print("\n  not promotable on this run, edge bundle not written")
     return 0

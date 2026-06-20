@@ -26,10 +26,10 @@ from engine import cadence
 # ----- the deterministic draft is deslop-clean and grounded -----
 
 def _edge():
-    return {"key": "ptc", "axis": "cost", "verdict": "claude-ahead", "lead_score": 2,
+    return {"key": "programmatic_tool_calling", "axis": "cost", "verdict": "claude-ahead", "lead_score": 2,
             "demoKind": "token_accounting",
             "claim": "The model writes one sandbox script that calls the developer's own tools.",
-            "fair_comparison": {"repro": {"command": "make ptc", "est_cost_usd": 0.08, "est_time_s": 90}}}
+            "fair_comparison": {"repro": {"command": "make programmatic-tool-calling", "est_cost_usd": 0.08, "est_time_s": 90}}}
 
 
 def test_draft_is_deslop_clean():
@@ -39,14 +39,14 @@ def test_draft_is_deslop_clean():
 
 def test_draft_carries_the_command_cost_and_claim():
     text = cadence._draft_email(_edge(), None)
-    assert "make ptc" in text
+    assert "make programmatic-tool-calling" in text
     assert "$0.08" in text
     assert "sandbox script" in text                   # the claim is on the surface
     assert "{repo_link}" in text                       # the link placeholder is preserved
 
 
 def test_draft_prefers_the_routing_estimate_over_the_seed_repro():
-    routing = {"key": "ptc", "estimate": {"usd": 0.09, "wall_clock_s": 120, "command": "make ptc"}}
+    routing = {"key": "programmatic_tool_calling", "estimate": {"usd": 0.09, "wall_clock_s": 120, "command": "make programmatic-tool-calling"}}
     text = cadence._draft_email(_edge(), routing)
     assert "$0.09" in text                             # the live estimate wins
     assert "2.0 minutes" in text
@@ -66,11 +66,11 @@ def test_deslop_outbox_exempts_fenced_code():
 
 def test_anchor_is_the_top_uncovered_lead():
     ranked = [
-        {"key": "ptc", "lead_score": 2}, {"key": "citations", "lead_score": 2},
+        {"key": "programmatic_tool_calling", "lead_score": 2}, {"key": "citations", "lead_score": 2},
         {"key": "managed_agents", "lead_score": 0},   # parity, never anchored
     ]
-    assert cadence._anchor_edge(ranked, covered_keys=set())["key"] == "ptc"
-    assert cadence._anchor_edge(ranked, covered_keys={"ptc"})["key"] == "citations"
+    assert cadence._anchor_edge(ranked, covered_keys=set())["key"] == "programmatic_tool_calling"
+    assert cadence._anchor_edge(ranked, covered_keys={"programmatic_tool_calling"})["key"] == "citations"
 
 
 def test_anchor_skips_parity_and_behind_edges():
@@ -79,8 +79,8 @@ def test_anchor_skips_parity_and_behind_edges():
 
 
 def test_anchor_falls_back_to_top_lead_when_all_covered():
-    ranked = [{"key": "ptc", "lead_score": 2}]
-    assert cadence._anchor_edge(ranked, covered_keys={"ptc"})["key"] == "ptc"
+    ranked = [{"key": "programmatic_tool_calling", "lead_score": 2}]
+    assert cadence._anchor_edge(ranked, covered_keys={"programmatic_tool_calling"})["key"] == "programmatic_tool_calling"
 
 
 # ----- the full run: $0, audit empty, no send, no benchmark, against a temp repo root -----
@@ -95,9 +95,9 @@ def temp_repo(tmp_path, monkeypatch):
     landscape = {
         "as_of_date": "2026-06-18",
         "edges": [
-            {"key": "ptc", "axis": "cost", "verdict": "claude-ahead", "lead_score": 2, "score": 6,
+            {"key": "programmatic_tool_calling", "axis": "cost", "verdict": "claude-ahead", "lead_score": 2, "score": 6,
              "demoKind": "token_accounting",
-             "fair_comparison": {"repro": {"command": "make ptc", "est_cost_usd": 0.08, "est_time_s": 90}}},
+             "fair_comparison": {"repro": {"command": "make programmatic-tool-calling", "est_cost_usd": 0.08, "est_time_s": 90}}},
             {"key": "managed_agents", "axis": "retention", "verdict": "parity", "lead_score": 0,
              "score": 0, "demoKind": "retention_resume", "fair_comparison": {}},
         ],
@@ -134,20 +134,20 @@ def test_run_drafts_an_inert_deslop_clean_outbox_file(temp_repo):
 
 def test_run_never_runs_a_benchmark_only_surfaces_the_estimate(temp_repo):
     result = cadence.run(do_sweep=False)
-    # a spending lead (ptc) is dispatched as ask-run-demonstrator with a surfaced estimate, NOT run.
-    ptc = next((r for r in result["routing"] if r["key"] == "ptc"), None)
-    assert ptc is not None
-    assert ptc["action"] == "ask-run-demonstrator"
-    assert ptc["gate"] == "ask"
-    assert ptc["estimate_surfaced"] is True
+    # a spending lead (programmatic_tool_calling) is dispatched as ask-run-demonstrator with a surfaced estimate, NOT run.
+    programmatic_tool_calling = next((r for r in result["routing"] if r["key"] == "programmatic_tool_calling"), None)
+    assert programmatic_tool_calling is not None
+    assert programmatic_tool_calling["action"] == "ask-run-demonstrator"
+    assert programmatic_tool_calling["gate"] == "ask"
+    assert programmatic_tool_calling["estimate_surfaced"] is True
 
 
 def test_run_does_not_repeat_an_edge_the_ledger_already_drafted(temp_repo):
-    # first run drafts ptc; a second run with ptc recorded as drafted must not re-anchor on it. With ptc
+    # first run drafts programmatic_tool_calling; a second run with programmatic_tool_calling recorded as drafted must not re-anchor on it. With programmatic_tool_calling
     # the only lead, the fallback re-uses the top lead, but the coverage row is what protects the stream.
     cadence.run(do_sweep=False)
     ledger = (temp_repo / "state" / "coverage.jsonl").read_text()
-    assert any('"action": "drafted"' in line and '"edge_key": "ptc"' in line
+    assert any('"action": "drafted"' in line and '"edge_key": "programmatic_tool_calling"' in line
                for line in ledger.splitlines())
 
 

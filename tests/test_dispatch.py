@@ -21,7 +21,7 @@ from engine.demonstrators.registry import REGISTRY, dispatch, register, register
 # ----- the taxonomy resolves every key, and never crashes -----
 
 def test_seed_table_maps_the_built_edges():
-    assert demokinds.demokind_for("ptc") == "token_accounting"
+    assert demokinds.demokind_for("programmatic_tool_calling") == "token_accounting"
     assert demokinds.demokind_for("citations") == "grounding_resolution"
     assert demokinds.demokind_for("context_editing") == "long_horizon_survival"
     assert demokinds.demokind_for("managed_agents") == "retention_resume"
@@ -45,7 +45,7 @@ def test_unknown_key_falls_back_to_axis_guess_then_other():
 
 
 def test_is_seeded_separates_table_keys_from_guesses():
-    assert demokinds.is_seeded("ptc") is True
+    assert demokinds.is_seeded("programmatic_tool_calling") is True
     assert demokinds.is_seeded("never_seen_edge") is False
 
 
@@ -73,13 +73,13 @@ def test_a_registered_demonstrator_declares_its_kind():
 
 def test_dispatch_routes_a_built_edge_with_a_surfaced_estimate():
     register_all()
-    edge = {"key": "ptc", "axis": "cost"}
+    edge = {"key": "programmatic_tool_calling", "axis": "cost"}
     r = dispatch(edge)
     assert r.covered is True
     assert r.demo_kind == "token_accounting"
     assert r.estimate is not None and r.estimate.usd > 0  # PTC spends a credit
     assert r.gate == "ask"                                  # so it waits for approval
-    assert r.estimate.command == "make ptc"
+    assert r.estimate.command == "make programmatic-tool-calling"
 
 
 def test_dispatch_files_a_build_stub_for_an_off_taxonomy_kind():
@@ -114,7 +114,7 @@ def test_dispatch_stamps_the_resolved_kind_onto_an_unstamped_edge():
 def test_dispatch_respects_a_per_edge_demokind_override():
     # An explicit demoKind on the edge always wins over the seed-table guess.
     register_all()
-    edge = {"key": "ptc", "axis": "cost", "demoKind": "long_horizon_survival"}
+    edge = {"key": "programmatic_tool_calling", "axis": "cost", "demoKind": "long_horizon_survival"}
     r = dispatch(edge)
     assert r.demo_kind == "long_horizon_survival"
     assert isinstance(r.demonstrator, type(REGISTRY["long_horizon_survival"]))
@@ -160,7 +160,7 @@ def test_build_receipt_applies_the_contract():
     class _D(base.BaseDemonstrator):
         demo_kind = "token_accounting"
 
-    edge = {"key": "ptc", "axis": "cost", "demoKind": "token_accounting",
+    edge = {"key": "programmatic_tool_calling", "axis": "cost", "demoKind": "token_accounting",
             "fair_comparison": {"lead_basis": "within-claude-only"}, "claim": "x"}
     claude = _claude_arm()
     competitors = [Arm(provider="openai", model="gpt", ran=False)]
@@ -175,7 +175,7 @@ def test_build_receipt_applies_the_contract():
 
 def test_audit_flags_a_spend_proposed_without_a_surfaced_estimate():
     from engine import gate
-    routing = [{"key": "ptc", "gate": gate.ASK, "demonstrator": "PTCDemonstrator",
+    routing = [{"key": "programmatic_tool_calling", "gate": gate.ASK, "demonstrator": "PTCDemonstrator",
                 "estimate_surfaced": False}]
     violations = gate.audit([], routing)
     assert violations and any("surfaced estimate" in v for v in violations)
@@ -183,7 +183,7 @@ def test_audit_flags_a_spend_proposed_without_a_surfaced_estimate():
 
 def test_audit_passes_a_spend_with_a_surfaced_estimate():
     from engine import gate
-    routing = [{"key": "ptc", "gate": gate.ASK, "demonstrator": "PTCDemonstrator",
+    routing = [{"key": "programmatic_tool_calling", "gate": gate.ASK, "demonstrator": "PTCDemonstrator",
                 "estimate_surfaced": True}]
     assert gate.audit([], routing) == []
 
@@ -222,7 +222,7 @@ def test_grounding_correction_demotes_context_editing_to_parity():
 
 def test_grounding_correction_leaves_other_edges_untouched():
     from engine import scan
-    edge = {"key": "ptc", "axis": "cost", "verdict": "claude-ahead", "lead_score": 2, "score": 6,
+    edge = {"key": "programmatic_tool_calling", "axis": "cost", "verdict": "claude-ahead", "lead_score": 2, "score": 6,
             "fair_comparison": {"lead_basis": "absence-of-evidence"}}
     out = scan.apply_grounding_correction(edge)
     assert out["verdict"] == "claude-ahead" and out["lead_score"] == 2  # PTC is a genuine lead, untouched

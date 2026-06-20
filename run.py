@@ -70,8 +70,8 @@ def main():
         from engine.demonstrators.bulk_extended_output import main as m; raise SystemExit(m())
     elif cmd in ("advisor", "advisor-routing", "advisor_routing"):
         from engine.demonstrators.advisor_routing import main as m; raise SystemExit(m())
-    elif cmd in ("code-exec-state", "code_exec_state"):
-        from engine.demonstrators.code_exec_state import main as m; raise SystemExit(m())
+    elif cmd in ("code-execution-state", "code_execution_state"):
+        from engine.demonstrators.code_execution_state import main as m; raise SystemExit(m())
     elif cmd in ("eval", "eval-quality"):
         from engine.demonstrators.eval_quality import main as m; m()
     elif cmd == "scan":

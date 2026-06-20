@@ -18,7 +18,7 @@ Every edge here is verified before it ships. The engine runs a skeptic pass on e
 to best and latest to latest across vendors, and keeps only the differentiators that survive it, so a
 win on this page has already beaten its toughest reading.
 
-## Lead edge: programmatic tool calling, about 28% fewer billed input tokens (`make ptc`)
+## Lead edge: programmatic tool calling, about 28% fewer billed input tokens (`make programmatic-tool-calling`)
 
 If your agent calls a tool many times over data it then crunches (usage rollups across cohorts,
 plan-limit checks across accounts, log or trace triage), every tool result flows into the model's
@@ -41,7 +41,7 @@ A 28% input-token cut, and the sandbox returns the exact winner. This pays off w
 a tool many times over data it then crunches (the fan-out shape). The full receipt is [`edges/programmatic-tool-calling/sample.txt`](edges/programmatic-tool-calling/sample.txt).
 
 ```bash
-make ptc          # about $0.08 on Sonnet, needs ANTHROPIC_API_KEY
+make programmatic-tool-calling          # about $0.08 on Sonnet, needs ANTHROPIC_API_KEY
 ```
 
 Reproduce it on your own tool: edit ONE file, [`app/my_tool.py`](app/my_tool.py), paste your
@@ -53,7 +53,7 @@ you change a line.
 Feature references, fetched 2026-06-18:
 - Programmatic tool calling docs: https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 - The 24% fewer input tokens / 11% accuracy gain on agentic search: https://claude.com/blog/improved-web-search-with-dynamic-filtering
-- The PTC cookbook (runnable): https://platform.claude.com/cookbook/tool-use-programmatic-tool-calling-ptc
+- The PTC cookbook (runnable): https://platform.claude.com/cookbook/tool-use-programmatic-tool-calling-programmatic_tool_calling
 
 ## Supporting edge: Citations, a verifiable per-character source pointer (`make citations`)
 
@@ -215,7 +215,7 @@ Feature references, fetched 2026-06-19:
 - OpenAI web search docs: https://developers.openai.com/api/docs/guides/tools-web-search
 - Gemini Google Search docs: https://ai.google.dev/gemini-api/docs/google-search
 
-## Supporting edge: Code-execution state that survives (`make code-exec-state`)
+## Supporting edge: Code-execution state that survives (`make code-execution-state`)
 
 A multi-step data agent over a user's files wants to build up state, intermediate tables, a fitted
 model, charts, across a conversation without re-uploading or re-running setup. Claude's code execution
@@ -234,12 +234,12 @@ container, then re-reading the same container after a 31-minute idle:
 While warm, Claude and OpenAI both reuse a container. After the idle, Claude read its file back while
 OpenAI's container had been discarded (the documented 20-minute idle expiry, measured as a real `400`),
 and Gemini has no reusable container to begin with. The win is durability and cross-call persistence.
-The full receipt is [`edges/code-exec-state/sample.txt`](edges/code-exec-state/sample.txt), with machine
-data in [`edges/code-exec-state/receipt.json`](edges/code-exec-state/receipt.json).
+The full receipt is [`edges/code-execution-state/sample.txt`](edges/code-execution-state/sample.txt), with machine
+data in [`edges/code-execution-state/receipt.json`](edges/code-execution-state/receipt.json).
 
 ```bash
-make code-exec-state        # write phase, then wait > 20 minutes
-make code-exec-state-verify # re-read: Claude survives, OpenAI expired
+make code-execution-state        # write phase, then wait > 20 minutes
+make code-execution-state-verify # re-read: Claude survives, OpenAI expired
 ```
 
 Feature references, fetched 2026-06-19:
@@ -376,11 +376,11 @@ Feature references, fetched 2026-06-19:
 git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make setup                        # the venv and the one dependency (anthropic)
 cp .env.example .env              # paste your ANTHROPIC_API_KEY
-make ptc                          # the lead edge, about $0.08 (needs ANTHROPIC_API_KEY)
+make programmatic-tool-calling                          # the lead edge, about $0.08 (needs ANTHROPIC_API_KEY)
 make app-check                    # the forkable app on the shipped example, then edit app/my_tool.py
 ```
 
-Cost expectations: every benchmark reads its numbers off a real API call. `make ptc` is about $0.08,
+Cost expectations: every benchmark reads its numbers off a real API call. `make programmatic-tool-calling` is about $0.08,
 `make citations` about $0.06, `make pdf-citations` about $0.09, `make search-results` about $0.06,
 `make grounding-stack` about $0.03, `make cache-diagnostics` is cents-scale, `make task-budget` is a
 bounded live receipt, and `make ledger` about $5 on the shipped full task. There is no hidden spend,

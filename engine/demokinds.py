@@ -9,7 +9,7 @@ registering it under its demoKind. Discovery, ranking, the gate, drafting, and p
 This module holds three things, all deterministic and offline:
 
   DEMO_KINDS      the canonical list of demoKind strings the engine knows how to talk about.
-  KEY_TO_DEMOKIND the seed table mapping a source key (ptc, citations, pricing) to its demoKind.
+  KEY_TO_DEMOKIND the seed table mapping a source key (programmatic_tool_calling, citations, pricing) to its demoKind.
   demokind_for()  the resolver: the seed table first, then a best-effort axis guess for an unknown
                   key, so a brand-new edge still routes instead of crashing.
 
@@ -52,11 +52,11 @@ DEMO_KINDS = [
 
 # The seed table: a source key (the short doc slug the sweep keys on, or a built-edge folder name)
 # maps to the demoKind that proves it. This is the taxonomy this engine uses for these assignments.
-# Both the slug form (ptc, context_editing) and the built-edge folder form (programmatic-tool-calling,
+# Both the slug form (programmatic_tool_calling, context_editing) and the built-edge folder form (programmatic-tool-calling,
 # long-horizon-autonomy) are listed so the live sweep key and the seed key both resolve.
 KEY_TO_DEMOKIND = {
     # token_accounting: a mechanism that keeps bytes out of the billed context.
-    "ptc": "token_accounting",
+    "programmatic_tool_calling": "token_accounting",
     "programmatic-tool-calling": "token_accounting",
     "mid_conversation_system": "token_accounting",
     # advisor_routing: a cheap executor consults a frontier advisor in ONE request (cost-at-quality).

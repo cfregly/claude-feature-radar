@@ -29,7 +29,7 @@ def _dollars(text: str) -> list[float]:
     return [float(x) for x in re.findall(r"\$(\d+\.\d{2,4})", text)]
 
 
-def check_ptc(fail, warn):
+def check_programmatic_tool_calling(fail, warn):
     """The PTC receipt (edges/programmatic-tool-calling/sample.txt) is the source for the billed-token
     numbers, the percent reduction, and the run cost. Every surface that quotes them must agree."""
     s = _read("edges/programmatic-tool-calling/sample.txt")
@@ -57,32 +57,32 @@ def check_ptc(fail, warn):
         "Makefile", "README.md", "FOUNDER_EMAIL.md", "app/run_tokens.py", "demo.tape",
         "edges/programmatic-tool-calling/README.md",
         "edges/programmatic-tool-calling/FOUNDER_EMAIL.md",
-        "emails/ptc_FOUNDER_EMAIL.md",
+        "emails/programmatic_tool_calling_FOUNDER_EMAIL.md",
     ]
     want = f"${total:.2f}"
     for rel in cost_files:
         text = _read(rel)
-        # only inspect lines that mention the PTC run cost (make ptc / make app / "on Sonnet ... reproduce")
+        # only inspect lines that mention the PTC run cost (make programmatic-tool-calling / make app / "on Sonnet ... reproduce")
         for i, line in enumerate(text.splitlines(), 1):
-            if not re.search(r"make (ptc|app)|on Sonnet|reproduce|token bill", line, re.I):
+            if not re.search(r"make (programmatic[-_]tool[-_]calling|app)|on Sonnet|reproduce|token bill", line, re.I):
                 continue
             for c in _dollars(line):
                 if abs(c - total) > COST_TOL:
                     fail.append(f"PTC cost: {rel}:{i} says ${c:.2f}, receipt total is {want} "
                                 f"(${a_cost:.4f}+${b_cost:.4f}); update both together")
 
-    # the $ figure that immediately follows a 'make ptc'/'make app' claim must be the receipt total,
+    # the $ figure that immediately follows a 'make programmatic-tool-calling'/'make app' claim must be the receipt total,
     # scanning across line breaks up to the next make-command (so 'make citations $0.06' is not misread)
     for rel in cost_files:
         text = _read(rel)
-        for mm in re.finditer(r"make (?:ptc|app)\b", text):
+        for mm in re.finditer(r"make (?:programmatic[-_]tool[-_]calling|app)\b", text):
             tail = re.split(r"\bmake \w", text[mm.end():mm.end() + 140])[0]
             d = _dollars(tail)
             if d and abs(d[0] - total) > COST_TOL:
-                fail.append(f"PTC cost: {rel} 'make ptc/app' is followed by ${d[0]:.2f}, receipt total is {want}")
+                fail.append(f"PTC cost: {rel} 'make programmatic-tool-calling/app' is followed by ${d[0]:.2f}, receipt total is {want}")
 
 
-def check_ptc_drift(fail, warn):
+def check_programmatic_tool_calling_drift(fail, warn):
     """Any PTC-token-shaped number (9,4xx / 6,8xx) on a PTC founder surface must equal the receipt, so a
     stray hand-typed 6,819 cannot drift away from the 6,828 the run actually billed. Scoped to files that
     are actually about PTC: with many briefs now, an unrelated edge can legitimately print a 6,8xx number
@@ -93,14 +93,14 @@ def check_ptc_drift(fail, warn):
     if not (a and b):
         return
     a_tok, b_tok = int(a.group(1).replace(",", "")), int(b.group(1).replace(",", ""))
-    ptc_ctx = re.compile(r"programmatic tool calling|Token MINNing|allowed_callers|\bPTC\b", re.I)
+    programmatic_tool_calling_ctx = re.compile(r"programmatic tool calling|Token MINNing|allowed_callers|\bPTC\b", re.I)
     files = [ROOT / "README.md", ROOT / "FOUNDER_EMAIL.md"]
     files += sorted(ROOT.glob("edges/*/FOUNDER_EMAIL.md")) + sorted(ROOT.glob("emails/*.md"))
     for p in files:
         if not p.exists():
             continue
         text = p.read_text()
-        if not ptc_ctx.search(text):
+        if not programmatic_tool_calling_ctx.search(text):
             continue  # not a PTC surface, so a 6,8xx/9,4xx number here is its own receipt, not PTC's
         for m in re.finditer(r"\b([69],\d{3})\b", text):
             v = int(m.group(1).replace(",", ""))
@@ -127,8 +127,8 @@ def check_price_provenance(fail, warn):
 
 def main():
     fail, warn = [], []
-    check_ptc(fail, warn)
-    check_ptc_drift(fail, warn)
+    check_programmatic_tool_calling(fail, warn)
+    check_programmatic_tool_calling_drift(fail, warn)
     check_price_provenance(fail, warn)
     for w in warn:
         print(f"  receipt gate: WARN {w}")

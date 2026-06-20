@@ -27,8 +27,8 @@ def test_clean_win_passes_the_gate():
 
 
 def test_slug_and_folder_key_both_resolve():
-    """Both the live sweep slug (ptc) and the built-edge folder name resolve to the same passing edge."""
-    assert pb.verdict_gate("ptc").ok
+    """Both the live sweep slug (programmatic_tool_calling) and the built-edge folder name resolve to the same passing edge."""
+    assert pb.verdict_gate("programmatic_tool_calling").ok
     assert pb.verdict_gate("programmatic-tool-calling").ok
 
 
@@ -107,7 +107,7 @@ def test_cost_model_key_refused_even_if_mislabeled(monkeypatch):
 def test_disagreeing_receipt_vetoes(monkeypatch, tmp_path):
     """A present receipt that does NOT indicate a Claude win vetoes a green-landscape publish."""
     _synthetic_edge(monkeypatch, verdict="claude-ahead", lead_score=5, lead_basis="absence-of-evidence")
-    bad = tmp_path / "last_ptc.json"
+    bad = tmp_path / "last_programmatic_tool_calling.json"
     bad.write_text(json.dumps({"mode_b_correct": False, "verdict": "never-evaluated"}))
     monkeypatch.setattr(pb, "_receipt_path", lambda k: bad)
     g = pb.verdict_gate("programmatic-tool-calling")
@@ -116,7 +116,7 @@ def test_disagreeing_receipt_vetoes(monkeypatch, tmp_path):
 
 def test_agreeing_receipt_passes(monkeypatch, tmp_path):
     _synthetic_edge(monkeypatch, verdict="claude-ahead", lead_score=5, lead_basis="absence-of-evidence")
-    good = tmp_path / "last_ptc.json"
+    good = tmp_path / "last_programmatic_tool_calling.json"
     good.write_text(json.dumps({"mode_b_correct": True, "pct_input_reduction": 28.0,
                                 "mode_a": {"billed_input": 9451}, "mode_b": {"billed_input": 6828}}))
     monkeypatch.setattr(pb, "_receipt_path", lambda k: good)

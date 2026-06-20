@@ -89,9 +89,16 @@ def _strip_to_text(raw: bytes) -> str:
 
 def fetch_one(src, prior: dict | None) -> dict:
     """One read-only conditional GET. Returns a result dict with status fetched, unchanged, or
-    unknown. A blocked, failed, or empty fetch is status unknown, NEVER read as absence. prior holds
-    the last run's {etag, last_modified, hash} for this url, used for the conditional request."""
-    req = urllib.request.Request(src.url, headers={"User-Agent": UA})
+    unknown. A blocked, failed, empty, or too-thin fetch is status unknown, NEVER read as absence.
+    prior holds the last run's {etag, last_modified, hash}, keyed on src.url, for the conditional
+    request.
+
+    When src.feed is set the GET targets the feed (the bytes), while every key, snapshot, and diff
+    still uses src.url so the citation stays the canonical page. src.min_chars rejects a body thinner
+    than the threshold as unknown, so a logged-out login shell or a dead feed instance that returns a
+    200 with chrome never registers as a real capability."""
+    target = src.feed or src.url
+    req = urllib.request.Request(target, headers={"User-Agent": UA})
     if prior:
         if prior.get("etag"):
             req.add_header("If-None-Match", prior["etag"])
@@ -113,6 +120,12 @@ def fetch_one(src, prior: dict | None) -> dict:
     text = _strip_to_text(body)
     if not text.strip():
         return {"src": src, "status": "unknown", "error": "empty body after strip", "hash": None}
+    if len(text.strip()) < src.min_chars:
+        # A 200 with only chrome (a login shell, a dead feed page). Below the source's own floor, so
+        # it is a fetch miss, never a real but empty capability. Honesty posture: never absence.
+        return {"src": src, "status": "unknown",
+                "error": f"thin body, {len(text.strip())} chars < min_chars {src.min_chars}",
+                "hash": None}
     digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
     return {"src": src, "status": "fetched", "text": text, "hash": digest,
             "etag": etag, "last_modified": last_mod}
@@ -134,7 +147,9 @@ def write_snapshot(src, text: str, date: str) -> str:
     rel = f"sources/{src.vendor}_{src.key}_{date}.txt"
     if (repo_root() / rel).exists():
         rel = f"sources/{src.vendor}_{src.key}_{date}.raw.txt"
+    via = f"Fetched via: {src.feed}\n" if getattr(src, "feed", None) else ""
     header = (f"Source: {src.url}\n"
+              f"{via}"
               f"Snapshot fetched {date}. Verbatim excerpts for citation grounding.\n\n")
     (repo_root() / rel).write_text(header + text)
     return rel
@@ -328,7 +343,7 @@ def _seed_axis_for(key: str) -> str:
         if d["key"] == key or key in d["key"] or d["key"].replace("-", "_") == key:
             return d["axis"]
     table = {
-        "ptc": "cost", "citations": "reliability", "context_editing": "reliability",
+        "programmatic_tool_calling": "cost", "citations": "reliability", "context_editing": "reliability",
         "memory_tool": "long-horizon", "prompt_caching": "cost", "code_execution": "cost",
         "managed_agents": "long-horizon", "pricing": "cost", "compaction": "reliability",
         "file_search": "reliability", "caching": "cost", "overview": "unknown",
@@ -354,7 +369,7 @@ def _seed_axis_for(key: str) -> str:
         "claude_code_plugins": "dx", "claude_code_github_releases": "agentic-success",
         "news": "unknown", "opus_4_8": "agentic-success", "fable_mythos_5": "agentic-success",
         "fable_mythos_access": "unknown", "claude_4": "agentic-success",
-        "claude_apps_release_notes": "unknown",
+        "claude_apps_release_notes": "unknown", "claude_devs_x": "unknown",
     }
     return table.get(key, "unknown")
 
@@ -362,7 +377,7 @@ def _seed_axis_for(key: str) -> str:
 # ----- coverage (which ranked edges already have a built email) ----------------------------------
 
 EDGE_DIR_FOR = {  # source key -> existing edges/<dir>, so the changelog flags what is already covered
-    "ptc": "programmatic-tool-calling",
+    "programmatic_tool_calling": "programmatic-tool-calling",
     "citations": "citations",
     "context_editing": "context-editing",
     "pricing": "cost-model",

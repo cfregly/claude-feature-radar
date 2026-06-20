@@ -18,7 +18,7 @@ from engine.scan import current_anchor
 # A demonstrator persists its standard Receipt to one of these, newest-wins. demoKind-agnostic: the
 # drafter reads the Receipt shape, never a per-feature field, so a ported demonstrator needs no edit
 # here. See engine/demonstrators/base.py Receipt.
-_RECEIPT_FILES = ("last_receipt.json", "last_ptc.json", "last_citations.json", "last_longhorizon.json")
+_RECEIPT_FILES = ("last_receipt.json", "last_programmatic_tool_calling.json", "last_citations.json", "last_longhorizon.json")
 
 
 def _unified_receipt() -> str | None:

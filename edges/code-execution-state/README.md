@@ -14,8 +14,8 @@ re-uploads or re-runs setup, even if the user is idle for a while.
 
 ## The Measured Proof
 
-Run: `make code-exec-state` (write a unique nonce to `/tmp/state.txt` in each vendor's sandbox, read it
-back from the reused container), wait past the idle window, then `make code-exec-state-verify`
+Run: `make code-execution-state` (write a unique nonce to `/tmp/state.txt` in each vendor's sandbox, read it
+back from the reused container), wait past the idle window, then `make code-execution-state-verify`
 (re-read the same container). Measured 2026-06-19 with a 31-minute idle gap:
 
 | vendor | persists across requests | survives a 31-min idle |
@@ -45,9 +45,9 @@ git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-r
 make setup
 make compare-deps
 cp .env.example .env        # paste ANTHROPIC_API_KEY, OPENAI_API_KEY, and GEMINI_API_KEY
-make code-exec-state        # write phase: write a nonce, warm read-back, save container ids
+make code-execution-state        # write phase: write a nonce, warm read-back, save container ids
 # wait > 20 minutes (OpenAI's documented idle expiry)
-make code-exec-state-verify # re-read: Claude survives, OpenAI's container is expired
+make code-execution-state-verify # re-read: Claude survives, OpenAI's container is expired
 ```
 
 Sources, fetched 2026-06-19:

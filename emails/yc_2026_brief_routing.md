@@ -9,12 +9,12 @@ so they are not contacted: targeting, not spraying.
 
 | Company | What they build | Segment | Brief to send | Email draft |
 |---|---|---|---|---|
-| Sazabi | finds prod problems via log analysis, fixes via Slack | cost | Programmatic tool calling (fan out over logs, keep the bulky rows out of context) | `emails/ptc_FOUNDER_EMAIL.md` |
-| Tasklet | an agent that calls work-app APIs to do tasks | cost | Programmatic tool calling (many tool calls, only the answer returns) | `emails/ptc_FOUNDER_EMAIL.md` |
+| Sazabi | finds prod problems via log analysis, fixes via Slack | cost | Programmatic tool calling (fan out over logs, keep the bulky rows out of context) | `emails/programmatic_tool_calling_FOUNDER_EMAIL.md` |
+| Tasklet | an agent that calls work-app APIs to do tasks | cost | Programmatic tool calling (many tool calls, only the answer returns) | `emails/programmatic_tool_calling_FOUNDER_EMAIL.md` |
 | Complir | AI agents for compliance and regulatory monitoring | trust | PDF citations (a page pointer into the regulation PDF, verifiable) | `emails/pdf_citations_FOUNDER_EMAIL.md` |
-| Arga Labs | digital-twin sandboxes for agents to test code | agent | Code-execution state (the sandbox keeps its files across turns) | `emails/code_exec_state_FOUNDER_EMAIL.md` |
+| Arga Labs | digital-twin sandboxes for agents to test code | agent | Code-execution state (the sandbox keeps its files across turns) | `emails/code_execution_state_FOUNDER_EMAIL.md` |
 | Superset | run 100+ coding agents in isolated workspaces | agent | Task budgets (cap each agent loop so it stops clean, not mid-action) | `emails/task_budgets_FOUNDER_EMAIL.md` |
-| Lightsprint | non-engineers build and ship app features via AI | agent | Code-execution state (a build agent that keeps state between steps) | `emails/code_exec_state_FOUNDER_EMAIL.md` |
+| Lightsprint | non-engineers build and ship app features via AI | agent | Code-execution state (a build agent that keeps state between steps) | `emails/code_execution_state_FOUNDER_EMAIL.md` |
 
 ## Not contacted (5, no edge fit)
 

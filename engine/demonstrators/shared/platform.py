@@ -24,8 +24,8 @@ FEATURES = {
     "panel": "judge panel (independent votes)",
     "managed": "Managed Agents (hosted sandbox, beta)",
     # engine-specific edge surfaces
-    "ptc": "programmatic tool calling (allowed_callers keeps tool outputs out of context)",
-    "code_exec": "code execution sandbox (server-side, beta)",
+    "programmatic_tool_calling": "programmatic tool calling (allowed_callers keeps tool outputs out of context)",
+    "code_execution": "code execution sandbox (server-side, beta)",
     "citations": "Citations (verifiable per-character source pointer)",
     "context_editing": "context editing (in-place tool-result clearing)",
     "memory": "the memory tool (durable state across a clear or kill)",
