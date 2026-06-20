@@ -173,7 +173,7 @@ PLANS: dict[str, BriefPlan] = {
             VendorFile("common/models.py", "common/models.py"),
             VendorFile("common/pricing.py", "common/pricing.py"),
         ),
-        make_help='build .venv, install anthropic, answer questions over a directly-supplied PDF and get a correct-page pointer for each answer (~$0.02)',
+        make_help='build .venv, install anthropic, answer questions over a directly-supplied PDF and get a correct-page pointer for each answer (~$0.05)',
         from_assets=True,
         headline="# Deep-link every answer to the exact page of a user's PDF with Claude Citations",
         index_blurb='Answer questions over a directly-supplied PDF and get a verifiable page_location pointer (page number plus the quoted source text) for every answer, with zero resolver code.',
@@ -1065,57 +1065,6 @@ if __name__ == "__main__":
 '''
 
 
-def _citations_readme_source(plan: BriefPlan) -> str:
-    """The public, wins-only README for the citations brief. Generated, no internal backrefs, doc link
-    from the landscape source_url (the plan's doc_url)."""
-    return f"""# Get a verifiable source pointer for every answer with Citations
-
-![demo](demo.gif)
-
-When your app answers a question over your users' own documents (contracts, policies, tickets, support
-docs), the answer is only as trustworthy as the source behind it. Claude's Citations feature returns,
-for every claim it makes, a structured pointer into the source document: the document, a character
-range, and the verbatim quote at that range. The pointer is guaranteed to resolve, and the quote is
-free of output tokens, so you can check every answer in your own code instead of trusting it.
-
-## What you get
-
-Set `citations.enabled` on each document and the API returns a `char_location` for every claim:
-`source[start_char_index:end_char_index]` is exactly the `cited_text` it handed back. This brief answers
-{len(_CITATIONS_QUESTIONS)} questions over three plain-text documents and resolves every pointer, so you
-see the guarantee hold on a live call.
-
-```python
-content = [
-    {{"type": "document",
-      "source": {{"type": "text", "media_type": "text/plain", "data": doc_text}},
-      "citations": {{"enabled": True}}}},          # turn citations on for this document
-    {{"type": "text", "text": question}},
-]
-msg = client.messages.create(model="claude-haiku-4-5", max_tokens=400,
-                            messages=[{{"role": "user", "content": content}}])
-# every citation resolves: source[c.start_char_index:c.end_char_index] == c.cited_text
-```
-
-## Run it (about $0.01)
-
-```
-export ANTHROPIC_API_KEY=your-key   # https://console.anthropic.com/
-make {plan.slug}        # build the venv, install anthropic, answer the questions and resolve every pointer
-```
-
-## Run it on your own documents
-
-Drop your own `.txt` files into `{plan.slug}/docs/`, edit `QUESTIONS` at the top of
-`{plan.slug}/cite.py` to the questions you want answered, and run `make {plan.slug}` again. Citations is
-supported on every active model except Haiku 3.
-
-## Learn more
-
-- [Citations docs]({plan.doc_url})
-"""
-
-
 def _codeexec_run_source(slug: str) -> str:
     """The generated run entry for the code-execution-state brief: write a unique value to /tmp/state.txt in a
     fresh container, capture container.id, then read it back from the REUSED container on a separate
@@ -1264,69 +1213,6 @@ if __name__ == "__main__":
 '''
 
 
-def _codeexec_readme_source(plan: BriefPlan) -> str:
-    """The public, wins-only README for the code-execution-state brief. Generated, no internal backrefs, no
-    competitor named, doc link from the plan's doc_url."""
-    return f"""# Keep your agent's sandbox state between turns with code execution
-
-![demo](demo.gif)
-
-A multi-step agent that runs code does real work across several turns: it ingests a file, cleans it,
-builds intermediate tables, fits a model, renders a chart. The hard part is state. If the sandbox does
-not persist between turns, you re-upload the file and re-run setup on every call, and you write your own
-checkpointing glue.
-
-## What you get
-
-Claude's code execution sandbox keeps its container and its files across separate Messages API requests.
-Capture `response.container.id` from one call, pass it as `container=<id>` on the next, and a file
-written in one turn is there in the next. This brief writes a unique value to `/tmp/state.txt`, then
-reads it back from the reused container on a separate request, so you see the state persist on a live
-call. Containers live 30 days, so the state is there even after your user steps away: a file written
-here read back from the same container after a 31-minute idle.
-
-```python
-r1 = client.beta.messages.create(
-    model="claude-sonnet-4-6", betas=["code-execution-2025-08-25"],
-    tools=[{{"type": "code_execution_20250825", "name": "code_execution"}}],
-    messages=[{{"role": "user", "content": "...write /tmp/state.txt..."}}])
-container_id = r1.container.id                        # capture it
-
-r2 = client.beta.messages.create(
-    model="claude-sonnet-4-6", betas=["code-execution-2025-08-25"],
-    container=container_id,                           # reuse it: the file from r1 is still here
-    tools=[{{"type": "code_execution_20250825", "name": "code_execution"}}],
-    messages=[{{"role": "user", "content": "...read /tmp/state.txt..."}}])
-```
-
-## Run it (about $0.05)
-
-```
-export ANTHROPIC_API_KEY=your-key   # https://console.anthropic.com/
-make {plan.slug}        # build the venv, install anthropic, write a file and read it back from the reused container
-```
-
-`make {plan.slug}` is self-bootstrapping: it creates `.venv`, installs `anthropic`, and runs the write then reread.
-
-## Run it on your own agent
-
-Open `{plan.slug}/run.py`, the file you edit. Change the two `messages` payloads to your agent's real
-steps: write whatever your first step produces into the container in request one, then do the next step
-in request two with `container=<id>` set. The state your first step wrote is still there. Keep the
-container id and pass it on every follow-up call.
-
-## The honest scope
-
-The edge is durability and cross-request persistence: the container and its files survive between
-separate requests and for 30 days, so a long-running agent keeps its state without re-uploading or
-re-running setup. Code execution is beta, so set `betas=["code-execution-2025-08-25"]`.
-
-## Learn more
-
-- [Code execution docs]({plan.doc_url})
-"""
-
-
 def _codeexec_sample_source() -> str:
     """The committed receipt snapshot the demo gif replays (cat by demo.tape). Wins-only, Claude-only,
     deterministic, no competitor named. Shows the value written in one request read back from the reused
@@ -1350,156 +1236,6 @@ def _codeexec_sample_source() -> str:
     )
 
 
-def _codeexec_founder_email_source(plan: BriefPlan) -> str:
-    """The code-execution-state founder email, written to the ENGINE repo (never the public briefs repo).
-    Wins-only, plain language, the real code, one reproduce path."""
-    return f"""Subject: Keep your agent's sandbox state between turns
-
-Hey {{first_name}},
-
-Congrats on getting into YC! Quick tip if you are building a multi-step agent that runs code over your users' files.
-
-A real agent runs across several turns: it ingests a file, cleans it, builds intermediate tables, fits a
-model, renders a chart. The annoying part is state. If the sandbox does not persist between turns, you
-re-upload the file and re-run setup on every call, and you write your own checkpointing glue.
-
-[Code execution]({plan.doc_url}) keeps its container and its files across separate requests. Capture
-response.container.id from one call, pass it back as container=<id> on the next, and a file written in
-one turn is there in the next. Containers live 30 days, so the state is there even after your user steps away.
-
-```python
-r1 = client.beta.messages.create(model="claude-sonnet-4-6", betas=["code-execution-2025-08-25"],
-    tools=[{{"type": "code_execution_20250825", "name": "code_execution"}}], messages=[...])
-container_id = r1.container.id                       # keep this
-
-r2 = client.beta.messages.create(model="claude-sonnet-4-6", betas=["code-execution-2025-08-25"],
-    container=container_id,                          # reuse it: the file from r1 is still here
-    tools=[{{"type": "code_execution_20250825", "name": "code_execution"}}], messages=[...])
-```
-
-Want to watch it first, no clone needed? The brief opens with a gif of the run:
-https://github.com/cfregly/claude-feature-hits/blob/main/{plan.slug}/README.md
-
-See it run (about a minute):
-
-```
-git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-export ANTHROPIC_API_KEY=your-key
-make {plan.slug}     # write a file and read it back from the reused container, $0.05
-```
-
-To run it on your own agent, open {plan.slug}/run.py and change the two messages payloads to your
-agent's real steps, then run make {plan.slug} again.
-
-Happy building! 🚀
-{{your_name}}
-Building with Claude
-"""
-
-
-def _readme_source(plan: BriefPlan, edge: dict, receipt: dict | None) -> str:
-    """The public, wins-only README for the brief. Generated from the engine truth: the measured receipt
-    numbers when present, the doc link from the landscape source_url (the plan's doc_url), no internal
-    backrefs or engine paths. The win-side table and the two-line code change are kept; nothing names a
-    Claude negative."""
-    # Pull the measured win-side numbers off the receipt when one is present, else state the shape only.
-    a_in = b_in = pct = None
-    if receipt:
-        ma, mb = receipt.get("mode_a", {}), receipt.get("mode_b", {})
-        a_in = ma.get("billed_input")
-        b_in = mb.get("billed_input")
-        pct = receipt.get("pct_input_reduction")
-    table = ""
-    if a_in and b_in:
-        pct_str = f"{pct:.0f}%" if isinstance(pct, (int, float)) else "fewer"
-        table = (
-            "\n| mode | input tokens billed | what happens to the 240 results |\n"
-            "|---|---:|---|\n"
-            f"| without PTC | {a_in:,} | all the results flow through the model's context |\n"
-            f"| **with PTC** | **{b_in:,}** | the sandbox aggregates, only the answer reaches the model |\n\n"
-            f"That is **{pct_str} fewer input tokens** on this run, because the results went to the "
-            "sandbox, not the model context. Every cell is read live off the API's own `usage` object, "
-            "so re-running shifts the count a little. The saving compounds across every fan-out you run.\n"
-        )
-    else:
-        table = (
-            "\nRun `make programmatic_tool_calling` to print your own before/after table from a live call. Every cell comes "
-            "from the real `usage` object the API returns, never from memory.\n"
-        )
-
-    return f"""# Cut your tool-output token bill with programmatic tool calling
-
-![demo](demo.gif)
-
-If your app calls your own tool to answer a question and that tool returns a lot of results, every
-result it pulls back lands in the model's context and you pay for all of them, even the ones that turn
-out irrelevant. Programmatic tool calling (PTC) runs your tool inside a code sandbox, keeps only the
-results that matter, and passes just those to the model. The rest never reach the context, so you are
-not billed for them.
-
-## The same task, Claude with PTC vs Claude without it
-
-The same fan-out task two ways on the same model (Sonnet 4.6): across four regions of about 60 results
-each (240 results), find the highest-revenue region. The only thing that changes between the two is
-programmatic tool calling, on or off.
-{table}
-## The change is two lines
-
-```python
-response = client.messages.create(
-    model="claude-sonnet-4-6",
-    messages=[...],
-    tools=[
-        {{"type": "code_execution_20260120", "name": "code_execution"}},   # add this
-        {{ "name": "query_region_sales", "input_schema": {{...}},   # your tool, unchanged
-          "allowed_callers": ["code_execution_20260120"] }},        # add this line
-    ],
-)
-```
-
-Add `allowed_callers: ["code_execution_20260120"]` to your tool and include the code execution tool.
-Claude writes one script in a server-side sandbox that loops over the inputs, calls your tool for each,
-and keeps only the results that matter. The irrelevant results stay in the sandbox, so you are not
-billed for them.
-
-## The honest scope
-
-The win is fan-out shaped: it lands when the model calls your tool many times, so the bulky outputs
-run in code instead of filling its context. The shipped example (`query_region_sales`, 240 results over
-four regions) is a genuine fan-out, which is where the input-token savings show up. The PTC docs list
-Fable 5, Mythos 5, Opus 4.5 to 4.8, and Sonnet 4.5 to 4.6 (not Haiku). This brief runs Sonnet and Opus,
-the practical founder paths.
-
-## Run it (about $0.08)
-
-```
-export ANTHROPIC_API_KEY=your-key   # https://console.anthropic.com/
-make programmatic_tool_calling        # build the venv, install anthropic, run the token-bill comparison on the region_sales example
-```
-
-`make programmatic_tool_calling` is self-bootstrapping: it creates `.venv`, installs `anthropic`, and runs the before/after.
-
-## Run it on your own tool
-
-Open `{plan.slug}/{plan.edit_surface}`, the one file you edit. Replace three things, then run
-`make programmatic_tool_calling` again:
-
-1. `TOOL_SPEC` with your own Messages-API tool dict (the same `{{name, description, input_schema}}` you
-   already pass in `tools=[...]`).
-2. `call(...)` with your real backend (a database query, an API call, a file read) returning whatever
-   the model normally gets back.
-3. `QUESTION` and `EXAMPLE_INPUTS` with your fan-out task and the inputs it fans out over.
-
-Keep the task fan-out shaped: a fan-out task, where the model calls your tool many times, is where
-the input-token savings show up.
-
-## Learn more
-
-- [Programmatic tool calling docs]({plan.doc_url})
-- [Improved web search with dynamic filtering](https://claude.com/blog/improved-web-search-with-dynamic-filtering) (about 24% fewer input tokens, 11% better answers)
-"""
-
-
 def _demo_tape_source(plan: BriefPlan) -> str:
     """The VHS tape for the brief's demo.gif. It shadows `make` with a function that cats the committed
     sample.txt, so `make gif` replays the receipt for $0 (no API call, deterministic). Generated here, so
@@ -1507,12 +1243,9 @@ def _demo_tape_source(plan: BriefPlan) -> str:
     slug = plan.slug
     _dims = {"citations": (1240, 820), "code_execution_state": (1200, 720)}
     width, height = _dims.get(slug, (1200, 720) if plan.from_assets else (1200, 640))
-    _headlines = {
-        "citations": "# Citations: a verifiable source pointer for every answer, resolved in your own code",
-        "code_execution_state": "# code execution state: your agent's sandbox keeps its files between requests",
-    }
-    headline = plan.headline or _headlines.get(
-        slug, "# programmatic tool calling: about 28% fewer billed input tokens on a fan-out task")
+    # The gif opens with the brief's own value title (the README's first line), so the gif and the
+    # README always lead with the same value, and a republish keeps the two in lockstep.
+    headline = _read_asset(plan, "README.md").splitlines()[0].strip()
     return (
         f"# VHS tape for the {slug} brief gif (https://github.com/charmbracelet/vhs).\n"
         f"# Regenerate from the repo root with:  make gif    (needs vhs and ffmpeg).\n"
@@ -1525,7 +1258,7 @@ def _demo_tape_source(plan: BriefPlan) -> str:
         f'Type "clear"\nEnter\n'
         f"Show\n\n"
         f'Type "{headline}"\nEnter\nSleep 1200ms\n'
-        f'Type "make {slug}"\nEnter\nSleep 6s\n'
+        f'Type "make {slug}"\nEnter\nSleep 3s\n'
     )
 
 
@@ -1634,126 +1367,6 @@ def _engine_sha() -> str:
         return out.stdout.strip() or "(unknown)"
     except Exception:  # noqa: BLE001
         return "(unknown)"
-
-
-def _founder_email_source(plan: BriefPlan, receipt: dict | None) -> str:
-    """The founder email, written to the ENGINE repo (never the public briefs repo). Wins-only, plain
-    language, startup-native example, the two-line code change, one reproduce path. Numbers come from the
-    receipt when present, else the shape is stated without a fabricated figure."""
-    a_in = b_in = pct = None
-    if receipt:
-        a_in = receipt.get("mode_a", {}).get("billed_input")
-        b_in = receipt.get("mode_b", {}).get("billed_input")
-        pct = receipt.get("pct_input_reduction")
-    if a_in and b_in:
-        pct_str = f"{pct:.0f}%" if isinstance(pct, (int, float)) else ""
-        table = (
-            "| | input tokens billed | why |\n"
-            "|---|---:|---|\n"
-            f"| without PTC | {a_in:,} | every result lands in the model's context |\n"
-            f"| with PTC | {b_in:,} | only the relevant results reach the model |\n\n"
-            f"{pct_str} fewer billed input tokens on this demo, and the saving grows with the size of the fan-out.\n"
-        )
-    else:
-        table = "Run `make programmatic_tool_calling` to print your own before/after from a live call.\n"
-
-    return f"""Subject: Token MINNing: removing unused tool results from your context window
-
-Hey {{first_name}},
-
-Congrats on getting into YC! Quick tip to trim your Claude token bill.
-
-If your app calls your own tool to answer a question and that tool returns a lot of results, every
-result it pulls back lands in the model's context, and you pay for all of them, even the ones that turn
-out irrelevant.
-
-[Programmatic tool calling]({plan.doc_url}) (PTC) fixes that. Claude runs your tool inside a code
-sandbox, keeps only the results that matter, and passes just those to the model. The rest never reach
-the context, so you are not billed for them.
-
-It is two small additions to the API call you already make:
-
-```python
-response = client.messages.create(
-    model="claude-sonnet-4-6",
-    messages=[...],
-    tools=[
-        {{"type": "code_execution_20260120", "name": "code_execution"}},   # add this
-        {{ "name": "query_region_sales", "input_schema": {{...}},   # your tool, unchanged
-          "allowed_callers": ["code_execution_20260120"] }},        # add this line
-    ],
-)
-```
-
-Same task and model (Sonnet 4.6), with and without it:
-
-{table}
-Want to watch it first, no clone needed? The brief opens with a gif of the run:
-https://github.com/cfregly/claude-feature-hits/blob/main/{plan.slug}/README.md
-
-See it run (about two minutes):
-
-```
-git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-export ANTHROPIC_API_KEY=your-key
-make programmatic_tool_calling        # the example, $0.08
-```
-
-To run it on your own tool, open [{plan.slug}/{plan.edit_surface}](https://github.com/cfregly/claude-feature-hits/blob/main/{plan.slug}/{plan.edit_surface}),
-drop in your tool, and run `make programmatic_tool_calling` again.
-
-Happy building! 🚀
-{{your_name}}
-Building with Claude
-"""
-
-
-def _citations_founder_email_source(plan: BriefPlan) -> str:
-    """The citations founder email, written to the ENGINE repo (never the public briefs repo). Wins-only,
-    plain language, the real code, one reproduce path."""
-    return f"""Subject: A Claude primitive for grounded answers you verify in code
-
-Hey {{first_name}},
-
-Congrats on getting into YC! Quick tip if your app answers questions over your users' own documents.
-
-When you answer over a contract, a policy, or a support doc, the answer is only as trustworthy as the
-source behind it. [Citations]({plan.doc_url}) gives you a source pointer for every answer that you can
-check in your own code: the document, a character range, and the verbatim quote at that range. The
-pointer is guaranteed to resolve, and the quote is free of output tokens.
-
-Turn it on per document, then verify in your own code:
-
-```python
-content = [
-    {{"type": "document",
-      "source": {{"type": "text", "media_type": "text/plain", "data": doc_text}},
-      "citations": {{"enabled": True}}}},          # add this
-    {{"type": "text", "text": question}},
-]
-msg = client.messages.create(model="claude-haiku-4-5", max_tokens=400,
-                            messages=[{{"role": "user", "content": content}}])
-# every citation resolves: source[c.start_char_index:c.end_char_index] == c.cited_text
-```
-
-Want to watch it first, no clone needed? The brief opens with a gif of the run:
-https://github.com/cfregly/claude-feature-hits/blob/main/{plan.slug}/README.md
-
-See it run (about a minute):
-
-```
-git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-export ANTHROPIC_API_KEY=your-key
-make {plan.slug}     # answer the questions and resolve every pointer, $0.01
-```
-
-To run it on your own documents, drop your `.txt` files into `{plan.slug}/docs/`, edit the questions at
-the top of `{plan.slug}/cite.py`, and run `make {plan.slug}` again.
-
-Happy building! 🚀
-{{your_name}}
-Building with Claude
-"""
 
 
 # --------------------------------------------------------------------------- idempotent root appends
@@ -1904,7 +1517,7 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
         run_src = _run_tokens_source(plan.slug)
         _assert_no_dangling(run_src, "run_tokens.py")  # the generated run entry must be closure-clean
         (brief_dir / "run_tokens.py").write_text(run_src)
-        (brief_dir / "README.md").write_text(_readme_source(plan, gate.edge or {}, _committed_receipt(plan)))
+        (brief_dir / "README.md").write_text(_read_asset(plan, "README.md"))
     elif plan.slug == "citations":
         # The grounding_resolution brief: a docs/ corpus as the edit surface, cite.py as the run.
         docs = brief_dir / plan.edit_surface
@@ -1914,14 +1527,14 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
         run_src = _cite_source(plan.slug)
         _assert_no_dangling(run_src, "cite.py")
         (brief_dir / "cite.py").write_text(run_src)
-        (brief_dir / "README.md").write_text(_citations_readme_source(plan))
+        (brief_dir / "README.md").write_text(_read_asset(plan, "README.md"))
     elif plan.slug == "code_execution_state":
         # The retention_resume brief: no edit surface, run.py writes a value to the container and reads
         # it back from the reused container on a separate request.
         run_src = _codeexec_run_source(plan.slug)
         _assert_no_dangling(run_src, "run.py")
         (brief_dir / "run.py").write_text(run_src)
-        (brief_dir / "README.md").write_text(_codeexec_readme_source(plan))
+        (brief_dir / "README.md").write_text(_read_asset(plan, "README.md"))
     else:  # pragma: no cover - a plan with no assembler is a programming error, not a publish path
         raise PublishRefused(f"no assembler for brief slug {plan.slug!r}")
 
@@ -1981,14 +1594,9 @@ def publish(edge_key: str, briefs_root: pathlib.Path, command: str) -> int:
     emails_dir = ROOT / "emails"
     emails_dir.mkdir(exist_ok=True)
     email_path = emails_dir / f"{plan.slug}_FOUNDER_EMAIL.md"
-    if plan.from_assets:
-        email_src = _read_asset(plan, "email.md")
-    elif plan.slug == "code_execution_state":
-        email_src = _codeexec_founder_email_source(plan)
-    elif plan.slug == "citations":
-        email_src = _citations_founder_email_source(plan)
-    else:
-        email_src = _founder_email_source(plan, _committed_receipt(plan))
+    # Every brief's prose (README + email) lives in engine/brief_assets/<slug>/, including the three
+    # briefs whose run code is still generated, so all 11 share one source of truth for the copy.
+    email_src = _read_asset(plan, "email.md")
     email_path.write_text(email_src)
     # This publisher writes only the engine's working draft, not the public briefs repo.
 

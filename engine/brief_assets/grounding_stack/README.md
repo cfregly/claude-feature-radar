@@ -1,40 +1,46 @@
-# Cite a text doc, a PDF, and a RAG chunk in one request with Claude Citations
+# Cite a text note, a PDF, and a RAG chunk in one Claude request
 
 ![demo](demo.gif)
 
-Your doc-QA agent answers over mixed sources at once: a plain-text note, a PDF the user just uploaded, and a chunk your own retriever pulled from their wiki. Users want to trust the answer, which means a pointer back to where each fact came from. Claude Citations gives you that in one `client.messages.create` call. Turn citations on for each source and Claude returns a typed pointer per source: a character range for the text, a page range for the PDF, and a chunk span for the RAG result.
+Your doc-QA agent answers over mixed sources at once: a plain-text note your user left, a PDF they just uploaded, and a chunk your retriever (RAG, the step that fetches matching snippets from a knowledge base) pulled from their wiki. Users trust the answer only when they can click back to where each fact came from. Claude Citations gives you that in one `client.messages.create` call: turn citations on per source and Claude returns a typed pointer for each, a character range for the text, a page range for the PDF, and a chunk span for the RAG result.
 
 ## What you get
 
-One request carrying all three sources and a three-part question came back with every part answered and a pointer into each source: `char_location` for the text, `page_location` for the PDF, and `search_result_location` for the chunk, all in the same response. No vector store to stand up, no upload-and-index step, and no copy of the user's data kept anywhere. The cited text rides along for free, it does not count against your output tokens. Measured on 2026-06-19: 3 of 3 sources cited in one request on Claude Haiku 4.5 for $0.0101.
+One request carrying all three sources and a three-part question comes back with every part answered and a correct typed pointer into each source: `char_location` for the text, `page_location` for the PDF, and `search_result_location` for the chunk, all in the same response. No vector store to stand up, no upload-and-index step, no copy of your user's data kept anywhere. The cited text rides along free of output tokens.
 
 ```python
-content = [
-    {"type": "document", "source": {"type": "text", "media_type": "text/plain", "data": text_note},
-     "citations": {"enabled": True}},                                              # add this
-    {"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": pdf_b64},
-     "citations": {"enabled": True}},                                              # add this
-    {"type": "search_result", "source": "kb://chunk", "title": "Rate limits",
-     "content": [{"type": "text", "text": rag_chunk}], "citations": {"enabled": True}},  # add this
-    {"type": "text", "text": question},
-]
+content=[text_doc, pdf_doc, search_result_chunk,
+         {"type": "text", "text": question}]  # all cited in one call
 r = client.messages.create(model="claude-haiku-4-5", max_tokens=600,
                            messages=[{"role": "user", "content": content}])
 ```
 
+Measured 2026-06-19: 3 of 3 sources cited, no vector store, no data copied, live cost $0.010.
+
+## Claude vs OpenAI vs Gemini
+
+Same prompt, same three sources (text + PDF + a RAG chunk), measured head-to-head on 2026-06-19:
+
+| Model  | Sources answered | Inline pointers |
+| :----- | :--------------- | :-------------- |
+| Claude | 3 of 3           | 3 of 3          |
+| OpenAI | 3 of 3           | 0 of 3          |
+| Gemini | 3 of 3           | 0 of 3          |
+
+Three citation modes in one request is the combination edge: every source comes back with its own verifiable pointer.
+
 ## Run it (about $0.01)
 
 ```bash
+export ANTHROPIC_API_KEY=sk-ant-...
 make grounding_stack
 ```
 
-## Run it on your own sources
+About a minute, $0.010. To reproduce the comparison, also set `OPENAI_API_KEY` and `GEMINI_API_KEY`.
 
-Edit `grounding_stack/run.py`: swap `TEXT_FACT`, the PDF the demo builds, and `CHUNK_FACT` for your own note, PDF, and retriever chunk, then re-run:
+## Run it on your own data
 
-```bash
-python grounding_stack/run.py --check
-```
+Edit `grounding_stack/run.py`: swap `TEXT_FACT`, the PDF the demo builds, and `CHUNK_FACT` for your own note, PDF, and retriever chunk, then re-run `make grounding_stack`.
 
 ## Learn more
 

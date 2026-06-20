@@ -2,28 +2,44 @@ Subject: Congrats on YC! A Claude trick for long agents that keep a running list
 
 Hey {first_name},
 
-Congrats on the batch. Quick builder tip if you are running a long agent: keep your running state in the assistant's own notes, not stuffed back into the prompt every turn, and you give context editing a clean line between the bulky stuff and the state worth keeping.
+Congrats on the batch. Here is a quick builder tip if you run a long agent that has to keep an exact running list.
 
-Here is the problem I kept hitting. An agent reads a long stream of records one at a time (think usage logs per cohort, churn flags, billing exceptions, support tickets) and has to report the exact list of flagged ids at the end. The record text is throwaway after each step, but the running list has to stay exact. As the stream grows, every old record stays in the window, so the carried context and the bill climb with it.
+The shape I keep hitting: an agent reads a long stream one record at a time (usage logs, churn flags, support tickets) and has to report the exact set of flagged ids at the end. The record text is throwaway after each step, but the running list has to stay exact. As the stream grows, every old record stays in the window, so the carried context (the tokens you pay for each turn) climbs with it, and so does the bill.
 
-Claude context editing fixes that. It clears the old tool results in place once the context crosses a trigger, so the bulky text leaves the window while the turns holding your running list stay put. Two lines on the request:
+Claude context editing fixes that. It clears the old tool results in place once the context crosses a trigger you set, so the bulky text leaves the window while the turns holding your running list stay put. The whole change is one block on the request:
 
 ```python
-extra_headers={"anthropic-beta": "context-management-2025-06-27"},
-extra_body={"context_management": {"edits": [
-    {"type": "clear_tool_uses_20250919",
-     "trigger": {"type": "input_tokens", "value": 30000},
-     "keep": {"type": "tool_uses", "value": 1}}
-]}},
+resp = client.messages.create(
+    model="claude-haiku-4-5",
+    max_tokens=1024,
+    messages=messages,
+    tools=[read_tool],
+    context_management={"edits": [{"type": "clear_tool_uses_20250919",   # add this
+        "trigger": {"type": "input_tokens", "value": 30000},             # add this
+        "keep": {"type": "tool_uses", "value": 1}}]},
+)
 ```
 
-On my key, on a 30-report chain (each report about 20,000 tokens), the agent returned the exact list and held its peak carried context to about 35k tokens instead of letting it balloon. The full run was $0.6700 and 60.7 seconds, about 64% cheaper and 63% faster than the next exact run on the same workload.
+On my key, on a long report chain, the agent returned the exact 10/10 list and held peak carried context to about 35k tokens instead of letting it balloon. The full run was $0.67 and 60.7s.
 
-Short walkthrough (the gif): https://github.com/cfregly/claude-feature-hits/blob/main/exact_ledger/README.md
+I ran it head-to-head against the others, same workload (2026-06-19). All three returned the exact list, so this is cost and speed at equal correctness:
 
-To try it: `make exact_ledger` runs a live self-test for about $0.17. To run it on your own data, edit `exact_ledger/run.py` to point the reader at your records and your flag rule, then `python -m exact_ledger.run`.
+| Stack | Cost, full run | Versus Claude |
+| --- | --- | --- |
+| Claude, context editing | $0.67 | best |
+| OpenAI, compaction | $1.84 | Claude 64% cheaper, 63% faster |
+| Gemini, full window | $2.57 | Claude 74% cheaper |
 
-One note: context editing is in beta, so you set that `anthropic-beta` header on the request.
+To try it, one clone and one command, about $0.17 and a minute on Claude Haiku 4.5:
+
+```bash
+git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
+make exact_ledger
+```
+
+To run it on your own data, edit `exact_ledger/run.py`: point the reader at your records and your flag rule, then run `make exact_ledger` again.
+
+One note: context editing is in beta, so set the header on the request, `anthropic-beta: context-management-2025-06-27`.
 
 Happy building! 🚀
 {your_name}

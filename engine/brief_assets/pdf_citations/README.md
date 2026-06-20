@@ -1,36 +1,51 @@
-# Deep-link every answer to the exact page of a user's PDF with Claude Citations
+# Deep-link every answer to the exact page of a user's PDF
 
 ![demo](demo.gif)
 
-Your product answers questions over a PDF your user just uploaded: a lease, a 10-K, an insurance policy, a vendor contract. The answer is only useful if the user can verify it, which means pointing them at the exact page it came from. Writing your own page resolver, or persisting every uploaded file into a hosted vector store first, is glue code you do not want to own.
+Your product answers questions over a PDF your user just uploaded: a lease, a 10-K, an insurance policy, a vendor contract. The answer is only useful when the user can verify it, which means pointing them at the exact page it came from. With Claude Citations you hand Claude the PDF directly in the request and every answer comes back with a page pointer, so there is no page resolver to write and no vector store to stand up first.
 
 ## What you get
 
-Send the PDF directly in the request as a base64 document block with citations enabled, and every answer comes back with a `page_location` citation: the page number plus the quoted source text. The pointer is guaranteed to resolve into the PDF you supplied, and the quote does not count toward your output tokens. No vector store to set up, no resolver to write. On a five-page agreement PDF with five questions, Claude answered all five and returned a correct-page pointer for all five (5 of 5), measured 2026-06-19 for $0.0458 on Claude Haiku 4.5.
+Send the PDF as a base64 document block with citations enabled. Every answer comes back with a `page_location` citation: the page number plus the quoted source text. The pointer resolves into the PDF you supplied, and the quoted text does not count toward your output tokens, so the page pointer adds nothing to the bill. On a five-page agreement PDF with five questions, Claude answered every question and returned a page pointer that resolved to the correct page every time (5/5), for $0.046.
 
 ```python
 doc = {
     "type": "document",
-    "source": {"type": "base64", "media_type": "application/pdf", "data": pdf_b64},  # add this: the PDF, supplied directly
-    "citations": {"enabled": True},                                                  # add this
+    "source": {"type": "base64", "media_type": "application/pdf", "data": pdf_b64},  # the PDF, supplied directly
+    "citations": {"enabled": True},                                                  # turn on page pointers
 }
-r = client.messages.create(model="claude-haiku-4-5-20251001", max_tokens=512,
-    messages=[{"role": "user", "content": [doc, {"type": "text", "text": question}]}])
-# each text block now carries citations with type page_location: start_page_number + cited_text
+r = client.messages.create(
+    model="claude-haiku-4-5",
+    max_tokens=512,
+    messages=[{"role": "user", "content": [doc, {"type": "text", "text": question}]}],
+)
+# each text block now carries a page_location citation: start_page_number + cited_text
 ```
 
-## Run it (about $0.02)
+## The page pointer, head-to-head
+
+Measured (2026-06-19), same five questions over the same directly-supplied PDF:
+
+| Model | Page pointer to the right page |
+| --- | --- |
+| Claude | 5/5 |
+| OpenAI (gpt-5.4) | 0/5 |
+| Gemini (3.5-flash) | 0/5 |
+
+Only Claude returns a page pointer on a PDF supplied directly in the request, so your user gets a one-click jump to the source.
+
+## Run it (about $0.05)
 
 ```
 export ANTHROPIC_API_KEY=your-key   # https://console.anthropic.com/
-make pdf_citations        # build the venv, install anthropic, answer questions over a PDF with a page pointer each
+make pdf_citations                  # build the venv, install anthropic, answer questions over a PDF with a page pointer each
 ```
 
-`make pdf_citations` is self-bootstrapping: it creates `.venv`, installs `anthropic`, and runs the self-test that asserts every answer points at the correct page.
+About a minute, $0.046 on my run. `make pdf_citations` is self-bootstrapping: it creates `.venv`, installs `anthropic`, and runs the self-test that asserts every answer points at the correct page. To reproduce the comparison, also set `OPENAI_API_KEY` and `GEMINI_API_KEY`.
 
-## Run it on your own PDF
+## Run it on your own data
 
-Open `pdf_citations/run.py`, the file you edit. Replace the `PAGES` sample and the `QUESTIONS` list with your own document and the questions your users ask, then run `python -m pdf_citations.run`. To point at a real PDF file instead of the generated sample, base64-encode its bytes and pass them as the document `source` data. Your PDF needs extractable text, since page citations are drawn from the text Claude extracts.
+Open `pdf_citations/run.py`, the one file you edit. Replace the sample pages and the questions list with your own document and the questions your users ask, then run `python -m pdf_citations.run`. Your PDF needs extractable text, since the page pointers come from the text Claude reads.
 
 ## Learn more
 

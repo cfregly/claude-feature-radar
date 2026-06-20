@@ -418,11 +418,14 @@ The offline tests add `pytest`, a dev-only dependency the CI installs.
 ## Clean prose
 No em-dashes or en-dashes, no semicolons in prose, no buzzwords. Say the thing plainly.
 
-## Keep the email competitor-neutral, name competitors only as evidence
-The founder email names no competitor, and the README hero stays neutral. The README comparison
-section and the brief may name a competitor when it is a real, sourced, runnable comparison (the
-OpenAI arm runs against OpenAI's published API and prices), because there it is dated evidence,
-not a swipe.
+## Show the wins-only comparison, name competitors as dated evidence
+The founder email and the brief README show the Claude vs OpenAI vs Gemini comparison when a real,
+sourced, dated head-to-head receipt exists, because the comparison is what a founder prices. It is
+dated evidence, never a swipe, and it stays wins-only: show only the axis where Claude leads, never a
+Claude negative and never a tie stated as a concession. When the edge is a capability gap or a
+within-Claude result with no head-to-head number, state the honest capability line and show no
+competitor table, never a fabricated competitor number. The both-directions losses stay in the
+private analysis and the product-team note, never on the founder surface.
 
 ## Keep it forkable
 Cloned and edited by a stranger. No secrets in git (`.env` is ignored), no machine-specific

@@ -1,42 +1,41 @@
-# Verifiable web answers with Claude's web search citations
+# Sourced web answers with Claude's web search citations
 
 ![demo](demo.gif)
 
-Your agent watches live web sources, a regulator's rules page, a competitor's pricing page, a standards spec, and flags claims a human has to trust. When a teammate asks "where does it say that?", the agent hands back a URL and they go re-read the whole page. Claude's web search tool returns each web-grounded claim with the verbatim source quote attached, so the reader checks the exact sentence in seconds.
+Your agent reads live web pages and reports back, a competitor-pricing watcher, a market-research bot, a rules-page monitor. When a teammate asks "where does it say that?", a bare URL means re-reading the whole page. Claude's web search tool returns each web-grounded claim with the verbatim source sentence attached, so the reader checks the exact line in seconds.
 
 ## What you get
 
-Every web-grounded claim comes back as a `web_search_result_location` citation that carries the `url`, the `title`, and `cited_text`, up to 150 characters of the actual source passage. The claim arrives self-verifying: the quote is right there in the response, lifted from the page. In a measured run of 3 web-research questions on claude-sonnet-4-6, all 9 returned web citations carried a verbatim source quote, for $0.12. And those citation fields cost nothing: `cited_text`, `title`, and `url` do not count toward input or output tokens.
+Every web-grounded claim arrives as a citation carrying the source `url`, the `title`, and `cited_text`, the actual passage lifted from the page. The claim is self-verifying: the quote is right there in the response. The citation fields cost nothing either, `cited_text`, `title`, and `url` do not count toward input or output tokens.
 
 ```python
-response = client.messages.create(
-    model="claude-sonnet-4-6",
-    max_tokens=700,
-    tools=[{"type": "web_search_20250305", "name": "web_search", "max_uses": 4}],  # add this
-    messages=[{"role": "user", "content": "Search the web: how tall is the Burj Khalifa? Cite a source."}],
-)
-# each text block's .citations carries web_search_result_location with .cited_text  # add this
+tools=[{"type": "web_search_20260209", "name": "web_search"}]  # each claim returns its source quote
 ```
+
+Measured: on 3 live web-research questions, every Claude citation (9 of 9) came back with the verbatim source quote attached. Live cost $0.115.
+
+## Claude vs OpenAI vs Gemini
+
+Same 3 live web-research questions, each platform on its best web-search setup:
+
+| Model  | Citations with a source quote |
+|--------|-------------------------------|
+| Claude | 9 of 9                        |
+| OpenAI | 0                             |
+| Gemini | 0                             |
 
 ## Run it (about $0.12)
 
 ```
+export ANTHROPIC_API_KEY=sk-ant-...
 make web_citations
 ```
 
-## Run it on your own questions
+About a minute. To reproduce the comparison, also set `OPENAI_API_KEY` and `GEMINI_API_KEY`.
 
-Edit the `QUESTIONS` list in `web_citations/run.py`, then run:
+## Run it on your own data
 
-```
-python web_citations/run.py
-```
-
-Or run the cheap self-test that asserts every web citation carries a source quote (about $0.05):
-
-```
-python web_citations/run.py --check
-```
+Edit the `QUESTIONS` list in `web_citations/run.py`, then run `make web_citations` again.
 
 ## Learn more
 

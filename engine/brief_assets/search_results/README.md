@@ -1,46 +1,45 @@
-# Cite your own RAG chunks inline with Claude search_result content blocks
+# Cite your own RAG chunks inline, no second vector store
 
 ![demo](demo.gif)
 
-You run your own retriever over your users' data (support docs, contracts, billing rules) and you
-want every answer to deep-link to the exact passage it came from. The usual path ships that data into
-a hosted vector store, then hands back a coarse file-level pointer. With Claude you pass the chunks
-your retriever already returned straight into the request as `search_result` content blocks. Claude
-answers and cites them inline.
+You already run your own retriever over your users' data (pgvector, your own embeddings) and you want every answer to deep-link to the exact passage it came from. The common path ships those passages into a second hosted vector store. With Claude you pass the chunks your retriever already returned straight into the request and get inline citations back, no second store.
 
 ## What you get
 
-Every answer comes back with a `search_result_location` pointer: which chunk, the block span inside
-it, and the verbatim cited text, all resolver-free. No hosted store, no upload step, no third-party
-copy of your users' data, no resolver code to write. Measured 2026-06-19 over five questions across
-five chunks supplied inline: Claude answered 5 of 5, cited the correct source chunk 5 of 5, with a
-block-span pointer, 0 hosted objects, for $0.0067 on Claude Haiku 4.5.
+Pass each chunk as a `search_result` block with citations turned on. Claude answers and cites it inline with a block-range pointer (which chunk, which block), and you persist nothing new.
 
 ```python
-# your retriever already returned these passages
-blocks = [{"type": "search_result", "source": "kb://overage.txt", "title": "Overage billing",
-           "content": [{"type": "text", "text": chunk_text}],
-           "citations": {"enabled": True}}]              # add this: makes each chunk citable
-content = blocks + [{"type": "text", "text": question}]   # add this: ask over the chunks inline
-resp = client.messages.create(model="claude-haiku-4-5-20251001", max_tokens=512,
-                              messages=[{"role": "user", "content": content}])
-# resp carries search_result_location citations: search_result_index, start/end_block_index, cited_text
+blocks = [{"type": "search_result", "source": "your-retriever",
+           "title": "your chunk title",
+           "content": [...],
+           "citations": {"enabled": True}}]   # add this line: makes each chunk citable
+content = blocks + [{"type": "text", "text": question}]  # add this line: ask over the chunks inline
 ```
+
+Measured over a small question set across my own chunks supplied inline: Claude cited 5/5 inline with a block-range pointer and 0 persisted objects, for $0.007.
+
+## Claude vs OpenAI vs Gemini
+
+Measured head-to-head, citing your own inline RAG chunks (RAG = your retriever feeds the model the passages):
+
+| Platform | Citation pointer | Objects you store |
+|----------|------------------|-------------------|
+| Claude   | block-range (chunk + block) | 0 persisted |
+| OpenAI   | file/chunk-level | 6 persisted |
+| Gemini   | file/chunk-level | 6 persisted |
 
 ## Run it (about $0.05)
 
 ```bash
+export ANTHROPIC_API_KEY=sk-ant-...
 make search_results
 ```
 
-## Run it on your own chunks
+Runs in about a minute. To reproduce the comparison, also set `OPENAI_API_KEY` and `GEMINI_API_KEY`.
 
-Edit `search_results/run.py`: replace the `CHUNKS` and `QUESTIONS` with your retriever's passages and
-your questions. Then re-run:
+## Run it on your own data
 
-```bash
-python search_results/run.py
-```
+Edit `search_results/run.py`: replace the chunks and questions with your retriever's passages and your questions, then re-run `make search_results`.
 
 ## Learn more
 

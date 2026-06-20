@@ -2,37 +2,39 @@ Subject: Congrats on YC! A Claude trick for citing your own RAG chunks
 
 Hey {first_name},
 
-Congrats on the batch. One quick tip from building RAG over private data: keep your retriever and
-your reranker yours. The moment you let an answer point only at a file name, your users stop trusting
-the citation, and you stop being able to debug a bad answer.
+Congrats on the batch. Quick builder tip from running RAG over private data: you can keep your retriever yours and still get clean inline citations.
 
-The problem I keep hitting: I run my own retrieval (pgvector, a reranker I wrote) and I want each
-answer to deep-link to the exact passage it came from. The common path ships those passages into a
-hosted vector store and hands back a file-level pointer, plus a copy of customer data I now have to
-manage.
+Here is the workload I keep hitting. You already run your own retrieval (pgvector, your own embeddings) and your answers need to deep-link to the exact passage they came from, so a user can click and verify. The common path ships those passages into a second hosted vector store, which means a copy of your users' data to manage and a coarse file-level pointer back.
 
-Claude has a cleaner route. Pass the chunks your retriever already returned straight into the request
-as search_result content blocks with citations enabled. Claude answers and cites them inline.
+Claude has a cleaner route. Pass the chunks your retriever already returned straight into the request as search_result blocks with citations turned on. Claude answers and cites them inline, no second store.
 
-    blocks = [{"type": "search_result", "source": "kb://overage.txt", "title": "Overage billing",
-               "content": [{"type": "text", "text": chunk_text}],
-               "citations": {"enabled": True}}]              # makes each chunk citable
-    content = blocks + [{"type": "text", "text": question}]   # ask over the chunks inline
+```python
+blocks = [{"type": "search_result", "source": "your-retriever",
+           "title": "your chunk title",
+           "content": [...],
+           "citations": {"enabled": True}}]   # add this line: makes each chunk citable
+content = blocks + [{"type": "text", "text": question}]  # add this line: ask over the chunks inline
+```
 
-Every answer comes back with a search_result_location pointer: which chunk, the block span inside it,
-and the verbatim cited text. No hosted store, no upload, no copy of your users' data, no resolver code.
-I measured it over five questions across five chunks: 5 of 5 answered, 5 of 5 cited to the correct
-chunk, block-level pointer, 0 hosted objects, $0.0067 on Claude Haiku 4.5.
+I measured it over a small question set across my own chunks: Claude cited 5/5 inline with a block-range pointer (which chunk, which block) and 0 persisted objects. Live cost was $0.007.
 
-Demo and code: https://github.com/cfregly/claude-feature-hits/blob/main/search_results/README.md
+Here is the same run head-to-head, citing your own inline RAG chunks (RAG = your retriever feeds Claude the passages):
 
-Run it in about a minute for $0.05:
+| Platform | Citation pointer | Objects you store |
+|----------|------------------|-------------------|
+| Claude   | block-range (chunk + block) | 0 persisted |
+| OpenAI   | file/chunk-level | 6 persisted |
+| Gemini   | file/chunk-level | 6 persisted |
 
-    make search_results
+Cost to reproduce is about $0.05 and it runs in about a minute. One clone, one command:
 
-To try it on your own data, edit the CHUNKS and QUESTIONS in search_results/run.py with your
-retriever's passages and questions, then run python search_results/run.py.
+```bash
+git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
+make search_results
+```
 
-Happy building! 🚀
+To run it on your own data, edit search_results/run.py with your retriever's chunks and questions, then run make search_results again.
+
+Have fun building
 {your_name}
 Building with Claude
