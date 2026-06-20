@@ -32,6 +32,12 @@ from .common.pricing import cost_usd
 CLAUDE_MODEL = "haiku"
 MAX_TOKENS = 600
 
+# The comparison gate default. The generator bakes this per surface: the public brief ships it OFF, so
+# `make grounding_stack` runs the Claude side alone on one dependency, and `make grounding_stack COMPARE=1`
+# (or --compare) reproduces the full OpenAI and Gemini head-to-head. A private both-directions checkout
+# ships it ON. Either way --compare / --no-compare overrides it.
+COMPARE_DEFAULT = {compare_default}
+
 # Three inline sources, each holding ONE disjoint fact, so a correct answer must cite that source.
 TEXT_FACT = "Data residency: customer data for EU organizations is stored exclusively in Frankfurt."
 PDF_FACT = "The Pro Plan carries a monthly uptime commitment of 99.9 percent."
@@ -123,19 +129,31 @@ def _print_table(answered, kinds, cost, latency):
     print(f"  {'wall time':<34}{f'{latency:.1f}s':>22}")
 
 
-def cmd_run(client) -> int:
+def _maybe_compare(answered, kinds, compare_on: bool) -> None:
+    """When the comparison gate is on, run the OpenAI and Gemini arms on the same three sources and print
+    the full head-to-head table. Imported lazily, so the default Claude-only run never touches the
+    comparison code or its optional SDKs."""
+    if not compare_on:
+        return
+    from .compare import append_comparison  # lazy: the comparison SDKs load only here
+    append_comparison(CLAUDE_MODEL, {"answered": answered, "pointers": len(kinds)})
+
+
+def cmd_run(client, compare_on: bool = False) -> int:
     print("\n  grounding_stack: text + PDF + RAG chunk, each cited, in ONE request.")
     print("  upfront estimate: about $0.01, about 3s on Haiku 4.5.")
     answered, kinds, cost, latency, _ = _run_once(client)
     _print_table(answered, kinds, cost, latency)
+    _maybe_compare(answered, kinds, compare_on)
     return 0
 
 
-def cmd_check(client) -> int:
+def cmd_check(client, compare_on: bool = False) -> int:
     print("\n  --check: one request must answer 3/3 and return all three typed pointers.")
     print("  upfront estimate: about $0.01 on Haiku 4.5.")
     answered, kinds, cost, latency, _ = _run_once(client)
     _print_table(answered, kinds, cost, latency)
+    _maybe_compare(answered, kinds, compare_on)
     assert answered == 3, f"expected 3/3 answered, got {answered}/3"
     assert set(kinds) == EXPECTED_KINDS, f"expected {sorted(EXPECTED_KINDS)} pointers, got {kinds}"
     print(f"\n  PASS: 3/3 answered, all three pointer types in one request, $0 hosted objects, ${cost:.4f}.")
@@ -147,9 +165,15 @@ def main(argv=None) -> int:
 
     p = argparse.ArgumentParser(description="grounding_stack: cite text + PDF + RAG chunk in one request.")
     p.add_argument("--check", action="store_true", help="assert the win invariant for a few cents")
+    p.add_argument("--compare", dest="compare", action="store_true", default=None,
+                   help="also run the OpenAI and Gemini arms and print the full head-to-head table "
+                        "(needs OPENAI_API_KEY, GEMINI_API_KEY, and requirements-compare.txt)")
+    p.add_argument("--no-compare", dest="compare", action="store_false",
+                   help="run only the Claude side (the public-brief default)")
     a = p.parse_args(argv)
+    compare_on = COMPARE_DEFAULT if a.compare is None else a.compare
     client = get_client()
-    return cmd_check(client) if a.check else cmd_run(client)
+    return cmd_check(client, compare_on) if a.check else cmd_run(client, compare_on)
 
 
 if __name__ == "__main__":

@@ -33,6 +33,12 @@ from .common.pricing import cost_usd  # noqa: E402  real usage object -> real do
 MAX_TOKENS = 512
 MODELS = {"haiku": "claude-haiku-4-5-20251001", "sonnet": "claude-sonnet-4-6", "opus": "claude-opus-4-8"}
 
+# The comparison gate default. The generator bakes this per surface: the public brief ships it OFF, so
+# `make pdf_citations` runs the Claude side alone on one dependency, and `make pdf_citations COMPARE=1`
+# (or --compare) reproduces the full OpenAI and Gemini head-to-head. A private both-directions checkout
+# ships it ON. Either way --compare / --no-compare overrides it.
+COMPARE_DEFAULT = {compare_default}
+
 # A small synthetic SaaS Pro Plan agreement, one citable fact per page. Built with the standard library
 # alone so a forked repo generates the same PDF with no PDF dependency.
 PAGES = [
@@ -194,18 +200,30 @@ def print_table(result: dict) -> None:
     print()
 
 
-def cmd_run(model_key: str) -> int:
+def _maybe_compare(model_key: str, result: dict, compare_on: bool) -> None:
+    """When the comparison gate is on, run the OpenAI and Gemini arms on the same PDF and questions and
+    print the full head-to-head table. Imported lazily, so the default Claude-only run never touches the
+    comparison code or its optional SDKs."""
+    if not compare_on:
+        return
+    from .compare import append_comparison  # lazy: the comparison SDKs load only here
+    append_comparison(model_key, result)
+
+
+def cmd_run(model_key: str, compare_on: bool = False) -> int:
     from .common.client import get_client  # lazy: anthropic only imported when we actually call
 
     print(f"\n  PDF citations: answer questions over a directly-supplied PDF and get a verifiable pointer")
     print(f"  to the exact page for each answer, on {get(model_key).label}.")
     print(f"  Upfront: about $0.02 and roughly 5 seconds on your key. The model calls are the only spend.\n")
     client = get_client()
-    print_table(answer_with_page_pointers(client, model_key, make_sample_pdf()))
+    result = answer_with_page_pointers(client, model_key, make_sample_pdf())
+    print_table(result)
+    _maybe_compare(model_key, result, compare_on)
     return 0
 
 
-def cmd_check(model_key: str) -> int:
+def cmd_check(model_key: str, compare_on: bool = False) -> int:
     """The self-test: assert every answer carries a verifiable pointer to the CORRECT page of the
     directly-supplied PDF. A missing pointer, or a pointer to the wrong page, is a failure."""
     from .common.client import get_client  # lazy
@@ -215,6 +233,7 @@ def cmd_check(model_key: str) -> int:
     client = get_client()
     result = answer_with_page_pointers(client, model_key, make_sample_pdf())
     print_table(result)
+    _maybe_compare(model_key, result, compare_on)
     if result["answered"] != result["asked"]:
         print("  CHECK FAILED: not every question was answered.\n")
         return 1
@@ -233,8 +252,14 @@ def main() -> int:
                    help="haiku (default), sonnet, or opus")
     p.add_argument("--check", action="store_true",
                    help="self-test: assert every answer carries a correct-page pointer")
+    p.add_argument("--compare", dest="compare", action="store_true", default=None,
+                   help="also run the OpenAI and Gemini arms and print the full head-to-head table "
+                        "(needs OPENAI_API_KEY, GEMINI_API_KEY, and requirements-compare.txt)")
+    p.add_argument("--no-compare", dest="compare", action="store_false",
+                   help="run only the Claude side (the public-brief default)")
     a = p.parse_args()
-    return cmd_check(a.model) if a.check else cmd_run(a.model)
+    compare_on = COMPARE_DEFAULT if a.compare is None else a.compare
+    return cmd_check(a.model, compare_on) if a.check else cmd_run(a.model, compare_on)
 
 
 if __name__ == "__main__":

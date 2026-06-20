@@ -35,7 +35,13 @@ export ANTHROPIC_API_KEY=sk-ant-...
 make search_results
 ```
 
-Runs in about a minute. To reproduce the comparison, also set `OPENAI_API_KEY` and `GEMINI_API_KEY`.
+Runs in about a minute. To reproduce the whole table on your own keys, not just the Claude side, also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
+
+```bash
+make search_results COMPARE=1
+```
+
+`COMPARE=1` installs `requirements-compare.txt` (the OpenAI and Gemini SDKs) into the same `.venv` and runs the file_search arms, which stand up a hosted vector store and upload your chunks (the objects the table counts), then delete it on cleanup. You see the citation pointer each platform returns and the count of objects you had to persist to get it. Without it, the brief runs the Claude side alone on one dependency. The competitor arms create and tear down a hosted store, so this run is slower than the Claude side.
 
 ## Run it on your own data
 

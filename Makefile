@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps mcp-deps mcp app app-check programmatic-tool-calling citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports check-surface check-receipts test ci deslop gif clean
+.PHONY: setup compare-deps mcp-deps mcp app app-check programmatic-tool-calling citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief publish-misses check-claims check-docs core-imports check-surface check-receipts test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -162,8 +162,15 @@ cost: ## EDGE cost: the pure pricing-model edge over swept dated prices, both wi
 draft: ## draft the founder email from the measured receipt
 	$(PY) run.py draft
 
-publish-brief: ## generate a self-contained public brief for a VERIFIED Claude-win edge into ../claude-feature-hits (offline, $0, writes files only, never pushes/sends)
+publish-brief: ## generate a self-contained public brief for a VERIFIED Claude-win edge into ../claude-feature-hits (the comparison gate defaults OFF, offline, $0, writes files only, never pushes/sends)
 	$(PY) -m engine.publish_brief --edge=$(EDGE)
+
+publish-misses: ## republish the 7 head-to-head briefs into MISSES_ROOT with the comparison gate defaulted ON (the always-full both-directions mirror). Set MISSES_ROOT to the private both-directions checkout, offline, $0
+	@test -n "$(MISSES_ROOT)" || { echo "set MISSES_ROOT=<path to the private both-directions head_to_head dir>"; exit 1; }
+	@for e in pdf-citations search-results grounding-stack web-citations bulk-extended-output exact-list-ledger code-execution-state; do \
+		echo "publishing $$e (compare default ON) ..."; \
+		$(PY) -m engine.publish_brief --edge=$$e --briefs-root=$(MISSES_ROOT) --compare-default on || exit 1; \
+	done
 
 check-claims: ## verify the citations reproduction cost still matches the summed receipt
 	$(PY) scripts/cost_claim_check.py

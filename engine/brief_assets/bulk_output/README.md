@@ -36,6 +36,14 @@ make bulk_output
 
 The live check submits an extended-output batch and asserts the deliverable comes back un-truncated in one request, in about a minute for roughly $0.20.
 
+To reproduce the whole table on your own keys, not just the Claude side, also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
+
+```bash
+make bulk_output COMPARE=1
+```
+
+`COMPARE=1` installs `requirements-compare.txt` (the OpenAI and Gemini SDKs) into the same `.venv` and confirms each competitor's single-request output ceiling directly: it asks the API for a `max_output_tokens` above the documented cap and the API enforces the limit, so you see the 128,000 and 65,536 ceilings without paying for a large generation. Without it, the brief runs the Claude side alone on one dependency.
+
 ## Run it on your own data
 
 Edit the prompt in `bulk_output/run.py` (the `_prompt` function) to your own long deliverable, then re-run:

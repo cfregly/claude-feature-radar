@@ -27,11 +27,22 @@ Same 3 live web-research questions, each platform on its best web-search setup:
 ## Run it (about $0.12)
 
 ```
-export ANTHROPIC_API_KEY=sk-ant-...
-make web_citations
+export ANTHROPIC_API_KEY=sk-ant-...   # https://console.anthropic.com/
+make web_citations                    # build the venv, install anthropic, answer web questions with a source quote each
 ```
 
-About a minute. To reproduce the comparison, also set `OPENAI_API_KEY` and `GEMINI_API_KEY`.
+About a minute, $0.115 on my run. `make web_citations` is self-bootstrapping: it creates `.venv`, installs `anthropic`, and runs the self-test that asserts every web citation carries a verbatim source quote.
+
+To reproduce the whole table on your own keys, not just the Claude side:
+
+```
+export ANTHROPIC_API_KEY=sk-ant-...
+export OPENAI_API_KEY=your-key
+export GEMINI_API_KEY=your-key
+make web_citations COMPARE=1          # installs the optional OpenAI and Gemini SDKs, runs all three arms
+```
+
+`COMPARE=1` installs `requirements-compare.txt` (the OpenAI and Gemini SDKs) into the same `.venv` and runs the same questions over the live web on each platform, so you see the verbatim source quote come back from Claude and not from the others. Without it, the brief runs the Claude side alone on one dependency.
 
 ## Run it on your own data
 

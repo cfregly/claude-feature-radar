@@ -103,6 +103,11 @@ class BriefPlan:
     from_assets: bool = False
     headline: str = ""
     index_blurb: str = ""
+    # head_to_head briefs carry a real, measured competitor arm, so they vendor common/compare_clients.py
+    # and a compare.py the gate option runs (OpenAI + Gemini on the same workload). The capability-gap
+    # briefs (programmatic_tool_calling, citations, cache_diagnostics, task_budgets) have no head-to-head
+    # number and stay Claude-only: no compare arm, no competitor table.
+    head_to_head: bool = False
 
 
 # The vendor closure for programmatic-tool-calling. The brief needs the one audited counter/run loop
@@ -152,6 +157,7 @@ PLANS: dict[str, BriefPlan] = {
     # on the public surface. The slug is underscored so `python -m code_execution_state.run` imports cleanly.
     "code-execution-state": BriefPlan(
         slug="code_execution_state",
+        head_to_head=True,
         title="code execution state",
         demo_kind="retention_resume",
         doc_url="https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool",
@@ -165,6 +171,7 @@ PLANS: dict[str, BriefPlan] = {
     ),
     "pdf-citations": BriefPlan(
         slug="pdf_citations",
+        head_to_head=True,
         title='PDF citations',
         demo_kind="pdf_grounding",
         doc_url="https://platform.claude.com/docs/en/build-with-claude/citations",
@@ -180,6 +187,7 @@ PLANS: dict[str, BriefPlan] = {
     ),
     "search-results": BriefPlan(
         slug="search_results",
+        head_to_head=True,
         title='Inline RAG citations',
         demo_kind="byo_rag_grounding",
         doc_url="https://platform.claude.com/docs/en/build-with-claude/search-results",
@@ -195,6 +203,7 @@ PLANS: dict[str, BriefPlan] = {
     ),
     "grounding-stack": BriefPlan(
         slug="grounding_stack",
+        head_to_head=True,
         title='Grounding stack (text + PDF + RAG cited in one request)',
         demo_kind="grounding_stack",
         doc_url="https://platform.claude.com/docs/en/build-with-claude/citations",
@@ -210,6 +219,7 @@ PLANS: dict[str, BriefPlan] = {
     ),
     "web-citations": BriefPlan(
         slug="web_citations",
+        head_to_head=True,
         title='Web search citations',
         demo_kind="web_grounding",
         doc_url="https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool",
@@ -225,6 +235,7 @@ PLANS: dict[str, BriefPlan] = {
     ),
     "bulk-extended-output": BriefPlan(
         slug="bulk_output",
+        head_to_head=True,
         title='Extended output',
         demo_kind="extended_output",
         doc_url="https://platform.claude.com/docs/en/build-with-claude/batch-processing",
@@ -240,6 +251,7 @@ PLANS: dict[str, BriefPlan] = {
     ),
     "exact-list-ledger": BriefPlan(
         slug="exact_ledger",
+        head_to_head=True,
         title='Exact-list ledger',
         demo_kind="token_accounting",
         doc_url="https://platform.claude.com/docs/en/build-with-claude/context-editing",
@@ -1068,8 +1080,9 @@ if __name__ == "__main__":
 def _codeexec_run_source(slug: str) -> str:
     """The generated run entry for the code-execution-state brief: write a unique value to /tmp/state.txt in a
     fresh container, capture container.id, then read it back from the REUSED container on a separate
-    request, plus a --check self-test. Claude-only, no competitor arm. Imports the flattened common/
-    package; anthropic is imported lazily so importing this module needs no SDK."""
+    request, plus a --check self-test. The Claude side runs by default on one dependency. The comparison
+    gate (--compare / COMPARE=1) adds the OpenAI and Gemini arms from the sibling compare.py. Imports the
+    flattened common/ package; anthropic is imported lazily so importing this module needs no SDK."""
     return f'''"""run: write a file in your agent's sandbox, then read it back from the reused container.
 
 The founder-facing artifact for the {slug} brief. A multi-step agent that runs code needs its sandbox to
@@ -1081,10 +1094,11 @@ re-fetched 2026-06-18: https://platform.claude.com/docs/en/agents-and-tools/tool
   python -m {slug}.run            write a value, then read it back from the reused container
   python -m {slug}.run --check    the self-test: ASSERT the value reads back from the reused container
   python -m {slug}.run --model opus    use Opus 4.8 instead of the default Sonnet 4.6
+  python -m {slug}.run --compare  also run the OpenAI and Gemini arms and print the full head-to-head
 
 This costs about $0.05 on Sonnet 4.6. The model calls are the only spend, the code runs server-side in
 Anthropic's sandbox. anthropic is imported lazily, inside the run path, so importing this module needs no
-SDK.
+SDK. The comparison arms (compare.py) need OPENAI_API_KEY, GEMINI_API_KEY, and requirements-compare.txt.
 """
 
 from __future__ import annotations
@@ -1106,6 +1120,11 @@ from .common.pricing import cost_usd  # noqa: E402  real usage object -> real do
 CODE_EXEC_BETA = "code-execution-2025-08-25"
 CODE_EXEC_TOOL = "code_execution_20250825"
 MODELS = {{"sonnet": "claude-sonnet-4-6", "opus": "claude-opus-4-8"}}
+
+# The comparison gate default. The generator bakes this per surface: the public brief ships it OFF, so
+# the Claude side runs alone on one dependency, and --compare (make code_execution_state COMPARE=1)
+# reproduces the OpenAI and Gemini head-to-head. A private both-directions checkout ships it ON.
+COMPARE_DEFAULT = {{compare_default}}
 
 
 def _nonce() -> str:
@@ -1164,7 +1183,16 @@ def print_table(result: dict) -> None:
     print()
 
 
-def cmd_run(model_key: str) -> int:
+def _maybe_compare(model_key: str, result: dict, compare_on: bool, idle_minutes: int) -> None:
+    """When the comparison gate is on, run the OpenAI and Gemini arms and print the full head-to-head.
+    Imported lazily, so the default Claude-only run never touches the comparison code or its SDKs."""
+    if not compare_on:
+        return
+    from .compare import append_comparison  # lazy: the comparison SDKs load only here
+    append_comparison(model_key, result, idle_minutes=idle_minutes)
+
+
+def cmd_run(model_key: str, compare_on: bool = False, idle_minutes: int = 0) -> int:
     from .common.client import get_client  # lazy: anthropic only imported when we actually call
 
     print(f"\\n  Code execution state: write a file in your agent's sandbox, then read it back from the")
@@ -1172,11 +1200,13 @@ def cmd_run(model_key: str) -> int:
     print(f"  Upfront: about $0.05 and roughly 40 seconds on your key. The model calls are the only spend,")
     print(f"  the code runs server-side in Anthropic's sandbox.\\n")
     client = get_client()
-    print_table(write_and_reread(client, model_key))
+    result = write_and_reread(client, model_key)
+    print_table(result)
+    _maybe_compare(model_key, result, compare_on, idle_minutes)
     return 0
 
 
-def cmd_check(model_key: str) -> int:
+def cmd_check(model_key: str, compare_on: bool = False, idle_minutes: int = 0) -> int:
     """The self-test: assert the value written in request 1 reads back from the REUSED container in
     request 2. No container id, or no read-back, is a failure."""
     from .common.client import get_client  # lazy
@@ -1186,6 +1216,7 @@ def cmd_check(model_key: str) -> int:
     client = get_client()
     result = write_and_reread(client, model_key)
     print_table(result)
+    _maybe_compare(model_key, result, compare_on, idle_minutes)
     if not result["container_id"]:
         print("  CHECK FAILED: no container id was returned to reuse.\\n")
         return 1
@@ -1204,13 +1235,225 @@ def main() -> int:
                    help="sonnet (default) or opus")
     p.add_argument("--check", action="store_true",
                    help="self-test: assert the value reads back from the reused container")
+    p.add_argument("--compare", dest="compare", action="store_true", default=None,
+                   help="also run the OpenAI and Gemini arms and print the full head-to-head table "
+                        "(needs OPENAI_API_KEY, GEMINI_API_KEY, and requirements-compare.txt)")
+    p.add_argument("--no-compare", dest="compare", action="store_false",
+                   help="run only the Claude side (the public-brief default)")
+    p.add_argument("--idle-minutes", type=int, default=0,
+                   help="with --compare, wait this many minutes, then re-read each container to reproduce "
+                        "the idle-survival result live (OpenAI expires after 20 minutes idle)")
     a = p.parse_args()
-    return cmd_check(a.model) if a.check else cmd_run(a.model)
+    compare_on = COMPARE_DEFAULT if a.compare is None else a.compare
+    if a.check:
+        return cmd_check(a.model, compare_on, a.idle_minutes)
+    return cmd_run(a.model, compare_on, a.idle_minutes)
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
 '''
+
+
+def _codeexec_compare_source(slug: str) -> str:
+    """The generated comparison arm for the code-execution-state brief: the OpenAI and Gemini code
+    sandboxes run the same write-then-reread, behind the gate option. Best to best, each vendor's
+    strongest sandbox. Imports are lazy, so importing this module needs no comparison SDK; a missing key
+    or SDK skips that arm with a clear note. Built as a plain string (slug substituted) so the dict and
+    f-string braces in the body need no escaping."""
+    body = '''"""compare: reproduce the container-durability head-to-head against OpenAI and Gemini.
+
+The default brief runs the Claude side alone on one dependency. Set OPENAI_API_KEY and GEMINI_API_KEY,
+install the optional comparison SDKs (pip install -r requirements-compare.txt), and run
+`make {slug} COMPARE=1` to reproduce the whole table on your own keys, not just the Claude side.
+
+Best to best, the same write-then-reread on each vendor's strongest code sandbox:
+  - Claude code execution reuses its container by id across requests, and containers live 30 days.
+  - OpenAI code_interpreter reuses a WARM container by id, but the container is discarded after 20
+    minutes idle and is not recoverable (documented).
+  - Gemini code execution exposes no reusable container handle, so a file written in one call is gone
+    in the next call.
+Sources, re-fetched 2026-06-19:
+  - OpenAI code interpreter: https://developers.openai.com/api/docs/guides/tools-code-interpreter
+  - Gemini code execution: https://ai.google.dev/gemini-api/docs/code-execution
+
+Every SDK import is lazy. A missing key or SDK skips that arm with a clear note and never fakes a row.
+By default the live arms show the warm reuse and Gemini's lack of a reusable container, and the
+20-minute idle expiry is the documented, dated result. Add --idle-minutes 21 to reproduce the idle
+expiry live (the run waits, then re-reads each container).
+"""
+
+from __future__ import annotations
+
+import os
+import time
+
+from .common.compare_clients import COMPARE_DEPS_HINT, gemini_cost, get_gemini_client, get_openai_client, openai_cost
+from .common.models import get
+
+OPENAI_MODEL = "gpt-top"    # gpt-5.5, code interpreter
+GEMINI_MODEL = "gem-flash"  # gemini-3.5-flash, code execution
+
+
+def _nonce(tag):
+    return "NONCE" + tag + str(int(time.time())) + os.urandom(2).hex()
+
+
+def _openai_container_id(resp):
+    for it in (getattr(resp, "output", None) or []):
+        if getattr(it, "type", None) == "code_interpreter_call":
+            return getattr(it, "container_id", None) or getattr(it, "container", None)
+    return None
+
+
+def _openai_arm(idle_minutes):
+    """Write a nonce to /tmp/state.txt in an OpenAI code_interpreter container, warm-read it back, then
+    (with --idle-minutes) wait and re-read to reproduce the documented 20-minute idle expiry live."""
+    m = get(OPENAI_MODEL)
+    client = get_openai_client()
+    if client is None:
+        return {"label": "OpenAI (" + m.id + ")", "skipped": "set OPENAI_API_KEY to run this arm"}
+    nonce = _nonce("OAI")
+    cost = 0.0
+    r = client.responses.create(
+        model=m.id, max_output_tokens=2048,
+        tools=[{"type": "code_interpreter", "container": {"type": "auto"}}],
+        input="Use the python tool: write the exact text " + nonce + " to /tmp/state.txt, then print done.")
+    cost += openai_cost(OPENAI_MODEL, r.usage)
+    cid = _openai_container_id(r)
+    warm = False
+    if cid:
+        r2 = client.responses.create(
+            model=m.id, max_output_tokens=2048,
+            tools=[{"type": "code_interpreter", "container": cid}],
+            input="Use the python tool: print the contents of /tmp/state.txt")
+        cost += openai_cost(OPENAI_MODEL, r2.usage)
+        warm = nonce in (getattr(r2, "output_text", "") or "")
+    idle = None
+    if idle_minutes > 0 and cid:
+        time.sleep(idle_minutes * 60)
+        try:
+            r3 = client.responses.create(
+                model=m.id, max_output_tokens=2048,
+                tools=[{"type": "code_interpreter", "container": cid}],
+                input="Use the python tool: print the contents of /tmp/state.txt, or print NOTFOUND if missing.")
+            cost += openai_cost(OPENAI_MODEL, r3.usage)
+            idle = nonce in (getattr(r3, "output_text", "") or "")
+        except Exception:  # noqa: BLE001  the documented outcome after 20 min idle: the container is gone
+            idle = False
+    return {"label": "OpenAI (" + m.id + ")", "warm": warm, "idle": idle, "cost": cost}
+
+
+def _gemini_arm():
+    """Gemini has no reusable container: write in call 1, then a FRESH call 2 cannot see the file."""
+    m = get(GEMINI_MODEL)
+    client = get_gemini_client()
+    if client is None:
+        return {"label": "Gemini (" + m.id + ")", "skipped": "set GEMINI_API_KEY to run this arm"}
+    from google.genai import types
+
+    nonce = _nonce("GEM")
+    tool = types.Tool(code_execution=types.ToolCodeExecution())
+    cfg = types.GenerateContentConfig(tools=[tool], max_output_tokens=1024)
+    cost = 0.0
+    r1 = client.models.generate_content(
+        model=m.id, contents="Write the exact text " + nonce + " to /tmp/state.txt using python, then print done.", config=cfg)
+    cost += gemini_cost(GEMINI_MODEL, getattr(r1, "usage_metadata", None))
+    r2 = client.models.generate_content(
+        model=m.id, contents="Using python, print the contents of /tmp/state.txt, or print NOTFOUND if it is missing.", config=cfg)
+    cost += gemini_cost(GEMINI_MODEL, getattr(r2, "usage_metadata", None))
+    persisted = nonce in (getattr(r2, "text", None) or "")
+    return {"label": "Gemini (" + m.id + ")", "persisted": persisted, "cost": cost}
+
+
+def _run_arm(fn, *args):
+    """Run one competitor arm, turning any failure into a skipped row, so --compare never crashes."""
+    try:
+        return fn(*args)
+    except SystemExit as e:
+        return {"skipped": str(e)}
+    except Exception as e:  # noqa: BLE001
+        return {"skipped": type(e).__name__ + ": " + str(e)[:80]}
+
+
+def _claude_idle_reread(model_key, claude_result, idle_minutes):
+    """Re-read Claude's container after the same idle, to show the file survives live. Returns a bool or
+    None when the id or nonce is missing or the call fails."""
+    cid = claude_result.get("container_id")
+    nonce = claude_result.get("nonce")
+    if not cid or not nonce:
+        return None
+    from .common.client import get_client
+    from .run import CODE_EXEC_BETA, CODE_EXEC_TOOL
+
+    client = get_client()
+    try:
+        r = client.beta.messages.create(
+            model=get(model_key).id, max_tokens=1024, betas=[CODE_EXEC_BETA], container=cid,
+            tools=[{"type": CODE_EXEC_TOOL, "name": "code_execution"}],
+            messages=[{"role": "user", "content":
+                       "Run python: print the contents of /tmp/state.txt, or print NOTFOUND if missing."}])
+        txt = "".join(b.text for b in r.content if getattr(b, "type", None) == "text")
+        return nonce in txt
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def append_comparison(model_key, claude_result, idle_minutes=0):
+    """Run the OpenAI and Gemini sandboxes on the same write-then-reread and print the head-to-head."""
+    short = get(model_key).label.replace("Claude ", "")
+    print("  Reproducing the head-to-head: container durability across a write-then-reread.")
+    print("  OpenAI and Gemini run their strongest code sandbox. " + COMPARE_DEPS_HINT + ".")
+    if idle_minutes > 0:
+        print("  Waiting " + str(idle_minutes) + " minutes idle, then re-reading each container live.\\n")
+    else:
+        print("  (Add --idle-minutes 21 to reproduce the idle expiry live.)\\n")
+
+    gem = _run_arm(_gemini_arm)
+    oai = _run_arm(_openai_arm, idle_minutes)
+
+    if idle_minutes > 0:
+        claude_idle = _claude_idle_reread(model_key, claude_result, idle_minutes)
+        claude_cell = "read back" if (claude_idle or (claude_idle is None and claude_result.get("read_back"))) else "see run output above"
+        rows = [("Claude (" + short + ")", claude_cell)]
+        if "skipped" in oai:
+            rows.append((oai.get("label", "OpenAI"), "skipped: " + oai["skipped"]))
+        else:
+            rows.append((oai["label"], "read back" if oai.get("idle") else "container expired"))
+        if "skipped" in gem:
+            rows.append((gem.get("label", "Gemini"), "skipped: " + gem["skipped"]))
+        else:
+            rows.append((gem["label"], "no reusable container"))
+        header = "reread after " + str(idle_minutes) + " minutes idle"
+    else:
+        rows = [("Claude (" + short + ")", "reused by id, 30-day container life")]
+        if "skipped" in oai:
+            rows.append((oai.get("label", "OpenAI"), "skipped: " + oai["skipped"]))
+        else:
+            rows.append((oai["label"], "reused while warm, expires after 20 min idle"))
+        if "skipped" in gem:
+            rows.append((gem.get("label", "Gemini"), "skipped: " + gem["skipped"]))
+        else:
+            rows.append((gem["label"], "no reusable container, file gone next call"))
+        header = "container reuse and idle durability"
+
+    print("  " + "platform".ljust(22) + header)
+    print("  " + "-" * 70)
+    for label, cell in rows:
+        print("  " + label.ljust(22) + cell)
+    print("  " + "-" * 70)
+    print()
+    print("  Claude's sandbox keeps your agent's files between requests and across a long idle, where")
+    print("  OpenAI's container expires after a 20-minute idle and Gemini has no reusable container.")
+    if idle_minutes == 0:
+        print("  Measured idle survival (2026-06-19): Claude read the file back after a 31-minute idle.")
+    ran = [a for a in (oai, gem) if "skipped" not in a]
+    if ran:
+        print("  Competitor arms this run: $" + format(sum(a["cost"] for a in ran), ",.4f") +
+              " across " + str(len(ran)) + " of 2 (OpenAI, Gemini).")
+    print()
+'''
+    return body.replace("{slug}", slug)
 
 
 def _codeexec_sample_source() -> str:
@@ -1377,7 +1620,15 @@ def _ensure_makefile_entry(makefile: pathlib.Path, plan: BriefPlan) -> bool:
     False if the entry was already present. Never duplicates: it keys on the target name."""
     text = makefile.read_text() if makefile.exists() else ""
     run_module = "run" if plan.from_assets else {"citations": "cite", "code_execution_state": "run"}.get(plan.slug, "run_tokens")
-    recipe = f"\t$(PY) -m {plan.slug}.{run_module}"
+    if plan.head_to_head:
+        # The comparison gate: `make <slug>` runs the Claude side alone, `make <slug> COMPARE=1` installs
+        # the optional comparison SDKs and adds --compare, so the full OpenAI and Gemini head-to-head
+        # reproduces. COMPARE is unset by default, so the default founder run stays one command, one
+        # dependency, Claude side. $(if $(COMPARE),...) expands to nothing when COMPARE is unset.
+        recipe = (f"\t$(if $(COMPARE),$(PIP) install --quiet -r requirements-compare.txt)\n"
+                  f"\t$(PY) -m {plan.slug}.{run_module} $(if $(COMPARE),--compare)")
+    else:
+        recipe = f"\t$(PY) -m {plan.slug}.{run_module}"
     # Refresh an existing target's recipe (its run module may have been renamed on republish), so a
     # republished brief never leaves make pointed at a deleted module.
     block_re = re.compile(rf"^{re.escape(plan.slug)}:.*\n(?:[ \t].*\n)*", re.MULTILINE)
@@ -1388,7 +1639,7 @@ def _ensure_makefile_entry(makefile: pathlib.Path, plan: BriefPlan) -> bool:
     block = (
         f"\n# {plan.title}: {plan.make_help}\n"
         f"{plan.slug}: $(VENV)/.installed\n"
-        f"\t$(PY) -m {plan.slug}.{run_module}\n"
+        f"{recipe}\n"
     )
     # Add the target to the .PHONY line if one exists and does not already name it.
     def _add_phony(m):
@@ -1482,7 +1733,13 @@ def _vendor_files(plan: BriefPlan, brief_dir: pathlib.Path) -> None:
     and rewriting import lines by the deterministic prefix swap. Refuses on any dangling import."""
     (brief_dir / "common").mkdir(parents=True, exist_ok=True)
     (brief_dir / "common" / "__init__.py").write_text("")
-    for vf in plan.files:
+    files = list(plan.files)
+    if plan.head_to_head:
+        # The comparison gate ships the lazy OpenAI + Gemini clients into common/, alongside the
+        # client/models/pricing trio. compare_clients.py uses same-package relative imports (.client,
+        # .pricing) like the rest of common/, so the prefix swap is a no-op and the dangling check passes.
+        files.append(VendorFile("common/compare_clients.py", "common/compare_clients.py"))
+    for vf in files:
         src = ROOT / vf.src
         text = src.read_text()
         swapped = _swap_imports(text)
@@ -1492,12 +1749,25 @@ def _vendor_files(plan: BriefPlan, brief_dir: pathlib.Path) -> None:
         dst.write_text(swapped)
 
 
-def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pathlib.Path) -> None:
+def _apply_compare_default(text: str, compare_default: bool) -> str:
+    """Bake the comparison-gate default into a generated run entry. The run.py templates of the
+    head-to-head briefs carry a literal `{compare_default}`, replaced here with the per-surface bool:
+    False for the public hits brief (Claude side by default, COMPARE=1 to reproduce the full table),
+    True for a private both-directions checkout (always full). A template without the marker is left
+    untouched, so this is safe to call on every run entry."""
+    return text.replace("{compare_default}", "True" if compare_default else "False")
+
+
+def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pathlib.Path,
+                    compare_default: bool = False) -> None:
     """Build the whole brief into a staging dir (so a failure leaves nothing behind), then the caller
     moves it into place atomically. Writes the vendored engine files, the edit surface, the generated
     run entry, __init__.py, README.md, and PROVENANCE.md. The edit surface and run entry differ by edge
     (the token_accounting brief ships my_tool.py + run_tokens.py; the grounding_resolution brief ships a
-    docs/ corpus + cite.py), so the body dispatches on the plan slug."""
+    docs/ corpus + cite.py), so the body dispatches on the plan slug.
+
+    compare_default sets the head-to-head briefs' comparison-gate default: False on the public hits
+    brief (Claude side by default), True on a private both-directions checkout (always full)."""
     brief_dir = staging
     brief_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1506,10 +1776,15 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
 
     if plan.from_assets:
         # Data-driven brief: the run entry and README are committed under engine/brief_assets/<slug>/.
-        run_src = _read_asset(plan, "run.py")
+        run_src = _apply_compare_default(_read_asset(plan, "run.py"), compare_default)
         _assert_no_dangling(run_src, "run.py")  # the shipped run entry must import only from its closure
         (brief_dir / "run.py").write_text(run_src)
         (brief_dir / "README.md").write_text(_read_asset(plan, "README.md"))
+        if plan.head_to_head:
+            # The comparison arm: OpenAI + Gemini on the same workload, behind the gate option.
+            compare_src = _read_asset(plan, "compare.py")
+            _assert_no_dangling(compare_src, "compare.py")
+            (brief_dir / "compare.py").write_text(compare_src)
     elif plan.slug == "programmatic_tool_calling":
         # The token_accounting brief: the region_sales fixture as the edit surface (my_tool.py),
         # run_tokens.py as the run.
@@ -1530,11 +1805,14 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
         (brief_dir / "README.md").write_text(_read_asset(plan, "README.md"))
     elif plan.slug == "code_execution_state":
         # The retention_resume brief: no edit surface, run.py writes a value to the container and reads
-        # it back from the reused container on a separate request.
-        run_src = _codeexec_run_source(plan.slug)
+        # it back from the reused container on a separate request. Head-to-head, so it ships compare.py too.
+        run_src = _apply_compare_default(_codeexec_run_source(plan.slug), compare_default)
         _assert_no_dangling(run_src, "run.py")
         (brief_dir / "run.py").write_text(run_src)
         (brief_dir / "README.md").write_text(_read_asset(plan, "README.md"))
+        compare_src = _codeexec_compare_source(plan.slug)
+        _assert_no_dangling(compare_src, "compare.py")
+        (brief_dir / "compare.py").write_text(compare_src)
     else:  # pragma: no cover - a plan with no assembler is a programming error, not a publish path
         raise PublishRefused(f"no assembler for brief slug {plan.slug!r}")
 
@@ -1547,10 +1825,13 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
     (brief_dir / "PROVENANCE.md").write_text(_provenance_source(plan, gate, command))
 
 
-def publish(edge_key: str, briefs_root: pathlib.Path, command: str) -> int:
+def publish(edge_key: str, briefs_root: pathlib.Path, command: str, compare_default: bool = False) -> int:
     """The end-to-end publish. Runs the gate, refuses fail-closed on any failure (writing nothing), and
     otherwise assembles the brief in a temp dir, moves it into place, makes the idempotent root appends,
-    and writes the founder email to the ENGINE repo. Returns a process exit code."""
+    and writes the founder email to the ENGINE repo. Returns a process exit code.
+
+    compare_default sets a head-to-head brief's comparison-gate default: False (the public hits brief,
+    Claude side by default) or True (a private both-directions checkout, always full)."""
     if not briefs_root.exists():
         print(f"  REFUSED: briefs root {briefs_root} does not exist. Pass --briefs-root=<path> to an "
               "existing checkout. Wrote nothing.")
@@ -1575,7 +1856,7 @@ def publish(edge_key: str, briefs_root: pathlib.Path, command: str) -> int:
     if staging.exists():
         _rmtree(staging)
     try:
-        _assemble_brief(plan, gate, command, staging)
+        _assemble_brief(plan, gate, command, staging, compare_default)
     except PublishRefused as exc:
         _rmtree(staging)
         print(f"\n  REFUSED to publish edge {gate.edge_key!r}: {exc}")
@@ -1651,12 +1932,21 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--edge", required=True, help="the edge key, e.g. programmatic-tool-calling")
     p.add_argument("--briefs-root", default=None,
                    help="the public briefs repo root (default: ../claude-feature-hits relative to the engine)")
+    p.add_argument("--compare-default", choices=("off", "on"), default="off",
+                   help="a head-to-head brief's comparison-gate default. off (the public hits brief: the "
+                        "Claude side runs by default, COMPARE=1 reproduces the full table); on (a private "
+                        "both-directions checkout: the full OpenAI and Gemini head-to-head always runs)")
     a = p.parse_args(argv)
 
     briefs_root = (pathlib.Path(a.briefs_root).resolve() if a.briefs_root
                    else (ROOT.parent / "claude-feature-hits"))
+    compare_default = a.compare_default == "on"
     command = f"make publish-brief EDGE={a.edge}"
-    return publish(a.edge, briefs_root, command)
+    if a.briefs_root:
+        command += f" BRIEFS_ROOT={a.briefs_root}"
+    if compare_default:
+        command += " COMPARE_DEFAULT=on"
+    return publish(a.edge, briefs_root, command, compare_default)
 
 
 if __name__ == "__main__":

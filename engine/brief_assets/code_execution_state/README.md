@@ -41,7 +41,13 @@ export ANTHROPIC_API_KEY=your-key   # https://console.anthropic.com/
 make code_execution_state
 ```
 
-Runs in about a minute. To reproduce the comparison, also set `OPENAI_API_KEY` and `GEMINI_API_KEY`.
+Runs in about a minute. To reproduce the whole table on your own keys, not just the Claude side, also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
+
+```
+make code_execution_state COMPARE=1
+```
+
+`COMPARE=1` installs `requirements-compare.txt` (the OpenAI and Gemini SDKs) into the same `.venv` and runs the same write-then-reread on each platform's code sandbox: Claude reuses its container by id with a 30-day life, OpenAI reuses a warm container that expires after a 20-minute idle, and Gemini has no reusable container. Add `--idle-minutes 21` to wait and re-read each container live and reproduce the idle result. Without it, the brief runs the Claude side alone on one dependency.
 
 ## Run it on your own data
 

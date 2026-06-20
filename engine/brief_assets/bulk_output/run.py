@@ -36,6 +36,12 @@ FULL_MAX_TOKENS = 300000          # the beta ceiling
 POLL_TIMEOUT_S = 1800.0
 DOC_URL = "https://platform.claude.com/docs/en/build-with-claude/batch-processing"
 
+# The comparison gate default. The generator bakes this per surface: the public brief ships it OFF, so
+# `make bulk_output` runs the Claude side alone on one dependency, and `make bulk_output COMPARE=1`
+# (or --compare) confirms the OpenAI and Gemini single-request output ceilings head-to-head. A private
+# both-directions checkout ships it ON. Either way --compare / --no-compare overrides it.
+COMPARE_DEFAULT = {compare_default}
+
 
 def _prompt(n: int) -> str:
     return (
@@ -88,6 +94,17 @@ def _run_batch(n: int, max_tokens: int, *, progress: bool = True) -> dict:
     return out
 
 
+def _maybe_compare(r: dict, args) -> None:
+    """When the comparison gate is on, confirm each competitor's single-request output ceiling and print
+    the full head-to-head table. Imported lazily, so the default Claude-only run never touches the
+    comparison code or its optional SDKs."""
+    compare_on = COMPARE_DEFAULT if getattr(args, "compare", None) is None else args.compare
+    if not compare_on:
+        return
+    from .compare import append_comparison  # lazy: the comparison SDKs load only here
+    append_comparison(CLAUDE_MODEL, r)
+
+
 def cmd_run(args) -> int:
     n = FULL_N if args.full else CHECK_N
     max_tokens = FULL_MAX_TOKENS if args.full else CHECK_MAX_TOKENS
@@ -97,6 +114,7 @@ def cmd_run(args) -> int:
           f"the batch can take {'many minutes' if args.full else 'a minute or two'}\n", flush=True)
     r = _run_batch(n, max_tokens)
     _print_table(r)
+    _maybe_compare(r, args)
     return 0
 
 
@@ -112,6 +130,7 @@ def cmd_check(args) -> int:
     print(f"  one batch request, {CHECK_N} entries, beta {BATCH_BETA}, about $0.20\n", flush=True)
     r = _run_batch(CHECK_N, CHECK_MAX_TOKENS)
     _print_table(r)
+    _maybe_compare(r, args)
 
     assert r["output_tokens"] > 0, "expected a non-empty deliverable from the batch"
     assert not r["truncated"], f"deliverable truncated (stop_reason={r['stop_reason']})"
@@ -142,6 +161,11 @@ def main(argv=None) -> int:
     cp.set_defaults(func=cmd_check)
     p.add_argument("--check", action="store_true", help="alias for the check subcommand")
     p.add_argument("--full", action="store_true", help="with no subcommand, run the full receipt run")
+    p.add_argument("--compare", dest="compare", action="store_true", default=None,
+                   help="also confirm the OpenAI and Gemini single-request output ceilings and print the "
+                        "full head-to-head table (needs OPENAI_API_KEY, GEMINI_API_KEY, requirements-compare.txt)")
+    p.add_argument("--no-compare", dest="compare", action="store_false",
+                   help="run only the Claude side (the public-brief default)")
     a = p.parse_args(argv)
     if a.check:
         return cmd_check(a)

@@ -39,7 +39,7 @@ def main() -> int:
         del sys.modules[mod]
 
     core = [
-        "common.client", "common.models", "common.pricing", "common.runner",
+        "common.client", "common.models", "common.pricing", "common.runner", "common.compare_clients",
         "engine.demokinds", "engine.gate", "engine.scan", "engine.sweep_edges",
         "engine.cite_facts", "engine.draft_email", "engine.product_alert", "engine.verify",
         "engine.publish_brief", "engine.mcp_tools",

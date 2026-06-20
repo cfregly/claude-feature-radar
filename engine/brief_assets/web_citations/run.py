@@ -31,6 +31,12 @@ CLAUDE_MODEL = "sonnet"               # claude-sonnet-4-6, web-search capable
 WEB_TAG = "web_search_20250305"       # the basic web_search tag returns the citation object directly
 MAX_TOKENS = 700
 
+# The comparison gate default. The generator bakes this per surface: the public brief ships it OFF, so
+# `make web_citations` runs the Claude side alone on one dependency, and `make web_citations COMPARE=1`
+# (or --compare) reproduces the full OpenAI and Gemini head-to-head. A private both-directions checkout
+# ships it ON. Either way --compare / --no-compare overrides it.
+COMPARE_DEFAULT = {compare_default}
+
 # Questions that force a live web search (current or specific facts a model verifies, not answers from
 # memory). The answer content does not matter to the gate, only the citation object that comes back.
 QUESTIONS = [
@@ -90,7 +96,17 @@ def _print_table(answered, n, web_citations, with_quote, cost, latency):
     print(f"  {'wall clock':<34}{f'{latency:.1f}s':>12}")
 
 
-def cmd_run(args):
+def _maybe_compare(model_key: str, web_citations: int, with_quote: int, compare_on: bool) -> None:
+    """When the comparison gate is on, run the OpenAI and Gemini arms on the same web-research questions
+    and print the full head-to-head table. Imported lazily, so the default Claude-only run never touches
+    the comparison code or its optional SDKs."""
+    if not compare_on:
+        return
+    from .compare import append_comparison  # lazy: the comparison SDKs load only here
+    append_comparison(model_key, {"web_citations": web_citations, "with_quote": with_quote})
+
+
+def cmd_run(args, compare_on: bool = False):
     print("\n  web_citations: every web-grounded claim comes back with the verbatim source quote.")
     print(f"  about ${0.12:.2f} on claude-sonnet-4-6, on your key.")
     answered, web_citations, with_quote, cost, latency, samples = _run_claude(QUESTIONS)
@@ -101,10 +117,11 @@ def cmd_run(args):
             print(f"    {url}")
             print(f"      \"{quote[:120]}\"")
     print()
+    _maybe_compare(CLAUDE_MODEL, web_citations, with_quote, compare_on)
     return 0
 
 
-def cmd_check(args):
+def cmd_check(args, compare_on: bool = False):
     """Cheap live self-test. Asserts the win invariant: every web citation carries a source quote."""
     qs = QUESTIONS[:2]  # two questions keeps --check around $0.05
     print("\n  web_citations --check: every Claude web citation must carry a verbatim source quote.")
@@ -117,6 +134,7 @@ def cmd_check(args):
     )
     assert answered == len(qs), "Claude did not answer every web question"
     print("\n  PASS: every web citation carried a verbatim source quote.\n")
+    _maybe_compare(CLAUDE_MODEL, web_citations, with_quote, compare_on)
     return 0
 
 
@@ -124,8 +142,14 @@ def main(argv=None):
     p = argparse.ArgumentParser(description="web_citations: a verifiable quote from the web source.")
     p.add_argument("--check", action="store_true",
                    help="cheap live self-test asserting every web citation carries a source quote")
+    p.add_argument("--compare", dest="compare", action="store_true", default=None,
+                   help="also run the OpenAI and Gemini arms and print the full head-to-head table "
+                        "(needs OPENAI_API_KEY, GEMINI_API_KEY, and requirements-compare.txt)")
+    p.add_argument("--no-compare", dest="compare", action="store_false",
+                   help="run only the Claude side (the public-brief default)")
     a = p.parse_args(argv)
-    return cmd_check(a) if a.check else cmd_run(a)
+    compare_on = COMPARE_DEFAULT if a.compare is None else a.compare
+    return cmd_check(a, compare_on) if a.check else cmd_run(a, compare_on)
 
 
 if __name__ == "__main__":

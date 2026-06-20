@@ -41,7 +41,18 @@ export ANTHROPIC_API_KEY=your-key   # https://console.anthropic.com/
 make pdf_citations                  # build the venv, install anthropic, answer questions over a PDF with a page pointer each
 ```
 
-About a minute, $0.046 on my run. `make pdf_citations` is self-bootstrapping: it creates `.venv`, installs `anthropic`, and runs the self-test that asserts every answer points at the correct page. To reproduce the comparison, also set `OPENAI_API_KEY` and `GEMINI_API_KEY`.
+About a minute, $0.046 on my run. `make pdf_citations` is self-bootstrapping: it creates `.venv`, installs `anthropic`, and runs the self-test that asserts every answer points at the correct page.
+
+To reproduce the whole table on your own keys, not just the Claude side:
+
+```
+export ANTHROPIC_API_KEY=your-key
+export OPENAI_API_KEY=your-key
+export GEMINI_API_KEY=your-key
+make pdf_citations COMPARE=1        # installs the optional OpenAI and Gemini SDKs, runs all three arms
+```
+
+`COMPARE=1` installs `requirements-compare.txt` (the OpenAI and Gemini SDKs) into the same `.venv` and runs the same questions over the same PDF on each platform, so you see the page pointer come back from Claude and not from the others. Without it, the brief runs the Claude side alone on one dependency.
 
 ## Run it on your own data
 

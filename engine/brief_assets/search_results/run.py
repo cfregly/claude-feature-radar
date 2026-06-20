@@ -29,6 +29,12 @@ from .common.pricing import cost_usd
 CLAUDE_MODEL = "haiku"
 MAX_TOKENS = 512
 
+# The comparison gate default. The generator bakes this per surface: the public brief ships it OFF, so
+# `make search_results` runs the Claude side alone on one dependency, and `make search_results COMPARE=1`
+# (or --compare) reproduces the full OpenAI and Gemini head-to-head. A private both-directions checkout
+# ships it ON. Either way --compare / --no-compare overrides it.
+COMPARE_DEFAULT = {compare_default}
+
 # Five RAG chunks a founder's own retriever might return for a support-bot product. Each chunk has a
 # stable id and one distinct citable fact, so a correct answer must point at the chunk that holds it.
 CHUNKS = [
@@ -94,7 +100,17 @@ def _ask_all(client, model_id, questions):
     return answered, cited, asked, cost, wall, rows
 
 
-def cmd_run() -> int:
+def _maybe_compare(compare_on: bool) -> None:
+    """When the comparison gate is on, run the OpenAI and Gemini file_search arms on the same chunks and
+    print the full head-to-head table. Imported lazily, so the default Claude-only run never touches the
+    comparison code or its optional SDKs."""
+    if not compare_on:
+        return
+    from .compare import append_comparison  # lazy: the comparison SDKs load only here
+    append_comparison(CLAUDE_MODEL, {"pointer": "block-range", "objects": 0})
+
+
+def cmd_run(compare_on: bool = False) -> int:
     from .common.client import get_client
 
     m = get(CLAUDE_MODEL)
@@ -112,10 +128,11 @@ def cmd_run() -> int:
     print(f"  answered {answered}/{asked}   correct-source cite {cited}/{asked}   "
           f"hosted objects 0   pointer block-span")
     print(f"  cost ${cost:.4f}   wall {wall:.1f}s\n")
+    _maybe_compare(compare_on)
     return 0
 
 
-def cmd_check() -> int:
+def cmd_check(compare_on: bool = False) -> int:
     """Self-test: assert every answer cites the correct chunk inline, with zero hosted objects."""
     from .common.client import get_client
 
@@ -131,6 +148,7 @@ def cmd_check() -> int:
     assert cited == asked, "an answer did not carry a search_result_location to the correct chunk"
     print("  INVARIANT HOLDS: inline citations resolved to the right chunk, 0 hosted objects, "
           "0 resolver code\n")
+    _maybe_compare(compare_on)
     return 0
 
 
@@ -139,9 +157,15 @@ def main(argv=None) -> int:
 
     p = argparse.ArgumentParser(description="Cite your own RAG chunks inline with Claude search_result blocks.")
     p.add_argument("--check", action="store_true", help="self-test the inline-citation invariant")
+    p.add_argument("--compare", dest="compare", action="store_true", default=None,
+                   help="also run the OpenAI and Gemini file_search arms and print the full head-to-head "
+                        "table (needs OPENAI_API_KEY, GEMINI_API_KEY, and requirements-compare.txt)")
+    p.add_argument("--no-compare", dest="compare", action="store_false",
+                   help="run only the Claude side (the public-brief default)")
     a = p.parse_args(argv)
     load_env()
-    return cmd_check() if a.check else cmd_run()
+    compare_on = COMPARE_DEFAULT if a.compare is None else a.compare
+    return cmd_check(compare_on) if a.check else cmd_run(compare_on)
 
 
 if __name__ == "__main__":

@@ -47,6 +47,12 @@ MAX_TURNS = 18
 # ON it holds near one record (about 17,000). The bound proves the context stayed flat, not unbounded.
 FLAT_CTX_BOUND = 45000
 
+# The comparison gate default. The generator bakes this per surface: the public brief ships it OFF, so
+# `make exact_ledger` runs the Claude side alone on one dependency, and `make exact_ledger COMPARE=1`
+# (or --compare) reproduces the OpenAI compaction and Gemini full-window head-to-head. A private
+# both-directions checkout ships it ON. Either way --compare / --no-compare overrides it.
+COMPARE_DEFAULT = {compare_default}
+
 
 # --------------------------------------------------------------------------------- the workload corpus
 
@@ -221,6 +227,16 @@ def _run_once(docs, start, trigger=TRIGGER, keep=KEEP, max_turns=MAX_TURNS):
     return gold, answer, cost, elapsed, peak
 
 
+def _maybe_compare(cost, answer, gold, compare_on: bool) -> None:
+    """When the comparison gate is on, run the same ledger agent on OpenAI (compaction) and Gemini (full
+    window) over the same chain and print the cost-at-equal-correctness table. Imported lazily, so the
+    default Claude-only run never touches the comparison code or its optional SDKs."""
+    if not compare_on:
+        return
+    from .compare import append_comparison  # lazy: the comparison SDKs load only here
+    append_comparison(EXEC_MODEL, {"cost": cost, "exact": answer == gold})
+
+
 def cmd_run(a) -> int:
     docs, start = build_chain(a.docs, a.doc_tokens)
     print(f"\n  Exact-list ledger over a {a.docs}-report chain, each report about {a.doc_tokens:,} "
@@ -235,6 +251,7 @@ def cmd_run(a) -> int:
     print(f"  {'peak carried context':<22}{peak:>16,}")
     print(f"  {'cost (USD)':<22}{('$' + format(cost, '.4f')):>16}")
     print(f"  {'wall time (s)':<22}{elapsed:>16.1f}\n")
+    _maybe_compare(cost, answer, gold, COMPARE_DEFAULT if a.compare is None else a.compare)
     return 0 if answer == gold else 1
 
 
@@ -252,6 +269,7 @@ def cmd_check(a) -> int:
     assert answer == gold, f"NOT exact: {answer} != {gold}"
     assert peak < FLAT_CTX_BOUND, f"context not held flat: peak {peak} >= {FLAT_CTX_BOUND}"
     print("  CHECK PASSED: exact list preserved while context editing held the context flat\n")
+    _maybe_compare(cost, answer, gold, COMPARE_DEFAULT if a.compare is None else a.compare)
     return 0
 
 
@@ -260,6 +278,11 @@ def main() -> int:
     p.add_argument("--check", action="store_true", help="cheap live self-test that asserts the win")
     p.add_argument("--docs", type=int, default=DOCS)
     p.add_argument("--doc-tokens", type=int, default=DOC_TOKENS)
+    p.add_argument("--compare", dest="compare", action="store_true", default=None,
+                   help="also run the OpenAI and Gemini ledger arms and print the cost-at-equal-correctness "
+                        "table (needs OPENAI_API_KEY, GEMINI_API_KEY, requirements-compare.txt, a few dollars)")
+    p.add_argument("--no-compare", dest="compare", action="store_false",
+                   help="run only the Claude side (the public-brief default)")
     a = p.parse_args()
     return cmd_check(a) if a.check else cmd_run(a)
 

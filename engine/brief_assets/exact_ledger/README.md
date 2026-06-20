@@ -39,7 +39,13 @@ make exact_ledger
 
 That runs a live self-test: it reads a long stream of bulky records, asserts the list comes back exact, and asserts context editing held the carried context flat. About $0.17 and a minute on Claude Haiku 4.5.
 
-Optional: set `OPENAI_API_KEY` and `GEMINI_API_KEY` to reproduce the comparison above.
+To reproduce the whole table on your own keys, not just the Claude side, also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
+
+```bash
+make exact_ledger COMPARE=1
+```
+
+`COMPARE=1` installs `requirements-compare.txt` (the OpenAI and Gemini SDKs) into the same `.venv` and runs the same ledger agent over the same chain on each platform: OpenAI with server-side compaction and Gemini carrying the full window, both at their strongest long-agent config. You see all three return the exact list and Claude keep it for the lowest bill. Because each competitor runs the full multi-turn agent over bulky records, this run costs a few dollars and takes several minutes. Without it, the brief runs the Claude side alone on one dependency.
 
 ## Run it on your own data
 

@@ -36,7 +36,13 @@ export ANTHROPIC_API_KEY=sk-ant-...
 make grounding_stack
 ```
 
-About a minute, $0.010. To reproduce the comparison, also set `OPENAI_API_KEY` and `GEMINI_API_KEY`.
+About a minute, $0.010. To reproduce the whole table on your own keys, not just the Claude side, also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
+
+```bash
+make grounding_stack COMPARE=1
+```
+
+`COMPARE=1` installs `requirements-compare.txt` (the OpenAI and Gemini SDKs) into the same `.venv` and sends the same three sources in one request to each platform, so you see all three return the answers and only Claude return an inline pointer for each source. Without it, the brief runs the Claude side alone on one dependency.
 
 ## Run it on your own data
 
