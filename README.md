@@ -390,12 +390,97 @@ The citations edge runs on the Anthropic key alone. To add the cross-vendor tabl
 per-character claim (the DIY `str.find` baseline on OpenAI and Gemini), install the optional SDKs and
 keys: `make compare-deps`, then paste `OPENAI_API_KEY` and `GEMINI_API_KEY` into `.env`.
 
+## Drive the engine from a chat window (MCP server)
+
+The engine ships an MCP (Model Context Protocol) server, so you can run it conversationally from
+Claude Code or Claude Desktop instead of the terminal. It speaks stdio, the transport both clients
+use. The server is a thin wrapper in [`engine/mcp_server.py`](engine/mcp_server.py): all the logic and
+the safety boundary live in [`engine/mcp_tools.py`](engine/mcp_tools.py), which adds no dependency. The
+MCP Python SDK is the one optional package the server needs, kept off the core one-dependency path.
+
+Grounded against the live docs on 2026-06-20: FastMCP exposes a tool with the `@mcp.tool()` decorator
+(parameter type hints become the input schema, the docstring becomes the description), stdio is the
+default transport, and `claude mcp add` registers a local server. Sources: the
+[MCP Python SDK README](https://github.com/modelcontextprotocol/python-sdk) and the
+[Claude Code MCP docs](https://code.claude.com/docs/en/mcp).
+
+```bash
+make mcp-deps                     # install the optional MCP SDK into the same .venv (once)
+make mcp                          # run the server in the foreground (Ctrl-C to stop)
+```
+
+### The tools, and the lane each one runs in
+
+The server mirrors the engine's own gate ([`engine/gate.py`](engine/gate.py)). The read tools and the
+discovery loop run unattended for free. Anything that writes a repo or spends credits is ASK: it
+refuses until you pass `confirm=true`. The actions that send, post, or push are not exposed as tools
+at all, so a chat client can never trigger them.
+
+| Tool | What it does | Lane | Spend |
+|------|--------------|------|-------|
+| `list_edges` | The ranked edges from the landscape (verdict, lead basis and score, value, axis) | Safe, unattended | $0 |
+| `show_landscape` | A summary: counts by verdict, the top leads, coverage gaps | Safe, unattended | $0 |
+| `show_coverage` | Per-demoKind coverage plus the recent coverage ledger | Safe, unattended | $0 |
+| `show_boundary` | The gate lanes, the per-tool tier, and the audit (which must be empty) | Safe, unattended | $0 |
+| `run_discovery` | The discovery loop: sweep live docs, diff, rank, draft to the inert outbox, coverage | Safe, unattended | $0 |
+| `publish_brief` | Generate a public brief for a verified-win edge into the briefs repo | ASK, needs `confirm=true` | $0, writes files |
+| `run_benchmark` | A paid proof against real API calls, with the estimate surfaced and a cost cap | ASK, needs `confirm=true` | spends credits |
+
+`publish_brief` runs a fail-closed verdict gate first, so it refuses any edge that is not a clean,
+ranked, non-regime-bounded Claude win, and it never pushes a remote. `run_benchmark` shows the dollar
+estimate before it spends and refuses any estimate over the cap, with a hard ceiling it will not cross
+from a tool call. Call either one with `confirm=false` first to preview the action for free.
+
+### Register it in Claude Code
+
+From the engine repo root, after `make mcp-deps`:
+
+```bash
+claude mcp add claude-feature-radar -- "$(pwd)/.venv/bin/python" "$(pwd)/engine/mcp_server.py"
+claude mcp list                   # verify it is registered and reachable
+```
+
+`$(pwd)` records the absolute path at registration time, so the server launches from any working
+directory. Use `--scope user` to make it available in every project, or `--scope project` to write a
+shared `.mcp.json` into the repo. The project-scoped JSON looks like this:
+
+```json
+{
+  "mcpServers": {
+    "claude-feature-radar": {
+      "type": "stdio",
+      "command": "/ABSOLUTE/PATH/TO/claude-feature-radar/.venv/bin/python",
+      "args": ["/ABSOLUTE/PATH/TO/claude-feature-radar/engine/mcp_server.py"]
+    }
+  }
+}
+```
+
+### Register it in Claude Desktop
+
+Open Settings, then Developer, then Edit Config, and add the same `mcpServers` block as above into
+`claude_desktop_config.json` (the Edit Config button opens the file for you). Use the absolute path to
+the `.venv` Python and to `engine/mcp_server.py`. Restart Claude Desktop, and the tools appear under
+the server name.
+
+### Trigger phrases
+
+Once registered, ask in plain language and the client routes to a tool:
+
+- "Show me the ranked Claude edges" or "what are the current leads" runs `list_edges` or `show_landscape`.
+- "Run the discovery loop" or "sweep the docs and tell me what changed" runs `run_discovery`.
+- "What can the engine prove today" or "show the coverage" runs `show_coverage`.
+- "What is this server allowed to do on its own" runs `show_boundary`.
+- "Publish the brief for programmatic tool calling" runs `publish_brief` and waits for your confirm.
+- "Benchmark the citations edge" runs `run_benchmark`, shows the cost estimate, and waits for your confirm.
+
 ## Layout
 
 ```
 app/            the forkable token-bill app: my_tool.py (the one edit surface) + run_tokens.py + example_tool.py
 edges/<edge>/   demo.py, sample.txt, README.md, one per edge
 common/         the verified model and price registry, the cost math, the client
+engine/         the discovery loop, the demonstrators, the gate, and the MCP server (mcp_server.py + mcp_tools.py)
 docs/           VERIFIED_FACTS.md, CITED_FACTS.md, the demo recording
 ```
 

@@ -1,0 +1,7 @@
+# Optional. Only needed to RUN the MCP server (make mcp), which lets you drive the engine from a chat
+# window (Claude Code or Claude Desktop). The official MCP Python SDK is the one dependency it adds,
+# kept off the core one-dependency path on purpose: the server's logic and the whole gate boundary
+# live in engine/mcp_tools.py, which imports no SDK, so the core, the one-dependency gate, and the
+# offline boundary test never pull this in. The [cli] extra adds the `mcp` dev command (the inspector),
+# handy but not required to serve. Install with: make mcp-deps (into the same .venv).
+mcp[cli]>=1.16

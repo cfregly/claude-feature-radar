@@ -20,8 +20,10 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-# The optional comparison SDKs. Block them so any core module that imports one at load fails loudly.
-BLOCKED = ("openai", "google", "google.genai")
+# The optional comparison and MCP SDKs. Block them so any core module that imports one at load fails
+# loudly. mcp is the optional server SDK (requirements-mcp.txt): the MCP logic layer engine.mcp_tools
+# must import without it, so the server's gate boundary stays testable with anthropic alone.
+BLOCKED = ("openai", "google", "google.genai", "mcp")
 
 
 class _Blocker:
@@ -40,7 +42,7 @@ def main() -> int:
         "common.client", "common.models", "common.pricing", "common.runner",
         "engine.demokinds", "engine.gate", "engine.scan", "engine.sweep_edges",
         "engine.cite_facts", "engine.draft_email", "engine.product_alert", "engine.verify",
-        "engine.publish_brief",
+        "engine.publish_brief", "engine.mcp_tools",
         "engine.sources_registry", "engine.cadence", "engine.coverage", "engine.managed",
         "engine.demonstrators", "engine.demonstrators.base", "engine.demonstrators.registry",
         "engine.demonstrators.shared.sandbox", "engine.demonstrators.shared.platform",

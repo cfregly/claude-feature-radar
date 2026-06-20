@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps app app-check programmatic-tool-calling citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports check-surface check-receipts test ci deslop gif clean
+.PHONY: setup compare-deps mcp-deps mcp app app-check programmatic-tool-calling citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief check-claims check-docs core-imports check-surface check-receipts test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -12,6 +12,13 @@ setup: ## create the venv and install the one dependency
 compare-deps: ## install the OpenAI + Gemini SDKs into the SAME venv, for compare/sweep
 	$(PY) -m pip install --quiet -r requirements-compare.txt
 	@echo "Compare deps installed into .venv. Now paste OPENAI_API_KEY and GEMINI_API_KEY into .env."
+
+mcp-deps: ## install the optional MCP Python SDK into the SAME venv, for the chat-window server (make mcp)
+	$(PY) -m pip install --quiet -r requirements-mcp.txt
+	@echo "MCP SDK installed into .venv. Now: make mcp (or register the server in Claude Code/Desktop, see the README)."
+
+mcp: ## MCP SERVER (stdio): drive the engine from a chat window. Read tools + the $0 discovery loop run free; publish and benchmark are ASK and refuse without confirm. Needs make mcp-deps once.
+	$(PY) -m engine.mcp_server
 
 app: ## FORKABLE APP: run the fan-out task over your own tool (app/my_tool.py), print your before-and-after token bill (needs ANTHROPIC_API_KEY, about $0.08)
 	$(PY) -m app.run_tokens

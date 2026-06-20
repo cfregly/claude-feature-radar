@@ -318,9 +318,32 @@ make compare                            # the fair head-to-head on your own keys
 Cost to reproduce is printed before you start and is about a dollar on the default size. Point it at
 your own task by editing the chain builder and the prompt in `engine/demo.py`.
 
+## Operate it from a chat window (MCP server)
+
+The engine runs conversationally through an MCP server over stdio, so you can drive it from Claude
+Code or Claude Desktop. The read tools (`list_edges`, `show_landscape`, `show_coverage`,
+`show_boundary`) and the `$0` discovery loop (`run_discovery`) run unattended for free. The two
+outward tools are ASK and refuse until you pass `confirm=true`: `publish_brief` writes a public brief
+(fail-closed verdict gate, never pushes) and `run_benchmark` runs a paid proof (estimate surfaced,
+cost-capped). The actions that send, post, or push have no tool, so a chat client cannot trigger them.
+The boundary mirrors `engine/gate.py`, and `show_boundary` prints it for inspection.
+
+```bash
+make mcp-deps                                  # install the optional MCP SDK into the same .venv (once)
+claude mcp add claude-feature-radar -- "$(pwd)/.venv/bin/python" "$(pwd)/engine/mcp_server.py"
+```
+
+Then ask in plain language: "show the ranked Claude edges", "run the discovery loop and tell me what
+changed", "what can the engine prove today", "what is this server allowed to do on its own", "publish
+the brief for programmatic tool calling", or "benchmark the citations edge". The README "Drive the
+engine from a chat window" section has the full tool table, the Claude Desktop steps, and the grounding
+citation. Grounded against the live MCP and Claude Code docs on 2026-06-20.
+
 ## The bundled tools
 
 ```
+engine/mcp_server.py          the stdio MCP server, the chat-window entrypoint (the one optional SDK)
+engine/mcp_tools.py           the SDK-free tool logic and the gate boundary the server exposes
 engine/scan.py / verify.py    candidate gaps and the skeptic pass
 engine/demo.py                the Claude arm (chain agent, context editing + memory + caching)
 edges/context-editing/demo.py the long-horizon proof: unmanaged degrades or crashes, managed finishes
