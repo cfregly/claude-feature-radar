@@ -440,7 +440,7 @@ def run_benchmark(edge: str, confirm: bool = False, max_usd: float = DEFAULT_MAX
         return {**base, "ran": False, "spent_usd": 0.0, "requires_confirmation": True,
                 "estimate": estimate,
                 "message": f"ESTIMATE only. {plan['command']} costs about ${est:.2f} and roughly "
-                           f"{plan['est_time_s']:.0f}s on your key. Re-call with confirm=true to run "
+                           f"{plan['est_time_s']:.0f}s using your API key. Re-call with confirm=true to run "
                            f"it. This spends real credits. It never sends or pushes."}
     # confirm is True: enforce the ceiling, then the cap, then the key, before any spend.
     if est > HARD_CAP_USD:

@@ -94,7 +94,8 @@ def check_programmatic_tool_calling_drift(fail, warn):
     a_tok, b_tok = int(a.group(1).replace(",", "")), int(b.group(1).replace(",", ""))
     programmatic_tool_calling_ctx = re.compile(r"programmatic tool calling|Token MINNing|allowed_callers|\bPTC\b", re.I)
     files = [ROOT / "README.md"]
-    files += sorted(ROOT.glob("edges/*/FOUNDER_EMAIL.md")) + sorted(ROOT.glob("emails/*.md"))
+    files += sorted(ROOT.glob("edges/*/FOUNDER_EMAIL.md"))
+    files += sorted(ROOT.glob("emails/*.md")) + sorted(ROOT.glob("emails/**/*.md"))
     for p in files:
         if not p.exists():
             continue

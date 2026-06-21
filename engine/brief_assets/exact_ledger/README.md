@@ -1,6 +1,10 @@
 # Keep an exact running list across a long agent, with Claude context editing
 
-![demo](demo.gif)
+![demo](https://raw.githubusercontent.com/cfregly/claude-feature-hits/main/exact_ledger/demo.gif)
+
+[![Claude proof: 64% cheaper vs OpenAI](https://img.shields.io/badge/Claude%20proof-64%25%20cheaper%20vs%20OpenAI-2F855A)](https://github.com/cfregly/claude-feature-hits/tree/main/exact_ledger#claude-vs-openai-vs-gemini)
+
+The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
 
 Your agent reads a long stream one record at a time (usage logs, churn flags, support tickets) and has to report the exact set of flagged ids at the end. The record text is throwaway after each step, but the running list has to stay exact, and as the stream grows the carried context (the tokens you pay for each turn) grows with it. Claude context editing clears the old tool results in place once the context crosses a trigger you set, so the bulky text leaves the window while the turns that hold your running list stay put.
 
@@ -32,16 +36,16 @@ Measured head-to-head (2026-06-19). All three returned the exact list, so this i
 
 These are the full-run figures on the longer chain. `make exact_ledger` runs a shorter self-test, and `make exact_ledger COMPARE=1` reproduces this head-to-head at that shorter scale: the absolute cost comes out lower, Claude still keeps the exact list for the lowest bill, and Claude's lead widens as the stream grows.
 
-## Run it (about $0.17)
+## Run it
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...
+export ANTHROPIC_API_KEY=your-api-key   # https://console.anthropic.com/
 make exact_ledger
 ```
 
-That runs a live self-test: it reads a long stream of bulky records, asserts the list comes back exact, and asserts context editing held the carried context flat. About $0.17 and a minute on Claude Haiku 4.5.
+Default Claude run: about $0.17 and a minute on Claude Haiku 4.5. It reads a long stream of bulky records, asserts the list comes back exact, and asserts context editing held the carried context flat.
 
-To reproduce the whole table on your own keys, not just the Claude side, also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
+Full comparison run: also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
 
 ```bash
 make exact_ledger COMPARE=1

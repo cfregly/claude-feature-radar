@@ -12,7 +12,7 @@ The quote does not count toward output tokens, and no beta header is needed. Sou
   python -m pdf_citations.run --check    the self-test: ASSERT every answer carries a correct-page pointer
   python -m pdf_citations.run --model opus    use Opus 4.8 instead of the default Haiku 4.5
 
-This costs about $0.02 on Haiku 4.5 for the self-test. The model calls are the only spend. anthropic is
+This costs about $0.05 on Haiku 4.5 for the self-test. The model calls are the only spend. anthropic is
 imported lazily, inside the run path, so importing this module needs no SDK.
 """
 
@@ -64,10 +64,13 @@ PAGES = [
      "percent of that month's base subscription fee, requested within 30 days."),
 ]
 
-# (question, answer_page (1-indexed), token a correct answer must contain). The self-test asks two so it
-# stays a couple of cents; the full five-question receipt is in the README.
+# (question, answer_page (1-indexed), token a correct answer must contain). The self-test asks the
+# same five questions as the sample output, so `make pdf_citations` reproduces the advertised 5/5 result.
 QUESTIONS = [
+    ("How many seats are included?", 1, "50"),
     ("How much is each overage seat per month?", 2, "12"),
+    ("What discount do annual contracts get?", 3, "20"),
+    ("How many days of notice to terminate?", 4, "30"),
     ("What is the monthly uptime commitment?", 5, "99.9"),
 ]
 
@@ -143,7 +146,7 @@ def make_sample_pdf(pages=PAGES) -> bytes:
 
 def answer_with_page_pointers(client, model_key: str, pdf_bytes: bytes) -> dict:
     """Ask each question over the directly-supplied PDF and collect, per answer, the page the model
-    cited. The whole trick is two lines: the document block carries the PDF as base64, and
+    cited. The mechanism is two lines: the document block carries the PDF as base64, and
     citations: {enabled: True} turns on the page_location pointer with the quoted source text."""
     model_id = get(model_key).id
     b64 = base64.standard_b64encode(pdf_bytes).decode("ascii")
@@ -215,7 +218,7 @@ def cmd_run(model_key: str, compare_on: bool = False) -> int:
 
     print(f"\n  PDF citations: answer questions over a directly-supplied PDF and get a verifiable pointer")
     print(f"  to the exact page for each answer, on {get(model_key).label}.")
-    print(f"  Upfront: about $0.02 and roughly 5 seconds on your key. The model calls are the only spend.\n")
+    print(f"  Upfront: about $0.05 and roughly 10 seconds using your API key. The model calls are the only spend.\n")
     client = get_client()
     result = answer_with_page_pointers(client, model_key, make_sample_pdf())
     print_table(result)
@@ -229,7 +232,7 @@ def cmd_check(model_key: str, compare_on: bool = False) -> int:
     from .common.client import get_client  # lazy
 
     print(f"\n  --check: asking questions over a directly-supplied PDF and asserting every answer carries")
-    print(f"  a pointer to the correct page, on {get(model_key).label}. About $0.02.\n")
+    print(f"  a pointer to the correct page, on {get(model_key).label}. About $0.05.\n")
     client = get_client()
     result = answer_with_page_pointers(client, model_key, make_sample_pdf())
     print_table(result)

@@ -1,7 +1,7 @@
 # Measured Claude edges for builders
 
 An internal operator menu of the edges in this engine repo, not a founder handout. Each one is a real
-Claude capability, measured on a real task against OpenAI and Gemini at their best, with the receipt
+Claude capability, measured on a real task against OpenAI and Gemini at their best, with the measured output
 committed in `edges/<edge>/`. It clones the private engine for the full three-arm comparison, so it
 stays internal. Do not trust the table, clone the repo and re-run the one command. If the number moves
 on the workload, that is the point.
@@ -24,7 +24,7 @@ Three questions cover most builders. Find yours, run those two or three commands
 A wrong, uncited answer over a contract or a clinical note is a churn event. These edges return a
 pointer back to the exact source, guaranteed by the API, with no resolver code on your side.
 
-| Edge | What you get | Receipt | Run |
+| Edge | What you get | Measured output | Run |
 |---|---|---|---|
 | Citations | A per-character pointer into your user's own document, every claim, with the quote free of output tokens. | 8 of 8 claims resolved, zero resolver code | `make citations` |
 | PDF citations | A page pointer into a PDF you hand the model directly in the request. | Claude 5 of 5 on the right page, the direct-file path on the others returned none | `make pdf-citations` |
@@ -37,7 +37,7 @@ pointer back to the exact source, guaranteed by the API, with no resolver code o
 When an agent fans out over data or carries a long context, the tokens are the bill. These edges keep
 the bytes the model does not need out of what you pay for.
 
-| Edge | What you get | Receipt | Run |
+| Edge | What you get | Measured output | Run |
 |---|---|---|---|
 | Programmatic tool calling | The model writes one sandbox script that calls your tool in a loop and returns only the answer, so the bulky rows never hit the context. | 9,451 to 6,828 billed input tokens, about 28% fewer, same answer | `make programmatic-tool-calling` |
 | Cache diagnostics | When a prompt-cache hit silently turns into a miss, the API names which prefix changed. | Root cause named on all 4 documented miss reasons, where the others expose only counters | `make cache-diagnostics` |
@@ -48,7 +48,7 @@ the bytes the model does not need out of what you pay for.
 The agents a founder actually lives with run for a while and have to keep their state. These edges are
 measured in the regime where that bites.
 
-| Edge | What you get | Receipt | Run |
+| Edge | What you get | Measured output | Run |
 |---|---|---|---|
 | Exact-list ledger | A long tool-heavy stream where the agent keeps a precise running list and the context stays bounded. | Exact list returned at $0.67 and 60.7s, cheaper and faster than the other exact runs | `make ledger` |
 | Task budgets | An advisory budget across the whole agent loop, so the agent hands off cleanly near a cap instead of truncating mid-action. | Clean handoff with 0 tool calls when the budget said stop | `make task-budget` |
@@ -68,6 +68,6 @@ Most edges are cents to a couple of dollars and print their cost before they com
 states where it holds and where it does not in `edges/<edge>/README.md`, because a scoped claim you can
 check is worth more than a broad one you cannot.
 
-Go build.
+Happy building.
 
 Building with Claude

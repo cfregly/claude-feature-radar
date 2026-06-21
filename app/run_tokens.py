@@ -11,7 +11,7 @@ same model, and prints YOUR own numbers:
           so you are not billed input tokens for data the model never reads.
 
 It prints the billed-input table for both modes, the input-token reduction, the dollar delta at the
-model's published input price, and an upfront "this run costs about $X and Y seconds on your key" line
+model's published input price, and an upfront "this run costs about $X and Y seconds using your API key" line
 BEFORE it spends anything. Source, re-fetched 2026-06-18:
 https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 
@@ -117,7 +117,7 @@ def cmd_run(model_key: str) -> int:
     print(f"  on {label}. Mode A calls the tool directly, Mode B (programmatic tool calling) runs it")
     print(f"  from a sandbox so the outputs stay out of the model's context.")
     print(f"  Upfront: this run makes 2 task runs over {n} inputs and costs about ${est_usd(model_key):.2f} and roughly")
-    print(f"  90 seconds on your key. The model arms are the only spend, the sandbox is server-side.\n")
+    print(f"  90 seconds using your API key. The model arms are the only spend, the sandbox is server-side.\n")
     client = get_client()
     result = run_token_compare(client, model_key)
     print_table(result)

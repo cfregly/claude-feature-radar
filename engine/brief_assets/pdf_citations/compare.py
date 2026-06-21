@@ -2,7 +2,7 @@
 
 The default brief runs the Claude side alone on one dependency. Set OPENAI_API_KEY and GEMINI_API_KEY,
 install the optional comparison SDKs (pip install -r requirements-compare.txt), and run
-`make pdf_citations COMPARE=1` to reproduce the whole table on your own keys, not just the Claude side.
+`make pdf_citations COMPARE=1` to reproduce the whole table using your own API keys, not just the Claude side.
 
 Best to best: OpenAI runs the Responses API with the PDF supplied directly as an input_file, Gemini
 runs the inline PDF part (document processing), both their strongest directly-supplied-PDF path. The
@@ -13,7 +13,7 @@ path). Sources, re-fetched 2026-06-19:
   - OpenAI file search: https://developers.openai.com/api/docs/guides/tools-file-search
   - Gemini file search: https://ai.google.dev/gemini-api/docs/file-search
 
-Every SDK import is lazy, so importing this module needs no comparison SDK. A missing key or SDK skips
+Every SDK import is lazy, so importing this module needs no comparison SDK. A missing API key or SDK skips
 that arm with a clear note and never fakes a row.
 """
 

@@ -2,7 +2,7 @@
 
 The default brief runs the Claude side alone on one dependency. Set OPENAI_API_KEY and GEMINI_API_KEY,
 install the optional comparison SDKs (pip install -r requirements-compare.txt), and run
-`make grounding_stack COMPARE=1` to reproduce the whole table on your own keys, not just the Claude side.
+`make grounding_stack COMPARE=1` to reproduce the whole table using your own API keys, not just the Claude side.
 
 Best to best, the same one request with the same three inline sources (a text note, a directly-supplied
 PDF, and a RAG chunk) on each platform's strongest inline path. The measured thing is two numbers: how
@@ -15,7 +15,7 @@ re-fetched 2026-06-19:
   - OpenAI file search: https://developers.openai.com/api/docs/guides/tools-file-search
   - Gemini file search: https://ai.google.dev/gemini-api/docs/file-search
 
-Every SDK import is lazy, so importing this module needs no comparison SDK. A missing key or SDK skips
+Every SDK import is lazy, so importing this module needs no comparison SDK. A missing API key or SDK skips
 that arm with a clear note and never fakes a row.
 """
 

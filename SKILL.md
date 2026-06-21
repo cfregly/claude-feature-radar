@@ -161,8 +161,10 @@ These are why the output is trusted. Break one and the trust is gone.
     subject line must clear spam filters, so use no money-and-urgency trigger words (cut, save, free, cheap,
     discount, guarantee, a dollar sign) and keep it warm, personal, and specific to the feature, a genuine note
     to the reader, for example "Congrats on YC! A cool Claude feature to help you build". Write in the
-    first person as a builder sharing the run ("I measured", "on my key"), never as someone claiming to
-    speak for Anthropic, and open with a concrete line, not vague filler. Use a startup-native example for a startup audience
+    first person as a builder sharing the run ("I measured", "using my API key"). Generic engine
+    drafts never claim to speak for Anthropic. The curated take-home email packet may use the
+    assigned Anthropic role because the prompt explicitly asks for it. Open with a concrete line,
+    not vague filler. Use a startup-native example for a startup audience
     (plan limits, usage, churn, signups, logs, MRR), not a generic enterprise one, and carry that single
     example through the problem, the code, the table, and the tool name.
     Every word fights for its place, so cut anything that does not earn its spot, the same every-word-earns-its-place standard.
@@ -312,7 +314,7 @@ git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-r
 make setup                              # venv + anthropic
 pip install -r requirements-compare.txt # openai, only for the comparison
 cp .env.example .env                    # paste ANTHROPIC_API_KEY and OPENAI_API_KEY
-make compare                            # the fair head-to-head on your own keys
+make compare                            # the fair head-to-head using your own API keys
 ```
 
 Cost to reproduce is printed before you start and is about a dollar on the default size. Point it at

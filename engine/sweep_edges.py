@@ -311,7 +311,7 @@ def rank(caps: dict, all_competitor_fetched_ok: bool) -> list[dict]:
             "value_score": v, "lead_score": lead, "score": v * lead, "verdict": verdict,
         }
         # Stamp demoKind + fair_comparison from the seed table (engine/scan.stamp_demokind). A built
-        # edge inherits its vetted seed spec; an unknown key gets an axis->demoKind guess. A guessed
+        # edge inherits its vetted seed spec; an unknown API key gets an axis->demoKind guess. A guessed
         # or parity-gated kind is held never-evaluated until a vetted comparison exists. This matters
         # now that the sweep ingests blogs, release notes, Claude Code changelogs, and broad overview
         # pages: those are strong discovery inputs, but not proof by themselves.
@@ -338,7 +338,7 @@ def rank(caps: dict, all_competitor_fetched_ok: bool) -> list[dict]:
 
 def _seed_axis_for(key: str) -> str:
     """Map a source key to the value axis the demoted scan.py constants assigned, so the live sweep
-    inherits the hand-ranked axes as a starting point. Unknown keys default to unknown (value 1)."""
+    inherits the hand-ranked axes as a starting point. Unknown API keys default to unknown (value 1)."""
     for d in scan.DIFFERENTIATORS:
         if d["key"] == key or key in d["key"] or d["key"].replace("-", "_") == key:
             return d["axis"]

@@ -27,10 +27,15 @@ I measured it: I wrote a file in one request, then read it back from the same co
 31-minute idle, and it was still there.
 
 Run it: `make code_execution_state` writes a file in one request, then reads it back from the same
-container in the next (cents on your key).
+container in the next (cents using your API key).
+
+Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state
 
 Docs: https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool
 
-Go build,
-{your_name}
+If you reply with the bottleneck you are working through, I can point you to the closest Claude pattern.
+
+Happy building,
+
+--Chris Fregly
 Building with Claude

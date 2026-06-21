@@ -1,4 +1,4 @@
-Subject: Congrats on YC! A Claude feature for the silent prompt-cache miss
+Subject: Congrats on YC! Cache-miss debugging for long prompts
 
 Hey {first_name},
 
@@ -19,16 +19,20 @@ second = client.beta.messages.create(
 second.diagnostics.cache_miss_reason.type  # typed: model / system / tools / messages changed
 ```
 
-On my key (2026-06-19) Claude named the exact cause, `system_changed`, on 4/4 root-cause variants. That cuts the suspect list from 4 to 1, and it came with a missed-token estimate (6,827) so I could see how much cached prefix I lost.
+Using my API key (2026-06-19) Claude named the exact cause, `system_changed`, for the seeded system-prompt change. That cuts the suspect list from 4 possible prefix surfaces to 1, and it came with a missed-token estimate (6,827) so I could see how much cached prefix I lost.
 
 One honest note from the same run: both OpenAI and Gemini expose cache token counters, but only Claude returned a typed per-request reason naming what broke. The counters tell you the cache missed. Claude tells you why.
 
-About $0.02 and a minute to reproduce on your own key:
+About $0.02 and a minute to reproduce using your own API key:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
 make cache_diagnostics
 ```
+
+Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/cache_diagnostics
+
+Docs: https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics
 
 To run it on your own prompts, edit `cache_diagnostics/run.py` to point the two calls at your own system prompt, tools, or messages, then run `python cache_diagnostics/run.py --check`.
 

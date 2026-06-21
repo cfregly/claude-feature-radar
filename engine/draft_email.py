@@ -86,7 +86,7 @@ def main():
         f"Anchor on this gap: {current_anchor()}\n\n"
         f"The measured proof to cite: {_receipt()}\n\n"
         f"The reader has tried all three big model platforms. Get them to clone a repo and run a "
-        f"two-minute demo on their own key. Give a subject line and a body. Use {{repo_link}} as "
+        f"two-minute demo using their own API key. Give a subject line and a body. Use {{repo_link}} as "
         f"the placeholder for the link."
     )
     # The founder email is the highest-stakes outbound surface, written once per run. It runs on the

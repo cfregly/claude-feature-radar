@@ -1,12 +1,16 @@
 # The largest deliverable in one request, with Claude extended output
 
-![demo](demo.gif)
+![demo](https://raw.githubusercontent.com/cfregly/claude-feature-hits/main/bulk_output/demo.gif)
 
-You run a nightly job that turns each backlog row into one long deliverable: a full report, a big generated dataset. When a single deliverable runs past a model's per-request output ceiling, you fall back to a chunk-and-stitch loop with its own seam-failure surface. Claude extended output, on the Message Batches API (the async bulk endpoint) with the beta header `output-300k-2026-03-24`, lifts the single-request `max_tokens` ceiling far past where the other vendors stop, so the whole thing lands in one turn.
+[![Claude proof: 80% above 128k cap](https://img.shields.io/badge/Claude%20proof-80%25%20above%20128k%20cap-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/bulk_output/sample.txt)
+
+The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
+
+You run a nightly job that turns each backlog row into one long deliverable: a full report, a big generated dataset. When a single deliverable runs past a model's per-request output ceiling, you fall back to a chunk-and-stitch loop with its own stitching-failure surface. Claude extended output, on the Message Batches API (the async bulk endpoint) with the beta header `output-300k-2026-03-24`, lifts the single-request `max_tokens` ceiling far past where the other vendors stop, so the whole thing lands in one turn.
 
 ## What you get
 
-One un-truncated deliverable per request. In a measured run on 2026-06-19 Claude emitted 230,607 output tokens in ONE request and finished clean (`stop_reason: end_turn`). No chunking, no stitching, no seam logic to maintain.
+One un-truncated deliverable per request. In a measured run on 2026-06-19 Claude emitted 230,607 output tokens in ONE request and finished clean (`stop_reason: end_turn`). No chunking, no stitching logic to maintain.
 
 ```python
 batch = client.beta.messages.batches.create(
@@ -21,22 +25,22 @@ batch = client.beta.messages.batches.create(
 
 Single-request output ceiling, from each vendor's own docs:
 
-| Provider | Single-request output | Result on the run |
+| Provider | Single-request output ceiling | Result on the run |
 | --- | --- | --- |
-| Claude (extended output) | extended-output ceiling | 230,607 tokens, un-truncated |
+| Claude (extended output) | 300,000 beta ceiling | 230,607 tokens, un-truncated |
 | OpenAI | 128k documented ceiling | below the deliverable size |
 | Gemini | 65,536 documented ceiling | below the deliverable size |
 
-## Run it (about $0.20)
+## Run it
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...
+export ANTHROPIC_API_KEY=your-api-key   # https://console.anthropic.com/
 make bulk_output
 ```
 
-The live check submits an extended-output batch and asserts the deliverable comes back un-truncated in one request, in about a minute for roughly $0.20.
+Default Claude run: roughly $0.20 on my run. The live check submits a moderate extended-output batch and asserts the deliverable comes back un-truncated in one request. The 230,607-token headline is the `python -m bulk_output.run --full` run from the saved full-run output, about $3.46. It is designed for async jobs, so allow minutes rather than a live-chat response time.
 
-To reproduce the whole table on your own keys, not just the Claude side, also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
+Full comparison run: also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
 
 ```bash
 make bulk_output COMPARE=1

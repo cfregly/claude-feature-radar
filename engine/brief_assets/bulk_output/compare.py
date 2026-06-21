@@ -2,21 +2,21 @@
 
 The default brief runs the Claude side alone on one dependency. Set OPENAI_API_KEY and GEMINI_API_KEY,
 install the optional comparison SDKs (pip install -r requirements-compare.txt), and run
-`make bulk_output COMPARE=1` to reproduce the whole table on your own keys, not just the Claude side.
+`make bulk_output COMPARE=1` to reproduce the whole table using your own API keys, not just the Claude side.
 
 Best to best, the measured thing is the largest deliverable a single request can return. Claude raises
 the single-request ceiling to 300,000 output tokens on the Message Batches API with the
 output-300k-2026-03-24 beta, and the dated full run (2026-06-19) returned 230,607 output tokens in one
 un-truncated request. OpenAI's frontier model documents a 128,000-token single-request output cap and
 Gemini 3.5 Flash a 65,536-token cap, both below that 230,607 deliverable. The competitor arms confirm
-the model is reachable on your key and report that documented ceiling. The ceiling is the documented
+the model is reachable using your API key and report that documented ceiling. The ceiling is the documented
 maximum, so reproducing it does not require generating a 128,000-token output. Sources, re-fetched
 2026-06-19:
   - Claude batch processing: https://platform.claude.com/docs/en/build-with-claude/batch-processing
   - OpenAI GPT-5.5: https://developers.openai.com/api/docs/models/gpt-5.5
   - Gemini 3.5 Flash: https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash
 
-Every SDK import is lazy, so importing this module needs no comparison SDK. A missing key or SDK skips
+Every SDK import is lazy, so importing this module needs no comparison SDK. A missing API key or SDK skips
 that arm with a clear note and never fakes a row.
 """
 
@@ -103,6 +103,6 @@ def append_comparison(model_key: str, claude_result: dict) -> None:
     if live:
         done = "un-truncated" if not claude_result.get("truncated") else "truncated"
         print("  This run's quick check emitted " + format(live, ",") + " tokens " + done
-              + ", confirming the extended-output path on your key.")
+              + ", confirming the extended-output path using your API key.")
         print("  The " + deliverable + "-token figure is the full dated deliverable (" + DATED["date"] + ").")
     print()

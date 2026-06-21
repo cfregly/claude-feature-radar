@@ -440,7 +440,7 @@ def verdict_gate(edge_key: str) -> GateResult:
 
     Reads, in order: the landscape (or seed) edge record (verdict + lead_score + fair_comparison), the
     optional data/last_<edge>.json receipt, and the lead_basis. ANY failing check returns ok=False with
-    a reason, and the caller writes nothing. Never raises on a missing edge: an unknown key is a refusal,
+    a reason, and the caller writes nothing. Never raises on a missing edge: an unknown API key is a refusal,
     not a crash."""
     edge, source = _find_edge(edge_key)
     if edge is None:
@@ -781,7 +781,7 @@ def cmd_run(model_key: str) -> int:
     print(f"  on {{label}}. Mode A calls the tool directly, Mode B (programmatic tool calling) runs it")
     print(f"  from a sandbox so the records stay out of the model's context.")
     print(f"  Upfront: this run makes 2 task runs over {{n}} inputs and costs about ${{est_usd(model_key):.2f}} and roughly")
-    print(f"  90 seconds on your key. The model arms are the only spend, the sandbox is server-side.\\n")
+    print(f"  90 seconds using your API key. The model arms are the only spend, the sandbox is server-side.\\n")
     client = get_client()
     result = run_token_compare(client, model_key)
     print_table(result)
@@ -1028,7 +1028,7 @@ def cmd_run(model_key):
     print(f"\\n  Citations: {{len(QUESTIONS)}} questions over {{len(corpus)}} of your own documents "
           f"({slug}/docs/*.txt), on {{label}}.")
     print(f"  Citations on, char_location pointers, and the grader resolves every pointer the run returns.")
-    print(f"  Upfront: about $0.01 and roughly 30 seconds on your key. The model call is the only spend.\\n")
+    print(f"  Upfront: about $0.01 and roughly 30 seconds using your API key. The model call is the only spend.\\n")
     client = get_client()
     print_table(run(client, model_key, corpus, QUESTIONS))
     return 0
@@ -1087,8 +1087,8 @@ def _codeexec_run_source(slug: str) -> str:
 
 The founder-facing artifact for the {slug} brief. A multi-step agent that runs code needs its sandbox to
 keep state between turns. Claude's code execution sandbox keeps its container and its files across
-separate Messages API requests: capture response.container.id from one call, pass it as container=<id>
-on the next, and a file written in turn 1 is there in turn 2. Containers live 30 days. Source,
+separate Messages API requests: save the container id returned by the first response, pass it as
+container=<id> on the next request, and a file written in turn 1 is there in turn 2. Containers live 30 days. Source,
 re-fetched 2026-06-18: https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool
 
   python -m {slug}.run            write a value, then read it back from the reused container
@@ -1137,8 +1137,8 @@ def _text(resp) -> str:
 
 def write_and_reread(client, model_key: str) -> dict:
     """Write a unique value to /tmp/state.txt in a fresh container, then read it back from the REUSED
-    container on a second, separate request. The container id is the whole trick: capture it from the
-    first response and pass it as container=<id> on the next call."""
+    container on a second, separate request. The container id is the mechanism: save it from the
+    first response and pass it as container=<id> on the next request."""
     model_id = get(model_key).id
     nonce = _nonce()
     tools = [{{"type": CODE_EXEC_TOOL, "name": "code_execution"}}]
@@ -1177,9 +1177,9 @@ def print_table(result: dict) -> None:
     print(f"  reuse container {{short:<34}}{{back}}")
     print("  " + "-" * 64)
     print()
-    print("  The file written in request 1 was read back from the SAME container in request 2,")
-    print("  because the container persists (30-day life). Capture response.container.id and pass")
-    print(f"  container=<id> on the next call. Live cost {{fmt_usd(result['cost'])}} on {{get(result['model_key']).label}}.")
+    print("  The file written in request 1 was read back from the SAME container in request 2.")
+    print("  Save the returned container id and pass container=<id> on the next request.")
+    print(f"  Live cost {{fmt_usd(result['cost'])}} on {{get(result['model_key']).label}}.")
     print()
 
 
@@ -1197,7 +1197,7 @@ def cmd_run(model_key: str, compare_on: bool = False, idle_minutes: int = 0) -> 
 
     print(f"\\n  Code execution state: write a file in your agent's sandbox, then read it back from the")
     print(f"  reused container on a separate request, on {{get(model_key).label}}.")
-    print(f"  Upfront: about $0.05 and roughly 40 seconds on your key. The model calls are the only spend,")
+    print(f"  Upfront: about $0.05 and roughly 40 seconds using your API key. The model calls are the only spend,")
     print(f"  the code runs server-side in Anthropic's sandbox.\\n")
     client = get_client()
     result = write_and_reread(client, model_key)
@@ -1265,22 +1265,21 @@ def _codeexec_compare_source(slug: str) -> str:
 
 The default brief runs the Claude side alone on one dependency. Set OPENAI_API_KEY and GEMINI_API_KEY,
 install the optional comparison SDKs (pip install -r requirements-compare.txt), and run
-`make {slug} COMPARE=1` to reproduce the whole table on your own keys, not just the Claude side.
+`make {slug} COMPARE=1` to reproduce the whole table using your own API keys, not just the Claude side.
 
 Best to best, the same write-then-reread on each vendor's strongest code sandbox:
   - Claude code execution reuses its container by id across requests, and containers live 30 days.
-  - OpenAI code_interpreter reuses a WARM container by id, but the container is discarded after 20
-    minutes idle and is not recoverable (documented).
-  - Gemini code execution exposes no reusable container handle, so a file written in one call is gone
-    in the next call.
+  - OpenAI code_interpreter reuses a warm container by id. The dated comparison run recorded an
+    expired-container error after the idle wait, consistent with the documented 20-minute idle expiry.
+  - Gemini code execution exposes no reusable container handle in the tested setup.
 Sources, re-fetched 2026-06-19:
   - OpenAI code interpreter: https://developers.openai.com/api/docs/guides/tools-code-interpreter
   - Gemini code execution: https://ai.google.dev/gemini-api/docs/code-execution
 
-Every SDK import is lazy. A missing key or SDK skips that arm with a clear note and never fakes a row.
+Every SDK import is lazy. A missing API key or SDK skips that arm with a clear note and never fakes a row.
 By default the live arms show the warm reuse and Gemini's lack of a reusable container, and the
-20-minute idle expiry is the documented, dated result. Add --idle-minutes 21 to reproduce the idle
-expiry live (the run waits, then re-reads each container).
+dated run records the idle result. Add --idle-minutes 21 to reproduce the idle re-read live (the run
+waits, then re-reads each container).
 """
 
 from __future__ import annotations
@@ -1308,7 +1307,7 @@ def _openai_container_id(resp):
 
 def _openai_arm(idle_minutes):
     """Write a nonce to /tmp/state.txt in an OpenAI code_interpreter container, warm-read it back, then
-    (with --idle-minutes) wait and re-read to reproduce the documented 20-minute idle expiry live."""
+    (with --idle-minutes) wait and re-read to reproduce the idle result live."""
     m = get(OPENAI_MODEL)
     client = get_openai_client()
     if client is None:
@@ -1444,7 +1443,8 @@ def append_comparison(model_key, claude_result, idle_minutes=0):
     print("  " + "-" * 70)
     print()
     print("  Claude's sandbox keeps your agent's files between requests and across a long idle, where")
-    print("  OpenAI's container expires after a 20-minute idle and Gemini has no reusable container.")
+    print("  The dated comparison run records OpenAI returning an expired-container error after")
+    print("  the idle wait, and Gemini exposing no reusable container handle in the tested setup.")
     if idle_minutes == 0:
         print("  Measured idle survival (2026-06-19): Claude read the file back after a 31-minute idle.")
     ran = [a for a in (oai, gem) if "skipped" not in a]
@@ -1470,9 +1470,8 @@ def _codeexec_sample_source() -> str:
         "  read it back from the reused container (req 2)   read back, matches\n"
         "  re-read after a 31-minute idle                   read back (30-day container life)\n"
         "  --------------------------------------------------------------------\n\n"
-        "  -> the file written in one request is there in the next, and survives a long idle,\n"
-        "     because the container persists for 30 days. Capture response.container.id and\n"
-        '     pass container=<id> on the next call.\n\n'
+        "  -> the file written in one request is there in the next, and survives a long idle.\n"
+        "     Save the returned container id and pass container=<id> on the next request.\n\n"
         '  The change: betas=["code-execution-2025-08-25"], add the code_execution tool, and carry\n'
         "  the container id between calls.\n\n"
         "  Runnable code and the full brief: code_execution_state/README.md\n"

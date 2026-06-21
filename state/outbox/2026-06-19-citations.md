@@ -4,15 +4,15 @@ Drafted by the unattended cadence into the inert outbox. No model call, no send.
 
 ---
 
-**Subject:** A Claude edge you can test on your own key
+**Subject:** A Claude edge you can test using your own API key
 
 Hey {first_name},
 
-Quick builder note. If this workload looks like yours, the repo below lets you check the number on your own key before you trust the claim.
+Quick builder note. If this workload looks like yours, the repo below lets you check the number using your own API key before you trust the claim.
 
 Citations - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop re
 
-Here is the receipt path: It costs about $0.06 and a few minutes to check on your own key (about 2.0 minutes). Clone the repo and run one command:
+Here is the receipt path: It costs about $0.06 and a few minutes to check using your own API key (about 2.0 minutes). Clone the repo and run one command:
 
 ```
 make citations

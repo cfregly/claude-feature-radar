@@ -10,7 +10,7 @@ Usage:
     python run.py            # run the citation workload, print the table and cost
     python run.py --check    # self-test: assert every answer cited the correct chunk inline
 
-Cost: about $0.05 for the full receipt, about $0.01 for --check.
+Cost: about $0.05 for the full measured run, about $0.01 for --check.
 Doc: https://platform.claude.com/docs/en/build-with-claude/search-results
 """
 

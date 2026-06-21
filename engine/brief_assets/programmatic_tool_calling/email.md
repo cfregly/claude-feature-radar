@@ -1,4 +1,4 @@
-Subject: Congrats on YC! A Claude trick for usage metering at scale
+Subject: Congrats on YC! A sandbox pattern for usage-metering agents
 
 Hey {first_name},
 
@@ -29,19 +29,23 @@ Same task, same model (Sonnet 4.6), the only change is the feature on or off:
 | without programmatic tool calling | 9,451 | every row lands in the model's context |
 | with programmatic tool calling | 6,828 | only the answer reaches the model |
 
-28% fewer input tokens on my run, and it answered correctly where the plain version did not. The saving grows with the size of the fan-out (an agent calling one tool many times over data it then crunches).
+28% fewer input tokens on my run, with the exact winner returned from the sandbox. The saving grows with the size of the fan-out (an agent calling one tool many times over data it then crunches).
 
 Why I am sending this for your workload: no other major provider keeps your own custom-tool output out of the model context the way `allowed_callers` does. Their code interpreters and tool search do not, checked 2026-06-18. For metering across many cohorts, that is the difference between paying for every row and paying for the answer.
 
-I ran it on my own key for about $0.08, takes around two minutes. To see it yourself, one clone and one command:
+I ran it using my own API key for about $0.08, takes around two minutes. To see it yourself, one clone and one command:
 
 ```
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
 make programmatic_tool_calling
 ```
 
+Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
+
+Docs: https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
+
 To run it on your own data, open `programmatic_tool_calling/my_tool.py`, drop in your tool, and run `make programmatic_tool_calling` again.
 
-Have fun with it 🚀
+Happy building,
 {your_name}
 Building with Claude

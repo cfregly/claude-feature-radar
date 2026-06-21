@@ -1,8 +1,12 @@
 # Verifiable source citations for every answer
 
-![demo](demo.gif)
+![demo](https://raw.githubusercontent.com/cfregly/claude-feature-hits/main/citations/demo.gif)
 
-When your app answers over a user's own documents (contracts, policies, support tickets), the answer is only as good as the source behind it. Claude's Citations feature returns a structured pointer for every claim: the document, a character range, and the verbatim quote at that range. You verify each answer in your own code instead of trusting it.
+[![Claude proof: 8/8 char pointers](https://img.shields.io/badge/Claude%20proof-8%2F8%20char%20pointers-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/citations/sample.txt)
+
+The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
+
+When your app answers over a user's own documents (contracts, policies, support tickets), users need the source behind each answer. Claude's Citations feature returns a structured pointer for every claim: the document, a character range, and the verbatim quote at that range. Your own code verifies each answer against that exact source span.
 
 ## What you get
 
@@ -20,7 +24,7 @@ msg = client.messages.create(model="claude-haiku-4-5", max_tokens=400,
 
 Measured on Haiku 4.5: all 8 answers came back with a `char_location` pointer that resolves. `source[start:end]` equals the `cited_text`, with the quote free of output tokens. Live cost $0.011.
 
-## Claude vs OpenAI vs Gemini
+## Char-level vs page-level vs file-level
 
 Claude returns a per-character pointer into the user's own document. Among the three, only Claude returns char-level: Gemini File Search resolves to a page, OpenAI file_search to a file (their docs, verified 2026-06-19). Char-level vs page-level vs file-level is the difference between checking the exact sentence and re-reading the file.
 
@@ -28,7 +32,7 @@ Claude returns a per-character pointer into the user's own document. Among the t
 
 ```
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-export ANTHROPIC_API_KEY=your-key   # https://console.anthropic.com/
+export ANTHROPIC_API_KEY=your-api-key   # https://console.anthropic.com/
 make citations        # answer the questions and resolve every pointer, about a minute
 ```
 

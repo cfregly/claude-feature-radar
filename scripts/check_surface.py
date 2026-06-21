@@ -31,7 +31,7 @@ FORBIDDEN = [
 ]
 
 # Rule 2: a founder-facing surface shows only Claude wins, never a negative or a both-directions tell.
-FOUNDER_GLOBS = ["FOUNDER_EMAIL.md", "emails/*.md", "edges/*/FOUNDER_EMAIL.md"]
+FOUNDER_GLOBS = ["FOUNDER_EMAIL.md", "emails/*.md", "emails/**/*.md", "edges/*/FOUNDER_EMAIL.md"]
 NEGATIVES = [
     "more expensive", "not on bedrock", "not on vertex", "not zdr", "zdr-eligible",
     "table stakes", "parity on", "is parity", "claude loses", "loses on", "where that flips",
@@ -59,12 +59,11 @@ SKIP = ("/.venv/", "/__pycache__/", "/sources/", "/data/", "/briefs/", "/.git/",
 
 
 def _tracked_files():
-    """The files git tracks, the only ones that ship on a clone. A gitignored internal note (a
-    LEDGER_WORKLOAD, a local brief, a per-edge product alert) may name a private sibling because it
-    never ships, so the gate scans what is committed, not local scratch. Falls back to the working
+    """The files git tracks plus new non-ignored files. Gitignored internal notes stay out of scope,
+    but a newly added founder draft should be checked before it is staged. Falls back to the working
     tree if git is unavailable."""
     try:
-        out = subprocess.run(["git", "ls-files", "-z"], cwd=ROOT,
+        out = subprocess.run(["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"], cwd=ROOT,
                              capture_output=True, text=True, check=True).stdout
         return [ROOT / rel for rel in out.split("\0") if rel]
     except Exception:

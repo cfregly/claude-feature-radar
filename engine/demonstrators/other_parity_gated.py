@@ -194,7 +194,7 @@ PARITY_CHECKS = {
 
 def parity_check_passed(edge_key: str) -> bool:
     """The single gate both applicable() and the CLI read: an edge is pitchable only when its recorded
-    parity-check verdict is "survives". Any other state (unchecked, killed, or an unknown key) holds the
+    parity-check verdict is "survives". Any other state (unchecked, killed, or an unknown API key) holds the
     edge never-evaluated. The rule lives here so the demonstrator cannot forget it."""
     entry = PARITY_CHECKS.get(edge_key)
     return bool(entry) and entry.get("parity_verdict") == "survives"

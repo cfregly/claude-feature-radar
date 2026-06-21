@@ -2,7 +2,7 @@
 
 The default brief runs the Claude side alone on one dependency. Set OPENAI_API_KEY and GEMINI_API_KEY,
 install the optional comparison SDKs (pip install -r requirements-compare.txt), and run
-`make web_citations COMPARE=1` to reproduce the whole table on your own keys, not just the Claude side.
+`make web_citations COMPARE=1` to reproduce the whole table using your own API keys, not just the Claude side.
 
 Best to best: OpenAI runs the Responses API web_search tool at its frontier model, Gemini runs Google
 Search grounding at its frontier model, each platform's strongest live-web path. The measured thing is
@@ -14,7 +14,7 @@ client must re-fetch the page to verify a claim. Sources, re-fetched 2026-06-19:
   - OpenAI web search: https://developers.openai.com/api/docs/guides/tools-web-search
   - Gemini Google Search: https://ai.google.dev/gemini-api/docs/google-search
 
-Every SDK import is lazy, so importing this module needs no comparison SDK. A missing key or SDK skips
+Every SDK import is lazy, so importing this module needs no comparison SDK. A missing API key or SDK skips
 that arm with a clear note and never fakes a row.
 """
 

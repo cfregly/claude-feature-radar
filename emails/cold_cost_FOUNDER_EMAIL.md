@@ -3,7 +3,7 @@ Subject: A Claude tool-calling pattern for fan-out agents
 Hey {first_name},
 
 Congrats on the batch. Quick builder note if you are running an agent that calls a tool many times
-over data it then crunches: usage rollups across a cohort, plan-limit checks across accounts, log or
+over data it then crunches: usage summaries across a cohort, plan-limit checks across accounts, log or
 trace triage.
 
 The problem is the bill. Every tool result flows into the model's context, so you pay input tokens for
@@ -37,10 +37,15 @@ About 28% fewer billed input tokens, and the sandbox returned the exact winner. 
 fan-out shape, many calls over data the model then crunches.
 
 Run it on your own tool: edit one file, programmatic_tool_calling/my_tool.py, paste your tool dict and
-the Python that runs it, then `make programmatic_tool_calling` (about $0.08 on your key).
+the Python that runs it, then `make programmatic_tool_calling` (about $0.08 using your API key).
+
+Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
 
 Docs: https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 
-Go build,
-{your_name}
+If you reply with the bottleneck you are working through, I can point you to the closest Claude pattern.
+
+Happy building,
+
+--Chris Fregly
 Building with Claude

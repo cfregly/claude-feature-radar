@@ -7,3 +7,15 @@
 {"edge_key": "programmatic_tool_calling", "demo_kind": "token_accounting", "run_date": "2026-06-19", "action": "drafted", "outbox": "state/outbox/2026-06-19-programmatic_tool_calling.md"}
 {"edge_key": "programmatic_tool_calling", "demo_kind": "token_accounting", "run_date": "2026-06-19", "action": "ask-run-demonstrator", "gate": "ask"}
 {"edge_key": "citations", "demo_kind": "grounding_resolution", "run_date": "2026-06-19", "action": "ask-run-demonstrator", "gate": "ask"}
+{"edge_key": "task_budgets", "demo_kind": "task_budget", "run_date": "2026-06-20", "action": "drafted", "outbox": "state/outbox/2026-06-20-task_budgets.md"}
+{"edge_key": "programmatic_tool_calling", "demo_kind": "token_accounting", "run_date": "2026-06-20", "action": "ask-run-demonstrator", "gate": "ask"}
+{"edge_key": "citations", "demo_kind": "grounding_resolution", "run_date": "2026-06-20", "action": "ask-run-demonstrator", "gate": "ask"}
+{"edge_key": "task_budgets", "demo_kind": "task_budget", "run_date": "2026-06-20", "action": "ask-build-demonstrator", "gate": "ask"}
+{"edge_key": "search_results", "demo_kind": "byo_rag_grounding", "run_date": "2026-06-20", "action": "ask-run-demonstrator", "gate": "ask"}
+{"edge_key": "cache_diagnostics", "demo_kind": "cache_diagnostics", "run_date": "2026-06-20", "action": "ask-build-demonstrator", "gate": "ask"}
+{"edge_key": "code-execution-state", "demo_kind": "retention_resume", "run_date": "2026-06-20", "action": "use-existing", "gate": "always"}
+{"edge_key": "pdf-citations", "demo_kind": "pdf_grounding", "run_date": "2026-06-20", "action": "ask-run-demonstrator", "gate": "ask"}
+{"edge_key": "grounding-stack", "demo_kind": "grounding_stack", "run_date": "2026-06-20", "action": "ask-run-demonstrator", "gate": "ask"}
+{"edge_key": "web-citations", "demo_kind": "web_grounding", "run_date": "2026-06-20", "action": "ask-run-demonstrator", "gate": "ask"}
+{"edge_key": "bulk-extended-output", "demo_kind": "extended_output", "run_date": "2026-06-20", "action": "ask-run-demonstrator", "gate": "ask"}
+{"edge_key": "exact-list-ledger", "demo_kind": "token_accounting", "run_date": "2026-06-20", "action": "ask-run-demonstrator", "gate": "ask"}

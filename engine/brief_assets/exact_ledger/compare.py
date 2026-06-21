@@ -2,7 +2,7 @@
 
 The default brief runs the Claude side alone on one dependency. Set OPENAI_API_KEY and GEMINI_API_KEY,
 install the optional comparison SDKs (pip install -r requirements-compare.txt), and run
-`make exact_ledger COMPARE=1` to reproduce the whole table on your own keys, not just the Claude side.
+`make exact_ledger COMPARE=1` to reproduce the whole table using your own API keys, not just the Claude side.
 
 Best to best, the same long tool-heavy ledger agent over the SAME chain, each platform at full strength:
   - OpenAI runs the Responses API with server-side compaction on at the same trigger Claude clears at,
@@ -16,7 +16,7 @@ list for the lowest bill. Sources, re-fetched 2026-06-19:
   - OpenAI compaction: https://developers.openai.com/api/docs/guides/compaction
   - Gemini long context: https://ai.google.dev/gemini-api/docs/long-context
 
-Every SDK import is lazy, so importing this module needs no comparison SDK. A missing key or SDK skips
+Every SDK import is lazy, so importing this module needs no comparison SDK. A missing API key or SDK skips
 that arm with a clear note. This arm runs the SAME multi-turn agent on each competitor over a chain of
 bulky records, so COMPARE=1 here costs a few dollars and runs for several minutes.
 """

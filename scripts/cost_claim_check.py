@@ -26,7 +26,7 @@ TABLE_COST_TOL = 0.001
 # by the hits repo's own number gate. Both that brief and this engine edge run a single Claude
 # Citations arm (~$0.01).
 CLAIMS = [
-    {"file": "edges/citations/README.md", "pattern": r"on your own keys?, \$(\d+\.\d{2})"},
+    {"file": "edges/citations/README.md", "pattern": r"using your own API keys?, \$(\d+\.\d{2})"},
     {"file": "Makefile", "pattern": r"^citations:.*\$(\d+\.\d{2})"},
 ]
 

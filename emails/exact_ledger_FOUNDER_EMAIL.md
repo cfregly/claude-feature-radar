@@ -1,4 +1,4 @@
-Subject: Congrats on YC! A Claude trick for long agents that keep a running list
+Subject: Congrats on YC! Lower-bill long agents with exact state
 
 Hey {first_name},
 
@@ -20,7 +20,7 @@ resp = client.messages.create(
 )
 ```
 
-On my key, on a long report chain, the agent returned the exact 10/10 list and held peak carried context to about 35k tokens instead of letting it balloon. The full run was $0.67 and 60.7s.
+Using my API key, on a long report chain, the agent returned the exact 10/10 list and held peak carried context to about 35k tokens while old bulky tool results fell away. The full run was $0.67 and 60.7s.
 
 I ran it head-to-head against the others, same workload (2026-06-19). All three returned the exact list, so this is cost and speed at equal correctness:
 
@@ -37,12 +37,19 @@ git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hi
 make exact_ledger
 ```
 
+Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/exact_ledger
+
+Docs: https://platform.claude.com/docs/en/build-with-claude/context-editing
+
 Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make exact_ledger COMPARE=1`. It runs all three side by side on the same chain, a few dollars and several minutes since each competitor runs the full agent. The table above is the longer full run, so a quick reproduce lands lower in absolute cost while Claude still keeps the exact list for the lowest bill, and the lead widens as the stream grows.
 
 To run it on your own data, edit `exact_ledger/run.py`: point the reader at your records and your flag rule, then run `make exact_ledger` again.
 
 One note: context editing is in beta, so set the header on the request, `anthropic-beta: context-management-2025-06-27`.
 
-Happy building! 🚀
-{your_name}
+If you reply with the bottleneck you are working through, I can point you to the closest Claude pattern.
+
+Happy building,
+
+--Chris Fregly
 Building with Claude

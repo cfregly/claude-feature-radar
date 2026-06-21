@@ -356,7 +356,7 @@ def current_edges() -> list[dict]:
 def stamp_demokind(edge: dict) -> dict:
     """Stamp demoKind + fair_comparison onto a live edge record (the sweep normalizer calls this).
 
-    A built edge inherits the vetted seed demoKind and the seed fair_comparison spec. An unknown key
+    A built edge inherits the vetted seed demoKind and the seed fair_comparison spec. An unknown API key
     gets a best-effort axis->demoKind guess (engine/demokinds) and a minimal fair_comparison whose
     lead_basis is held: a guessed kind is never-evaluated until a demonstrator and a parity check
     exist, the same absence-of-evidence discipline the sweep already enforces on an unverified lead. A

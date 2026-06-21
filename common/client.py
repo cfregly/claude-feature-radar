@@ -34,7 +34,7 @@ def get_client() -> Anthropic:
     load_env()
     if not os.environ.get("ANTHROPIC_API_KEY"):
         raise SystemExit(
-            "ANTHROPIC_API_KEY is not set. Copy .env.example to .env and paste your key, "
+            "ANTHROPIC_API_KEY is not set. Copy .env.example to .env and paste your API key, "
             "or export it. Get one at https://console.anthropic.com/."
         )
     return Anthropic()

@@ -1,6 +1,10 @@
-# Cite your own RAG chunks inline, no second vector store
+# Cite your own retriever chunks inline, no second vector store
 
-![demo](demo.gif)
+![demo](https://raw.githubusercontent.com/cfregly/claude-feature-hits/main/search_results/demo.gif)
+
+[![Claude proof: 0 hosted objects](https://img.shields.io/badge/Claude%20proof-0%20hosted%20objects-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/search_results/sample.txt)
+
+The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
 
 You already run your own retriever over your users' data (pgvector, your own embeddings) and you want every answer to deep-link to the exact passage it came from. The common path ships those passages into a second hosted vector store. With Claude you pass the chunks your retriever already returned straight into the request and get inline citations back, no second store.
 
@@ -28,20 +32,20 @@ Measured head-to-head, citing your own inline RAG chunks (RAG = your retriever f
 | OpenAI   | file/chunk-level | 6 persisted |
 | Gemini   | file/chunk-level | 6 persisted |
 
-## Run it (about $0.05)
+## Run it
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...
+export ANTHROPIC_API_KEY=your-api-key   # https://console.anthropic.com/
 make search_results
 ```
 
-Runs in about a minute. To reproduce the whole table on your own keys, not just the Claude side, also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
+Default Claude run: about a minute, one dependency, and no hosted store. Full comparison run: also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
 
 ```bash
 make search_results COMPARE=1
 ```
 
-`COMPARE=1` installs `requirements-compare.txt` (the OpenAI and Gemini SDKs) into the same `.venv` and runs the file_search arms, which stand up a hosted vector store and upload your chunks (the objects the table counts), then delete it on cleanup. You see the citation pointer each platform returns and the count of objects you had to persist to get it. Without it, the brief runs the Claude side alone on one dependency. The competitor arms create and tear down a hosted store, so this run is slower than the Claude side.
+`COMPARE=1` installs `requirements-compare.txt` (the OpenAI and Gemini SDKs) into the same `.venv` and runs the file_search arms, which stand up a hosted vector store and upload your chunks (the objects the table counts), then delete it on cleanup. You see the citation pointer each platform returns and the count of objects you had to persist to get it. Without it, the brief runs the Claude side alone on one dependency.
 
 ## Run it on your own data
 

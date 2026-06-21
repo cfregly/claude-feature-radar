@@ -58,7 +58,7 @@
   so on a job short enough to finish either way the editing-ON run can cost MORE. Its value
   is that a heavy job finishes at all. The editing-ON run here cost $0.3513.
 
-  Reproduce: `make longhorizon` on Claude Haiku 4.5, your own key. This run cost $0.6417 total
+  Reproduce: `make longhorizon` on Claude Haiku 4.5, your own API key. This run cost $0.6417 total
   and took 36s wall.
 
   RELIABILITY (3 runs of the same setup, only context editing toggled)

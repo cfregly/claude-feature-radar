@@ -47,6 +47,6 @@ re-fetched 2026-06-18.
 git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make setup
 cp .env.example .env   # paste your Anthropic key
-make programmatic-tool-calling               # this edge, on your own key, $0.08 on Sonnet 4.6
+make programmatic-tool-calling               # this edge, using your own API key, $0.08 on Sonnet 4.6
 # or directly: python edges/programmatic-tool-calling/demo.py
 ```

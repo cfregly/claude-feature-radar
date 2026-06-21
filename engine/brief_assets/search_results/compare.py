@@ -2,7 +2,7 @@
 
 The default brief runs the Claude side alone on one dependency. Set OPENAI_API_KEY and GEMINI_API_KEY,
 install the optional comparison SDKs (pip install -r requirements-compare.txt), and run
-`make search_results COMPARE=1` to reproduce the whole table on your own keys, not just the Claude side.
+`make search_results COMPARE=1` to reproduce the whole table using your own API keys, not just the Claude side.
 
 Best to best, the same chunks cited on each platform's strongest path. The measured thing is two things:
 the citation pointer the developer receives, and how many objects you must persist to get it. Claude
@@ -16,7 +16,7 @@ persisted copy is left behind. Sources, re-fetched 2026-06-19:
   - OpenAI file search: https://developers.openai.com/api/docs/guides/tools-file-search
   - Gemini file search: https://ai.google.dev/gemini-api/docs/file-search
 
-Every SDK import is lazy, so importing this module needs no comparison SDK. A missing key or SDK skips
+Every SDK import is lazy, so importing this module needs no comparison SDK. A missing API key or SDK skips
 that arm with a clear note. Note that the OpenAI and Gemini arms CREATE a hosted store and upload your
 chunks (the objects the table counts), then delete it, so this arm runs slower than the Claude side.
 """

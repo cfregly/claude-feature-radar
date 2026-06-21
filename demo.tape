@@ -7,17 +7,18 @@
 
 Output docs/demo.gif
 
-Set FontSize 16
+Set FontSize 18
 Set Width 1180
 Set Height 640
-Set Padding 18
+Set Padding 14
+Set TypingSpeed 0.004
 
 Type "# programmatic tool calling: about 28% fewer billed input tokens on a fan-out task"
 Enter
-Sleep 1.2s
+Sleep 700ms
 Type "make programmatic-tool-calling   # about $0.08 on a real run; below is the committed receipt, replayed for $0"
 Enter
-Sleep 1.2s
+Sleep 700ms
 Type `printf '\n  Task: across 4 regions (240 sales rows total), find the highest-revenue region.\n  Same task, same model (Sonnet 4.6), both ways.\n\n  mode                                      billed input tok    what happens to the 240 rows\n  --------------------------------------------------------------------------------------------\n  plain tool use                                       9,451    all 240 rows flow through the model context\n  programmatic (allowed_callers)                       6,828    the sandbox aggregates, only the answer (east) reaches the model\n  --------------------------------------------------------------------------------------------\n  -> 28%% fewer billed input tokens, and the sandbox returns the exact winner (east).\n\n  full receipt: edges/programmatic-tool-calling/sample.txt\n\n'`
 Enter
-Sleep 6s
+Sleep 2200ms

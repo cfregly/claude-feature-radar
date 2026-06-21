@@ -151,7 +151,7 @@ def _norm(key: str) -> str:
 
 
 def demokind_for(key: str, axis: str | None = None) -> str:
-    """Resolve a key (and its value axis) to a demoKind. The seed table wins. An unknown key falls
+    """Resolve a key (and its value axis) to a demoKind. The seed table wins. An unknown API key falls
     back to a best-effort axis guess, then to "other", so a never-before-seen edge always routes.
 
     The caller stamps the result onto the edge. A guessed kind (not in the seed table) is the signal

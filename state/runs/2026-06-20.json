@@ -1,0 +1,351 @@
+{
+  "date": "2026-06-20",
+  "tier": 1,
+  "steps": [
+    {
+      "id": "rank",
+      "gate": "always",
+      "outward": false
+    },
+    {
+      "id": "draft_to_outbox",
+      "gate": "always",
+      "outward": false
+    },
+    {
+      "id": "update_coverage",
+      "gate": "always",
+      "outward": false
+    }
+  ],
+  "dispatch": [
+    {
+      "key": "programmatic_tool_calling",
+      "demoKind": "token_accounting",
+      "action": "ask-run-demonstrator",
+      "gate": "ask",
+      "covered": true,
+      "demonstrator": "PTCDemonstrator",
+      "estimate_surfaced": true,
+      "estimate": {
+        "usd": 0.08,
+        "wall_clock_s": 90.0,
+        "command": "make programmatic-tool-calling",
+        "note": "two fan-out runs on sonnet, the only spend is the model arms"
+      },
+      "edge_dir": "edges/programmatic-tool-calling"
+    },
+    {
+      "key": "citations",
+      "demoKind": "grounding_resolution",
+      "action": "ask-run-demonstrator",
+      "gate": "ask",
+      "covered": true,
+      "demonstrator": "CitationsDemonstrator",
+      "estimate_surfaced": true,
+      "estimate": {
+        "usd": 0.02,
+        "wall_clock_s": 60.0,
+        "command": "make citations",
+        "note": "8 questions, one Claude Citations arm, cents"
+      },
+      "edge_dir": "edges/citations"
+    },
+    {
+      "key": "task_budgets",
+      "demoKind": "task_budget",
+      "action": "ask-build-demonstrator",
+      "gate": "ask",
+      "covered": false,
+      "demonstrator": null,
+      "estimate_surfaced": false,
+      "estimate": null,
+      "note": "build a demonstrator for kind 'task_budget' to prove edge 'task_budgets' (kind is not in the canonical taxonomy); until then this edge is held never-evaluated, not pitched"
+    },
+    {
+      "key": "search_results",
+      "demoKind": "byo_rag_grounding",
+      "action": "ask-run-demonstrator",
+      "gate": "ask",
+      "covered": true,
+      "demonstrator": "SearchResultsDemonstrator",
+      "estimate_surfaced": true,
+      "estimate": {
+        "usd": 0.1,
+        "wall_clock_s": 120.0,
+        "command": "make search-results",
+        "note": "5 questions x 3 vendors over 5 chunks; the competitor arms create and delete a hosted store, cents"
+      },
+      "edge_dir": "edges/search-results"
+    },
+    {
+      "key": "cache_diagnostics",
+      "demoKind": "cache_diagnostics",
+      "action": "ask-build-demonstrator",
+      "gate": "ask",
+      "covered": false,
+      "demonstrator": null,
+      "estimate_surfaced": false,
+      "estimate": null,
+      "note": "build a demonstrator for kind 'cache_diagnostics' to prove edge 'cache_diagnostics' (kind is not in the canonical taxonomy); until then this edge is held never-evaluated, not pitched"
+    },
+    {
+      "key": "code-execution-state",
+      "demoKind": "retention_resume",
+      "action": "use-existing",
+      "gate": "always",
+      "covered": true,
+      "demonstrator": "RetentionResumeDemonstrator",
+      "estimate_surfaced": true,
+      "estimate": {
+        "usd": 0.0,
+        "wall_clock_s": 1.0,
+        "command": "make retention",
+        "note": "the default doc-grounded retention/bundle comparison; no Managed Agents spend (the live kill-resume is the opt-in make retention-live)"
+      },
+      "edge_dir": null
+    },
+    {
+      "key": "pdf-citations",
+      "demoKind": "pdf_grounding",
+      "action": "ask-run-demonstrator",
+      "gate": "ask",
+      "covered": true,
+      "demonstrator": "PdfCitationsDemonstrator",
+      "estimate_surfaced": true,
+      "estimate": {
+        "usd": 0.05,
+        "wall_clock_s": 40.0,
+        "command": "make pdf-citations",
+        "note": "5 questions x 3 vendors over a 5-page PDF, cents"
+      },
+      "edge_dir": null
+    },
+    {
+      "key": "grounding-stack",
+      "demoKind": "grounding_stack",
+      "action": "ask-run-demonstrator",
+      "gate": "ask",
+      "covered": true,
+      "demonstrator": "GroundingStackDemonstrator",
+      "estimate_surfaced": true,
+      "estimate": {
+        "usd": 0.05,
+        "wall_clock_s": 40.0,
+        "command": "make grounding-stack",
+        "note": "one request x 3 vendors over 3 mixed inline sources, cents"
+      },
+      "edge_dir": null
+    },
+    {
+      "key": "web-citations",
+      "demoKind": "web_grounding",
+      "action": "ask-run-demonstrator",
+      "gate": "ask",
+      "covered": true,
+      "demonstrator": "WebCitationsDemonstrator",
+      "estimate_surfaced": true,
+      "estimate": {
+        "usd": 0.15,
+        "wall_clock_s": 60.0,
+        "command": "make web-citations",
+        "note": "3 web-research questions x 3 vendors, cents-scale"
+      },
+      "edge_dir": null
+    },
+    {
+      "key": "bulk-extended-output",
+      "demoKind": "extended_output",
+      "action": "ask-run-demonstrator",
+      "gate": "ask",
+      "covered": true,
+      "demonstrator": "BulkExtendedOutputDemonstrator",
+      "estimate_surfaced": true,
+      "estimate": {
+        "usd": 6.0,
+        "wall_clock_s": 1800.0,
+        "command": "make bulk-output",
+        "note": "generates a >128k-token deliverable per arm; a few dollars and the Claude batch can take many minutes (explicit-go, never the cadence)"
+      },
+      "edge_dir": null
+    },
+    {
+      "key": "exact-list-ledger",
+      "demoKind": "token_accounting",
+      "action": "ask-run-demonstrator",
+      "gate": "ask",
+      "covered": true,
+      "demonstrator": "PTCDemonstrator",
+      "estimate_surfaced": true,
+      "estimate": {
+        "usd": 0.08,
+        "wall_clock_s": 90.0,
+        "command": "make programmatic-tool-calling",
+        "note": "two fan-out runs on claude-haiku-4-5-20251001, the only spend is the model arms"
+      },
+      "edge_dir": null
+    }
+  ],
+  "anchor_edge": "task_budgets",
+  "outbox_draft": "state/outbox/2026-06-20-task_budgets.md",
+  "coverage": {
+    "demo_kinds_total": 14,
+    "registered": 13,
+    "with_bundle": 12,
+    "by_port_status": {
+      "exists": [
+        "discovery_loop",
+        "grounding_resolution",
+        "long_horizon_survival",
+        "token_accounting"
+      ],
+      "adapt": [
+        "eval_quality",
+        "retention_resume"
+      ],
+      "build": [
+        "advisor_routing",
+        "byo_rag_grounding",
+        "cost",
+        "extended_output",
+        "grounding_stack",
+        "other",
+        "pdf_grounding",
+        "web_grounding"
+      ]
+    },
+    "gaps": [],
+    "rows": [
+      {
+        "demo_kind": "token_accounting",
+        "registered": true,
+        "demonstrator": "PTCDemonstrator",
+        "bundle": "programmatic-tool-calling",
+        "has_bundle": true,
+        "port_status": "exists",
+        "spend_lane": "ASK (a credit-spending benchmark)"
+      },
+      {
+        "demo_kind": "grounding_resolution",
+        "registered": true,
+        "demonstrator": "CitationsDemonstrator",
+        "bundle": "citations",
+        "has_bundle": true,
+        "port_status": "exists",
+        "spend_lane": "ASK (a credit-spending benchmark)"
+      },
+      {
+        "demo_kind": "pdf_grounding",
+        "registered": true,
+        "demonstrator": "PdfCitationsDemonstrator",
+        "bundle": "pdf-citations",
+        "has_bundle": true,
+        "port_status": "build",
+        "spend_lane": "ASK (a credit-spending benchmark, cents-scale)"
+      },
+      {
+        "demo_kind": "byo_rag_grounding",
+        "registered": true,
+        "demonstrator": "SearchResultsDemonstrator",
+        "bundle": "search-results",
+        "has_bundle": true,
+        "port_status": "build",
+        "spend_lane": "ASK (a credit-spending benchmark, cents-scale)"
+      },
+      {
+        "demo_kind": "grounding_stack",
+        "registered": true,
+        "demonstrator": "GroundingStackDemonstrator",
+        "bundle": "grounding-stack",
+        "has_bundle": true,
+        "port_status": "build",
+        "spend_lane": "ASK (a credit-spending benchmark, cents-scale)"
+      },
+      {
+        "demo_kind": "web_grounding",
+        "registered": true,
+        "demonstrator": "WebCitationsDemonstrator",
+        "bundle": "web-citations",
+        "has_bundle": true,
+        "port_status": "build",
+        "spend_lane": "ASK (a credit-spending benchmark, cents-scale)"
+      },
+      {
+        "demo_kind": "advisor_routing",
+        "registered": true,
+        "demonstrator": "AdvisorRoutingDemonstrator",
+        "bundle": null,
+        "has_bundle": false,
+        "port_status": "build",
+        "spend_lane": "ASK (a credit-spending benchmark); held until the cost-at-quality value reproduces"
+      },
+      {
+        "demo_kind": "extended_output",
+        "registered": true,
+        "demonstrator": "BulkExtendedOutputDemonstrator",
+        "bundle": "bulk-extended-output",
+        "has_bundle": true,
+        "port_status": "build",
+        "spend_lane": "ASK (a credit-spending benchmark, a few dollars, the Claude batch is slow)"
+      },
+      {
+        "demo_kind": "long_horizon_survival",
+        "registered": true,
+        "demonstrator": "ContextEditingDemonstrator",
+        "bundle": "context-editing",
+        "has_bundle": true,
+        "port_status": "exists",
+        "spend_lane": "ASK (a credit-spending benchmark)"
+      },
+      {
+        "demo_kind": "retention_resume",
+        "registered": true,
+        "demonstrator": "RetentionResumeDemonstrator",
+        "bundle": "retention-resume",
+        "has_bundle": true,
+        "port_status": "adapt",
+        "spend_lane": "$0 ALWAYS default (doc-grounded parity); the live kill-resume is opt-in ASK"
+      },
+      {
+        "demo_kind": "eval_quality",
+        "registered": true,
+        "demonstrator": "EvalQualityDemonstrator",
+        "bundle": "eval-quality",
+        "has_bundle": true,
+        "port_status": "adapt",
+        "spend_lane": "ASK (a credit-spending grid, the larger slice)"
+      },
+      {
+        "demo_kind": "cost",
+        "registered": true,
+        "demonstrator": "CostModelDemonstrator",
+        "bundle": "cost-model",
+        "has_bundle": true,
+        "port_status": "build",
+        "spend_lane": "$0 ALWAYS (pure pricing model, no API call)"
+      },
+      {
+        "demo_kind": "discovery_loop",
+        "registered": false,
+        "demonstrator": null,
+        "bundle": null,
+        "has_bundle": false,
+        "port_status": "exists",
+        "spend_lane": "$0 ALWAYS (stdlib doc sweep, no API call)"
+      },
+      {
+        "demo_kind": "other",
+        "registered": true,
+        "demonstrator": "OtherParityGatedDemonstrator",
+        "bundle": "parity-gated",
+        "has_bundle": true,
+        "port_status": "build",
+        "spend_lane": "HELD until the parity check passes, then ASK (the opt-in thin proof)"
+      }
+    ]
+  },
+  "audit_violations": [],
+  "spent_usd": 0.0,
+  "sent": false,
+  "note": "Tier-1 weekly cadence: sweep, rank, dispatch decision, $0 deterministic draft to the inert outbox, coverage update. No benchmark spend, no send. Tier-2 (engine/managed.py) is the optional monthly resumable deep run, ASK, never on a schedule."
+}

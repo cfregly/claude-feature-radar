@@ -169,7 +169,7 @@ def print_report(model, n_docs, doc_tokens, off_rec, off_ans, on_rec, on_ans, go
     print(f"  is that a heavy job finishes at all. The editing-ON run here cost {fmt_usd(on['total_cost'])}.")
     print()
     total = off["total_cost"] + on["total_cost"]
-    print(f"  Reproduce: `make longhorizon` on {label}, your own key. This run cost {fmt_usd(total)} total")
+    print(f"  Reproduce: `make longhorizon` on {label}, your own API key. This run cost {fmt_usd(total)} total")
     print(f"  and took {wall_s:.0f}s wall.\n")
 
 

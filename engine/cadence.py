@@ -82,7 +82,7 @@ def _draft_email(edge: dict, routing_for_edge: dict | None) -> str:
     minutes = round((est.get("wall_clock_s", repro.get("est_time_s", 0.0)) or 0.0) / 60.0, 1)
     claim = (edge.get("claim") or edge.get("evidence_quote") or edge.get("key", "")).strip()
     cost_line = ("It costs nothing to check" if cost <= 0
-                 else f"It costs about ${cost:.2f} and a few minutes to check on your own key")
+                 else f"It costs about ${cost:.2f} and a few minutes to check using your own API key")
     time_clause = f" (about {minutes} minutes)" if minutes else ""
 
     lines = [
@@ -94,12 +94,12 @@ def _draft_email(edge: dict, routing_for_edge: dict | None) -> str:
         "",
         "---",
         "",
-        "**Subject:** A Claude edge you can test on your own key",
+        "**Subject:** A Claude edge you can test using your own API key",
         "",
         "Hey {first_name},",
         "",
         "Quick builder note. If this workload looks like yours, the repo below lets you check the "
-        "number on your own key before you trust the claim.",
+        "number using your own API key before you trust the claim.",
         "",
         claim,
         "",

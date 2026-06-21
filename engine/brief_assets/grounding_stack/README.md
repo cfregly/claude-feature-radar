@@ -1,12 +1,16 @@
 # Cite a text note, a PDF, and a RAG chunk in one Claude request
 
-![demo](demo.gif)
+![demo](https://raw.githubusercontent.com/cfregly/claude-feature-hits/main/grounding_stack/demo.gif)
 
-Your doc-QA agent answers over mixed sources at once: a plain-text note your user left, a PDF they just uploaded, and a chunk your retriever (RAG, the step that fetches matching snippets from a knowledge base) pulled from their wiki. Users trust the answer only when they can click back to where each fact came from. Claude Citations gives you that in one `client.messages.create` call: turn citations on per source and Claude returns a typed pointer for each, a character range for the text, a page range for the PDF, and a chunk span for the RAG result.
+[![Claude proof: 3/3 source pointers](https://img.shields.io/badge/Claude%20proof-3%2F3%20source%20pointers-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/grounding_stack/sample.txt)
+
+The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
+
+Your doc-QA agent answers over mixed sources at once: a plain-text note your user left, a PDF they just uploaded, and a chunk your retriever (RAG, the step that fetches matching snippets from a knowledge base) pulled from their wiki. Users can click back to where each fact came from. Claude Citations gives you that in one `client.messages.create` call: turn citations on per source and Claude returns a typed pointer for each, a character range for the text, a page range for the PDF, and a chunk span for the RAG result.
 
 ## What you get
 
-One request carrying all three sources and a three-part question comes back with every part answered and a correct typed pointer into each source: `char_location` for the text, `page_location` for the PDF, and `search_result_location` for the chunk, all in the same response. No vector store to stand up, no upload-and-index step, no copy of your user's data kept anywhere. The cited text rides along free of output tokens.
+One request carrying all three sources and a three-part question comes back with every part answered and a correct typed pointer into each source: `char_location` for the text, `page_location` for the PDF, and `search_result_location` for the chunk, all in the same response. No vector store to stand up, and no copy of your user's data kept anywhere. The cited text rides along free of output tokens.
 
 ```python
 content=[text_doc, pdf_doc, search_result_chunk,
@@ -27,16 +31,16 @@ Same prompt, same three sources (text + PDF + a RAG chunk), measured head-to-hea
 | OpenAI | 3 of 3           | 0 of 3          |
 | Gemini | 3 of 3           | 0 of 3          |
 
-Three citation modes in one request is the combination edge: every source comes back with its own verifiable pointer.
+One request, three source types, and every source comes back with its own verifiable pointer.
 
-## Run it (about $0.01)
+## Run it
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...
+export ANTHROPIC_API_KEY=your-api-key   # https://console.anthropic.com/
 make grounding_stack
 ```
 
-About a minute, $0.010. To reproduce the whole table on your own keys, not just the Claude side, also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
+Default Claude run: about a minute and $0.010 on my run. Full comparison run: also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
 
 ```bash
 make grounding_stack COMPARE=1

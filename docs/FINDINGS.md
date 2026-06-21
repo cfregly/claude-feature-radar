@@ -93,7 +93,7 @@ before a correctness claim, or you ship a strawman win.
 ## What the benchmark is for
 
 The benchmark is a credibility tool, not a sales pitch: a fair, exhaustive, best-to-best fight a
-founder can run on their own keys. A toy task collapses every model into a cost-and-speed race that
+founder can run using their own API keys. A toy task collapses every model into a cost-and-speed race that
 decides nothing, so the engine pushes past it to find the genuine Claude-only capability, the edge an
 audit can stand behind, and measures that.
 

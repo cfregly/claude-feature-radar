@@ -9,7 +9,7 @@ on 2026-06-19 Claude emitted 230,607 output tokens in ONE request and finished u
     make bulk_output                 # the live check (a moderate batch, about $0.20)
     python -m bulk_output.run --check  # asserts the win invariant on a live batch
 
-Cost: the live --check generates a moderate output for about $0.20. The full 230,607-token receipt
+Cost: the live --check generates a moderate output for about $0.20. The full 230,607-token measured run
 run costs about $3.46 at the 50% batch discount and the batch can take many minutes.
 
 Doc (verified 2026-06-19): https://platform.claude.com/docs/en/build-with-claude/batch-processing
@@ -30,7 +30,7 @@ from .common.pricing import cost_usd
 BATCH_BETA = "output-300k-2026-03-24"
 CLAUDE_MODEL = "sonnet"            # Sonnet 4.6 supports the 300k batch beta
 CHECK_N = 200                      # a moderate enumerated deliverable for the cheap live check
-FULL_N = 3000                      # the full receipt run (230,607 output tokens, about $3.46)
+FULL_N = 3000                      # the full measured run (230,607 output tokens, about $3.46)
 CHECK_MAX_TOKENS = 64000          # comfortably above the moderate check output, so it finishes cleanly
 FULL_MAX_TOKENS = 300000          # the beta ceiling
 POLL_TIMEOUT_S = 1800.0
@@ -123,7 +123,7 @@ def cmd_check(args) -> int:
 
     The invariant: the batch + extended-output-beta path returns one deliverable that finishes
     un-truncated (stop_reason end_turn, not max_tokens). That is the mechanism the full 230,607-token
-    receipt run rides on. The cheap check proves the path works live without spending dollars on a
+    measured run rides on. The cheap check proves the path works live without spending dollars on a
     full 300k generation.
     """
     print("\n  bulk_output --check: extended-output batch path, live invariant")
@@ -137,7 +137,7 @@ def cmd_check(args) -> int:
     assert r["stop_reason"] == "end_turn", f"expected end_turn, got {r['stop_reason']}"
     print("\n  PASS: the extended-output batch path returned one un-truncated deliverable in a single "
           "request.")
-    print(f"  The full receipt run (make bulk_output --full) emits 230,607 output tokens, above the "
+    print(f"  The full measured run (make bulk_output --full) emits 230,607 output tokens, above the "
           f"128k single-request ceiling of competitor frontier models. Doc: {DOC_URL}")
     return 0
 
@@ -154,13 +154,13 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(description="bulk_output: largest single-request deliverable with "
                                             "Claude extended output (300k batch beta).")
     sub = p.add_subparsers(dest="cmd")
-    rp = sub.add_parser("run", help="run the extended-output batch (add --full for the 230k receipt)")
-    rp.add_argument("--full", action="store_true", help="the full 3,000-entry, 300k-cap receipt run")
+    rp = sub.add_parser("run", help="run the extended-output batch (add --full for the 230k measured run)")
+    rp.add_argument("--full", action="store_true", help="the full 3,000-entry, 300k-cap measured run")
     rp.set_defaults(func=cmd_run)
     cp = sub.add_parser("check", help="live invariant self-test (about $0.20)")
     cp.set_defaults(func=cmd_check)
     p.add_argument("--check", action="store_true", help="alias for the check subcommand")
-    p.add_argument("--full", action="store_true", help="with no subcommand, run the full receipt run")
+    p.add_argument("--full", action="store_true", help="with no subcommand, run the full measured run")
     p.add_argument("--compare", dest="compare", action="store_true", default=None,
                    help="also confirm the OpenAI and Gemini single-request output ceilings and print the "
                         "full head-to-head table (needs OPENAI_API_KEY, GEMINI_API_KEY, requirements-compare.txt)")

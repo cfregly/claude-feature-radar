@@ -1,8 +1,8 @@
-Subject: Congrats on YC! A Claude trick for citing your own RAG chunks
+Subject: Congrats on YC! Inline citations for your retriever chunks
 
 Hey {first_name},
 
-Congrats on the batch. Quick builder tip from running RAG over private data: you can keep your retriever yours and still get clean inline citations.
+Congrats on the batch. Quick builder tip from running retrieval-augmented generation over private data: you can keep your retriever yours and still get clean inline citations.
 
 Here is the workload I keep hitting. You already run your own retrieval (pgvector, your own embeddings) and your answers need to deep-link to the exact passage they came from, so a user can click and verify. The common path ships those passages into a second hosted vector store, which means a copy of your users' data to manage and a coarse file-level pointer back.
 
@@ -26,17 +26,24 @@ Here is the same run head-to-head, citing your own inline RAG chunks (RAG = your
 | OpenAI   | file/chunk-level | 6 persisted |
 | Gemini   | file/chunk-level | 6 persisted |
 
-Cost to reproduce is about $0.05 and it runs in about a minute. One clone, one command:
+Cost to reproduce the Claude side is about $0.01 and it runs in about a minute. One clone, one command:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
 make search_results
 ```
 
-Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make search_results COMPARE=1`. It runs Claude, OpenAI, and Gemini side by side on the same chunks, so you see Claude cite inline with zero stored objects while the others stand up a hosted store, on your own keys for a few cents.
+Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/search_results
 
-To run it on your own data, edit search_results/run.py with your retriever's chunks and questions, then run make search_results again.
+Docs: https://platform.claude.com/docs/en/build-with-claude/search-results
 
-Have fun building
-{your_name}
+Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make search_results COMPARE=1`. It runs Claude, OpenAI, and Gemini side by side on the same chunks, so you see Claude cite inline with zero stored objects while the others stand up a hosted store, about $0.05 using your API keys.
+
+To run it on your own data, edit `search_results/run.py` with your retriever's chunks and questions, then run `make search_results` again.
+
+If you reply with the bottleneck you are working through, I can point you to the closest Claude pattern.
+
+Happy building,
+
+--Chris Fregly
 Building with Claude

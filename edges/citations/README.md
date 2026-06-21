@@ -48,7 +48,7 @@ Citations cannot be combined with Structured Outputs on the same document (the A
 git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make setup                        # core deps, the one dependency
 cp .env.example .env              # paste your ANTHROPIC_API_KEY
-make citations                    # this edge, on your own key, $0.01
+make citations                    # this edge, using your own API key, $0.01
 # or directly: python edges/citations/demo.py
 ```
 
