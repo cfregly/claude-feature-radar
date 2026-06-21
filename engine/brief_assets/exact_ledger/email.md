@@ -20,9 +20,13 @@ resp = client.messages.create(
 )
 ```
 
-Using my API key, on a long report chain, the agent returned the exact 10/10 list and held peak carried context to about 35k tokens while old bulky tool results fell away. The full run was $0.67 and 60.7s.
+I keep two receipts separate because they answer different questions. The longer stress run used a
+30-report chain: the agent returned the exact 10/10 list, held peak carried context to about 35k
+tokens, and finished at $0.67 in 60.7s.
 
-I ran it head-to-head against the others, same workload (captured 2026-06-20). All three returned the exact list, so this is cost at equal correctness:
+The head-to-head table below uses a shorter 8-report chain so the comparison is cheap to rerun with
+your own API keys. All three returned the exact list, so this is cost at equal correctness on the
+same 8-report comparison workload:
 
 | Stack | Cost, this run | Wall time | Correctness | Versus Claude |
 | --- | ---: | ---: | --- | --- |
@@ -30,7 +34,8 @@ I ran it head-to-head against the others, same workload (captured 2026-06-20). A
 | OpenAI `gpt-5.5`, compaction | $0.46 | 31.6s | exact | Claude 63% cheaper |
 | Gemini `gemini-3.1-pro-preview`, full window | $0.35 | 23.8s | exact | Claude 51% cheaper |
 
-To try it, one clone and one command, $0.17 and a minute on Claude Haiku 4.5:
+To try the short Claude-side check, one clone and one command, $0.17 and a minute on Claude Haiku
+4.5:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
@@ -43,7 +48,7 @@ Committed comparison receipt: https://github.com/cfregly/claude-feature-hits/blo
 
 Docs: https://platform.claude.com/docs/en/build-with-claude/context-editing
 
-Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make exact_ledger COMPARE=1`. It runs all three side by side on the same chain, a few dollars and several minutes since each competitor runs the full agent. The table above is the committed comparison receipt.
+Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make exact_ledger COMPARE=1`. It runs all three side by side on the same short chain. In the captured comparison, the three rows total $0.98 because each competitor runs the full agent. The table above is the committed comparison receipt.
 
 To run it on your own data, edit `exact_ledger/run.py`: point the reader at your records and your flag rule, then run `make exact_ledger` again.
 

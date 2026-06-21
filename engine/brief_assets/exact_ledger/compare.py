@@ -18,7 +18,7 @@ list for the lowest bill. Sources, re-fetched 2026-06-19:
 
 Every SDK import is lazy, so importing this module needs no comparison SDK. A missing API key or SDK skips
 that arm with a clear note. This arm runs the SAME multi-turn agent on each competitor over a chain of
-bulky records, so COMPARE=1 here costs a few dollars and runs for several minutes.
+bulky records, so COMPARE=1 here costs roughly the sum of the three printed rows and runs for a few minutes.
 """
 
 from __future__ import annotations
@@ -175,8 +175,8 @@ def append_comparison(model_key: str, claude_result: dict) -> None:
     gold = sorted(d["id"] for d in docs.values() if d["urgent"])
 
     print("  Reproducing the head-to-head: the same long ledger agent over the same chain, cost at equal")
-    print("  correctness. The OpenAI and Gemini arms each run the multi-turn agent live, so this costs a")
-    print("  few dollars and several minutes. " + COMPARE_DEPS_HINT + ".\n")
+    print("  correctness. The OpenAI and Gemini arms each run the multi-turn agent live, so this costs")
+    print("  roughly the sum of the three printed rows and runs for a few minutes. " + COMPARE_DEPS_HINT + ".\n")
 
     oai = _run_arm(_openai_arm, docs, start)
     gem = _run_arm(_gemini_arm, docs, start)

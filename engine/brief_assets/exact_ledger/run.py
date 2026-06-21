@@ -280,7 +280,7 @@ def main() -> int:
     p.add_argument("--doc-tokens", type=int, default=DOC_TOKENS)
     p.add_argument("--compare", dest="compare", action="store_true", default=None,
                    help="also run the OpenAI and Gemini ledger arms and print the cost-at-equal-correctness "
-                        "table (needs OPENAI_API_KEY, GEMINI_API_KEY, requirements-compare.txt, a few dollars)")
+                        "table (needs OPENAI_API_KEY, GEMINI_API_KEY, requirements-compare.txt)")
     p.add_argument("--no-compare", dest="compare", action="store_false",
                    help="run only the Claude side (the public-brief default)")
     a = p.parse_args()

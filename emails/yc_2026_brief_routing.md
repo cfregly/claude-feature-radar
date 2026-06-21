@@ -49,10 +49,9 @@ page clearly marks a CEO founder. Re-check the page before sending because found
   prompt-injection defense that self-improves for AI-native applications and agents. That maps to a
   discovery or Product/security conversation about prompt-injection evals, tool-boundary controls,
   hooks, and adversarial testing. It does not yet map to one of the measured public `claude-feature-hits`
-  briefs with a saved Claude win, so I would not force it into this appendix. If asked live, the move
-  is: "I would absolutely take Silmaril. I would not send the generic feature brief. I would run a
-  security discovery call and bring a prompt-injection eval or tool-boundary demo." Source:
-  https://www.ycombinator.com/companies/silmaril
+  briefs with a saved Claude win, so it should not be forced into this appendix. The right route is a
+  security discovery call with a prompt-injection eval or tool-boundary demo, not a generic feature
+  brief. Source: https://www.ycombinator.com/companies/silmaril
 
 ## How to use
 

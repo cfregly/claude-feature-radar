@@ -60,7 +60,7 @@ Full comparison run: also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
 make exact_ledger COMPARE=1
 ```
 
-`COMPARE=1` installs `requirements-compare.txt` (the OpenAI and Gemini SDKs) into the same `.venv` and runs the same ledger agent over the same chain on each platform: OpenAI with server-side compaction and Gemini carrying the full window, both at their strongest long-agent config. You see all three return the exact list and Claude keep it for the lowest bill. Because each competitor runs the full multi-turn agent over bulky records, this run costs a few dollars and takes several minutes. Without it, the brief runs the Claude side alone on one dependency.
+`COMPARE=1` installs `requirements-compare.txt` (the OpenAI and Gemini SDKs) into the same `.venv` and runs the same ledger agent over the same chain on each platform: OpenAI with server-side compaction and Gemini carrying the full window, both at their strongest long-agent config. You see all three return the exact list and Claude keep it for the lowest bill. In the captured short comparison, the three rows total $0.98 and take a few minutes. Without it, the brief runs the Claude side alone on one dependency.
 
 ## Run it on your own data
 
