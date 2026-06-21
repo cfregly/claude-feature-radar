@@ -10,7 +10,7 @@
   model             claude-haiku-4-5-20251001
   miss reason       system_changed
   missed tokens     6,827
-  cost              $0.0150
+  cost              $0.01
   wall time         1.5s
 
   The change: pass diagnostics={"previous_message_id": first.id} and the

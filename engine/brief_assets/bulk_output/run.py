@@ -137,7 +137,7 @@ def cmd_check(args) -> int:
     assert r["stop_reason"] == "end_turn", f"expected end_turn, got {r['stop_reason']}"
     print("\n  PASS: the extended-output batch path returned one un-truncated deliverable in a single "
           "request.")
-    print(f"  The full measured run (make bulk_output --full) emits 230,607 output tokens, above the "
+    print(f"  The full measured run (python -m bulk_output.run --full) emits 230,607 output tokens, above the "
           f"128k single-request ceiling of competitor frontier models. Doc: {DOC_URL}")
     return 0
 
@@ -146,7 +146,7 @@ def _print_table(r: dict) -> None:
     print(f"  {'model':<22}{'output tokens':>15}{'truncated':>11}{'stop':>12}{'cost':>10}")
     print("  " + "-" * 68)
     print(f"  {r['model']:<22}{r['output_tokens']:>15,}{str(r['truncated']):>11}"
-          f"{(r['stop_reason'] or '-'):>12}{('$' + format(r['cost'], '.4f')):>10}")
+          f"{(r['stop_reason'] or '-'):>12}{('$' + format(r['cost'], '.2f')):>10}")
     print(f"\n  wall-clock: {r['latency_s']}s")
 
 

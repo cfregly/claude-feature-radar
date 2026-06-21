@@ -72,13 +72,13 @@ def _probe(model: str, repeats: int) -> dict:
 
 
 def _print_table(r: dict) -> None:
-    print(f"\n  Claude cache diagnostics, live run. cost ${r['cost_usd']:.4f}, {r['latency_s']:.1f}s\n")
+    print(f"\n  Claude cache diagnostics, live run. cost ${r['cost_usd']:.2f}, {r['latency_s']:.1f}s\n")
     print("  field             value")
     print("  ----------------------------------------")
     print(f"  model             {r['model']}")
     print(f"  miss reason       {r['miss_reason'] or '-'}")
     print(f"  missed tokens     {r['missed_tokens']:,}")
-    print(f"  cost              ${r['cost_usd']:.4f}")
+    print(f"  cost              ${r['cost_usd']:.2f}")
     print(f"  wall time         {r['latency_s']:.1f}s")
     print()
 

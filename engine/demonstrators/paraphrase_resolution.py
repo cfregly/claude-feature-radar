@@ -640,7 +640,7 @@ def _sample_text(receipt: dict) -> str:
     for a in receipt["arms"]:
         rows.append(
             f"  {a['name']:<32}{a['pointer_kind']:<13}{a['resolved']:>9}{a['source_correct']:>8}"
-            f"{a['persisted_objects']:>13}{('$' + format(a['cost'], '.4f')):>10}"
+            f"{a['persisted_objects']:>13}{('$' + format(a['cost'], '.2f')):>10}"
         )
         if a["errors"]:
             rows.append(f"      note: {a['errors'][0]}")
@@ -696,7 +696,7 @@ def write_edge_bundle(receipt: dict) -> pathlib.Path:
     for a in receipt["arms"]:
         rows.append(
             f"| {a['name']} | {tool_name.get(a['mechanism'], a['mechanism'])} | {a['pointer_kind']} | "
-            f"{a['resolved']} | {a['source_correct']} | {a['persisted_objects']} | ${a['cost']:.4f} |")
+            f"{a['resolved']} | {a['source_correct']} | {a['persisted_objects']} | ${a['cost']:.2f} |")
     v = receipt["verdict"]
     comp_objs = v.get("competitor_persisted_objects", {})
     comp_total = sum(comp_objs.values()) if comp_objs else 0

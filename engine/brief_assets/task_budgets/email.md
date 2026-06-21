@@ -30,6 +30,7 @@ Reproduce it in a few seconds for about $0.01. One clone, one command:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
+export ANTHROPIC_API_KEY=your-api-key
 make task_budgets
 ```
 
@@ -39,7 +40,7 @@ Docs: https://platform.claude.com/docs/en/build-with-claude/task-budgets
 
 To run it on your own agent, edit the prompt and tools in `task_budgets/run.py`, then re-run `make task_budgets`.
 
-One note: task budgets are in beta, so set the `task-budgets-2026-03-13` beta header (the `betas=[...]` line above) to opt in.
+One note: task budgets are in beta, so set the `task-budgets-2026-03-13` beta header (the `betas=[...]` line above) to opt in. I would still keep your own hard billing and quota stops server-side. The budget is the model's loop-level countdown, not a replacement for your account limits.
 
 Happy building,
 {your_name}

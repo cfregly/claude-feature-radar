@@ -29,9 +29,9 @@ Run: `make ledger`, 2026-06-19, same deterministic corpus and same exact-list pr
 
 | arm | exact list | cost | wall time | peak context |
 |---|:---:|---:|---:|---:|
-| Claude Haiku 4.5 with context editing | yes | $0.6700 | 60.7s | 35,186 |
-| OpenAI GPT-5.5 with Responses compaction | yes | $1.8425 | 164.3s | 41,548 |
-| Gemini 3.1 Pro Preview with full context | yes | $2.5690 | 201.0s | 434,629 |
+| Claude Haiku 4.5 with context editing | yes | $0.67 | 60.7s | 35,186 |
+| OpenAI GPT-5.5 with Responses compaction | yes | $1.84 | 164.3s | 41,548 |
+| Gemini 3.1 Pro Preview with full context | yes | $2.57 | 201.0s | 434,629 |
 
 Claude was exact, and it was about 64% cheaper and 63% faster than the exact OpenAI run. It was about
 74% cheaper and 70% faster than the exact Gemini run.
@@ -46,9 +46,9 @@ OpenAI). Every cell stayed exact.
 
 | config | Claude (context editing) | OpenAI gpt-5.5 (compaction) | cost gap |
 |---|---|---|---|
-| keep=1 (the headline config) | 5/5 exact, $0.667/run | 5/5 exact, $1.900/run | Claude ~65% cheaper |
-| keep=3 | 5/5 exact, $1.727/run | 5/5 exact, $1.883/run | Claude ~8% cheaper |
-| keep=3, Sonnet 4.6 executor | 5/5 exact, $4.230/run | 5/5 exact, $1.933/run | strong-tier check, also exact |
+| keep=1 (the headline config) | 5/5 exact, $0.67/run | 5/5 exact, $1.90/run | Claude ~65% cheaper |
+| keep=3 | 5/5 exact, $1.73/run | 5/5 exact, $1.88/run | Claude ~8% cheaper |
+| keep=3, Sonnet 4.6 executor | 5/5 exact, $4.23/run | 5/5 exact, $1.93/run | strong-tier check, also exact |
 
 Both arms are reliably exact in all 5 runs of every config, so the correctness is not a fluke and the
 cost win is not one lucky run. The size of the cost gap depends on the context-editing `keep` setting:

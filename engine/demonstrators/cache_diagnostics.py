@@ -407,7 +407,7 @@ def write_receipt(receipt: dict) -> Path:
 
 
 def _fmt_usd(x: float) -> str:
-    return f"${x:.4f}" if x >= 0.0001 else f"${x:.6f}"
+    return f"${x:.2f}" if x >= 0.0001 else f"${x:.2f}"
 
 
 def write_sample(receipt: dict) -> Path:

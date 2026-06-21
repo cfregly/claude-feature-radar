@@ -20,7 +20,7 @@ blocks = [{"type": "search_result", "source": "your-retriever",
 content = blocks + [{"type": "text", "text": question}]  # add this line: ask over the chunks inline
 ```
 
-Measured over a small question set across my own chunks supplied inline: Claude cited 5/5 inline with a block-range pointer and 0 persisted objects, for $0.007.
+Measured over a small question set across my own chunks supplied inline: Claude cited 5/5 inline with a block-range pointer and 0 persisted objects, for $0.01.
 
 ## Claude vs OpenAI vs Gemini
 

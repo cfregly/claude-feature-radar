@@ -2,9 +2,9 @@ Subject: Congrats on YC! A sandbox pattern for log-triage agents
 
 Hey Sherwood,
 
-First of all, congrats on the batch! Very exciting!!
+Congrats on YC - very exciting!!
 
-My name is Chris Fregly, and I'm on the Applied AI team here at Anthropic. I focus on helping AI startups like Sazabi get past the bottlenecks that show up once agents move from demo to product.
+I'm Chris Fregly on the Applied AI team here at Anthropic. I focus on helping AI startups turn promising agent demos into production systems that stay fast and affordable.
 
 I saw Sazabi is building AI-native observability around logs, Slack, and agent-driven investigations. From one former founder to an active founder, builder to builder, I wanted to share a Claude pattern for log-triage agents that need to fan out over many log slices without dragging every row into the model context.
 
@@ -37,10 +37,9 @@ make programmatic_tool_calling
 
 To try it on your own workload, edit `programmatic_tool_calling/my_tool.py` with your log query tool and re-run the same command.
 
-If I guessed the wrong bottleneck, reply with the real one and I can point you to the closest Claude pattern.
+If Sazabi's biggest agent cost is not log fan-out, send me the bottleneck and I can point you to the closest Claude pattern.
 
 Happy building,
 
 --Chris Fregly
 Applied AI, Anthropic
-fellow Claude builder and former AI startup founder

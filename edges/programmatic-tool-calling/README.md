@@ -20,7 +20,7 @@ regions of 60 sales rows each (240 rows), find the highest-revenue region.
 | mode | billed input tokens | answer | round-trips | cost |
 |---|--:|:--:|:--:|--:|
 | Mode A: plain tool use (every row through context) | 9,451 | None (failed) | 2 | $0.06 |
-| **Mode B: programmatic (`allowed_callers`)** | **6,828** | **east (correct)** | 5 | $0.023 |
+| **Mode B: programmatic (`allowed_callers`)** | **6,828** | **east (correct)** | 5 | $0.02 |
 
 **The honest read.** Mode B billed about **28% fewer input tokens** because the 240 rows went to the
 sandbox, not the model context (Anthropic's own docs report about 24% on agentic-search benchmarks, so

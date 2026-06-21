@@ -11,11 +11,11 @@ Claude Citations does it in one request. Turn citations on per source and Claude
 ```python
 content = [text_doc, pdf_doc, search_result_chunk,
            {"type": "text", "text": question}]  # all cited in one call
-r = client.messages.create(model="claude-haiku-4-5", max_tokens=600,
+r = client.messages.create(model="claude-haiku-4-5-20251001", max_tokens=600,
                            messages=[{"role": "user", "content": content}])
 ```
 
-Using my API key, one request mixing all three sources answered every part and returned a correct typed pointer into each one (char, page, and chunk) in the same response. No vector store, no copy of your user's data, and the cited text rides along free of output tokens. Live cost $0.010.
+Using my API key, one request mixing all three sources answered every part and returned a correct typed pointer into each one (char, page, and chunk) in the same response. No vector store, no copy of your user's data, and the cited text rides along free of output tokens. Live cost about $0.01.
 
 I ran the same prompt head-to-head on 2026-06-19:
 
@@ -27,10 +27,11 @@ I ran the same prompt head-to-head on 2026-06-19:
 
 One request, three source types, and every source comes back with its own verifiable pointer.
 
-Reproduce it in about a minute for $0.010. One clone, one command:
+Reproduce it in about a minute for $0.01. One clone, one command:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
+export ANTHROPIC_API_KEY=your-api-key
 make grounding_stack
 ```
 

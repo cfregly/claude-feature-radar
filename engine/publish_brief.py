@@ -736,7 +736,7 @@ def est_usd(model_key: str) -> float:
 
 
 def fmt_usd(x: float) -> str:
-    return f"${{x:,.6f}}" if x < 0.01 else f"${{x:,.4f}}"
+    return f"${{x:,.2f}}"
 
 
 def run_token_compare(client, model_key: str) -> dict:
@@ -924,7 +924,7 @@ DOCS_DIR = Path(__file__).resolve().parent / "docs"
 
 # Citations is supported on every active model except Haiku 3. The brief runs on Haiku 4.5 (the cheap
 # tier) by default and offers Sonnet 4.6.
-CITATION_MODELS = {{"haiku": "claude-haiku-4-5", "sonnet": "claude-sonnet-4-6"}}
+CITATION_MODELS = {{"haiku": "claude-haiku-4-5-20251001", "sonnet": "claude-sonnet-4-6"}}
 
 QUESTIONS = [
     {qlist},
@@ -952,7 +952,7 @@ def _doc_blocks(corpus):
 
 
 def fmt_usd(x: float) -> str:
-    return f"${{x:,.6f}}" if x < 0.01 else f"${{x:,.4f}}"
+    return f"${{x:,.2f}}"
 
 
 def ask(client, model_id, corpus, question):
@@ -1039,7 +1039,7 @@ def cmd_check(model_key):
     from .common.client import get_client  # lazy
     corpus = load_corpus()
     print(f"\\n  --check: answering {{len(QUESTIONS)}} questions on {{get(model_key).label}} and asserting "
-          f"every returned char_location pointer resolves. About $0.012.\\n")
+          f"every returned char_location pointer resolves. About $0.01.\\n")
     client = get_client()
     result = run(client, model_key, corpus, QUESTIONS)
     print_table(result)
@@ -1163,7 +1163,7 @@ def write_and_reread(client, model_key: str) -> dict:
 
 
 def fmt_usd(x: float) -> str:
-    return f"${{x:,.6f}}" if x < 0.01 else f"${{x:,.4f}}"
+    return f"${{x:,.2f}}"
 
 
 def print_table(result: dict) -> None:
@@ -1449,7 +1449,7 @@ def append_comparison(model_key, claude_result, idle_minutes=0):
         print("  Measured idle survival (2026-06-19): Claude read the file back after a 31-minute idle.")
     ran = [a for a in (oai, gem) if "skipped" not in a]
     if ran:
-        print("  Competitor arms this run: $" + format(sum(a["cost"] for a in ran), ",.4f") +
+        print("  Competitor arms this run: $" + format(sum(a["cost"] for a in ran), ",.2f") +
               " across " + str(len(ran)) + " of 2 (OpenAI, Gemini).")
     print()
 '''

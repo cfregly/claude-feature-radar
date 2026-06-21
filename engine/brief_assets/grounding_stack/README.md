@@ -15,11 +15,11 @@ One request carrying all three sources and a three-part question comes back with
 ```python
 content=[text_doc, pdf_doc, search_result_chunk,
          {"type": "text", "text": question}]  # all cited in one call
-r = client.messages.create(model="claude-haiku-4-5", max_tokens=600,
+r = client.messages.create(model="claude-haiku-4-5-20251001", max_tokens=600,
                            messages=[{"role": "user", "content": content}])
 ```
 
-Measured 2026-06-19: 3 of 3 sources cited, no vector store, no data copied, live cost $0.010.
+Measured 2026-06-19: 3 of 3 sources cited, no vector store, no data copied, live cost about $0.01.
 
 ## Claude vs OpenAI vs Gemini
 
@@ -40,7 +40,7 @@ export ANTHROPIC_API_KEY=your-api-key   # https://console.anthropic.com/
 make grounding_stack
 ```
 
-Default Claude run: about a minute and $0.010 on my run. Full comparison run: also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
+Default Claude run: about a minute and $0.01 on my run. Full comparison run: also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
 
 ```bash
 make grounding_stack COMPARE=1

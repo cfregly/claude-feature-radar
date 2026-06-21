@@ -17,7 +17,7 @@ r = client.messages.create(
 )
 ```
 
-The measured result, using my API key: on 3 live web-research questions, every Claude citation (9/9) came back with the verbatim source quote attached. Live cost $0.115. Those citation fields (the quote, the title, the URL) cost no input or output tokens either.
+The measured result, using my API key: on 3 live web-research questions, every Claude citation (9/9) came back with the verbatim source quote attached. Live cost about $0.12. Those citation fields (the quote, the title, the URL) cost no input or output tokens either.
 
 How it compares, on the same 3 questions:
 
@@ -31,6 +31,7 @@ Run it yourself. About $0.12, under a minute:
 
 ```
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
+export ANTHROPIC_API_KEY=your-api-key
 make web_citations
 ```
 

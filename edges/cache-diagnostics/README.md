@@ -17,9 +17,9 @@ Claude cache-miss reason variants.
 
 | arm | root cause known | miss reason | missed tokens | cost | wall time |
 |---|:---:|---|---:|---:|---:|
-| Claude Haiku 4.5 cache diagnostics | yes | `system_changed` | 6,827 | $0.0694 | 12.7s |
-| OpenAI GPT-5.5 prompt caching | no | none exposed | 0 | $0.0515 | 2.7s |
-| Gemini 3.1 Pro cache counters | no | none exposed | 0 | $0.0242 | 3.5s |
+| Claude Haiku 4.5 cache diagnostics | yes | `system_changed` | 6,827 | $0.07 | 12.7s |
+| OpenAI GPT-5.5 prompt caching | no | none exposed | 0 | $0.05 | 2.7s |
+| Gemini 3.1 Pro cache counters | no | none exposed | 0 | $0.02 | 3.5s |
 
 Claude identified 4/4 documented cache-miss reason variants:
 

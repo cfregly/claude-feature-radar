@@ -18,22 +18,24 @@ doc = {
 
 Every answer comes back with a `page_location` pointer: the page number plus the quoted source text. The quote rides for free (it does not count toward your output tokens), so the page pointer adds nothing to the bill.
 
-Using my API key, over a five-page agreement PDF with five questions, Claude answered every question and returned a page pointer that resolved to the correct page every time. That run cost $0.046.
+Using my API key, over a five-page agreement PDF with five questions, Claude answered every question and returned a page pointer that resolved to the correct page every time. That run cost about $0.05.
 
-I ran the same five questions on the other two big models. Here is the head-to-head on the page pointer:
+I ran the same five questions on the other two big models, without creating a hosted vector store or
+file-search index first. Here is the direct-PDF head-to-head:
 
-| Model | Page pointer to the right page |
+| Model | Correct page pointer on the direct-PDF path |
 | --- | --- |
 | Claude | 5/5 |
 | OpenAI (gpt-5.4) | 0/5 |
 | Gemini (3.5-flash) | 0/5 |
 
-Only Claude hands back a page pointer on a PDF you supply directly, so your user gets a one-click jump to the source.
+On this direct-request path, Claude hands back the page pointer in the same response, so your user gets a one-click jump to the source without a pre-upload step.
 
 Reproduce it in about a minute for $0.05. One clone, one command:
 
 ```
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
+export ANTHROPIC_API_KEY=your-api-key
 make pdf_citations
 ```
 
@@ -41,7 +43,7 @@ Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude
 
 Docs: https://platform.claude.com/docs/en/build-with-claude/citations
 
-Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make pdf_citations COMPARE=1`. It runs Claude, OpenAI, and Gemini side by side on the same questions, so the page pointer comes back from Claude and not the others, using your own API keys for a few cents.
+Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make pdf_citations COMPARE=1`. It runs Claude, OpenAI, and Gemini side by side on the same directly-supplied PDF, with no hosted file-search store, using your own API keys for a few cents.
 
 To run it on your own data, open `pdf_citations/run.py` and swap the sample pages and questions for your document and the questions your users ask. Your PDF needs extractable text, since the page pointers come from the text Claude reads.
 

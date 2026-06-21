@@ -76,7 +76,7 @@ def main():
     print("  " + "-" * 83)
     for row in rows:
         s, ok = row["s"], "Y" if row["ans"] == gold else "N"
-        print(f"  {row['name']:<40}{s['cost']:>9.4f}{s['time']:>8.1f}{s['peak']:>8,}"
+        print(f"  {row['name']:<40}{s['cost']:>9.2f}{s['time']:>8.1f}{s['peak']:>8,}"
               f"{s['cache_read']:>9,}{str(row['ans']):>5}{ok:>4}")
 
     def find(kind, caching):
@@ -92,17 +92,17 @@ def main():
     if mon and moff:
         verb = "costs MORE" if mon["s"]["cost"] > moff["s"]["cost"] else "costs less"
         print(f"  - Caching and context editing fight. Managed {verb} with caching ON "
-              f"(${mon['s']['cost']:.4f}) than OFF (${moff['s']['cost']:.4f}), because clearing "
+              f"(${mon['s']['cost']:.2f}) than OFF (${moff['s']['cost']:.2f}), because clearing "
               f"rewrites the cached prefix. Managed cache reads: {mon['s']['cache_read']:,}.")
     if bon and boff:
-        print(f"  - On the untrimmed baseline, caching works: ${bon['s']['cost']:.4f} on vs "
-              f"${boff['s']['cost']:.4f} off ({_pct(bon['s']['cost'], boff['s']['cost']):.0f}% "
+        print(f"  - On the untrimmed baseline, caching works: ${bon['s']['cost']:.2f} on vs "
+              f"${boff['s']['cost']:.2f} off ({_pct(bon['s']['cost'], boff['s']['cost']):.0f}% "
               f"cheaper, cache reads {bon['s']['cache_read']:,}).")
     if oai:
-        print(f"  - OpenAI best: ${oai['s']['cost']:.4f}, {oai['s']['time']:.1f}s, "
+        print(f"  - OpenAI best: ${oai['s']['cost']:.2f}, {oai['s']['time']:.1f}s, "
               f"answer {oai['ans']} ({'correct' if oai['ans'] == gold else 'WRONG'}).")
     if cheapest:
-        print(f"  - Cheapest CORRECT variant: {cheapest['name']} at ${cheapest['s']['cost']:.4f}.")
+        print(f"  - Cheapest CORRECT variant: {cheapest['name']} at ${cheapest['s']['cost']:.2f}.")
     print()
 
     out = {"config": cfg, "gold": gold, "trim_threshold": trig,

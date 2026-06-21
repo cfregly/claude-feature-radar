@@ -6,9 +6,9 @@
 
   platform                              root cause known  miss reason       missed tok     cache signal     cost  wall time
   ---------------------------------------------------------------------------------------------------------------
-  claude claude-haiku-4-5-20251001           YES   system_changed          6,827              yes  $0.0694      12.7s
-  openai gpt-5.5                              NO                -              0              yes  $0.0515       2.7s
-  gemini gemini-3.1-pro-preview               NO                -              0              yes  $0.0242       3.5s
+  claude claude-haiku-4-5-20251001           YES   system_changed          6,827              yes  $0.07      12.7s
+  openai gpt-5.5                              NO                -              0              yes  $0.05       2.7s
+  gemini gemini-3.1-pro-preview               NO                -              0              yes  $0.02       3.5s
 
   Claude diagnostic variant coverage:
     system_changed     -> system_changed     matched=true missed=6,827

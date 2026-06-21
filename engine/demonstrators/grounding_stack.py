@@ -479,7 +479,7 @@ def _sample_text(receipt: dict) -> str:
             cited += " (inline)"
         rows.append(
             f"  {arm['name']:<22}{arm['answered']:>10}   {cited:<36}"
-            f"{arm['persisted_objects']:>6}{('$' + format(arm['cost'], '.4f')):>10}"
+            f"{arm['persisted_objects']:>6}{('$' + format(arm['cost'], '.2f')):>10}"
             f"{arm['latency_s']:>8.1f}s"
         )
     verdict = receipt["verdict"]
@@ -529,7 +529,7 @@ def write_edge_bundle(receipt: dict) -> pathlib.Path:
             ptr = " (" + " + ".join(k.replace("_location", "") for k in arm["pointer_kinds"]) + ")"
         rows.append(
             f"| {arm['name']} | {arm['answered']} | {arm['source_types_cited_in_one_request']}{ptr} | "
-            f"{arm['persisted_objects']} | ${arm['cost']:.4f} |"
+            f"{arm['persisted_objects']} | ${arm['cost']:.2f} |"
         )
     (edge_dir / "README.md").write_text(
         "# Edge: Grounding stack, three mixed sources cited in one request\n\n"

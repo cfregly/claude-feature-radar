@@ -12,9 +12,9 @@ Run: `make pdf-citations`, 2026-06-19, five questions over a five-page agreement
 
 | arm | answered | direct-PDF pointer | right page | cost | wall time |
 |---|:---:|:---:|:---:|---:|---:|
-| claude:haiku | 5/5 | 5/5 | 5/5 | $0.0458 | 6.2s |
-| openai:gpt-mid | 5/5 | 0/5 | 0/5 | $0.0064 | 15.9s |
-| gemini:gem-flash | 5/5 | 0/5 | 0/5 | $0.0322 | 14.1s |
+| claude:haiku | 5/5 | 5/5 | 5/5 | $0.05 | 6.2s |
+| openai:gpt-mid | 5/5 | 0/5 | 0/5 | $0.01 | 15.9s |
+| gemini:gem-flash | 5/5 | 0/5 | 0/5 | $0.03 | 14.1s |
 
 Claude answered every question and returned a correct-page citation for every answer. OpenAI and Gemini answered the same direct-PDF questions but returned no pointer into the supplied PDF on this direct-file path.
 

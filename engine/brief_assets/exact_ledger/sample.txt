@@ -14,11 +14,13 @@
            "trigger": {"type": "input_tokens", "value": 45000},
            "keep": {"type": "tool_uses", "value": 1}}]}}
 
-  Result, one full run, Claude Haiku 4.5:
+  Saved full-run receipt, Claude Haiku 4.5. The default `make exact_ledger`
+  check is shorter and costs about $0.17; this longer receipt is the source for
+  the full-run comparison table.
 
       exact list           yes  [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]
       peak carried context 35,186 tokens
-      cost                 $0.6700
+      cost                 $0.67
       wall time            60.7s
 
   Runnable code and the full brief: exact_ledger/README.md

@@ -2,9 +2,9 @@ Subject: Congrats on YC! Clean handoffs for many coding agents
 
 Hey Kiet,
 
-First of all, congrats on the batch! Very exciting!!
+Congrats on the YC batch - very exciting!!
 
-My name is Chris Fregly, and I'm on the Applied AI team here at Anthropic. I focus on helping AI startups like Superset get past the bottlenecks that show up once agents move from demo to product.
+I'm Chris Fregly on the Applied AI team here at Anthropic. I work with AI startups on the operational edges that appear once agents are running in parallel, not just in a demo.
 
 I saw Superset helps engineers run 100s of coding agents in parallel. From one former founder to an active founder, builder to builder, I wanted to share a Claude pattern for coding agents that should stop cleanly before starting tool work they cannot finish.
 
@@ -37,12 +37,11 @@ export ANTHROPIC_API_KEY=your-api-key
 make task_budgets
 ```
 
-To try it on your own agent, edit the prompt and tools in `task_budgets/run.py`, then re-run `make task_budgets`.
+To try it on your own agent, edit the prompt and tools in `task_budgets/run.py`, then re-run `make task_budgets`. I would still keep Superset's own hard billing and quota stops server-side. The task budget is the agent's loop-level countdown, not a replacement for your account limits.
 
-If I guessed the wrong bottleneck, reply with the real one and I can point you to the closest Claude pattern.
+If Superset is hitting a different many-agent failure mode, reply with the pattern and I can send the closest Claude example.
 
 Happy building,
 
 --Chris Fregly
 Applied AI, Anthropic
-fellow Claude builder and former AI startup founder

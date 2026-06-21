@@ -16,7 +16,7 @@ blocks = [{"type": "search_result", "source": "your-retriever",
 content = blocks + [{"type": "text", "text": question}]  # add this line: ask over the chunks inline
 ```
 
-I measured it over a small question set across my own chunks: Claude cited 5/5 inline with a block-range pointer (which chunk, which block) and 0 persisted objects. Live cost was $0.007.
+I measured it over a small question set across my own chunks: Claude cited 5/5 inline with a block-range pointer (which chunk, which block) and 0 persisted objects. Live cost was $0.01.
 
 Here is the same run head-to-head, citing your own inline RAG chunks (RAG = your retriever feeds Claude the passages):
 
@@ -30,6 +30,7 @@ Cost to reproduce the Claude side is about $0.01 and it runs in about a minute. 
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
+export ANTHROPIC_API_KEY=your-api-key
 make search_results
 ```
 

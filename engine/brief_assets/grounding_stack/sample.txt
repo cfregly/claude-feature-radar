@@ -3,13 +3,13 @@
   Workload: a doc-QA agent answers over three mixed sources at once, each holding one
   fact, with a three-part question. The win is a typed pointer back into each source.
 
-  model: claude-haiku-4-5   (one request, citations enabled on every source)
+  model: claude-haiku-4-5-20251001   (one request, citations enabled on every source)
   --------------------------------------------------------------------------
   parts answered correctly             3/3
   source types cited in 1 request      3/3
   pointer kinds                        char + page + search_result
   hosted vector-store objects          0
-  cost                                 $0.0101
+  cost                                 $0.01
 
   The change: add  "citations": {"enabled": true}  to each source block, send one request.
 

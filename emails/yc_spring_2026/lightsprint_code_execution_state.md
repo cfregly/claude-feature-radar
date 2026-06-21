@@ -2,9 +2,9 @@ Subject: Congrats on YC! Persistent state for AI build agents
 
 Hey Ben,
 
-First of all, congrats on the batch! Very exciting!!
+Congrats on the batch, and on getting Lightsprint in front of YC. Very exciting!!
 
-My name is Chris Fregly, and I'm on the Applied AI team here at Anthropic. I focus on helping AI startups like Lightsprint get past the bottlenecks that show up once agents move from demo to product.
+I'm Chris Fregly on the Applied AI team here at Anthropic. I focus on the agent-product details that start mattering once teams expect agents to keep real work moving across sessions.
 
 I saw Lightsprint is building collaborative product development with cloud agents so teams can plan, preview, and ship with agents. From one former founder to an active founder, builder to builder, I wanted to share a Claude pattern for build agents that need generated files, test output, and scratch state to survive when a user steps away.
 
@@ -48,10 +48,9 @@ make code_execution_state
 
 To try it on your own builder, edit `code_execution_state/run.py` with two real build-agent steps and re-run the same command.
 
-If I guessed the wrong bottleneck, reply with the real one and I can point you to the closest Claude pattern.
+If the state boundary in Lightsprint is somewhere else, reply with the rough workflow and I can point you to the more relevant Claude pattern.
 
 Happy building,
 
 --Chris Fregly
 Applied AI, Anthropic
-fellow Claude builder and former AI startup founder

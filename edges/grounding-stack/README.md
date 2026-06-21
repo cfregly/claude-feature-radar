@@ -12,9 +12,9 @@ Run: `make grounding-stack`, 2026-06-19, one request per arm carrying the same t
 
 | arm | answered | source types cited in one request | hosted objects | cost |
 |---|:---:|:---:|:---:|---:|
-| claude:haiku | 3/3 | 3/3 (char + page + search_result) | 0 | $0.0101 |
-| openai:gpt-mid | 3/3 | 0/3 | 0 | $0.0028 |
-| gemini:gem-flash | 3/3 | 0/3 | 0 | $0.0087 |
+| claude:haiku | 3/3 | 3/3 (char + page + search_result) | 0 | $0.01 |
+| openai:gpt-mid | 3/3 | 0/3 | 0 | $0.01 |
+| gemini:gem-flash | 3/3 | 0/3 | 0 | $0.01 |
 
 All three answered every part correctly. Only Claude returned a pointer into the supplied content, and it returned all three location types in one response. On the one-request inline path, OpenAI and Gemini returned no pointer into the inline sources.
 

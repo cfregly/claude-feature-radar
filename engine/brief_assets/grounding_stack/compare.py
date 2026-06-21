@@ -131,6 +131,6 @@ def append_comparison(model_key: str, claude_result: dict) -> None:
     ran = [a for a in (oai, gem) if "skipped" not in a]
     if ran:
         extra = sum(a["cost"] for a in ran)
-        print("  Competitor arms this run: $" + format(extra, ",.4f") + " across "
+        print("  Competitor arms this run: $" + format(extra, ",.2f") + " across "
               + str(len(ran)) + " of 2 (OpenAI, Gemini).")
     print()

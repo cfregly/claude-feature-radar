@@ -37,6 +37,7 @@ I ran it using my own API key for about $0.08, takes around two minutes. To see 
 
 ```
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
+export ANTHROPIC_API_KEY=your-api-key
 make programmatic_tool_calling
 ```
 

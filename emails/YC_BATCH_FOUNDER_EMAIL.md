@@ -57,4 +57,3 @@ Happy building,
 
 --Chris Fregly
 Applied AI, Anthropic
-fellow Claude builder and former AI startup founder

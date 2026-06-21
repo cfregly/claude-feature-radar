@@ -74,7 +74,7 @@ def claude_checks(client) -> bool:
     msg = client.messages.create(model=get("haiku").id, max_tokens=16, messages=ping)
     dollars = cost_usd("haiku", msg.usage)
     passed &= check("cost computes from real usage", dollars > 0,
-                    f"{msg.usage.input_tokens} in + {msg.usage.output_tokens} out = ${dollars:.6f} on Haiku 4.5")
+                    f"{msg.usage.input_tokens} in + {msg.usage.output_tokens} out = ${dollars:.2f} on Haiku 4.5")
     return passed
 
 

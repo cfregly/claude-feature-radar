@@ -2,9 +2,9 @@ Subject: Congrats on YC! A sandbox pattern for work-app agents
 
 Hey Jonny,
 
-First of all, congrats on the batch! Very exciting!!
+Congrats on getting Tasklet into YC - very exciting!!
 
-My name is Chris Fregly, and I'm on the Applied AI team here at Anthropic. I focus on helping AI startups like Tasklet get past the bottlenecks that show up once agents move from demo to product.
+I'm Chris Fregly on the Applied AI team here at Anthropic. I spend my time with AI startups on the mechanics that make agents cheaper, more reliable, and easier to ship.
 
 I saw Tasklet is building agents that call work-app APIs to get tasks done. From one former founder to an active founder, builder to builder, I wanted to share a Claude pattern for app-API agents that need to make many calls, inspect bulky intermediate results, and return one action.
 
@@ -33,10 +33,9 @@ make programmatic_tool_calling
 
 To try it on Tasklet's shape, edit `programmatic_tool_calling/my_tool.py` with one of your work-app tools and the inputs it fans out over.
 
-If I guessed the wrong bottleneck, reply with the real one and I can point you to the closest Claude pattern.
+If Tasklet's heavier bottleneck is a different app-agent loop, reply with that flow and I can point you to the closest Claude pattern.
 
 Happy building,
 
 --Chris Fregly
 Applied AI, Anthropic
-fellow Claude builder and former AI startup founder

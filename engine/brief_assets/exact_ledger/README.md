@@ -10,11 +10,14 @@ Your agent reads a long stream one record at a time (usage logs, churn flags, su
 
 ## What you get
 
-The carried context stays flat near one record instead of growing with every step, and the list comes back exact. On a long report chain the agent returned the exact 10/10 list and held peak carried context to about 35k tokens. The full run cost $0.67 and finished in 60.7s.
+The carried context stays flat near one record instead of growing with every step, and the list comes
+back exact. The default command uses the trigger shown below and costs about $0.17. The saved full-run
+receipt uses the same mechanism on a longer chain with a 45,000-token trigger; that run returned the
+exact 10/10 list, held peak carried context to about 35k tokens, cost $0.67, and finished in 60.7s.
 
 ```python
 resp = client.messages.create(
-    model="claude-haiku-4-5",
+    model="claude-haiku-4-5-20251001",
     max_tokens=1024,
     messages=messages,
     tools=[read_tool],
@@ -34,7 +37,10 @@ Measured head-to-head (2026-06-19). All three returned the exact list, so this i
 | OpenAI, compaction | $1.84 | Claude 64% cheaper, 63% faster |
 | Gemini, full window | $2.57 | Claude 74% cheaper |
 
-These are the full-run figures on the longer chain. `make exact_ledger` runs a shorter self-test, and `make exact_ledger COMPARE=1` reproduces this head-to-head at that shorter scale: the absolute cost comes out lower, Claude still keeps the exact list for the lowest bill, and Claude's lead widens as the stream grows.
+These are the saved full-run figures on the longer chain. `make exact_ledger` runs the shorter
+default check, currently about $0.17. `make exact_ledger COMPARE=1` reproduces the head-to-head at
+that shorter scale: the absolute cost comes out lower, Claude still keeps the exact list for the
+lowest bill, and Claude's lead widens as the stream grows.
 
 ## Run it
 

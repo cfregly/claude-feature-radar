@@ -3,7 +3,7 @@
 
   platform        answered   correct cite   pointer kind   hosted objects     cost   wall
   --------------------------------------------------------------------------------------------
-  claude:haiku         5/5            5/5     block-span                0   $0.0067   4.5s
+  claude:haiku         5/5            5/5     block-span                0   $0.01   4.5s
 
   The change: wrap each retrieved passage in a search_result block with citations enabled, then
   ask over the blocks inline.

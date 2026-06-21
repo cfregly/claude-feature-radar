@@ -184,7 +184,7 @@ def append_comparison(model_key: str, claude_result: dict) -> None:
 
     claude_cost = claude_result.get("cost", 0.0)
     claude_exact = claude_result.get("exact", False)
-    rows = [("Claude (context editing)", "$" + format(claude_cost, ".4f"),
+    rows = [("Claude (context editing)", "$" + format(claude_cost, ".2f"),
              "exact" if claude_exact else "see run output")]
     for arm in (oai, gem):
         if "skipped" in arm:
@@ -195,7 +195,7 @@ def append_comparison(model_key: str, claude_result: dict) -> None:
         if exact and claude_exact and arm["cost"] > claude_cost > 0:
             pct = round((1 - claude_cost / arm["cost"]) * 100)
             versus = "Claude " + str(pct) + "% cheaper"
-        rows.append((arm["label"], "$" + format(arm["cost"], ".4f"), "exact" if exact else "list not exact"))
+        rows.append((arm["label"], "$" + format(arm["cost"], ".2f"), "exact" if exact else "list not exact"))
         if versus:
             rows.append(("", "", versus))
 

@@ -504,7 +504,7 @@ def run_grid(models=None, *, limit=None, efforts=DEFAULT_EFFORTS, judge=False, p
                 tacc = f"{cell.test_accuracy * 100:.0f}%"
                 agree = "" if cell.judge_agreement is None else f"  judge-agree {cell.judge_agreement * 100:.0f}%"
                 print(f"    {get(model_key).label:<22} @ {cell.label:<7} "
-                      f"overall {acc:>5}  held-out {tacc:>5}  ${cell.total_cost:.4f}{agree}", flush=True)
+                      f"overall {acc:>5}  held-out {tacc:>5}  ${cell.total_cost:.2f}{agree}", flush=True)
     return GridRun(cells=cells, n_problems=len(problems), n_dev=n_dev, n_test=n_test,
                    total_cost=total, efforts=tuple(efforts), judge=judge, skipped=skipped)
 

@@ -41,7 +41,7 @@ def get_client() -> Anthropic:
 
 
 def fmt_usd(x: float) -> str:
-    return f"${x:,.6f}" if x < 0.01 else f"${x:,.4f}"
+    return f"${x:,.2f}"
 
 
 def managed_client() -> Anthropic:

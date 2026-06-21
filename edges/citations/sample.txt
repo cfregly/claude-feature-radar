@@ -1,22 +1,20 @@
 
   Verifiable source citations: 3 of your own documents, 8 questions.
-  Claude Citations is GA, no beta header. Among the three platforms only Claude ships a per-character
-  document pointer (Gemini File Search is page-level, OpenAI file_search is file-level). The grader
-  verifies the API's own offsets against the source (source[start:end] == cited_text).
+  Claude Citations is GA, no beta header. This run measures Claude's structured source pointers
+  on plain-text documents: the grader verifies the API's own offsets against the source
+  (source[start:end] == cited_text).
 
   what a founder building over their own documents gets
   arm                                  resolves   resolver  quote free  out_tok     cost$
   ----------------------------------------------------------------------------------------
-  Claude Haiku 4.5 + Citations              8/8    the API         yes      308  0.01112
+  Claude Haiku 4.5 + Citations              8/8    the API         yes      305  $0.01
 
   Honest reading:
   - Claude Haiku 4.5 + Citations: 8/8 pointers resolve, the API does the resolving and guarantees it,
     and the quote is free of output tokens. Zero resolver code.
-  - The value is the in-API guarantee, the free quote, and char granularity, a within-Claude value-add.
-    Among the three platforms only Claude returns a per-character document pointer (Gemini File Search
-    is page-level, OpenAI file_search is file-level).
-  - The cross-vendor head-to-head, where OpenAI and Gemini cannot cite a directly supplied document
-    without a hosted vector store, is measured in the sibling citations edges (citations-paraphrase,
-    pdf-citations, search-results, grounding-stack).
+  - The value is the in-API guarantee, the free quote, and char granularity on plain-text documents,
+    a within-Claude value-add.
+  - The cross-vendor head-to-heads live in the sibling citations edges, where each task shape states
+    whether it uses direct request inputs, hosted search, PDFs, returned RAG chunks, or mixed grounding.
 
-  wrote receipts to data/last_citations.json
+  (per-turn detail cached in gitignored data/last_citations.json; this printout is the receipt)

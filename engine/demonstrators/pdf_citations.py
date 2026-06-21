@@ -582,7 +582,7 @@ def _sample_text(receipt: dict) -> str:
     for arm in receipt["arms"]:
         rows.append(
             f"  {arm['name']:<30}{arm['answered']:>8}{arm['cited']:>21}"
-            f"{arm['page_correct']:>13}{('$' + format(arm['cost'], '.4f')):>9}{arm['latency_s']:>9.1f}s"
+            f"{arm['page_correct']:>13}{('$' + format(arm['cost'], '.2f')):>9}{arm['latency_s']:>9.1f}s"
         )
     verdict = receipt["verdict"]
     rows.extend([
@@ -627,7 +627,7 @@ def write_edge_bundle(run: PdfRun, receipt: dict) -> pathlib.Path:
     for arm in receipt["arms"]:
         rows.append(
             f"| {arm['name']} | {arm['answered']} | {arm['cited']} | {arm['page_correct']} | "
-            f"${arm['cost']:.4f} | {arm['latency_s']:.1f}s |"
+            f"${arm['cost']:.2f} | {arm['latency_s']:.1f}s |"
         )
     (edge_dir / "README.md").write_text(
         "# Edge: PDF citations, page pointers for directly supplied PDFs\n\n"

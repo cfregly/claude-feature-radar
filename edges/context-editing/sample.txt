@@ -21,7 +21,7 @@
     Editing OFF : CRASHED at step 8. Input 203,056 tokens exceeded the
                   200,000 window, the API rejected the request, the run cannot finish.
     Editing ON  : finished all 8 reports, answer 3 (correct), context held flat
-                  at ~34k tokens. $0.3513, 19s.
+                  at ~34k tokens. $0.35, 19s.
 
     The value, measured and isolated: context editing is what lets the long run FINISH.
     Identical setup, one flag. Without it the API errors at the window; with it the agent
@@ -56,9 +56,9 @@
 
   HONEST COST: context editing is not a cheaper bill. Clearing rewrites the cached prefix,
   so on a job short enough to finish either way the editing-ON run can cost MORE. Its value
-  is that a heavy job finishes at all. The editing-ON run here cost $0.3513.
+  is that a heavy job finishes at all. The editing-ON run here cost $0.35.
 
-  Reproduce: `make longhorizon` on Claude Haiku 4.5, your own API key. This run cost $0.6417 total
+  Reproduce: `make longhorizon` on Claude Haiku 4.5, your own API key. This run cost $0.64 total
   and took 36s wall.
 
   RELIABILITY (3 runs of the same setup, only context editing toggled)

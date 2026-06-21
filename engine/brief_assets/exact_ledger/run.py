@@ -249,7 +249,7 @@ def cmd_run(a) -> int:
     print(f"  {'Claude answer':<22}{str(answer):>16}")
     print(f"  {'exact list':<22}{('yes' if answer == gold else 'no'):>16}")
     print(f"  {'peak carried context':<22}{peak:>16,}")
-    print(f"  {'cost (USD)':<22}{('$' + format(cost, '.4f')):>16}")
+    print(f"  {'cost (USD)':<22}{('$' + format(cost, '.2f')):>16}")
     print(f"  {'wall time (s)':<22}{elapsed:>16.1f}\n")
     _maybe_compare(cost, answer, gold, COMPARE_DEFAULT if a.compare is None else a.compare)
     return 0 if answer == gold else 1
@@ -265,7 +265,7 @@ def cmd_check(a) -> int:
     print(f"  gold URGENT ids: {gold}")
     print(f"  Claude answer:   {answer}")
     print(f"  exact: {answer == gold}   peak ctx: {peak:,} (flat bound {FLAT_CTX_BOUND:,})")
-    print(f"  cost: ${cost:.6f}   wall: {elapsed:.1f}s\n")
+    print(f"  cost: ${cost:.2f}   wall: {elapsed:.1f}s\n")
     assert answer == gold, f"NOT exact: {answer} != {gold}"
     assert peak < FLAT_CTX_BOUND, f"context not held flat: peak {peak} >= {FLAT_CTX_BOUND}"
     print("  CHECK PASSED: exact list preserved while context editing held the context flat\n")

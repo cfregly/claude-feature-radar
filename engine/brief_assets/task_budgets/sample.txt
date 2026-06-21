@@ -6,13 +6,14 @@
 
   arm                       hidden low-budget stop   first tool calls   wall time
   -------------------------------------------------------------------------------
-  low budget (remaining 50)            yes                  0              1.6s
-  control   (remaining 5000)           n/a                  1              3.0s
+  low budget (remaining 50)            yes                  0              2.1s
+  control   (remaining 5000)           n/a                  1              1.6s
 
   Claude saw the low remaining budget and handed off before the first tool call.
   With budget to spare, the same agent started the loop.
 
   The agent stops at the right moment on its own, so a long job ends with a clean
   handoff instead of a tool call it cannot pay for.
+  cost $0.01 on Claude Opus 4.8 for the two-call check.
 
   Runnable code and the full brief: task_budgets/README.md

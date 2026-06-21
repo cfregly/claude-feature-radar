@@ -2,9 +2,9 @@ Subject: Congrats on YC! Persistent sandbox state for test agents
 
 Hey Phillip,
 
-First of all, congrats on the batch! Very exciting!!
+Congrats on the YC batch - very exciting!!
 
-My name is Chris Fregly, and I'm on the Applied AI team here at Anthropic. I focus on helping AI startups like Arga Labs get past the bottlenecks that show up once agents move from demo to product.
+I'm Chris Fregly on the Applied AI team here at Anthropic, where I work with AI startups moving agents from demo to product.
 
 I saw you're building real-world sandboxes to test agents and agent-facing software. From one former founder to an active founder, builder to builder, I wanted to share a Claude pattern for test agents that need generated files, fixtures, logs, or intermediate state to survive across separate API calls.
 
@@ -48,10 +48,9 @@ make code_execution_state
 
 To try it on your own workflow, edit `code_execution_state/run.py` with two real test-agent steps and re-run the same command.
 
-If I guessed the wrong bottleneck, reply with the real one and I can point you to the closest Claude pattern.
+If the harder Arga bottleneck is a different part of the eval loop, reply with that shape and I can point you to a closer Claude pattern.
 
 Happy building,
 
 --Chris Fregly
 Applied AI, Anthropic
-fellow Claude builder and former AI startup founder

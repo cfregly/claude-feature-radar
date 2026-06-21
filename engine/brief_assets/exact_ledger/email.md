@@ -10,7 +10,7 @@ Claude context editing fixes that. It clears the old tool results in place once 
 
 ```python
 resp = client.messages.create(
-    model="claude-haiku-4-5",
+    model="claude-haiku-4-5-20251001",
     max_tokens=1024,
     messages=messages,
     tools=[read_tool],
@@ -34,6 +34,7 @@ To try it, one clone and one command, about $0.17 and a minute on Claude Haiku 4
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
+export ANTHROPIC_API_KEY=your-api-key
 make exact_ledger
 ```
 

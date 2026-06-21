@@ -5,9 +5,9 @@
 
   arm                             pointer       resolves  src ok   hosted objs      cost
   ------------------------------------------------------------------------------------------
-  claude citations:sonnet         char-span          6/6     6/6            0   $0.0237
-  openai file_search:gpt-top      file-level         6/6     6/6            4   $0.0729
-  gemini File Search:gem-pro      chunk-level        6/6     6/6            4   $0.0220
+  claude citations:sonnet         char-span          6/6     6/6            0   $0.02
+  openai file_search:gpt-top      file-level         6/6     6/6            4   $0.07
+  gemini File Search:gem-pro      chunk-level        6/6     6/6            4   $0.02
 
   Verdict:
     positive_signal: true

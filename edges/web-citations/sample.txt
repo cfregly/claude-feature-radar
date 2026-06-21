@@ -3,9 +3,9 @@
 
   platform              answered   web citations   with source quote     cost
   -----------------------------------------------------------------------------
-  claude:sonnet              3/3               9                   9   $0.1152
-  openai:gpt-top             3/3               3                   0   $0.1581
-  gemini:gem-pro             3/3               6                   0   $0.0302
+  claude:sonnet              3/3               9                   9   $0.12
+  openai:gpt-top             3/3               3                   0   $0.16
+  gemini:gem-pro             3/3               6                   0   $0.03
 
   Verdict:
     positive_signal: true

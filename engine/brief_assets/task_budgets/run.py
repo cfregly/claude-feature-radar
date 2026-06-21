@@ -132,7 +132,7 @@ def cmd_run() -> int:
     _print_table(low, control)
     spent = low["cost"] + control["cost"]
     print(f"  Claude held the tool call at low budget and started the loop with budget to spare.")
-    print(f"  Total budget {total:,} tokens. Spent ${spent:.6f} on these two calls.\n")
+    print(f"  Total budget {total:,} tokens. Spent ${spent:.2f} on these two calls.\n")
     return 0
 
 
@@ -152,7 +152,7 @@ def cmd_check() -> int:
         f"FAIL: the control did not start the tool loop (tool_calls={control['tool_calls']})"
     )
     print(f"  PASS: low budget handed off before the first tool call, the control started the loop.")
-    print(f"  Spent ${spent:.6f}.\n")
+    print(f"  Spent ${spent:.2f}.\n")
     return 0
 
 

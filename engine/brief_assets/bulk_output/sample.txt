@@ -11,6 +11,9 @@
     betas=["output-300k-2026-03-24"]   # raises the single-request max_tokens cap to 300,000
     max_tokens=300000
 
+  Saved full-run receipt. The default `make bulk_output` check is smaller and costs about $0.20;
+  this longer receipt is the source for the 230,607-token headline.
+
   Claude emitted 230,607 output tokens in one request and finished clean, about 1.8x a 128k
   single-request ceiling. One un-truncated turn, no chunk-and-stitch loop to maintain.
   Batch-only, the 50% batch discount applies, and the batch can take many minutes.

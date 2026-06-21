@@ -19,21 +19,20 @@ returned pointer, not a do-it-yourself string search.
 
 | approach | resolves | who resolves it | quote free of output tokens | output tokens | cost |
 |---|:--:|:--:|:--:|--:|--:|
-| **Claude Haiku 4.5 + Citations** | **8/8** (guaranteed) | the API | yes | 308 | $0.011 |
+| **Claude Haiku 4.5 + Citations** | **8/8** (guaranteed) | the API | yes | 305 | $0.01 |
 
 **The honest read.** The value is the in-API guarantee, the verbatim quote free of output tokens, and
 char granularity, with zero resolver code to own. It is a within-Claude value-add, measured on a single
 arm. Citations is not the cheapest arm in raw dollars, so we never claim "cheaper." Full receipt in
 [`sample.txt`](sample.txt).
 
-## The precise edge, and the cross-vendor head-to-head
+## The precise edge, and where comparisons live
 
-Among the three platforms only Claude returns a per-character pointer into a user-supplied document with
-a guaranteed-valid, output-token-free quote. The granularity comparison is verified against the live
-docs on 2026-06-19: Gemini File Search returns a page-level pointer and OpenAI `file_search` a
-file-level one, both only through a hosted vector store. Where that becomes a head-to-head capability
-gap, OpenAI and Gemini cannot cite a directly supplied document at all without first uploading it to a
-hosted store, is measured in the sibling edges:
+This single-arm edge proves Claude's own API guarantee for plain-text user documents: a structured
+character-range pointer, a guaranteed-valid quoted span, and zero resolver code. It does not claim that
+competitors lack hosted-search or custom-resolver paths. Where the task becomes a head-to-head
+capability comparison, the sibling edges state the exact condition being tested: direct request inputs,
+hosted stores, PDFs, returned RAG chunks, or mixed grounding:
 [citations-paraphrase](../citations-paraphrase/README.md),
 [pdf-citations](../pdf-citations/README.md), [search-results](../search-results/README.md), and
 [grounding-stack](../grounding-stack/README.md). Sources:
@@ -48,7 +47,7 @@ Citations cannot be combined with Structured Outputs on the same document (the A
 git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make setup                        # core deps, the one dependency
 cp .env.example .env              # paste your ANTHROPIC_API_KEY
-make citations                    # this edge, using your own API key, $0.01
+make citations                    # this edge, using your own API key, about $0.01
 # or directly: python edges/citations/demo.py
 ```
 

@@ -12,9 +12,9 @@ Run: `make citations-paraphrase`, 2026-06-19, 6 questions over 3 user documents.
 
 | arm | citation tool | pointer granularity | resolves | cites right doc | hosted objects (copies of the user's data) | cost |
 |---|---|:---:|:---:|:---:|:---:|---:|
-| claude citations:sonnet | Claude Citations (inline) | char-span | 6/6 | 6/6 | 0 | $0.0237 |
-| openai file_search:gpt-top | OpenAI file_search | file-level | 6/6 | 6/6 | 4 | $0.0729 |
-| gemini File Search:gem-pro | Gemini File Search | chunk-level | 6/6 | 6/6 | 4 | $0.0220 |
+| claude citations:sonnet | Claude Citations (inline) | char-span | 6/6 | 6/6 | 0 | $0.02 |
+| openai file_search:gpt-top | OpenAI file_search | file-level | 6/6 | 6/6 | 4 | $0.07 |
+| gemini File Search:gem-pro | Gemini File Search | chunk-level | 6/6 | 6/6 | 4 | $0.02 |
 
 Claude returns a structured, API-guaranteed-to-resolve **char-span** pointer into the user's directly-supplied documents with **zero hosted objects**, so the data never leaves the request. OpenAI `file_search` and Gemini `File Search` **cannot cite a directly-supplied document**: they require uploading it to a hosted vector store first (4/4 hosted objects, 8 in total, a third-party copy of the user's data), and even then the citation is file-level (OpenAI) or chunk-level (Gemini), never a guaranteed char span into the source. Verified against the vendors' live docs on 2026-06-19. Because this is an API-surface gap, it holds at the competitors' frontier tier, it is not a model contest.
 

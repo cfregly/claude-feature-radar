@@ -21,7 +21,7 @@ r = client.messages.create(
 )
 ```
 
-Measured: on 3 live web-research questions, every Claude citation (9 of 9) came back with the verbatim source quote attached. Live cost $0.115.
+Measured: on 3 live web-research questions, every Claude citation (9 of 9) came back with the verbatim source quote attached. Live cost about $0.12.
 
 ## Claude vs OpenAI vs Gemini
 
@@ -42,7 +42,7 @@ export ANTHROPIC_API_KEY=your-api-key   # https://console.anthropic.com/
 make web_citations                    # build the venv, install anthropic, answer web questions with a source quote each
 ```
 
-Default Claude run: about a minute and $0.115 on my run. `make web_citations` is self-bootstrapping: it creates `.venv`, installs `anthropic`, and runs the self-test that asserts every web citation carries a verbatim source quote.
+Default Claude run: about a minute and $0.12 on my run. `make web_citations` is self-bootstrapping: it creates `.venv`, installs `anthropic`, and runs the self-test that asserts every web citation carries a verbatim source quote.
 
 Full comparison run: export all three API keys and run:
 

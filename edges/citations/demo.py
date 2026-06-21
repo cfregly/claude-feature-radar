@@ -7,12 +7,10 @@ count towards output tokens." Source, re-fetched 2026-06-17:
 https://platform.claude.com/docs/en/build-with-claude/citations
 
 This edge demonstrates the feature value a founder gets: a guaranteed per-character source pointer into
-the user's own document, the verbatim quote extracted for you and free of output tokens, with zero
-resolver code to own. Among the three platforms only Claude returns a per-character document pointer
-(Gemini File Search is page-level, OpenAI file_search is file-level), so on granularity Claude is the
-finest. The head-to-head CROSS-VENDOR comparison, where OpenAI and Gemini cannot cite a directly
-supplied document at all without a hosted vector store, is measured in the sibling edges
-(citations-paraphrase, pdf-citations, search-results, grounding-stack).
+the user's own plain-text document, the verbatim quote extracted for you and free of output tokens, with
+zero resolver code to own. It is a single-arm Claude Citations receipt. The cross-vendor comparisons
+live in the sibling edges where the task shape is explicitly direct request, hosted store, PDF, returned
+RAG chunks, or mixed grounding.
 
 Every number is read off the real `usage` object. There is no string matching here: the grader checks
 the API's own char offsets against the source (source[start:end] == cited_text, the documented
@@ -210,10 +208,9 @@ class CitationsDemonstrator(BaseDemonstrator):
                 "task_shape": f"{len(self._questions(spec))} questions over {len(CORPUS)} plain-text user documents",
                 "model": claude.model, "features_on": ["citations.enabled"],
                 "assumptions": "the value is the in-API guarantee, the verbatim quote free of output tokens, "
-                               "and char granularity, with zero resolver code; among the three platforms only "
-                               "Claude returns a per-character document pointer (Gemini File Search is "
-                               "page-level, OpenAI file_search is file-level); Citations is incompatible with "
-                               "Structured Outputs (400)",
+                               "and char granularity on plain-text documents, with zero resolver code; this "
+                               "single-arm receipt does not claim competitors lack hosted-search or custom "
+                               "resolver paths; Citations is incompatible with Structured Outputs (400)",
             },
             grounding=[{"claim": "citations are guaranteed to contain valid pointers; cited_text does not count toward output tokens",
                         "source_url": "https://platform.claude.com/docs/en/build-with-claude/citations",
@@ -240,9 +237,9 @@ def main():
     label = get(a.claude_model).label
 
     print(f"\n  Verifiable source citations: {len(CORPUS)} of your own documents, {n} questions.")
-    print("  Claude Citations needs no beta header. Among the three platforms only Claude ships a per-character")
-    print("  document pointer (Gemini File Search is page-level, OpenAI file_search is file-level). The grader")
-    print("  verifies the API's own offsets against the source (source[start:end] == cited_text).\n")
+    print("  Claude Citations needs no beta header. This run measures Claude's structured source pointers")
+    print("  on plain-text documents: the grader verifies the API's own offsets against the source")
+    print("  (source[start:end] == cited_text).\n")
 
     cit = run_claude_citations(client, a.claude_model, CORPUS, questions)
     s = _roll(f"{label} + Citations", cit, n)
@@ -256,11 +253,11 @@ def main():
     print("\n  Honest reading:")
     print(f"  - {s['arm']}: {s['resolved']}/{n} pointers resolve, the API does the resolving and guarantees")
     print("    it, and the quote is free of output tokens. Zero resolver code.")
-    print("  - The value is the in-API guarantee, the free quote, and char granularity, a within-Claude")
-    print("    value-add. Among the three platforms only Claude returns a per-character document pointer")
-    print("    (Gemini File Search is page-level, OpenAI file_search is file-level).")
-    print("  - The cross-vendor head-to-head, where OpenAI and Gemini cannot cite a directly supplied")
-    print("    document without a hosted vector store, is in the sibling citations edges.\n")
+    print("  - The value is the in-API guarantee, the free quote, and char granularity on plain-text")
+    print("    documents, a within-Claude value-add.")
+    print("  - The cross-vendor head-to-heads live in the sibling citations edges, where each task")
+    print("    shape states whether it uses direct request inputs, hosted search, PDFs, returned RAG")
+    print("    chunks, or mixed grounding.\n")
 
     out = {"corpus_titles": [d["title"] for d in CORPUS], "questions": questions, "summaries": [s]}
     (repo_root() / "data").mkdir(exist_ok=True)

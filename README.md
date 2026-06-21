@@ -79,7 +79,7 @@ verbatim quote free of output tokens and no resolver code to maintain. The per-e
 is [`edges/citations/sample.txt`](edges/citations/sample.txt).
 
 ```bash
-make citations    # about $0.06, needs ANTHROPIC_API_KEY
+make citations    # about $0.01, needs ANTHROPIC_API_KEY
 ```
 
 Feature references, fetched 2026-06-18:
@@ -98,9 +98,9 @@ source page:
 
 | arm | answered | direct-PDF pointer | right page | cost | wall time |
 |---|:---:|:---:|:---:|---:|---:|
-| Claude Haiku 4.5 + PDF Citations | 5/5 | 5/5 | 5/5 | $0.0458 | 6.2s |
-| OpenAI GPT-5.4 direct `input_file` | 5/5 | 0/5 | 0/5 | $0.0064 | 15.9s |
-| Gemini 3.5 Flash inline PDF | 5/5 | 0/5 | 0/5 | $0.0322 | 14.1s |
+| Claude Haiku 4.5 + PDF Citations | 5/5 | 5/5 | 5/5 | $0.05 | 6.2s |
+| OpenAI GPT-5.4 direct `input_file` | 5/5 | 0/5 | 0/5 | $0.01 | 15.9s |
+| Gemini 3.5 Flash inline PDF | 5/5 | 0/5 | 0/5 | $0.03 | 14.1s |
 
 Claude answered every question and returned a correct-page citation for every answer. OpenAI and
 Gemini answered the same direct-PDF questions but returned no pointer into the supplied PDF on this
@@ -134,9 +134,9 @@ holds the answer:
 
 | arm | correct cite | pointer | hosted objects | cost |
 |---|:---:|:---:|:---:|---:|
-| Claude Haiku 4.5 + search results | 5/5 | block-span | 0 | $0.0067 |
-| OpenAI GPT-5.4 hosted file search | 5/5 | file-level | 6 | $0.0301 |
-| Gemini 3.5 Flash hosted file search | 5/5 | chunk-level | 6 | $0.0156 |
+| Claude Haiku 4.5 + search results | 5/5 | block-span | 0 | $0.01 |
+| OpenAI GPT-5.4 hosted file search | 5/5 | file-level | 6 | $0.03 |
+| Gemini 3.5 Flash hosted file search | 5/5 | chunk-level | 6 | $0.02 |
 
 All three cited the correct source. Claude did it inline, resolver-free, with a block-level pointer and
 zero persisted objects, where the others each stood up a hosted store of six objects and returned a
@@ -163,9 +163,9 @@ Measured over one mixed-source request with three facts, one unique fact per sou
 
 | arm | answered | inline source types cited | hosted objects | cost |
 |---|:---:|:---:|:---:|---:|
-| Claude Haiku 4.5 | 3/3 | 3/3 | 0 | $0.0101 |
-| OpenAI GPT-5.4 inline sources | 3/3 | 0/3 | 0 | $0.0028 |
-| Gemini 3.5 Flash inline sources | 3/3 | 0/3 | 0 | $0.0087 |
+| Claude Haiku 4.5 | 3/3 | 3/3 | 0 | $0.01 |
+| OpenAI GPT-5.4 inline sources | 3/3 | 0/3 | 0 | $0.01 |
+| Gemini 3.5 Flash inline sources | 3/3 | 0/3 | 0 | $0.01 |
 
 All three answered correctly. Only Claude returned pointers into the supplied content, and it returned
 all three location types in the same response. The edge is the one-request inline mixed-source path,
@@ -289,9 +289,9 @@ at the end. The corpus is deterministic and the ground truth is computed in code
 
 | arm | exact list | cost | wall time | peak context |
 |---|:---:|---:|---:|---:|
-| Claude Haiku 4.5 with context editing | yes | $0.6700 | 60.7s | 35,186 |
-| OpenAI GPT-5.5 with Responses compaction | yes | $1.8425 | 164.3s | 41,548 |
-| Gemini 3.1 Pro Preview with full context | yes | $2.5690 | 201.0s | 434,629 |
+| Claude Haiku 4.5 with context editing | yes | $0.67 | 60.7s | 35,186 |
+| OpenAI GPT-5.5 with Responses compaction | yes | $1.84 | 164.3s | 41,548 |
+| Gemini 3.1 Pro Preview with full context | yes | $2.57 | 201.0s | 434,629 |
 
 All three arms got the exact list. Claude won on cost and time: about 64% cheaper and 63% faster than
 the exact OpenAI run, and about 74% cheaper and 70% faster than the exact Gemini run. The full receipt
@@ -386,9 +386,9 @@ Cost expectations: every benchmark reads its numbers off a real API call. `make 
 bounded live receipt, and `make ledger` about $5 on the shipped full task. There is no hidden spend,
 and each target prints its receipt before it commits anything.
 
-The citations edge runs on the Anthropic key alone. To add the cross-vendor table that backs the
-per-character claim (the DIY `str.find` baseline on OpenAI and Gemini), install the optional SDKs and
-keys: `make compare-deps`, then paste `OPENAI_API_KEY` and `GEMINI_API_KEY` into `.env`.
+The citations edge runs on the Anthropic key alone and proves Claude's structured source-pointer
+receipt. Cross-vendor grounding comparisons live in the sibling edges, each with its own stated task
+shape and optional SDK/key requirements.
 
 ## Drive the engine from a chat window (MCP server)
 

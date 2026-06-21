@@ -2,7 +2,7 @@
 
 ![demo](https://raw.githubusercontent.com/cfregly/claude-feature-hits/main/citations/demo.gif)
 
-[![Claude proof: 8/8 char pointers](https://img.shields.io/badge/Claude%20proof-8%2F8%20char%20pointers-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/citations/sample.txt)
+[![Claude proof: 8/8 source pointers](https://img.shields.io/badge/Claude%20proof-8%2F8%20source%20pointers-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/citations/sample.txt)
 
 The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
 
@@ -17,16 +17,18 @@ content = [
     {"type": "document", "source": {...}, "citations": {"enabled": True}},  # one flag, per-character pointers back
     {"type": "text", "text": question},
 ]
-msg = client.messages.create(model="claude-haiku-4-5", max_tokens=400,
+msg = client.messages.create(model="claude-haiku-4-5-20251001", max_tokens=400,
                             messages=[{"role": "user", "content": content}])
 # every citation resolves: source[c.start_char_index:c.end_char_index] == c.cited_text
 ```
 
-Measured on Haiku 4.5: all 8 answers came back with a `char_location` pointer that resolves. `source[start:end]` equals the `cited_text`, with the quote free of output tokens. Live cost $0.011.
+Measured on Haiku 4.5: all 8 answers came back with a `char_location` pointer that resolves. `source[start:end]` equals the `cited_text`, with the quote free of output tokens. Live cost about $0.01.
 
-## Char-level vs page-level vs file-level
+## Why this matters
 
-Claude returns a per-character pointer into the user's own document. Among the three, only Claude returns char-level: Gemini File Search resolves to a page, OpenAI file_search to a file (their docs, verified 2026-06-19). Char-level vs page-level vs file-level is the difference between checking the exact sentence and re-reading the file.
+The operational win is that the API hands back a structured pointer and the verbatim `cited_text` in
+the same response, so your app can verify the source span without writing a separate quote resolver
+or paying output tokens for the quote.
 
 ## Run it (about $0.01)
 

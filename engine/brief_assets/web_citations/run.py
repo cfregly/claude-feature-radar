@@ -92,7 +92,7 @@ def _print_table(answered, n, web_citations, with_quote, cost, latency):
     print(f"  {'questions answered':<34}{f'{answered}/{n}':>12}")
     print(f"  {'web citations returned':<34}{web_citations:>12}")
     print(f"  {'with verbatim source quote':<34}{with_quote:>12}")
-    print(f"  {'cost':<34}{f'${cost:.6f}':>12}")
+    print(f"  {'cost':<34}{f'${cost:.2f}':>12}")
     print(f"  {'wall clock':<34}{f'{latency:.1f}s':>12}")
 
 

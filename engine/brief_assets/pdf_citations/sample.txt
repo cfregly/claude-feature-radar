@@ -9,7 +9,7 @@
   How many days of notice to terminate?              4          yes
   What is the monthly uptime commitment?             5          yes
   -----------------------------------------------------------------------------
-  answered 5/5      correct page 5/5      $0.0458 on Claude Haiku 4.5
+  answered 5/5      correct page 5/5      $0.05 on Claude Haiku 4.5
 
   The change: send the PDF as a base64 document block and set citations enabled. Each answer comes
   back with a page_location pointer (page number plus the quoted source text, free of output tokens),

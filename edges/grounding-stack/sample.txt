@@ -4,9 +4,9 @@
 
   platform              answered   source types cited /1 request   hosted objects     cost  wall time
   ------------------------------------------------------------------------------------------------------
-  claude:haiku                 3/3   3/3 (char+page+search_result)            0   $0.0101     2.3s
-  openai:gpt-mid               3/3   0/3 (inline)                             0   $0.0028     4.4s
-  gemini:gem-flash             3/3   0/3 (inline)                             0   $0.0087     3.9s
+  claude:haiku                 3/3   3/3 (char+page+search_result)            0   $0.01     2.3s
+  openai:gpt-mid               3/3   0/3 (inline)                             0   $0.01     4.4s
+  gemini:gem-flash             3/3   0/3 (inline)                             0   $0.01     3.9s
 
   Verdict:
     positive_signal: true

@@ -127,7 +127,7 @@ def cmd_run(compare_on: bool = False) -> int:
     print("  " + "-" * 74)
     print(f"  answered {answered}/{asked}   correct-source cite {cited}/{asked}   "
           f"hosted objects 0   pointer block-span")
-    print(f"  cost ${cost:.4f}   wall {wall:.1f}s\n")
+    print(f"  cost ${cost:.2f}   wall {wall:.1f}s\n")
     _maybe_compare(compare_on)
     return 0
 
@@ -143,7 +143,7 @@ def cmd_check(compare_on: bool = False) -> int:
     answered, cited, asked, cost, wall, rows = _ask_all(client, m.id, QUESTIONS[:3])
     for q, ans_idx, idxs, hit in rows:
         print(f"  {q[:46]:<48} cited={idxs} expected={ans_idx} {'OK' if hit else 'MISS'}")
-    print(f"\n  answered {answered}/{asked}  correct-cite {cited}/{asked}  cost ${cost:.4f}  {wall:.1f}s")
+    print(f"\n  answered {answered}/{asked}  correct-cite {cited}/{asked}  cost ${cost:.2f}  {wall:.1f}s")
     assert answered == asked, "not every question was answered"
     assert cited == asked, "an answer did not carry a search_result_location to the correct chunk"
     print("  INVARIANT HOLDS: inline citations resolved to the right chunk, 0 hosted objects, "

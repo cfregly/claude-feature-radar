@@ -183,7 +183,7 @@ def answer_with_page_pointers(client, model_key: str, pdf_bytes: bytes) -> dict:
 # --------------------------------------------------------------------------- output
 
 def fmt_usd(x: float) -> str:
-    return f"${x:,.6f}" if x < 0.01 else f"${x:,.4f}"
+    return f"${x:,.2f}"
 
 
 def print_table(result: dict) -> None:

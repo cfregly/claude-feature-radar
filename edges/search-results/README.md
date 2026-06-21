@@ -12,9 +12,9 @@ Run: `make search-results`, 2026-06-19, five questions over five developer-suppl
 
 | arm | answered | correct cite | pointer kind | hosted objects | cost | wall time |
 |---|:---:|:---:|:---:|:---:|---:|---:|
-| claude:haiku | 5/5 | 5/5 | block-span | 0 | $0.0067 | 4.5s |
-| openai:gpt-mid | 5/5 | 5/5 | file-level | 6 | $0.0301 | 19.8s |
-| gemini:gem-flash | 5/5 | 5/5 | chunk-level | 6 | $0.0156 | 26.5s |
+| claude:haiku | 5/5 | 5/5 | block-span | 0 | $0.01 | 4.5s |
+| openai:gpt-mid | 5/5 | 5/5 | file-level | 6 | $0.03 | 19.8s |
+| gemini:gem-flash | 5/5 | 5/5 | chunk-level | 6 | $0.02 | 26.5s |
 
 All three cited the correct source. Claude did it inline, resolver-free, with a block-level pointer and zero persisted objects. OpenAI and Gemini each required a hosted vector store and returned a coarser file or chunk-level pointer.
 

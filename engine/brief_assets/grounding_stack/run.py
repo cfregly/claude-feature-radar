@@ -125,7 +125,7 @@ def _print_table(answered, kinds, cost, latency):
     print(f"  {'source types cited in 1 request':<34}{f'{len(kinds)}/3':>22}")
     print(f"  {'pointer kinds':<34}{'+'.join(k.replace('_location','') for k in kinds):>22}")
     print(f"  {'hosted vector-store objects':<34}{'0':>22}")
-    print(f"  {'cost':<34}{f'${cost:.4f}':>22}")
+    print(f"  {'cost':<34}{f'${cost:.2f}':>22}")
     print(f"  {'wall time':<34}{f'{latency:.1f}s':>22}")
 
 
@@ -156,7 +156,7 @@ def cmd_check(client, compare_on: bool = False) -> int:
     _maybe_compare(answered, kinds, compare_on)
     assert answered == 3, f"expected 3/3 answered, got {answered}/3"
     assert set(kinds) == EXPECTED_KINDS, f"expected {sorted(EXPECTED_KINDS)} pointers, got {kinds}"
-    print(f"\n  PASS: 3/3 answered, all three pointer types in one request, $0 hosted objects, ${cost:.4f}.")
+    print(f"\n  PASS: 3/3 answered, all three pointer types in one request, $0 hosted objects, ${cost:.2f}.")
     return 0
 
 

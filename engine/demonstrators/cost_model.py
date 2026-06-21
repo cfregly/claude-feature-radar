@@ -621,7 +621,7 @@ register(CostModelDemonstrator())
 
 
 def _fmt(usd: float) -> str:
-    return f"${usd:,.4f}"
+    return f"${usd:,.2f}"
 
 
 def _print_cache_ttl(ttl: dict) -> None:

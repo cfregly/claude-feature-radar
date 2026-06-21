@@ -2,7 +2,8 @@
 
 The default brief runs the Claude side alone on one dependency. Set OPENAI_API_KEY and GEMINI_API_KEY,
 install the optional comparison SDKs (pip install -r requirements-compare.txt), and run
-`make pdf_citations COMPARE=1` to reproduce the whole table using your own API keys, not just the Claude side.
+`make pdf_citations COMPARE=1` to reproduce the direct-PDF table using your own API keys, not just the
+Claude side.
 
 Best to best: OpenAI runs the Responses API with the PDF supplied directly as an input_file, Gemini
 runs the inline PDF part (document processing), both their strongest directly-supplied-PDF path. The
@@ -107,8 +108,8 @@ def append_comparison(model_key: str, claude_result: dict) -> None:
     short = get(model_key).label.replace("Claude ", "")
     claude_label = "Claude (" + short + ")"
 
-    print("  Reproducing the head-to-head: a page pointer to the right page, same questions, same PDF.")
-    print("  OpenAI and Gemini run their strongest directly-supplied-PDF path. " + COMPARE_DEPS_HINT + ".\n")
+    print("  Reproducing the direct-PDF head-to-head: a page pointer to the right page, same questions, same PDF.")
+    print("  No arm creates a hosted file-search store first. " + COMPARE_DEPS_HINT + ".\n")
 
     oai = _run_arm(_openai_arm, pdf, QUESTIONS)
     gem = _run_arm(_gemini_arm, pdf, QUESTIONS)
@@ -120,16 +121,16 @@ def append_comparison(model_key: str, claude_result: dict) -> None:
         else:
             rows.append((arm["label"], str(arm["pointer"]) + "/" + str(arm["asked"])))
 
-    print(f"  {'platform':<24}{'page pointer to the right page':>32}")
+    print(f"  {'platform':<24}{'direct-PDF page pointer':>32}")
     print("  " + "-" * 56)
     for label, cell in rows:
         print(f"  {label:<24}{cell:>32}")
     print("  " + "-" * 56)
     print()
-    print("  Only Claude returns a verifiable page pointer on a PDF supplied directly in the request,")
-    print("  so your user gets a one-click jump to the exact source page.")
+    print("  On this direct-request path, Claude returns the page pointer in the same response,")
+    print("  with no hosted vector store or pre-upload step.")
     ran = [a for a in (oai, gem) if "skipped" not in a]
     if ran:
         extra = sum(a["cost"] for a in ran)
-        print(f"  Competitor arms this run: ${extra:,.4f} across {len(ran)} of 2 (OpenAI, Gemini).")
+        print(f"  Competitor arms this run: ${extra:,.2f} across {len(ran)} of 2 (OpenAI, Gemini).")
     print()

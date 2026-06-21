@@ -6,8 +6,8 @@ benchmark is re-run. The figure is quoted in two layers, both of which can rot:
   1. the total dollar figure, in two prose spots: README.md and the Makefile.
   2. the per-arm cost and output-token columns of the README measured-proof table.
 
-This gate re-sums the committed receipt (edges/citations/sample.txt) and checks both layers against
-it. Stdlib only, runs offline, exits non-zero on drift.
+This gate re-sums the committed receipt (edges/citations/sample.txt) and checks both layers at
+cents-level precision. Stdlib only, runs offline, exits non-zero on meaningful drift.
 """
 
 import json
@@ -16,8 +16,8 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-TOLERANCE_CENTS = 1
-TABLE_COST_TOL = 0.001
+TOLERANCE_CENTS = 2
+TABLE_COST_TOL = 0.015
 
 # (file, regex with one capturing group for the dollar total). Each is anchored tightly enough to
 # match only the citations cost claim, not another "$X" figure in the same file.
@@ -26,7 +26,7 @@ TABLE_COST_TOL = 0.001
 # by the hits repo's own number gate. Both that brief and this engine edge run a single Claude
 # Citations arm (~$0.01).
 CLAIMS = [
-    {"file": "edges/citations/README.md", "pattern": r"using your own API keys?, \$(\d+\.\d{2})"},
+    {"file": "edges/citations/README.md", "pattern": r"using your own API keys?, (?:about )?\$(\d+\.\d{2})"},
     {"file": "Makefile", "pattern": r"^citations:.*\$(\d+\.\d{2})"},
 ]
 
@@ -36,7 +36,7 @@ def snapshot_arms(path):
     arms = []
     for line in path.read_text().splitlines():
         if re.search(r"\d/8", line):
-            m = re.search(r"([\d,]+)\s+(\d+\.\d+)\s*$", line)
+            m = re.search(r"([\d,]+)\s+\$?(\d+\.\d+)\s*$", line)
             if m:
                 arms.append((int(m.group(1).replace(",", "")), float(m.group(2))))
     return arms
@@ -93,7 +93,7 @@ def main():
     else:
         for idx, ((r_tok, r_cost), (t_tok, t_cost)) in enumerate(zip(arms, table), 1):
             if abs(r_cost - t_cost) > TABLE_COST_TOL:
-                failures.append(f"README.md table arm {idx} cost ${t_cost:.3f}  STALE -> ${r_cost:.3f}")
+                failures.append(f"README.md table arm {idx} cost ${t_cost:.2f}  STALE -> ${r_cost:.2f}")
             if r_tok != t_tok:
                 failures.append(f"README.md table arm {idx} output tokens {t_tok}  STALE -> {r_tok}")
 
@@ -104,7 +104,7 @@ def main():
             print(f"  {f}")
     else:
         print(f"cost-claim gate: clean (committed receipt {want_dollars}, "
-              f"3 prose claims and {len(arms)} table arms agree)")
+              f"{len(CLAIMS)} prose claims and {len(arms)} table arms agree)")
 
     scratch = ROOT / "data" / "last_citations.json"
     if scratch.exists():

@@ -8,7 +8,7 @@
   questions answered                         3/3
   web citations returned                       9
   with verbatim source quote                   9
-  cost                                  $0.115173
+  cost                                  $0.12
 
   the change: add one tool to the request.
     tools=[{"type": "web_search_20250305", "name": "web_search", "max_uses": 4}]

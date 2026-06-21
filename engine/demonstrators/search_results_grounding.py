@@ -598,7 +598,7 @@ def _sample_text(receipt: dict) -> str:
         rows.append(
             f"  {arm['name']:<22}{arm['answered']:>10}{arm['correct_source_citation']:>15}"
             f"{arm['pointer_kind']:>15}{arm['persisted_objects']:>17}"
-            f"{('$' + format(arm['cost'], '.4f')):>9}{arm['latency_s']:>8.1f}s"
+            f"{('$' + format(arm['cost'], '.2f')):>9}{arm['latency_s']:>8.1f}s"
         )
     verdict = receipt["verdict"]
     rows.extend([
@@ -643,7 +643,7 @@ def write_edge_bundle(run: SrRun, receipt: dict) -> pathlib.Path:
     for arm in receipt["arms"]:
         rows.append(
             f"| {arm['name']} | {arm['answered']} | {arm['correct_source_citation']} | "
-            f"{arm['pointer_kind']} | {arm['persisted_objects']} | ${arm['cost']:.4f} | "
+            f"{arm['pointer_kind']} | {arm['persisted_objects']} | ${arm['cost']:.2f} | "
             f"{arm['latency_s']:.1f}s |"
         )
     (edge_dir / "README.md").write_text(

@@ -33,6 +33,7 @@ Reproduce the live check in about a minute for roughly $0.20. The 230,607-token 
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
+export ANTHROPIC_API_KEY=your-api-key
 make bulk_output
 ```
 

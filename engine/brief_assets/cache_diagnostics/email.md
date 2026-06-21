@@ -27,6 +27,7 @@ About $0.02 and a minute to reproduce using your own API key:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
+export ANTHROPIC_API_KEY=your-api-key
 make cache_diagnostics
 ```
 

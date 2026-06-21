@@ -68,7 +68,7 @@ def check_programmatic_tool_calling(fail, warn):
             for c in _dollars(line):
                 if abs(c - total) > COST_TOL:
                     fail.append(f"PTC cost: {rel}:{i} says ${c:.2f}, receipt total is {want} "
-                                f"(${a_cost:.4f}+${b_cost:.4f}); update both together")
+                                f"(${a_cost:.2f}+${b_cost:.2f}); update both together")
 
     # the $ figure that immediately follows a 'make programmatic-tool-calling'/'make app' claim must be the receipt total,
     # scanning across line breaks up to the next make-command (so 'make citations $0.06' is not misread)
