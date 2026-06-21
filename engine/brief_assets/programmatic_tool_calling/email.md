@@ -31,9 +31,9 @@ Same task, same model (Sonnet 4.6), the only change is the feature on or off:
 
 28% fewer input tokens on my run, with the exact winner returned from the sandbox. The saving grows with the size of the fan-out (an agent calling one tool many times over data it then crunches).
 
-Why I am sending this for your workload: no other major provider keeps your own custom-tool output out of the model context the way `allowed_callers` does. Their code interpreters and tool search do not, checked 2026-06-18. For metering across many cohorts, that is the difference between paying for every row and paying for the answer.
+Why I am sending this for your workload: `allowed_callers` lets Claude call your own tool from the code sandbox and return only the computed answer to the model. For metering across many cohorts, that is the difference between paying for every row and paying for the answer.
 
-I ran it using my own API key for about $0.08, takes around two minutes. To see it yourself, one clone and one command:
+I ran it using my own API key for $0.08, takes around two minutes. To see it yourself, one clone and one command:
 
 ```
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits

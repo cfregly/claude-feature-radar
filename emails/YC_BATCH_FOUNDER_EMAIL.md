@@ -2,7 +2,7 @@ Subject: Congrats on YC! 3 Claude demos to run this week
 
 Hey YC founders,
 
-Congrats on the batch! Quick builder note from my own testing: I made a small public repo of Claude features that you can run in one command using your own API key.
+Congrats on the batch! I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. Quick builder note from my own testing: I made a small public repo of Claude features that you can run in one command using your own API key.
 
 The repo is here: https://github.com/cfregly/claude-feature-hits
 
@@ -42,7 +42,7 @@ Run it:
 
 ```shell
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-# Starter credits if you need an API key: <starter-credit-link>
+# Get an API key: https://console.anthropic.com/
 export ANTHROPIC_API_KEY=your-api-key
 make programmatic_tool_calling   # many tool calls
 make document_citations          # PDF and text-doc answers
@@ -56,4 +56,4 @@ If you reply with the bottleneck you are working through this week, I can point 
 Happy building,
 
 --Chris Fregly
-Building with Claude
+Applied AI, Startups, Anthropic

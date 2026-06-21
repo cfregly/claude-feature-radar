@@ -4,7 +4,7 @@ Hey Jonny,
 
 Congrats on getting Tasklet into YC.
 
-I'm Chris Fregly. I spend my time with AI startups on the mechanics that make agents cheaper, more reliable, and easier to ship.
+I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I spend my time on the mechanics that make agents cheaper, more reliable, and easier to ship.
 
 I saw Tasklet is building agents that call work-app APIs to get tasks done. The Claude pattern that maps to that workload is app-API fan-out where the agent makes many calls, inspects bulky intermediate results, and returns one action.
 
@@ -26,7 +26,7 @@ Run it in about two minutes for $0.08:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-# Starter credits if you need an API key: <starter-credit-link>
+# Get an API key: https://console.anthropic.com/
 export ANTHROPIC_API_KEY=your-api-key
 make programmatic_tool_calling
 ```
@@ -38,4 +38,4 @@ If Tasklet's heavier bottleneck is a different app-agent loop, reply with that f
 Happy building,
 
 --Chris Fregly
-Building with Claude
+Applied AI, Startups, Anthropic

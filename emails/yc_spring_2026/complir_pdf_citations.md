@@ -4,7 +4,7 @@ Hey Gustav,
 
 Congrats on YC.
 
-I'm Chris Fregly. I spend a lot of time with AI startups working through the practical bottlenecks that show up after the first useful agent demo.
+I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I spend a lot of time working through the practical bottlenecks that show up after the first useful agent demo.
 
 I saw Complir is building AI agents for compliance and regulatory monitoring. The Claude pattern that maps to that workload is page-linked PDF evidence for compliance agents whose answers need to survive reviewer scrutiny.
 
@@ -26,7 +26,7 @@ Run it in about a minute for $0.05:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-# Starter credits if you need an API key: <starter-credit-link>
+# Get an API key: https://console.anthropic.com/
 export ANTHROPIC_API_KEY=your-api-key
 make pdf_citations
 ```
@@ -38,4 +38,4 @@ If page-linked regulatory answers are not the sharpest Complir bottleneck right 
 Happy building,
 
 --Chris Fregly
-Building with Claude
+Applied AI, Startups, Anthropic

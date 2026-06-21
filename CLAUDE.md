@@ -457,14 +457,14 @@ A founder-facing piece is not done until it passes this, read cold as a busy YC 
 - Make the run-it-on-your-own-data path explicit: name the one file to edit and the one command to re-run, never a vague "swap in your tool".
 - Sign reusable engine-generated drafts neutrally as the sender, a name placeholder and "Building
   with Claude". The exception is the curated take-home email packet, where the assignment explicitly
-  asks for the Anthropic Claude Evangelist role. Keep that role language only in the submission
+  asks for the Applied AI, Startups role at Anthropic. Keep that role language only in the submission
   emails and Google Doc, not in public repos or generic engine templates. A warm sign-off may carry
   one emoji.
 - Do not editorialize about a feature's maturity. Mention beta or a required beta header only when the founder must act on it (they have to set the header). For a GA feature, never write "it is GA" or "no beta header", it is noise. Get to the value.
 - The subject line must clear spam filters: no money-and-urgency trigger words (cut, save, free, cheap, discount, guarantee, a dollar sign). Keep the subject warm, personal, and specific to the feature, a genuine note to the reader, for example "Congrats on YC! A cool Claude feature to help you build".
 - Write in the first person as a builder sharing your own run ("I measured", "using my API key").
   Generic engine drafts never claim to speak for Anthropic. The submission email packet may use the
-  assigned Anthropic role because the prompt explicitly asks for it. Open with a plain, concrete line
+  Applied AI, Startups role because the prompt explicitly asks for it. Open with a plain, concrete line
   (a "quick tip"), never a vague filler like "quick one".
 - The reader is a startup founder (a YC batch), so use a startup-native example (plan limits, usage metering, churn, signups, logs, MRR, cohorts), never a generic enterprise scenario like employee expenses. Carry one example all the way through: the problem, the code, the table, and the tool name all use the same scenario.
 - Every word fights for its place. Cut anything that does not earn its spot, the same every-word-earns-its-place standard. If a word or a line can come out without losing meaning or punch, it comes out.

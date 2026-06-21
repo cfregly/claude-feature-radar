@@ -12,7 +12,7 @@ The quote does not count toward output tokens, and no beta header is needed. Sou
   python -m pdf_citations.run --check    the self-test: ASSERT every answer carries a correct-page pointer
   python -m pdf_citations.run --model opus    use Opus 4.8 instead of the default Haiku 4.5
 
-This costs about $0.05 on Haiku 4.5 for the self-test. The model calls are the only spend. anthropic is
+This costs $0.05 on Haiku 4.5 for the self-test. The model calls are the only spend. anthropic is
 imported lazily, inside the run path, so importing this module needs no SDK.
 """
 
@@ -218,7 +218,7 @@ def cmd_run(model_key: str, compare_on: bool = False) -> int:
 
     print(f"\n  PDF citations: answer questions over a directly-supplied PDF and get a verifiable pointer")
     print(f"  to the exact page for each answer, on {get(model_key).label}.")
-    print(f"  Upfront: about $0.05 and roughly 10 seconds using your API key. The model calls are the only spend.\n")
+    print(f"  Upfront: $0.05 and roughly 10 seconds using your API key. The model calls are the only spend.\n")
     client = get_client()
     result = answer_with_page_pointers(client, model_key, make_sample_pdf())
     print_table(result)

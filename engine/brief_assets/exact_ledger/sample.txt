@@ -15,7 +15,7 @@
            "keep": {"type": "tool_uses", "value": 1}}]}}
 
   Saved full-run receipt, Claude Haiku 4.5. The default `make exact_ledger`
-  check is shorter and costs about $0.17; this longer receipt is the source for
+  check is shorter and costs $0.17; this longer receipt is the source for
   the full-run comparison table.
 
       exact list           yes  [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]

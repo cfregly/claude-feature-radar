@@ -4,7 +4,7 @@ Hey Sherwood,
 
 Congrats on YC.
 
-I'm Chris Fregly. I focus on helping AI startups turn promising agent demos into production systems that stay fast and affordable.
+I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I focus on helping teams turn promising agent demos into production systems that stay fast and affordable.
 
 I saw Sazabi is building AI-native observability around logs, Slack, and agent-driven investigations. The Claude pattern that maps to that workload is log-triage fan-out without dragging every row into the model context.
 
@@ -30,7 +30,7 @@ Run it in about two minutes for $0.08:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-# Starter credits if you need an API key: <starter-credit-link>
+# Get an API key: https://console.anthropic.com/
 export ANTHROPIC_API_KEY=your-api-key
 make programmatic_tool_calling
 ```
@@ -42,4 +42,4 @@ If Sazabi's biggest agent cost is not log fan-out, send me the bottleneck and I 
 Happy building,
 
 --Chris Fregly
-Building with Claude
+Applied AI, Startups, Anthropic

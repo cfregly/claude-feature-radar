@@ -7,9 +7,9 @@ system prompt, the tools, or the message history. No more guessing.
 
 Usage:
   python run.py            # one live run: name the changed prefix surface, print the table
-  python run.py --check    # self-test: assert the API names system_changed (about $0.02)
+  python run.py --check    # self-test: assert the API names system_changed ($0.01)
 
-Cost: about $0.02 for --check on the 2026-06-19 run.
+Cost: $0.01 for --check on the 2026-06-19 run.
 Doc:  https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics
 """
 

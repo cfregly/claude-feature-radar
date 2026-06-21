@@ -21,7 +21,7 @@ r = client.messages.create(
 )
 ```
 
-Measured: on 3 live web-research questions, every Claude citation (9 of 9) came back with the verbatim source quote attached. Live cost about $0.12.
+Measured: on 3 live web-research questions, every Claude citation (9 of 9) came back with the verbatim source quote attached. Live cost $0.12.
 
 ## Claude vs OpenAI vs Gemini
 

@@ -3,7 +3,7 @@
   Captured: 2026-06-20
 
   Exact-list ledger over a 8-report chain, each report about 20,000 tokens.
-  Claude Claude Haiku 4.5, context editing on (clear old tool results, keep 1).
+  Claude Haiku 4.5, context editing on (clear old tool results, keep 1).
 
   metric                           value
   --------------------------------------

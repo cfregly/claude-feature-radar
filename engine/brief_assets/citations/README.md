@@ -22,7 +22,7 @@ msg = client.messages.create(model="claude-haiku-4-5-20251001", max_tokens=400,
 # every citation resolves: source[c.start_char_index:c.end_char_index] == c.cited_text
 ```
 
-Measured on Haiku 4.5: all 8 answers came back with a `char_location` pointer that resolves. `source[start:end]` equals the `cited_text`, with the quote free of output tokens. Live cost about $0.01.
+Measured on Haiku 4.5: all 8 answers came back with a `char_location` pointer that resolves. `source[start:end]` equals the `cited_text`, with the quote free of output tokens. Live cost $0.01.
 
 ## Why this matters
 
@@ -30,7 +30,7 @@ The operational win is that the API hands back a structured pointer and the verb
 the same response, so your app can verify the source span without writing a separate quote resolver
 or paying output tokens for the quote.
 
-## Run it (about $0.01)
+## Run it ($0.01)
 
 ```
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits

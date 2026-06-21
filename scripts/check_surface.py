@@ -43,10 +43,16 @@ NEGATIVES = [
     "table stakes", "parity on", "is parity", "claude loses", "loses on", "where that flips",
     "lose regime", "got it wrong", "failed to produce", "is not a cheaper bill",
     "not a claude-only", "measured it honestly", "the honest part", "the honest one",
+    "about $", "roughly $", "no other major provider", "only claude's task budget",
+    "the only one that stopped before the first tool call",
     # Folded in from the public repo's old phrase-list gate, so the move loses no coverage:
     "8% more", "8 percent more", "competitors can match", "competitors already match",
     "competitor can match", "competitor already matches", "claude is slower", "claude is worse",
     "claude slower", "claude worse", "claude lags",
+]
+
+CASE_SENSITIVE_NEGATIVES = [
+    "Claude Claude",
 ]
 
 # The public briefs' authored prose stays wins-only too. Its sources live in THIS repo under
@@ -54,9 +60,15 @@ NEGATIVES = [
 # live in the sibling claude-feature-hits checkout (scanned too when it is present locally). This is
 # the enforcement the public repo's old no_negative_check phrase-list gate used to do, moved here so the
 # negative-phrase list lives only in this private engine, never on the public surface.
-BRIEF_ASSET_GLOBS = ["brief_assets/*/README.md", "brief_assets/*/run.py", "brief_assets/*/email.md"]
+BRIEF_ASSET_GLOBS = [
+    "brief_assets/*/README.md", "brief_assets/*/run.py", "brief_assets/*/email.md",
+    "brief_assets/*/sample.txt", "brief_assets/*/compare_sample.txt",
+]
 SIBLING_BRIEFS = ROOT.parent / "claude-feature-hits"
-SIBLING_BRIEF_GLOBS = ["README.md", "*/README.md", "*/run.py", "*/run_tokens.py", "*/cite.py", "*/my_tool.py"]
+SIBLING_BRIEF_GLOBS = [
+    "README.md", "*/README.md", "*/run.py", "*/run_tokens.py", "*/cite.py", "*/my_tool.py",
+    "*/sample.txt", "*/compare_sample.txt",
+]
 
 # Raw fetched vendor docs and gitignored scratch are not authored surfaces, so they are out of scope.
 # briefs/ is internal, gitignored, both-directions scratch (the analytical record stays local), so a
@@ -148,6 +160,9 @@ def main():
             low = line.lower()
             for neg in NEGATIVES:
                 if neg in low:
+                    bad.append(f"{_label(p)}:{i}: founder-surface negative: {neg!r}")
+            for neg in CASE_SENSITIVE_NEGATIVES:
+                if neg in line:
                     bad.append(f"{_label(p)}:{i}: founder-surface negative: {neg!r}")
     if bad:
         print("surface gate: FAIL")

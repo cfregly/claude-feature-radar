@@ -11,7 +11,7 @@ Usage:
   python run.py            # run the workload, print the table
   python run.py --check    # cheap live self-test: assert every web citation carries a source quote
 
-Cost: about $0.05 for --check, about $0.12 for the full run (claude-sonnet-4-6, using your API key).
+Cost: $0.05 for --check, $0.12 for the full run (claude-sonnet-4-6, using your API key).
 Doc: https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool
 """
 
@@ -108,7 +108,7 @@ def _maybe_compare(model_key: str, web_citations: int, with_quote: int, compare_
 
 def cmd_run(args, compare_on: bool = False):
     print("\n  web_citations: every web-grounded claim comes back with the verbatim source quote.")
-    print(f"  about ${0.12:.2f} on claude-sonnet-4-6, using your API key.")
+    print(f"  ${0.12:.2f} on claude-sonnet-4-6, using your API key.")
     answered, web_citations, with_quote, cost, latency, samples = _run_claude(QUESTIONS)
     _print_table(answered, len(QUESTIONS), web_citations, with_quote, cost, latency)
     if samples:
@@ -125,7 +125,7 @@ def cmd_check(args, compare_on: bool = False):
     """Cheap live self-test. Asserts the win invariant: every web citation carries a source quote."""
     qs = QUESTIONS[:2]  # two questions keeps --check around $0.05
     print("\n  web_citations --check: every Claude web citation must carry a verbatim source quote.")
-    print(f"  about ${0.05:.2f} on claude-sonnet-4-6, using your API key.")
+    print(f"  ${0.05:.2f} on claude-sonnet-4-6, using your API key.")
     answered, web_citations, with_quote, cost, latency, _ = _run_claude(qs)
     _print_table(answered, len(qs), web_citations, with_quote, cost, latency)
     assert web_citations > 0, "no web citations returned"

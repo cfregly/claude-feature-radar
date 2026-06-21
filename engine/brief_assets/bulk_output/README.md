@@ -38,7 +38,7 @@ export ANTHROPIC_API_KEY=your-api-key   # https://console.anthropic.com/
 make bulk_output
 ```
 
-Default Claude run: roughly $0.20 on my run. The live check submits a moderate extended-output batch and asserts the deliverable comes back un-truncated in one request. The 230,607-token headline is the `python -m bulk_output.run --full` run from the saved full-run output, about $3.46. It is designed for async jobs, so allow minutes rather than a live-chat response time.
+Default Claude run: $0.20 on my run. The live check submits a moderate extended-output batch and asserts the deliverable comes back un-truncated in one request. The 230,607-token headline is the `python -m bulk_output.run --full` run from the saved full-run output, $3.46. It is designed for async jobs, so allow minutes rather than a live-chat response time.
 
 Full comparison run: also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
 

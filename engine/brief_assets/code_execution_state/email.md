@@ -43,7 +43,7 @@ Here is the same write-then-reread, run live on all three platforms:
 
 Run verified 2026-06-19. Docs rechecked 2026-06-20.
 
-It costs about $0.05 and runs in about a minute. One clone, one command:
+It costs $0.05 and runs in about a minute. One clone, one command:
 
 ```
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits

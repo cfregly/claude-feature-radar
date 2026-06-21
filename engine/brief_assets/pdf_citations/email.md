@@ -18,7 +18,7 @@ doc = {
 
 Every answer comes back with a `page_location` pointer: the page number plus the quoted source text. The quote rides for free (it does not count toward your output tokens), so the page pointer adds nothing to the bill.
 
-Using my API key, over a five-page agreement PDF with five questions, Claude answered every question and returned a page pointer that resolved to the correct page every time. That run cost about $0.05.
+Using my API key, over a five-page agreement PDF with five questions, Claude answered every question and returned a page pointer that resolved to the correct page every time. That run cost $0.05.
 
 I ran the same five questions on the other two big models, without creating a hosted vector store or
 file-search index first. Here is the direct-PDF head-to-head:

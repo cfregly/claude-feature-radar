@@ -4,7 +4,7 @@ Hey Kiet,
 
 Congrats on the YC batch.
 
-I'm Chris Fregly. I work with AI startups on the operational edges that appear once agents are running in parallel, not just in a demo.
+I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I work on the operational edges that appear once agents are running in parallel, not just in a demo.
 
 I saw Superset helps engineers run 100s of coding agents in parallel. The Claude pattern that maps to that workload is loop-level task budgeting, so each agent can stop cleanly before it starts tool work it cannot finish.
 
@@ -32,7 +32,7 @@ Run it in a few seconds for $0.01:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-# Starter credits if you need an API key: <starter-credit-link>
+# Get an API key: https://console.anthropic.com/
 export ANTHROPIC_API_KEY=your-api-key
 make task_budgets
 ```
@@ -44,4 +44,4 @@ If Superset is hitting a different many-agent failure mode, reply with the patte
 Happy building,
 
 --Chris Fregly
-Building with Claude
+Applied AI, Startups, Anthropic

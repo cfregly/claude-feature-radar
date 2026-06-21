@@ -15,7 +15,7 @@ r = client.messages.create(model="claude-haiku-4-5-20251001", max_tokens=600,
                            messages=[{"role": "user", "content": content}])
 ```
 
-Using my API key, one request mixing all three sources answered every part and returned a correct typed pointer into each one (char, page, and chunk) in the same response. No vector store, no copy of your user's data, and the cited text rides along free of output tokens. Live cost about $0.01.
+Using my API key, one request mixing all three sources answered every part and returned a correct typed pointer into each one (char, page, and chunk) in the same response. No vector store, no copy of your user's data, and the cited text rides along free of output tokens. Live cost $0.01.
 
 I ran the same prompt head-to-head on 2026-06-19:
 

@@ -4,7 +4,7 @@ Hey Ben,
 
 Congrats on the batch, and on getting Lightsprint in front of YC.
 
-I'm Chris Fregly. I focus on the agent-product details that start mattering once teams expect agents to keep real work moving across sessions.
+I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I focus on the agent-product details that start mattering once teams expect agents to keep real work moving across sessions.
 
 I saw Lightsprint is building collaborative product development with cloud agents so teams can plan, preview, and ship with agents. The Claude pattern that maps to that workload is persistent code-execution state for build agents that need generated files, test output, and scratch state to survive when a user steps away.
 
@@ -41,7 +41,7 @@ Run it in about a minute for $0.05:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-# Starter credits if you need an API key: <starter-credit-link>
+# Get an API key: https://console.anthropic.com/
 export ANTHROPIC_API_KEY=your-api-key
 make code_execution_state
 ```
@@ -53,4 +53,4 @@ If the state boundary in Lightsprint is somewhere else, reply with the rough wor
 Happy building,
 
 --Chris Fregly
-Building with Claude
+Applied AI, Startups, Anthropic

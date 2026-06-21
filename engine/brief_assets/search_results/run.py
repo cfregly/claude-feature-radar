@@ -10,7 +10,7 @@ Usage:
     python run.py            # run the citation workload, print the table and cost
     python run.py --check    # self-test: assert every answer cited the correct chunk inline
 
-Cost: about $0.05 for the full measured run, about $0.01 for --check.
+Cost: $0.05 for the full measured run, $0.01 for --check.
 Doc: https://platform.claude.com/docs/en/build-with-claude/search-results
 """
 
@@ -116,7 +116,7 @@ def cmd_run(compare_on: bool = False) -> int:
     m = get(CLAUDE_MODEL)
     print(f"\n  search_result inline citations on {m.label} ({m.id})")
     print(f"  {len(QUESTIONS)} questions over {len(CHUNKS)} chunks you supply inline. No hosted store.")
-    print(f"  est cost about $0.05, about 15s\n")
+    print(f"  est cost $0.05, about 15s\n")
     client = get_client()
     answered, cited, asked, cost, wall, rows = _ask_all(client, m.id, QUESTIONS)
     print(f"  {'question':<48}{'cited chunk':>13}{'expected':>10}{'ok':>5}")

@@ -19,7 +19,7 @@ r = client.messages.create(model="claude-haiku-4-5-20251001", max_tokens=600,
                            messages=[{"role": "user", "content": content}])
 ```
 
-Measured 2026-06-19: 3 of 3 sources cited, no vector store, no data copied, live cost about $0.01.
+Measured 2026-06-19: 3 of 3 sources cited, no vector store, no data copied, live cost $0.01.
 
 ## Claude vs OpenAI vs Gemini
 

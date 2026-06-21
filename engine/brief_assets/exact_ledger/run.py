@@ -9,9 +9,9 @@ context stays flat instead of growing with every record, and the list stays exac
 
 Usage:
     python -m exact_ledger.run            # run the long-stream ledger agent, print the table
-    python -m exact_ledger.run --check    # cheap live self-test that asserts the win invariant (~$0.17)
+    python -m exact_ledger.run --check    # cheap live self-test that asserts the win invariant ($0.17)
 
-Cost: about $0.17 for --check on the 2026-06-19 run (Claude Haiku 4.5).
+Cost: $0.17 for --check on the 2026-06-19 run (Claude Haiku 4.5).
 Docs: https://platform.claude.com/docs/en/build-with-claude/context-editing
 """
 

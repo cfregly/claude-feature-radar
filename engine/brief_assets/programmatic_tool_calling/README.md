@@ -37,7 +37,7 @@ That is **28% fewer input tokens**, with the exact winner returned from the sand
 
 `allowed_callers` lets Claude call your own tool from the code sandbox and return only the computed answer to the model. For metering across many cohorts, that is the difference between paying for every row and paying for the answer.
 
-## Run it (about $0.08)
+## Run it ($0.08)
 
 ```
 export ANTHROPIC_API_KEY=your-api-key   # https://console.anthropic.com/

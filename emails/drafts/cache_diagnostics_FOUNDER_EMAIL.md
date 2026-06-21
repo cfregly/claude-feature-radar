@@ -23,7 +23,7 @@ Using my API key (2026-06-19) Claude named the exact cause, `system_changed`, fo
 
 One honest note from the same run: both OpenAI and Gemini expose cache token counters, but only Claude returned a typed per-request reason naming what broke. The counters tell you the cache missed. Claude tells you why.
 
-About $0.02 and a minute to reproduce using your own API key:
+$0.01 and a minute to reproduce using your own API key:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits

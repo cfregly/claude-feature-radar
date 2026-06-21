@@ -6,11 +6,11 @@ Batches API with the beta header output-300k-2026-03-24, Claude raises the singl
 ceiling to 300,000 output tokens (batch-only, on Opus 4.8/4.7/4.6 and Sonnet 4.6). In a measured run
 on 2026-06-19 Claude emitted 230,607 output tokens in ONE request and finished un-truncated.
 
-    make bulk_output                 # the live check (a moderate batch, about $0.20)
+    make bulk_output                 # the live check (a moderate batch, $0.20)
     python -m bulk_output.run --check  # asserts the win invariant on a live batch
 
-Cost: the live --check generates a moderate output for about $0.20. The full 230,607-token measured run
-run costs about $3.46 at the 50% batch discount and the batch can take many minutes.
+Cost: the live --check generates a moderate output for $0.20. The full 230,607-token measured run
+run costs $3.46 at the 50% batch discount and the batch can take many minutes.
 
 Doc (verified 2026-06-19): https://platform.claude.com/docs/en/build-with-claude/batch-processing
 """
@@ -30,7 +30,7 @@ from .common.pricing import cost_usd
 BATCH_BETA = "output-300k-2026-03-24"
 CLAUDE_MODEL = "sonnet"            # Sonnet 4.6 supports the 300k batch beta
 CHECK_N = 200                      # a moderate enumerated deliverable for the cheap live check
-FULL_N = 3000                      # the full measured run (230,607 output tokens, about $3.46)
+FULL_N = 3000                      # the full measured run (230,607 output tokens, $3.46)
 CHECK_MAX_TOKENS = 64000          # comfortably above the moderate check output, so it finishes cleanly
 FULL_MAX_TOKENS = 300000          # the beta ceiling
 POLL_TIMEOUT_S = 1800.0
@@ -110,7 +110,7 @@ def cmd_run(args) -> int:
     max_tokens = FULL_MAX_TOKENS if args.full else CHECK_MAX_TOKENS
     print("\n  bulk_output: the largest deliverable in ONE request, with Claude extended output")
     print(f"  one batch request asking for {n:,} numbered entries, beta {BATCH_BETA}")
-    print(f"  upfront estimate: about ${'3.46' if args.full else '0.20'}, "
+    print(f"  upfront estimate: ${'3.46' if args.full else '0.20'}, "
           f"the batch can take {'many minutes' if args.full else 'a minute or two'}\n", flush=True)
     r = _run_batch(n, max_tokens)
     _print_table(r)
@@ -127,7 +127,7 @@ def cmd_check(args) -> int:
     full 300k generation.
     """
     print("\n  bulk_output --check: extended-output batch path, live invariant")
-    print(f"  one batch request, {CHECK_N} entries, beta {BATCH_BETA}, about $0.20\n", flush=True)
+    print(f"  one batch request, {CHECK_N} entries, beta {BATCH_BETA}, $0.20\n", flush=True)
     r = _run_batch(CHECK_N, CHECK_MAX_TOKENS)
     _print_table(r)
     _maybe_compare(r, args)
@@ -157,7 +157,7 @@ def main(argv=None) -> int:
     rp = sub.add_parser("run", help="run the extended-output batch (add --full for the 230k measured run)")
     rp.add_argument("--full", action="store_true", help="the full 3,000-entry, 300k-cap measured run")
     rp.set_defaults(func=cmd_run)
-    cp = sub.add_parser("check", help="live invariant self-test (about $0.20)")
+    cp = sub.add_parser("check", help="live invariant self-test ($0.20)")
     cp.set_defaults(func=cmd_check)
     p.add_argument("--check", action="store_true", help="alias for the check subcommand")
     p.add_argument("--full", action="store_true", help="with no subcommand, run the full measured run")

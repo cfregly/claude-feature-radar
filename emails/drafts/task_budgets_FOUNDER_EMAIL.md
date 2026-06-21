@@ -24,7 +24,7 @@ msg = client.beta.messages.create(
 
 I measured it on a budget-sensitive audit, same prompt both times. With the budget near zero, Claude made 0 tool calls and handed off before it touched the first record. With budget to spare, the same agent started the loop and made 1 call. The agent stops at the right moment on its own. Live on claude-opus-4-8, 2026-06-19.
 
-Only Claude's task budget gives the model a budget marker for the whole agentic loop, so it is the only one that stopped before the first tool call. Scoped to one avoided tool action on this run.
+Claude's task budget is the control surface this brief proves. On this run, the near-exhausted budget stopped before the first tool call, while the fresh-budget control started the loop. Scoped to one avoided tool action, it shows how to hand off before launching work the agent no longer has budget to finish.
 
 Reproduce it in a few seconds for $0.01. One clone, one command:
 

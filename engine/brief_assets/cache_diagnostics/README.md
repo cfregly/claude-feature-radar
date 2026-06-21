@@ -29,7 +29,7 @@ On the 2026-06-19 run Claude named the exact cause, `system_changed`, for the se
 
 On the same live run (2026-06-19), both OpenAI and Gemini exposed cache token counters but no per-request reason for the miss. Only Claude returned a typed `cache_miss_reason` naming the part that changed. The counters tell you the cache missed. Claude tells you why.
 
-## Run it (about $0.02)
+## Run it ($0.01)
 
 ```bash
 export ANTHROPIC_API_KEY=your-api-key   # https://console.anthropic.com/

@@ -8,9 +8,9 @@ for the PDF, and search_result_location for the chunk. One request, three typed 
 back into the user's own content, no vector store and no upload step.
 
   run a live demo:   python run.py
-  self-test (~$0.01): python run.py --check
+  self-test ($0.01): python run.py --check
 
-Cost: the three-source Claude request runs for about $0.01 on Haiku 4.5.
+Cost: the three-source Claude request runs for $0.01 on Haiku 4.5.
 Doc: https://platform.claude.com/docs/en/build-with-claude/citations
 """
 
@@ -141,7 +141,7 @@ def _maybe_compare(answered, kinds, compare_on: bool) -> None:
 
 def cmd_run(client, compare_on: bool = False) -> int:
     print("\n  grounding_stack: text + PDF + RAG chunk, each cited, in ONE request.")
-    print("  upfront estimate: about $0.01, about 3s on Haiku 4.5.")
+    print("  upfront estimate: $0.01, about 3s on Haiku 4.5.")
     answered, kinds, cost, latency, _ = _run_once(client)
     _print_table(answered, kinds, cost, latency)
     _maybe_compare(answered, kinds, compare_on)
@@ -150,7 +150,7 @@ def cmd_run(client, compare_on: bool = False) -> int:
 
 def cmd_check(client, compare_on: bool = False) -> int:
     print("\n  --check: one request must answer 3/3 and return all three typed pointers.")
-    print("  upfront estimate: about $0.01 on Haiku 4.5.")
+    print("  upfront estimate: $0.01 on Haiku 4.5.")
     answered, kinds, cost, latency, _ = _run_once(client)
     _print_table(answered, kinds, cost, latency)
     _maybe_compare(answered, kinds, compare_on)

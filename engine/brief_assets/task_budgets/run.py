@@ -6,9 +6,9 @@ hands off cleanly when the budget is near exhausted, instead of starting work it
 
 Usage:
     python -m task_budgets.run          # run the low-budget vs control tool loop, print the table
-    python -m task_budgets.run --check  # live self-test: assert the win invariant holds (about $0.01)
+    python -m task_budgets.run --check  # live self-test: assert the win invariant holds ($0.01)
 
-Cost: about $0.01 on claude-opus-4-8 for the two live calls.
+Cost: $0.01 on claude-opus-4-8 for the two live calls.
 Docs: https://platform.claude.com/docs/en/build-with-claude/task-budgets
 """
 
@@ -126,7 +126,7 @@ def _print_table(low: dict, control: dict) -> None:
 def cmd_run() -> int:
     total = BUDGET_TOTAL
     est = 0.01
-    print(f"\n  task_budgets live run on {CLAUDE_MODEL}. Two calls, about ${est:.2f}, a few seconds.")
+    print(f"\n  task_budgets live run on {CLAUDE_MODEL}. Two calls, ${est:.2f}, a few seconds.")
     low = run_loop(LOW_REMAINING)
     control = run_loop(HIGH_REMAINING)
     _print_table(low, control)
@@ -138,8 +138,8 @@ def cmd_run() -> int:
 
 def cmd_check() -> int:
     """Live self-test: the win invariant must hold. Low budget hands off before the first tool call,
-    and the control starts the loop. About $0.01."""
-    print(f"\n  task_budgets --check on {CLAUDE_MODEL}. Two calls, about $0.01.")
+    and the control starts the loop. $0.01."""
+    print(f"\n  task_budgets --check on {CLAUDE_MODEL}. Two calls, $0.01.")
     low = run_loop(LOW_REMAINING)
     control = run_loop(HIGH_REMAINING)
     _print_table(low, control)

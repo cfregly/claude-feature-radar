@@ -4,7 +4,7 @@ Hey Phillip,
 
 Congrats on the YC batch.
 
-I'm Chris Fregly. I work with AI startups moving agents from demo to product.
+I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I work with teams moving agents from demo to product.
 
 I saw you're building real-world sandboxes to test agents and agent-facing software. The Claude pattern that maps to that workload is persistent code-execution state for test agents that need generated files, fixtures, logs, or intermediate state to survive across separate API calls.
 
@@ -41,7 +41,7 @@ Run it in about a minute for $0.05:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-# Starter credits if you need an API key: <starter-credit-link>
+# Get an API key: https://console.anthropic.com/
 export ANTHROPIC_API_KEY=your-api-key
 make code_execution_state
 ```
@@ -53,4 +53,4 @@ If the harder Arga bottleneck is a different part of the eval loop, reply with t
 Happy building,
 
 --Chris Fregly
-Building with Claude
+Applied AI, Startups, Anthropic

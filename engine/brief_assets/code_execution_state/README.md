@@ -59,7 +59,7 @@ export ANTHROPIC_API_KEY=your-api-key   # https://console.anthropic.com/
 make code_execution_state
 ```
 
-Default Claude run: about a minute and about $0.05. It writes a file in one request and reads it from the reused container in the next. Full comparison run: also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
+Default Claude run: about a minute and $0.05. It writes a file in one request and reads it from the reused container in the next. Full comparison run: also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
 
 ```
 make code_execution_state COMPARE=1
