@@ -31,7 +31,13 @@ FORBIDDEN = [
 ]
 
 # Rule 2: a founder-facing surface shows only Claude wins, never a negative or a both-directions tell.
-FOUNDER_GLOBS = ["FOUNDER_EMAIL.md", "emails/*.md", "emails/**/*.md", "edges/*/FOUNDER_EMAIL.md"]
+FOUNDER_GLOBS = [
+    "FOUNDER_EMAIL.md",
+    "emails/YC_BATCH_FOUNDER_EMAIL.md",
+    "emails/yc_spring_2026/*.md",
+    "emails/drafts/*.md",
+    "edges/*/FOUNDER_EMAIL.md",
+]
 NEGATIVES = [
     "more expensive", "not on bedrock", "not on vertex", "not zdr", "zdr-eligible",
     "table stakes", "parity on", "is parity", "claude loses", "loses on", "where that flips",

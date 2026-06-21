@@ -45,7 +45,7 @@ def check_programmatic_tool_calling(fail, warn):
 
     # the stable token numbers and percent must appear verbatim where the edge is pitched
     a_str, b_str = f"{a_tok:,}", f"{b_tok:,}"
-    for rel in ["README.md", "emails/programmatic_tool_calling_FOUNDER_EMAIL.md"]:
+    for rel in ["README.md", "emails/drafts/programmatic_tool_calling_FOUNDER_EMAIL.md"]:
         text = _read(rel)
         if a_str not in text or b_str not in text:
             fail.append(f"PTC tokens: {rel} does not carry the receipt's {a_str}/{b_str}")
@@ -56,7 +56,7 @@ def check_programmatic_tool_calling(fail, warn):
     cost_files = [
         "Makefile", "README.md", "app/run_tokens.py", "demo.tape",
         "edges/programmatic-tool-calling/README.md",
-        "emails/programmatic_tool_calling_FOUNDER_EMAIL.md",
+        "emails/drafts/programmatic_tool_calling_FOUNDER_EMAIL.md",
     ]
     want = f"${total:.2f}"
     for rel in cost_files:

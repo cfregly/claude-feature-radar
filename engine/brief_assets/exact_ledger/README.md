@@ -2,7 +2,7 @@
 
 ![demo](https://raw.githubusercontent.com/cfregly/claude-feature-hits/main/exact_ledger/demo.gif)
 
-[![Claude proof: 64% cheaper vs OpenAI](https://img.shields.io/badge/Claude%20proof-64%25%20cheaper%20vs%20OpenAI-2F855A)](https://github.com/cfregly/claude-feature-hits/tree/main/exact_ledger#claude-vs-openai-vs-gemini)
+[![Claude proof: 63% cheaper vs OpenAI](https://img.shields.io/badge/Claude%20proof-63%25%20cheaper%20vs%20OpenAI-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/exact_ledger/compare_sample.txt)
 
 The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
 
@@ -11,8 +11,8 @@ Your agent reads a long stream one record at a time (usage logs, churn flags, su
 ## What you get
 
 The carried context stays flat near one record instead of growing with every step, and the list comes
-back exact. The default command uses the trigger shown below and costs about $0.17. The saved full-run
-receipt uses the same mechanism on a longer chain with a 45,000-token trigger; that run returned the
+back exact. The default command uses the trigger shown below and costs $0.17. The saved full-run
+receipt uses the same mechanism on a longer chain with a 45,000-token trigger. That run returned the
 exact 10/10 list, held peak carried context to about 35k tokens, cost $0.67, and finished in 60.7s.
 
 ```python
@@ -29,18 +29,21 @@ resp = client.messages.create(
 
 ## Claude vs OpenAI vs Gemini
 
-Measured head-to-head (2026-06-19). All three returned the exact list, so this is cost and speed at equal correctness:
+Measured head-to-head (captured 2026-06-20). All three returned the exact list, so this is cost at equal correctness:
 
-| Stack | Cost, full run | Versus Claude |
-| --- | --- | --- |
-| Claude, context editing | $0.67 | best |
-| OpenAI, compaction | $1.84 | Claude 64% cheaper, 63% faster |
-| Gemini, full window | $2.57 | Claude 74% cheaper |
+| Stack | Cost, this run | Wall time | Correctness | Versus Claude |
+| --- | ---: | ---: | --- | --- |
+| Claude `claude-haiku-4-5-20251001`, context editing | $0.17 | 14.3s | exact | best |
+| OpenAI `gpt-5.5`, compaction | $0.46 | 31.6s | exact | Claude 63% cheaper |
+| Gemini `gemini-3.1-pro-preview`, full window | $0.35 | 23.8s | exact | Claude 51% cheaper |
 
-These are the saved full-run figures on the longer chain. `make exact_ledger` runs the shorter
-default check, currently about $0.17. `make exact_ledger COMPARE=1` reproduces the head-to-head at
-that shorter scale: the absolute cost comes out lower, Claude still keeps the exact list for the
-lowest bill, and Claude's lead widens as the stream grows.
+The saved comparison receipt is `exact_ledger/compare_sample.txt`. `make exact_ledger` runs the
+Claude side only, currently $0.17. `make exact_ledger COMPARE=1` reproduces the head-to-head: it
+installs the optional OpenAI and Gemini SDKs, then runs all three platforms on the same chain.
+
+The earlier full-run reference from 2026-06-19 used a longer 10-of-10 chain: Claude $0.67, OpenAI
+$1.84, Gemini $2.57, all exact. The public proof badge points to the current committed comparison
+receipt above.
 
 ## Run it
 
@@ -49,7 +52,7 @@ export ANTHROPIC_API_KEY=your-api-key   # https://console.anthropic.com/
 make exact_ledger
 ```
 
-Default Claude run: about $0.17 and a minute on Claude Haiku 4.5. It reads a long stream of bulky records, asserts the list comes back exact, and asserts context editing held the carried context flat.
+Default Claude run: $0.17 and a minute on Claude Haiku 4.5. It reads a long stream of bulky records, asserts the list comes back exact, and asserts context editing held the carried context flat.
 
 Full comparison run: also export `OPENAI_API_KEY` and `GEMINI_API_KEY` and run:
 

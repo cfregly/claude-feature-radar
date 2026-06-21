@@ -35,7 +35,7 @@ That is **28% fewer input tokens**, with the exact winner returned from the sand
 
 ## Why I built this on Claude
 
-No other major provider keeps your own custom-tool output out of the model context the way `allowed_callers` does. Their code interpreters and tool search do not, checked 2026-06-18. For metering across many cohorts, that is the difference between paying for every row and paying for the answer.
+`allowed_callers` lets Claude call your own tool from the code sandbox and return only the computed answer to the model. For metering across many cohorts, that is the difference between paying for every row and paying for the answer.
 
 ## Run it (about $0.08)
 

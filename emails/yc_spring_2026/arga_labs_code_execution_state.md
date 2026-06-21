@@ -2,11 +2,11 @@ Subject: Congrats on YC! Persistent sandbox state for test agents
 
 Hey Phillip,
 
-Congrats on the YC batch - very exciting!!
+Congrats on the YC batch.
 
-I'm Chris Fregly on the Applied AI team here at Anthropic, where I work with AI startups moving agents from demo to product.
+I'm Chris Fregly. I work with AI startups moving agents from demo to product.
 
-I saw you're building real-world sandboxes to test agents and agent-facing software. From one former founder to an active founder, builder to builder, I wanted to share a Claude pattern for test agents that need generated files, fixtures, logs, or intermediate state to survive across separate API calls.
+I saw you're building real-world sandboxes to test agents and agent-facing software. The Claude pattern that maps to that workload is persistent code-execution state for test agents that need generated files, fixtures, logs, or intermediate state to survive across separate API calls.
 
 The practical version: have Claude write a file during one request, save `r1.container.id`, then pass that value back as `container=container_id` on the next request. Claude keeps using the same code-execution workspace, so the next test step can read the files, logs, or fixtures the previous step created instead of rebuilding them from scratch.
 
@@ -37,11 +37,11 @@ Using my API key, after a 31-minute idle, Claude read the file back from the sam
 
 Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state
 
-Run it in about a minute for about $0.05:
+Run it in about a minute for $0.05:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-# Starter credits if you need an API key: https://claude.com/offers?offer_code=bdfcc786-eb41-44f3-9190-e29e6e38209c&signup_code=3a6e0453a611a2c4bd79968fa98e3471
+# Starter credits if you need an API key: <starter-credit-link>
 export ANTHROPIC_API_KEY=your-api-key
 make code_execution_state
 ```
@@ -53,4 +53,4 @@ If the harder Arga bottleneck is a different part of the eval loop, reply with t
 Happy building,
 
 --Chris Fregly
-Applied AI, Anthropic
+Building with Claude

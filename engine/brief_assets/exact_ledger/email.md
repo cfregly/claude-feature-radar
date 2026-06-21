@@ -22,15 +22,15 @@ resp = client.messages.create(
 
 Using my API key, on a long report chain, the agent returned the exact 10/10 list and held peak carried context to about 35k tokens while old bulky tool results fell away. The full run was $0.67 and 60.7s.
 
-I ran it head-to-head against the others, same workload (2026-06-19). All three returned the exact list, so this is cost and speed at equal correctness:
+I ran it head-to-head against the others, same workload (captured 2026-06-20). All three returned the exact list, so this is cost at equal correctness:
 
-| Stack | Cost, full run | Versus Claude |
-| --- | --- | --- |
-| Claude, context editing | $0.67 | best |
-| OpenAI, compaction | $1.84 | Claude 64% cheaper, 63% faster |
-| Gemini, full window | $2.57 | Claude 74% cheaper |
+| Stack | Cost, this run | Wall time | Correctness | Versus Claude |
+| --- | ---: | ---: | --- | --- |
+| Claude `claude-haiku-4-5-20251001`, context editing | $0.17 | 14.3s | exact | best |
+| OpenAI `gpt-5.5`, compaction | $0.46 | 31.6s | exact | Claude 63% cheaper |
+| Gemini `gemini-3.1-pro-preview`, full window | $0.35 | 23.8s | exact | Claude 51% cheaper |
 
-To try it, one clone and one command, about $0.17 and a minute on Claude Haiku 4.5:
+To try it, one clone and one command, $0.17 and a minute on Claude Haiku 4.5:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
@@ -39,15 +39,19 @@ make exact_ledger
 ```
 
 Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/exact_ledger
+Committed comparison receipt: https://github.com/cfregly/claude-feature-hits/blob/main/exact_ledger/compare_sample.txt
 
 Docs: https://platform.claude.com/docs/en/build-with-claude/context-editing
 
-Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make exact_ledger COMPARE=1`. It runs all three side by side on the same chain, a few dollars and several minutes since each competitor runs the full agent. The table above is the longer full run, so a quick reproduce lands lower in absolute cost while Claude still keeps the exact list for the lowest bill, and the lead widens as the stream grows.
+Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make exact_ledger COMPARE=1`. It runs all three side by side on the same chain, a few dollars and several minutes since each competitor runs the full agent. The table above is the committed comparison receipt.
 
 To run it on your own data, edit `exact_ledger/run.py`: point the reader at your records and your flag rule, then run `make exact_ledger` again.
 
 One note: context editing is in beta, so set the header on the request, `anthropic-beta: context-management-2025-06-27`.
 
+If you reply with the bottleneck you are working through, I can point you to the closest Claude pattern.
+
 Happy building,
-{your_name}
+
+--Chris Fregly
 Building with Claude

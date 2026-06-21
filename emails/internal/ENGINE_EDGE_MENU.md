@@ -61,7 +61,7 @@ git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-r
 make setup
 make compare-deps                  # the OpenAI and Gemini arms
 cp .env.example .env               # paste ANTHROPIC_API_KEY, OPENAI_API_KEY, GEMINI_API_KEY
-make programmatic-tool-calling                           # start with your bottleneck's edge, about $0.08
+make programmatic-tool-calling                           # start with your bottleneck's edge, $0.08
 ```
 
 Most edges are cents to a couple of dollars and print their cost before they commit anything. Each one

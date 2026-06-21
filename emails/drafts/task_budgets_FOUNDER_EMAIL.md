@@ -26,7 +26,7 @@ I measured it on a budget-sensitive audit, same prompt both times. With the budg
 
 Only Claude's task budget gives the model a budget marker for the whole agentic loop, so it is the only one that stopped before the first tool call. Scoped to one avoided tool action on this run.
 
-Reproduce it in a few seconds for about $0.01. One clone, one command:
+Reproduce it in a few seconds for $0.01. One clone, one command:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits

@@ -35,8 +35,7 @@ GEMINI_MODEL = "gem-pro"   # gemini-3.1-pro-preview
 
 # The committed dated full-run measurement (the brief README table). This brief runs a shorter chain
 # than that full run, so the live numbers below land lower in absolute cost. The reference is printed
-# next to the live result so the difference reads as scale, not drift. context editing's lead widens
-# with the stream, so the longer dated run shows the larger gap.
+# next to the live result so the difference reads as scale, not drift.
 DATED = {"date": "2026-06-19", "claude": 0.67, "openai": 1.84, "gemini": 2.57,
          "openai_pct": 64, "gemini_pct": 74}
 
@@ -184,37 +183,37 @@ def append_comparison(model_key: str, claude_result: dict) -> None:
 
     claude_cost = claude_result.get("cost", 0.0)
     claude_exact = claude_result.get("exact", False)
-    rows = [("Claude (context editing)", "$" + format(claude_cost, ".2f"),
-             "exact" if claude_exact else "see run output")]
+    claude_elapsed = claude_result.get("elapsed", 0.0)
+    rows = [("Claude " + get(model_key).id + " (context editing)", "$" + format(claude_cost, ".2f"),
+             (format(claude_elapsed, ".1f") + "s") if claude_elapsed else "-", "exact" if claude_exact else "see run output")]
     for arm in (oai, gem):
         if "skipped" in arm:
-            rows.append((arm.get("label", "competitor"), "skipped: " + arm["skipped"], ""))
+            rows.append((arm.get("label", "competitor"), "skipped: " + arm["skipped"], "-", ""))
             continue
         exact = arm.get("answer") == gold
         versus = ""
         if exact and claude_exact and arm["cost"] > claude_cost > 0:
             pct = round((1 - claude_cost / arm["cost"]) * 100)
             versus = "Claude " + str(pct) + "% cheaper"
-        rows.append((arm["label"], "$" + format(arm["cost"], ".2f"), "exact" if exact else "list not exact"))
+        rows.append((arm["label"], "$" + format(arm["cost"], ".2f"),
+                     format(arm.get("elapsed", 0.0), ".1f") + "s", "exact" if exact else "list not exact"))
         if versus:
-            rows.append(("", "", versus))
+            rows.append(("", "", "", versus))
 
-    print(f"  {'stack':<34}{'cost, this run':>16}{'correctness':>16}")
-    print("  " + "-" * 66)
-    for label, cost, note in rows:
-        print(f"  {label:<34}{cost:>16}{note:>16}")
-    print("  " + "-" * 66)
+    print(f"  {'stack':<58}{'cost, this run':>16}{'wall time':>12}{'correctness':>16}")
+    print("  " + "-" * 102)
+    for label, cost, elapsed, note in rows:
+        print(f"  {label:<58}{cost:>16}{elapsed:>12}{note:>16}")
+    print("  " + "-" * 102)
     print()
     print("  Claude clears the bulky tool results in place and holds the carried context flat, so it keeps")
     print("  the exact list for the lowest bill while the compaction and full-window runs carry more.")
     print()
     # The dated full-run figures from the brief table, labeled, so the live numbers above (a shorter
-    # chain, so lower absolute cost) read as a scale difference, not drift. The lead is larger on the
-    # longer dated run because context editing's advantage compounds with the length of the stream.
+    # chain, so lower absolute cost) read as a scale difference, not drift.
     print("  Dated full-run measurement (" + DATED["date"] + ", a longer 10-of-10 chain), for reference:")
     print("    Claude $" + format(DATED["claude"], ".2f")
           + ", OpenAI $" + format(DATED["openai"], ".2f") + " (Claude " + str(DATED["openai_pct"]) + "% cheaper)"
           + ", Gemini $" + format(DATED["gemini"], ".2f") + " (Claude " + str(DATED["gemini_pct"]) + "% cheaper).")
-    print("  This brief runs a shorter chain, so the absolute cost is lower and Claude's lead widens as")
-    print("  the stream grows.")
+    print("  This brief runs a shorter chain, so the absolute cost is lower than the dated full run.")
     print()

@@ -21,7 +21,7 @@ TABLE_COST_TOL = 0.015
 
 # (file, regex with one capturing group for the dollar total). Each is anchored tightly enough to
 # match only the citations cost claim, not another "$X" figure in the same file.
-# NOTE: the citations founder email (emails/citations_FOUNDER_EMAIL.md) is NOT listed here on purpose.
+# NOTE: the citations founder email draft (emails/drafts/citations_FOUNDER_EMAIL.md) is NOT listed here on purpose.
 # That email tells the reader to clone claude-feature-hits and run the BRIEF's `make citations`, gated
 # by the hits repo's own number gate. Both that brief and this engine edge run a single Claude
 # Citations arm (~$0.01).

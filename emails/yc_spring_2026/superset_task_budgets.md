@@ -2,13 +2,13 @@ Subject: Congrats on YC! Clean handoffs for many coding agents
 
 Hey Kiet,
 
-Congrats on the YC batch - very exciting!!
+Congrats on the YC batch.
 
-I'm Chris Fregly on the Applied AI team here at Anthropic. I work with AI startups on the operational edges that appear once agents are running in parallel, not just in a demo.
+I'm Chris Fregly. I work with AI startups on the operational edges that appear once agents are running in parallel, not just in a demo.
 
-I saw Superset helps engineers run 100s of coding agents in parallel. From one former founder to an active founder, builder to builder, I wanted to share a Claude pattern for coding agents that should stop cleanly before starting tool work they cannot finish.
+I saw Superset helps engineers run 100s of coding agents in parallel. The Claude pattern that maps to that workload is loop-level task budgeting, so each agent can stop cleanly before it starts tool work it cannot finish.
 
-Claude task budgets give the model a token budget for the whole agent loop: thinking, tool calls, tool results, and output. The model sees a running countdown and can hand off cleanly before starting a tool call it cannot pay for.
+Claude task budgets give the model a token budget for the whole agent loop: thinking, tool calls, tool results, and output. The model sees a running countdown and can hand off cleanly before starting work it cannot pay for. At Superset scale, that matters because a small overshoot multiplied across hundreds of parallel coding agents becomes real latency, queue pressure, and bill variance.
 
 ```python
 msg = client.beta.messages.create(
@@ -24,15 +24,15 @@ msg = client.beta.messages.create(
 )
 ```
 
-Using my API key, with the hidden task budget near zero, Claude made 0 tool calls and handed off before touching the first record. With budget to spare, the same agent started the loop and made 1 call. Scoped to one avoided tool action on this run.
+Using my API key, with the task budget exhausted, Claude made 0 tool calls and handed off before touching the first record. With budget to spare, the same agent started the loop and made 1 call. Scoped to one avoided tool action on this run, the point is the control surface: many agents can stop before launching work they no longer have budget to complete.
 
 Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/task_budgets
 
-Run it in a few seconds for about $0.01:
+Run it in a few seconds for $0.01:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-# Starter credits if you need an API key: https://claude.com/offers?offer_code=bdfcc786-eb41-44f3-9190-e29e6e38209c&signup_code=3a6e0453a611a2c4bd79968fa98e3471
+# Starter credits if you need an API key: <starter-credit-link>
 export ANTHROPIC_API_KEY=your-api-key
 make task_budgets
 ```
@@ -44,4 +44,4 @@ If Superset is hitting a different many-agent failure mode, reply with the patte
 Happy building,
 
 --Chris Fregly
-Applied AI, Anthropic
+Building with Claude

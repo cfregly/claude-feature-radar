@@ -27,7 +27,7 @@ I measured it over 8 questions on real documents: every claim came back with a p
 the source (8 of 8), and the quote costs no output tokens. The important part is that the API returns
 the source span directly, so your app is not guessing where a quote came from.
 
-Run it: `make citations` (about $0.01 using your API key). Point it at your own documents to see your resolve
+Run it: `make citations` ($0.01 using your API key). Point it at your own documents to see your resolve
 rate.
 
 Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/citations

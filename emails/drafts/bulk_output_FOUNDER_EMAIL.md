@@ -29,7 +29,7 @@ How that single-request output ceiling compares, from each vendor's own docs:
 
 It runs at the batch discount and most batches finish in under an hour, so it fits a nightly job, not a live request.
 
-Reproduce the live check in about a minute for roughly $0.20. The 230,607-token headline is the `python -m bulk_output.run --full` run from the saved full-run output, about $3.46:
+Reproduce the live check in about a minute for $0.20. The 230,607-token headline is the `python -m bulk_output.run --full` run from the saved full-run output, $3.46:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits

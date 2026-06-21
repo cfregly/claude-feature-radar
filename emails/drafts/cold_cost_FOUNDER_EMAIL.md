@@ -37,7 +37,7 @@ About 28% fewer billed input tokens, and the sandbox returned the exact winner. 
 fan-out shape, many calls over data the model then crunches.
 
 Run it on your own tool: edit one file, programmatic_tool_calling/my_tool.py, paste your tool dict and
-the Python that runs it, then `make programmatic_tool_calling` (about $0.08 using your API key).
+the Python that runs it, then `make programmatic_tool_calling` ($0.08 using your API key).
 
 Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
 

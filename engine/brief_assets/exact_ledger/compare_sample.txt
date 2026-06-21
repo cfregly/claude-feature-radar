@@ -1,0 +1,35 @@
+  Exact-list ledger comparison receipt.
+  Captured from: make exact_ledger COMPARE=1
+  Captured: 2026-06-20
+
+  Exact-list ledger over a 8-report chain, each report about 20,000 tokens.
+  Claude Claude Haiku 4.5, context editing on (clear old tool results, keep 1).
+
+  metric                           value
+  --------------------------------------
+  gold URGENT ids              [0, 3, 6]
+  Claude answer                [0, 3, 6]
+  exact list                         yes
+  peak carried context            17,041
+  cost (USD)                       $0.17
+  wall time (s)                     14.3
+
+  Reproducing the head-to-head: the same long ledger agent over the same chain, cost at equal
+  correctness. The OpenAI and Gemini arms each run the multi-turn agent live, so this costs a
+  few dollars and several minutes. the comparison SDKs are optional. Install them with: pip install -r requirements-compare.txt.
+
+  stack                                                       cost, this run   wall time     correctness
+  ------------------------------------------------------------------------------------------------------
+  Claude claude-haiku-4-5-20251001 (context editing)                   $0.17       14.3s           exact
+  OpenAI gpt-5.5 (compaction)                                          $0.46       31.6s           exact
+                                                                                        Claude 63% cheaper
+  Gemini gemini-3.1-pro-preview (full context)                         $0.35       23.8s           exact
+                                                                                        Claude 51% cheaper
+  ------------------------------------------------------------------------------------------------------
+
+  Claude clears the bulky tool results in place and holds the carried context flat, so it keeps
+  the exact list for the lowest bill while the compaction and full-window runs carry more.
+
+  Dated full-run measurement (2026-06-19, a longer 10-of-10 chain), for reference:
+    Claude $0.67, OpenAI $1.84 (Claude 64% cheaper), Gemini $2.57 (Claude 74% cheaper).
+  This brief runs a shorter chain, so the absolute cost is lower than the dated full run.

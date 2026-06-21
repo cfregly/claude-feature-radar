@@ -2,11 +2,11 @@ Subject: Congrats on YC! A sandbox pattern for work-app agents
 
 Hey Jonny,
 
-Congrats on getting Tasklet into YC - very exciting!!
+Congrats on getting Tasklet into YC.
 
-I'm Chris Fregly on the Applied AI team here at Anthropic. I spend my time with AI startups on the mechanics that make agents cheaper, more reliable, and easier to ship.
+I'm Chris Fregly. I spend my time with AI startups on the mechanics that make agents cheaper, more reliable, and easier to ship.
 
-I saw Tasklet is building agents that call work-app APIs to get tasks done. From one former founder to an active founder, builder to builder, I wanted to share a Claude pattern for app-API agents that need to make many calls, inspect bulky intermediate results, and return one action.
+I saw Tasklet is building agents that call work-app APIs to get tasks done. The Claude pattern that maps to that workload is app-API fan-out where the agent makes many calls, inspects bulky intermediate results, and returns one action.
 
 Without a filter point, every API result flows into the model context. Claude programmatic tool calling gives you that filter point. Mark your tool as callable from code execution, then Claude can write a sandbox script that loops over the tool and returns only the answer the model needs.
 
@@ -22,11 +22,11 @@ Using my API key, the measured fan-out run went from 9,451 to 6,828 billed input
 
 Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
 
-Run it in about two minutes for about $0.08:
+Run it in about two minutes for $0.08:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-# Starter credits if you need an API key: https://claude.com/offers?offer_code=bdfcc786-eb41-44f3-9190-e29e6e38209c&signup_code=3a6e0453a611a2c4bd79968fa98e3471
+# Starter credits if you need an API key: <starter-credit-link>
 export ANTHROPIC_API_KEY=your-api-key
 make programmatic_tool_calling
 ```
@@ -38,4 +38,4 @@ If Tasklet's heavier bottleneck is a different app-agent loop, reply with that f
 Happy building,
 
 --Chris Fregly
-Applied AI, Anthropic
+Building with Claude

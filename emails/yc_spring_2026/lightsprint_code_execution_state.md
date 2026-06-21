@@ -2,11 +2,11 @@ Subject: Congrats on YC! Persistent state for AI build agents
 
 Hey Ben,
 
-Congrats on the batch, and on getting Lightsprint in front of YC. Very exciting!!
+Congrats on the batch, and on getting Lightsprint in front of YC.
 
-I'm Chris Fregly on the Applied AI team here at Anthropic. I focus on the agent-product details that start mattering once teams expect agents to keep real work moving across sessions.
+I'm Chris Fregly. I focus on the agent-product details that start mattering once teams expect agents to keep real work moving across sessions.
 
-I saw Lightsprint is building collaborative product development with cloud agents so teams can plan, preview, and ship with agents. From one former founder to an active founder, builder to builder, I wanted to share a Claude pattern for build agents that need generated files, test output, and scratch state to survive when a user steps away.
+I saw Lightsprint is building collaborative product development with cloud agents so teams can plan, preview, and ship with agents. The Claude pattern that maps to that workload is persistent code-execution state for build agents that need generated files, test output, and scratch state to survive when a user steps away.
 
 The practical version: have Claude write generated files during one request, save `r1.container.id`, then pass that value back as `container=container_id` on the next request. Claude keeps using the same code-execution workspace, so the next build step can read the files, test output, or scratch state the previous step created instead of rebuilding them from scratch.
 
@@ -37,11 +37,11 @@ Using my API key, after a 31-minute idle, Claude read the file back from the sam
 
 Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state
 
-Run it in about a minute for about $0.05:
+Run it in about a minute for $0.05:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-# Starter credits if you need an API key: https://claude.com/offers?offer_code=bdfcc786-eb41-44f3-9190-e29e6e38209c&signup_code=3a6e0453a611a2c4bd79968fa98e3471
+# Starter credits if you need an API key: <starter-credit-link>
 export ANTHROPIC_API_KEY=your-api-key
 make code_execution_state
 ```
@@ -53,4 +53,4 @@ If the state boundary in Lightsprint is somewhere else, reply with the rough wor
 Happy building,
 
 --Chris Fregly
-Applied AI, Anthropic
+Building with Claude
