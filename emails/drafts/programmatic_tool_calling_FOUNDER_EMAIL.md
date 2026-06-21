@@ -29,7 +29,7 @@ Same task, same model (Sonnet 4.6), the only change is the feature on or off:
 | without programmatic tool calling | 9,451 | every row lands in the model's context |
 | with programmatic tool calling | 6,828 | only the answer reaches the model |
 
-28% fewer input tokens on my run, with the exact winner returned from the sandbox. The saving grows with the size of the fan-out (an agent calling one tool many times over data it then crunches).
+That is 28% fewer input tokens than the same Claude agent without programmatic tool calling, with the exact winner returned from the sandbox. The saving grows with the size of the fan-out (an agent calling one tool many times over data it then crunches).
 
 Why I am sending this for your workload: `allowed_callers` lets Claude call your own tool from the code sandbox and return only the computed answer to the model. For metering across many cohorts, that is the difference between paying for every row and paying for the answer.
 

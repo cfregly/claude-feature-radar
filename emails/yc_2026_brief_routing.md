@@ -3,16 +3,17 @@
 Source list: TechCrunch, "The 11 standout startups from YC's Demo Day, according to VCs," published
 2026-06-18: https://techcrunch.com/2026/06/18/the-11-standout-startups-from-ycs-demo-day-according-to-vcs/
 
-Company pages and founder greetings last reviewed from public YC pages on 2026-06-20.
+Company pages and founder greetings last reviewed from public YC pages on 2026-06-21.
 
 The batch-level email is `emails/YC_BATCH_FOUNDER_EMAIL.md`. In the submitted founder-email Google
 Doc, put the batch email first, then include this routing table and the six routed drafts below as an
 appendix. Each routed company draft names the workload in the opener and points to the exact public
 brief README, demo GIF, code, and sample output. Reused numbers are intentional: each routed draft
 points to the same reproducible public run for that Claude pattern, measured once using my API key, so a
-founder can rerun the brief before swapping in their own workload. The five hardware, defense, and
-security companies do not map to a Claude builder edge, so they are not contacted: targeting, not
-spraying.
+founder can rerun the brief before swapping in their own workload. The companies outside the routed
+set are not lower value. They just do not map cleanly to one of the measured public feature briefs in
+`claude-feature-hits`. The rule is targeting, not spraying: send a runnable edge only when the
+company's public workload maps to that exact edge.
 
 ## Routed (6)
 
@@ -37,19 +38,30 @@ page clearly marks a CEO founder. Re-check the page before sending because found
 - **Superset:** high. YC page says Superset helps engineers run 100s of coding agents in parallel. Task budgets maps to stopping many agents cleanly before they start work they cannot finish.
 - **Lightsprint:** high. YC page describes collaborative product development with cloud agents, multiple agents working a codebase, PR previews, and non-engineers shipping product changes. Code-execution state maps to multi-step build agents that need files and test output to persist.
 
-## Not contacted (5, no edge fit)
+## Not routed into this email appendix
 
-9 Mothers (counter-drone hardware), Adialante (MRI hardware), Dispatch (spacecraft), Ploy
-(marketing-copy generation), Silmaril (agent security infrastructure). None maps to a measured Claude
-builder edge, so a cold email would be noise.
+- **Hardware and defense systems:** 9 Mothers, Adialante, and Dispatch are interesting companies, but
+  the public feature briefs here are Claude API builder patterns, not hardware or spacecraft
+  activation briefs.
+- **Ploy:** marketing-copy generation could use Claude, but the public page does not expose a
+  sharper measured bottleneck than generic copy quality. A broad "try Claude" email would be noise.
+- **Silmaril:** high-value safety conversation, not a feature-hits cold route. The YC page describes
+  prompt-injection defense that self-improves for AI-native applications and agents. That maps to a
+  discovery or Product/security conversation about prompt-injection evals, tool-boundary controls,
+  hooks, and adversarial testing. It does not yet map to one of the measured public `claude-feature-hits`
+  briefs with a saved Claude win, so I would not force it into this appendix. If asked live, the move
+  is: "I would absolutely take Silmaril. I would not send the generic feature brief. I would run a
+  security discovery call and bring a prompt-injection eval or tool-boundary demo." Source:
+  https://www.ycombinator.com/companies/silmaril
 
 ## How to use
 
 Each company-specific email pre-fills the founder greeting from the public YC company page. Re-check
-the source URL before sending. The email already carries the public brief link, the demo GIF, the code
-change, the measured result, the starter-credit CTA, the one-command reproduce path, and a narrow
-reply path: send the real bottleneck and Chris can point to the closest Claude pattern. The emails
-intentionally include only the public brief/repo links plus the starter-credit link. Docs and
-references live in the brief to keep the email focused and keep the link count low. Every brief is
-public and runnable at `cfregly/claude-feature-hits`:
+the source URL before sending. Re-check completed on 2026-06-21: the active-founder greetings still
+match Sherwood, Jonny, Gustav, Phillip, Kiet, and Ben. The email already carries the public brief
+link, the demo GIF, the code change, the measured result, the Console API-key step, the one-command
+reproduce path, and a narrow reply path: send the real bottleneck and Chris can point to the closest
+Claude pattern. The emails intentionally include only the public brief/repo links plus the Console
+API-key link. Docs and references live in the brief to keep the email focused and keep the link count
+low. Every brief is public and runnable at `cfregly/claude-feature-hits`:
 https://github.com/cfregly/claude-feature-hits

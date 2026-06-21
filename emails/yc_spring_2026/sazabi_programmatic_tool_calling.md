@@ -22,7 +22,7 @@ response = client.messages.create(
 )
 ```
 
-Using my API key, the same fan-out task on 240 rows went from 9,451 to 6,828 billed input tokens, with the exact winner returned from the sandbox. That is 28% fewer billed input tokens on the measured run.
+Using my API key, the same fan-out task on 240 rows went from 9,451 to 6,828 billed input tokens, with the exact winner returned from the sandbox. That is 28% fewer billed input tokens than the same Claude agent without programmatic tool calling.
 
 Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
 

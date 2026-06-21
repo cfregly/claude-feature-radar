@@ -18,7 +18,7 @@ Every edge here is verified before it ships. The engine runs a skeptic pass on e
 to best and latest to latest across vendors, and keeps only the differentiators that survive it, so a
 win on this page has already beaten its toughest reading.
 
-## Lead edge: programmatic tool calling, about 28% fewer billed input tokens (`make programmatic-tool-calling`)
+## Lead edge: programmatic tool calling, about 28% fewer billed input tokens than the same Claude agent without the feature (`make programmatic-tool-calling`)
 
 If your agent calls a tool many times over data it then crunches (usage rollups across cohorts,
 plan-limit checks across accounts, log or trace triage), every tool result flows into the model's
@@ -37,8 +37,7 @@ regions of 60 sales rows each (240 rows), find the highest-revenue region.
 | plain tool use | 9,451 | all 240 rows flow through the model's context |
 | programmatic | 6,828 | the sandbox aggregates, only the answer (east) reaches the model |
 
-A 28% input-token cut, and the sandbox returns the exact winner. This pays off when your agent calls
-a tool many times over data it then crunches (the fan-out shape). The full receipt is [`edges/programmatic-tool-calling/sample.txt`](edges/programmatic-tool-calling/sample.txt).
+A 28% input-token cut against the same Claude agent without programmatic tool calling, and the sandbox returns the exact winner. This pays off when your agent calls a tool many times over data it then crunches (the fan-out shape). The full receipt is [`edges/programmatic-tool-calling/sample.txt`](edges/programmatic-tool-calling/sample.txt).
 
 ```bash
 make programmatic-tool-calling          # about $0.08 on Sonnet, needs ANTHROPIC_API_KEY

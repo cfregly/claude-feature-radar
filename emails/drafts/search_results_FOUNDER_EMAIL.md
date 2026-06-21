@@ -23,8 +23,8 @@ Here is the same run head-to-head, citing your own inline RAG chunks (RAG = your
 | Platform | Citation pointer | Objects you store |
 |----------|------------------|-------------------|
 | Claude   | block-range (chunk + block) | 0 persisted |
-| OpenAI   | file/chunk-level | 6 persisted |
-| Gemini   | file/chunk-level | 6 persisted |
+| OpenAI   | hosted-store pointer | 6 persisted |
+| Gemini   | hosted-store pointer | 6 persisted |
 
 Cost to reproduce the Claude side is $0.01 and it runs in about a minute. One clone, one command:
 
