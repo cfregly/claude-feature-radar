@@ -45,6 +45,7 @@ import pathlib
 from common.client import repo_root
 from engine import coverage as coverage_view
 from engine import gate, scan, sweep_edges
+from engine.demokinds import PRIVATE_ONLY_DEMOKINDS, demokind_for
 from engine.demonstrators.registry import register_all
 
 # The banned characters the prose deslop gate forbids. The cadence drafts deslop-clean by construction
@@ -76,11 +77,17 @@ PUBLIC_CLAIMS = {
 
 # ----- draft-to-outbox (ALWAYS, $0, deterministic, no model call) --------------------------------
 
+def _private_only(edge: dict) -> bool:
+    kind = edge.get("demoKind") or edge.get("demo_kind") or demokind_for(edge.get("key", ""),
+                                                                        edge.get("axis"))
+    return kind in PRIVATE_ONLY_DEMOKINDS
+
+
 def _anchor_edge(ranked: list[dict], covered_keys: set[str]) -> dict | None:
     """The newest UNCOVERED lead edge: the top-ranked genuine lead whose key the stream has not already
     drafted. Falls back to the top lead when every lead is covered (so a run always has an anchor when a
     lead exists). Returns None when there is no genuine lead this run."""
-    leads = [e for e in ranked if e.get("lead_score", 0) > 0]
+    leads = [e for e in ranked if e.get("lead_score", 0) > 0 and not _private_only(e)]
     if not leads:
         return None
     for e in leads:

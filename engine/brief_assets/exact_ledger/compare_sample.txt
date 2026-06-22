@@ -15,8 +15,9 @@
   wall time (s)                     14.3
 
   Reproducing the head-to-head: the same long ledger agent over the same chain, cost at equal
-  correctness. The OpenAI and Gemini arms each run the multi-turn agent live, so this costs a
-  roughly the sum of the three printed rows and runs for a few minutes. the comparison SDKs are optional. Install them with: pip install -r requirements-compare.txt.
+  correctness. The OpenAI and Gemini arms each run the multi-turn agent live, so it costs roughly
+  the sum of the three printed rows and runs for a few minutes. The comparison SDKs are optional.
+  Install them with: pip install -r requirements-compare.txt.
 
   stack                                                       cost, this run   wall time     correctness
   ------------------------------------------------------------------------------------------------------

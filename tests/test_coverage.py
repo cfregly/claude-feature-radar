@@ -30,7 +30,7 @@ def test_public_kinds_report_a_bundle_and_internal_kinds_register_without_one():
         assert by_kind[kind]["bundle"]                # the edges/<dir> name
     # The internal kinds have a registered demonstrator but ship no public bundle (the publish gate
     # refuses them as regime-bounded or parity); the analysis runs and is kept local, never a gap.
-    for kind in ("eval_quality", "retention_resume", "cost", "other"):
+    for kind in ("eval_quality", "retention_resume", "cost", "security_posture", "other"):
         assert by_kind[kind]["registered"] is True
 
 
@@ -41,6 +41,7 @@ def test_port_status_labels_match_the_framework_asset_mapping():
     assert by_kind["eval_quality"]["port_status"] == "adapt"
     assert by_kind["retention_resume"]["port_status"] == "adapt"
     assert by_kind["cost"]["port_status"] == "build"
+    assert by_kind["security_posture"]["port_status"] == "build"
     assert by_kind["other"]["port_status"] == "build"
 
 
@@ -51,7 +52,7 @@ def test_gaps_do_not_flag_discovery_loop_or_internal_kinds():
     # discovery_loop is intrinsic (the cadence proves it, not a plugin); the internal kinds ship no
     # public bundle by design (the publish gate refuses them). None of these is a gap.
     assert not any("discovery_loop" in line for line in g)
-    for kind in ("other", "cost", "eval_quality", "retention_resume"):
+    for kind in ("other", "cost", "eval_quality", "retention_resume", "security_posture"):
         assert not any(line.startswith(f"{kind}:") for line in g)
 
 

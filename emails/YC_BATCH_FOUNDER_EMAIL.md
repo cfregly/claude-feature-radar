@@ -17,7 +17,7 @@ Pick the bottleneck you have this week:
 | **speed** for large outputs or long-stream work | [`make bulk_output`](https://github.com/cfregly/claude-feature-hits/tree/main/bulk_output) or [`make exact_ledger`](https://github.com/cfregly/claude-feature-hits/tree/main/exact_ledger) | one un-truncated large deliverable, or a faster exact long-stream run |
 | **reliability** for multi-step code, data, or build agents | [`make code_execution_state`](https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state) or [`make task_budgets`](https://github.com/cfregly/claude-feature-hits/tree/main/task_budgets) | sandbox files that survive across separate requests, or loop-level budget handoffs |
 | **accuracy** for answers over PDFs, docs, filings, or retrieved chunks | [`make pdf_citations`](https://github.com/cfregly/claude-feature-hits/tree/main/pdf_citations) or [`make citations`](https://github.com/cfregly/claude-feature-hits/tree/main/citations) | page-level pointers for PDFs and character-level pointers for text docs |
-| **security** for regulated data, MCP connectors, prompt injection, or agent attack surface | reply with that workflow | I can point you to the right Claude pattern: CMEK, Compliance API, Claude Code security review, enterprise-managed MCP auth, or a tool-boundary security review |
+| **security** for regulated data, MCP connectors, prompt injection, or agent attack surface | [`make security`](https://github.com/cfregly/claude-feature-hits#clone-and-run) | a local prompt-injection gate plus a source-backed controls map, both $0.00 |
 
 The code hooks are small:
 
@@ -54,12 +54,15 @@ git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hi
 # If this send has a startup credit code, include it here: <insert-credit-code>
 export ANTHROPIC_API_KEY=your-api-key
 make programmatic_tool_calling   # cost and speed for fan-out agents
-make document_citations          # accuracy for PDF and text-doc answers
+make citations                   # accuracy for text-doc answers
 make code_execution_state        # reliability for multi-step agents
+make security                    # security preflight plus source-backed controls map
 ```
 
-Each brief has a short demo GIF, the code, sample output, the exact cost, and the one file to edit
-for your own workload.
+Each brief has the code, sample output, the exact cost, and a named edit surface for your own
+workload, such as `programmatic_tool_calling/my_tool.py`, `citations/cite.py`,
+`tool_boundary_security/policy.json`, `security_controls_map/controls.json`, or the brief README's
+`Run it on your own data` section. Most also have a short demo GIF.
 
 If you reply with the bottleneck you are working through this week, I can point you to the closest
 Claude pattern.

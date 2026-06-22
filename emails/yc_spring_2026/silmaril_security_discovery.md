@@ -9,18 +9,21 @@ teams moving agent demos into production, where the hard questions are cost, spe
 accuracy, and security at the same time.
 
 I saw Silmaril is building prompt-injection defense that self-improves for AI-native applications and
-agents. I would not force that into one of my public feature-hit briefs. The sharper route is a
-security discovery conversation around the exact boundary your customers need to defend.
+agents. I made two small public security artifacts for exactly this boundary question: which tool
+action is high risk, which injected instructions should block or ask, what evidence gets logged, and
+which official source supports each security-control line.
 
-The Claude security surfaces I would map first:
+The Claude security surface I would map first is the exact boundary your product defends: model
+input, retrieved content, tool call, action policy, operator review, and buyer evidence. The public
+preflight is deliberately narrow. It prints 5/5 controls, 4/4 prompt-injection cases, 0 dangerous
+actions allowed, and $0.00 cost:
 
-| Security question | Claude pattern to test |
-| --- | --- |
-| Can we find vulnerable code paths before they ship? | Claude Code security review in the developer workflow |
-| Can we review agent PRs before merge? | Claude Code security safeguards and PR-level review |
-| Can we make tool boundaries explicit? | MCP/tool contract review: typed args, failure modes, destructive-action boundaries |
-| Can enterprise buyers audit usage? | Compliance API, audit logs, connector controls |
-| Can regulated customers own the encryption boundary? | CMEK for eligible Enterprise and Platform organizations |
+https://github.com/cfregly/claude-feature-hits/tree/main/tool_boundary_security
+
+The companion controls map is also public and zero-spend. It checks ten security rows against
+official-source snapshots and caveats before any copy ships:
+
+https://github.com/cfregly/claude-feature-hits/tree/main/security_controls_map
 
 The test I would build with you is not a generic "try Claude" demo. It is a prompt-injection eval
 over an agent with real tool access:
@@ -32,10 +35,17 @@ evidence: tool call, refusal, source, and audit event
 ```
 
 That gives you the security pillar in the same language buyers use: which attack chain was stopped,
-which tool boundary caught it, what got logged, and what the operator does next.
+which boundary caught it, and what the operator does next.
+
+Run it:
+
+```shell
+git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
+make security
+```
 
 If useful, reply with one prompt-injection workflow you use in demos. I can point you to the closest
-Claude security pattern and the exact eval shape I would run.
+Claude security pattern, the exact eval shape, and the source row I would map it to.
 
 Happy building,
 

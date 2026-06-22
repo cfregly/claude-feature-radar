@@ -23,6 +23,7 @@ def _targets():
     docs += sorted((ROOT / "edges").glob("*/*.md"))   # per-edge FOUNDER_EMAIL, PRODUCT_EMAIL, README
     docs += sorted((ROOT / "emails").glob("*.md"))    # the founder outreach emails
     docs += sorted((ROOT / "emails").glob("**/*.md"))  # company-specific founder drafts
+    docs += sorted((ROOT / "state" / "outbox").glob("*.md"))
     return docs
 
 

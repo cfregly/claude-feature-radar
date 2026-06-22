@@ -43,7 +43,7 @@ About a minute on one API key.
 Edit `cache_diagnostics/run.py` to point the two calls at your own system prompt, tools, or messages, then run:
 
 ```bash
-python cache_diagnostics/run.py --check
+.venv/bin/python -m cache_diagnostics.run --check
 ```
 
 ## Learn more

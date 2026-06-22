@@ -3,6 +3,10 @@
 A private engine that repeatedly finds live Claude platform feature edges, proves them on real
 workloads, and publishes only verified Claude wins into public runnable briefs.
 
+Package role: this is the private method repo. Show it live when useful, but do not send a public
+link. The public founder-facing output is `claude-feature-hits`. The Product feedback output stays
+private.
+
 The Claude Developer Platform ships every month, so the sharpest edge moves. This repo re-checks the
 live docs, ranks the genuine differentiators by what a founder building a product actually prices:
 cost, speed, reliability, accuracy, and security. It ships only the winning public pattern, with
@@ -417,7 +421,7 @@ at all, so a chat client can never trigger them.
 
 | Tool | What it does | Lane | Spend |
 |------|--------------|------|-------|
-| `list_edges` | The ranked edges from the landscape (verdict, lead basis and score, value, axis) | Safe, unattended | $0 |
+| `list_edges` | The ranked edge set (verdict, lead basis and score, value, axis) | Safe, unattended | $0 |
 | `show_landscape` | A summary: counts by verdict, the top leads, coverage gaps | Safe, unattended | $0 |
 | `show_coverage` | Per-demoKind coverage plus the recent coverage ledger | Safe, unattended | $0 |
 | `show_boundary` | The gate lanes, the per-tool tier, and the audit (which must be empty) | Safe, unattended | $0 |

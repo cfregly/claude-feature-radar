@@ -1,0 +1,214 @@
+Source: https://platform.claude.com/docs/en/build-with-claude/citations
+Snapshot fetched 2026-06-22. Verbatim excerpts for citation grounding.
+
+Citations - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop reasons and fallback Refusals and fallback Fallback credit Model capabilities Extended thinking Adaptive thinking Effort Task budgets (beta) Fast mode (research preview) Structured outputs Citations Streaming Messages Batch processing Search results Streaming refusals Multilingual support Embeddings Tools Overview How tool use works Tutorial: Build a tool-using agent Define tools Handle tool calls Parallel tool use Tool Runner (SDK) Strict tool use Tool use with prompt caching Server tools Troubleshooting Web search tool Web fetch tool Code execution tool Advisor tool Memory tool Bash tool Computer use tool Text editor tool Tool infrastructure Tool reference Manage tool context Tool combinations Tool search Programmatic tool calling Fine-grained tool streaming Context management Context windows Compaction Context editing Prompt caching Mid-conversation system messages Build an orchestration mode Cache diagnostics (beta) Token counting Working with files Files API PDF support Images and vision Skills Overview Quickstart Best practices Skills for enterprise Skills in the API MCP Remote MCP servers MCP connector MCP tunnels  Claude on cloud platforms Amazon Bedrock Amazon Bedrock (legacy) Claude Platform on AWS Microsoft Foundry Vertex AI  Log in  Messages  Citations Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Solutions AI agents Code modernization Coding Customer support Education Financial services Government Life sciences Partners Claude on AWS Google Cloud's Vertex AI Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Company Anthropic Careers Economic Futures Research News Responsible Scaling Policy Security and compliance Transparency Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Help and security Availability Status Support Discord Terms and policies Privacy policy Responsible disclosure policy Terms of service: Commercial Terms of service: Consumer Usage policy Messages / Model capabilities Citations Copy page  Copy page   This feature is eligible for Zero Data Retention (ZDR) . When your organization has a ZDR arrangement, data sent through this feature is not stored after the API response is returned.
+Claude is capable of providing detailed citations when answering questions about documents, helping you track and verify information sources in responses.
+All active models support citations, with the exception of Haiku 3.
+ Share your feedback and suggestions about the citations feature using this form .
+Here's an example of how to use citations with the Messages API:
+cURL CLI Python Java  client = anthropic.Anthropic()
+response = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 1024 ,
+messages = [
+{
+"role" : "user" ,
+"content" : [
+{
+"type" : "document" ,
+"source" : {
+"type" : "text" ,
+"media_type" : "text/plain" ,
+"data" : "The grass is green. The sky is blue." ,
+},
+"title" : "My Document" ,
+"context" : "This is a trustworthy document." ,
+"citations" : { "enabled" : True },
+},
+{ "type" : "text" , "text" : "What color is the grass and sky?" },
+],
+}
+],
+)
+print (response)
+ Comparison with prompt-based approaches In comparison with prompt-based citations solutions, the citations feature has the following advantages:
+Cost savings: If your prompt-based approach asks Claude to output direct quotes, you may see cost savings due to the fact that cited_text does not count towards your output tokens.
+Better citation reliability: Because citations are parsed into the respective response formats mentioned above and cited_text is extracted, citations are guaranteed to contain valid pointers to the provided documents.
+Improved citation quality: In evaluations, the citations feature was found to be significantly more likely to cite the most relevant quotes from documents as compared to purely prompt-based approaches.
+ How citations work
+Integrate citations with Claude in these steps:
+ Automatic chunking vs custom content By default, plain text and PDF documents are automatically chunked into sentences. If you need more control over citation granularity (e.g., for bullet points or transcripts), use custom content documents instead. See Document Types for more details. For example, if you want Claude to be able to cite specific sentences from your RAG chunks, you should put each RAG chunk into a plain text document. Otherwise, if you do not want any further chunking to be done, or if you want to customize any additional chunking, you can put RAG chunks into custom content document(s).
+ Citable vs non-citable content
+Text found within a document's source content can be cited from.
+title and context are optional fields that will be passed to the model but not used towards cited content.
+title is limited in length so you may find the context field to be useful in storing any document metadata as text or stringified json.
+ Citation indices
+Document indices are 0-indexed from the list of all document content blocks in the request (spanning across all messages).
+Character indices are 0-indexed with exclusive end indices.
+Page numbers are 1-indexed with exclusive end page numbers.
+Content block indices are 0-indexed with exclusive end indices from the content list provided in the custom content document.
+ Token costs
+Enabling citations incurs a slight increase in input tokens due to system prompt additions and document chunking.
+However, the citations feature is very efficient with output tokens. Under the hood, the model is outputting citations in a standardized format that are then parsed into cited text and document location indices. The cited_text field is provided for convenience and does not count towards output tokens.
+When passed back in subsequent conversation turns, cited_text is also not counted towards input tokens.
+ Feature compatibility
+Citations works in conjunction with other API features including prompt caching , token counting and batch processing .
+ Citations and Structured Outputs are incompatible Citations cannot be used together with Structured Outputs . If you enable citations on any user-provided document (Document blocks or RequestSearchResultBlock) and also include the output_config.format parameter (or the deprecated output_format parameter), the API will return a 400 error. This is because citations require interleaving citation blocks with text output, which is incompatible with the strict JSON schema constraints of structured outputs.
+ Using Prompt Caching with Citations
+Citations and prompt caching can be used together effectively.
+The citation blocks generated in responses cannot be cached directly, but the source documents they reference can be cached. To optimize performance, apply cache_control to your top-level document content blocks.
+In this example:
+The document content is cached using cache_control on the document block
+Citations are enabled on the document
+Claude can generate responses with citations while benefiting from cached document content
+Subsequent requests using the same document will benefit from the cached content
+ Document Types
+ Choosing a document type
+Three document types are supported for citations. Documents can be provided directly in the message (base64, text, or URL) or uploaded via the Files API and referenced by file_id :
+Type Best for Chunking Citation format Plain text Simple text documents, prose Sentence Character indices (0-indexed) PDF PDF files with text content Sentence Page numbers (1-indexed) Custom content Lists, transcripts, special formatting, more granular citations No additional chunking Block indices (0-indexed)
+ .csv, .xlsx, .docx, .md, and .txt files are not supported as document blocks. Convert these to plain text and include directly in message content. See Working with other file formats .
+ Plain text documents
+Plain text documents are automatically chunked into sentences. You can provide them inline or by reference with their file_id :
+Example plain text citation
+ PDF documents
+PDF documents can be provided as base64-encoded data, a URL, or by file_id . PDF text is extracted and chunked into sentences. As image citations are not yet supported, PDFs that are scans of documents and do not contain extractable text will not be citable.
+Example PDF citation
+ Custom content documents
+Custom content documents give you control over citation granularity. No additional chunking is done and chunks are provided to the model according to the content blocks provided.
+{
+"type" : "document" ,
+"source" : {
+"type" : "content" ,
+"content" : [
+{ "type" : "text" , "text" : "First chunk" },
+{ "type" : "text" , "text" : "Second chunk" },
+],
+},
+"title" : "Document Title" , # optional
+"context" : "Context about the document that will not be cited from" , # optional
+"citations" : { "enabled" : True },
+} 
+Example citation
+ Response Structure
+When citations are enabled, responses include multiple text blocks with citations:
+{
+"content" : [
+{ "type" : "text" , "text" : "According to the document, " },
+{
+"type" : "text" ,
+"text" : "the grass is green" ,
+"citations" : [
+{
+"type" : "char_location" ,
+"cited_text" : "The grass is green." ,
+"document_index" : 0 ,
+"document_title" : "Example Document" ,
+"start_char_index" : 0 ,
+"end_char_index" : 20 ,
+}
+],
+},
+{ "type" : "text" , "text" : " and " },
+{
+"type" : "text" ,
+"text" : "the sky is blue" ,
+"citations" : [
+{
+"type" : "char_location" ,
+"cited_text" : "The sky is blue." ,
+"document_index" : 0 ,
+"document_title" : "Example Document" ,
+"start_char_index" : 20 ,
+"end_char_index" : 36 ,
+}
+],
+},
+{
+"type" : "text" ,
+"text" : ". Information from page 5 states that " ,
+},
+{
+"type" : "text" ,
+"text" : "water is essential" ,
+"citations" : [
+{
+"type" : "page_location" ,
+"cited_text" : "Water is essential for life." ,
+"document_index" : 1 ,
+"document_title" : "PDF Document" ,
+"start_page_number" : 5 ,
+"end_page_number" : 6 ,
+}
+],
+},
+{
+"type" : "text" ,
+"text" : ". The custom document mentions " ,
+},
+{
+"type" : "text" ,
+"text" : "important findings" ,
+"citations" : [
+{
+"type" : "content_block_location" ,
+"cited_text" : "These are important findings." ,
+"document_index" : 2 ,
+"document_title" : "Custom Content Document" ,
+"start_block_index" : 0 ,
+"end_block_index" : 1 ,
+}
+],
+},
+]
+} 
+ Streaming Support
+For streaming responses, a citations_delta type is included that contains a single citation to be added to the citations list on the current text content block.
+Example streaming events Was this page helpful?   How citations work Citable vs non-citable content Citation indices Token costs Feature compatibility Document Types Choosing a document type Plain text documents PDF documents Custom content documents Response Structure Streaming Support 1 Provide document(s) and enable citations
+Include documents in any of the supported formats: PDFs , plain text , or custom content documents
+Set citations.enabled=true on each of your documents. Currently, citations must be enabled on all or none of the documents within a request.
+Note that only text citations are currently supported and image citations are not yet possible.
+2 Documents get processed
+Document contents are "chunked" in order to define the minimum granularity of possible citations. For example, sentence chunking would allow Claude to cite a single sentence or chain together multiple consecutive sentences to cite a paragraph (or longer)!
+For PDFs: Text is extracted as described in PDF Support and content is chunked into sentences. Citing images from PDFs is not currently supported.
+For plain text documents: Content is chunked into sentences that can be cited from.
+For custom content documents: Your provided content blocks are used as-is and no further chunking is done.
+3 Claude provides cited response
+Responses may now include multiple text blocks where each text block can contain a claim that Claude is making and a list of citations that support the claim.
+Citations reference specific locations in source documents. The format of these citations are dependent on the type of document being cited from.
+For PDFs: Citations include the page number range (1-indexed).
+For plain text documents: Citations include the character index range (0-indexed).
+For custom content documents: Citations include the content block index range (0-indexed) corresponding to the original content list provided.
+Document indices are provided to indicate the reference source and are 0-indexed according to the list of all documents in your original request.
+cURL CLI Python TypeScript  client = anthropic.Anthropic()
+# Long document content (e.g., technical documentation)
+long_document = (
+"This is a very long document with thousands of words..." + " ... " * 1000
+) # Minimum cacheable length
+response = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 1024 ,
+messages = [
+{
+"role" : "user" ,
+"content" : [
+{
+"type" : "document" ,
+"source" : {
+"type" : "text" ,
+"media_type" : "text/plain" ,
+"data" : long_document,
+},
+"citations" : { "enabled" : True },
+"cache_control" : {
+"type" : "ephemeral"
+}, # Cache the document content
+},
+{
+"type" : "text" ,
+"text" : "What does this document say about API features?" ,
+},
+],
+}
+],
+)
+print (response) Inline text Inline text Files API Files API Base64 Base64 URL URL Files API Files API

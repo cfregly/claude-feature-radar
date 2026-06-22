@@ -5,7 +5,7 @@ description: >-
   Gemini, then emit the assets: a founder email anchored on a genuinely Claude-only capability, a
   product-team email on what competitors have that Claude does not, and a reproducible benchmark
   bundle a founder can run themselves. Use when someone wants to find what Claude has that others
-  lack, run a best-to-best cost / speed / correctness benchmark, generate live-evangelism assets, or
+  lack, run a best-to-best cost / speed / security / correctness benchmark, generate live-evangelism assets, or
   keep competitive intelligence current as the platforms ship every month. Triggers on "competitive
   engine", "what does Claude have that OpenAI or Gemini do not", "fair Claude vs competitor
   benchmark", "live evangelism", "founder email", "competitive gap", or "what do competitors have
@@ -214,8 +214,8 @@ raw API surface before ranking. A documented field that is not accepted by the c
 held discrepancy, not a public edge. Then RANK what survives by value to a founder times
 how clearly Claude leads, and carry the global maximum forward as the anchor, not the first thing that
 was easy to measure. This produces two lists: Claude's genuine differentiators, ranked, and Claude's
-genuine gaps. Map each to the founder priority stack: cost, speed, then reduced maintenance and heavy
-lifting.
+genuine gaps. Map each to the founder priority stack: cost, speed, security, then reduced maintenance
+and heavy lifting.
 
 ### 2. Benchmark best to best
 Run the same long-horizon agent on each platform at full strength and measure the outcomes a

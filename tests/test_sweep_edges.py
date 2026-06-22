@@ -8,6 +8,7 @@ manufacture a false Claude lead. They run fully offline, with no network.
 """
 import json
 
+from engine.demonstrators import security_posture as sp
 from engine import sweep_edges as se
 from engine.sources_registry import Source, sources
 
@@ -172,6 +173,18 @@ def test_registry_carries_the_claude_devs_feed():
     s = cd[0]
     assert s.kind == "blog" and s.vendor == "anthropic"
     assert s.feed and s.min_chars >= 800  # fetched through a feed, the thin login shell guarded out
+
+
+def test_security_registry_sources_are_official_and_seeded_to_security():
+    entries = {(s.vendor, s.key): s for s in sources()}
+    for key in sp.REQUIRED_KEYS:
+        src = entries.get(("claude", key))
+        assert src is not None, f"missing required security source {key}"
+        assert src.url.startswith(("https://platform.claude.com/", "https://docs.claude.com/",
+                                   "https://code.claude.com/"))
+        assert se._seed_axis_for(key) == "security"
+    assert sum(1 for s in sources() if s.vendor == "claude" and s.key == "mcp_connector") == 1
+    assert ("claude", "ip_addresses") in entries
 
 
 # ----- diff: new, changed, gone, unchanged, and unknown never poisons -----

@@ -101,6 +101,19 @@ def test_cost_model_key_refused_even_if_mislabeled(monkeypatch):
     assert not g.ok and "regime-bounded" in g.reason
 
 
+def test_private_only_demokind_refused_even_if_mislabeled_as_win(monkeypatch):
+    edge = {
+        "key": "cmek", "axis": "security", "demoKind": "security_posture",
+        "verdict": "claude-ahead", "lead_score": 9,
+        "fair_comparison": {"lead_basis": "head-to-head"},
+    }
+    monkeypatch.setattr(pb, "_find_edge", lambda k: (dict(edge), "synthetic"))
+    monkeypatch.setattr(pb, "_receipt_path", lambda k: None)
+    g = pb.verdict_gate("cmek")
+    assert not g.ok
+    assert "private-only" in g.reason
+
+
 # --------------------------------------------------------------------------- the receipt veto
 
 

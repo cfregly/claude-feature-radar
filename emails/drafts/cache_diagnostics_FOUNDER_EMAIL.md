@@ -35,7 +35,7 @@ Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude
 
 Docs: https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics
 
-To run it on your own prompts, edit `cache_diagnostics/run.py` to point the two calls at your own system prompt, tools, or messages, then run `python cache_diagnostics/run.py --check`.
+To run it on your own prompts, edit `cache_diagnostics/run.py` to point the two calls at your own system prompt, tools, or messages, then run `.venv/bin/python -m cache_diagnostics.run --check`.
 
 Beta note: set the beta header `cache-diagnosis-2026-04-07`, as shown above.
 

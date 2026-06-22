@@ -37,6 +37,8 @@ FOUNDER_GLOBS = [
     "emails/yc_spring_2026/*.md",
     "emails/drafts/*.md",
     "edges/*/FOUNDER_EMAIL.md",
+    "state/outbox/*.md",
+    "docs/FOUNDER_EMAIL_GOOGLE_DOC_MIRROR.md",
 ]
 NEGATIVES = [
     "more expensive", "not on bedrock", "not on vertex", "not zdr", "zdr-eligible",
@@ -49,6 +51,14 @@ NEGATIVES = [
     "8% more", "8 percent more", "competitors can match", "competitors already match",
     "competitor can match", "competitor already matches", "claude is slower", "claude is worse",
     "claude slower", "claude worse", "claude lags",
+]
+
+SECURITY_TERMS = [
+    # Security posture details belong in private source-backed reviews, not public founder copy,
+    # except for the public security_controls_map brief, whose own runner verifies sources and caveats.
+    "zdr", "zero data retention", "hipaa", "baa", "business associate agreement",
+    "cmek", "customer-managed encryption", "access transparency",
+    "compliance api", "admin api", "blanket coverage",
 ]
 
 CASE_SENSITIVE_NEGATIVES = [
@@ -67,7 +77,7 @@ BRIEF_ASSET_GLOBS = [
 SIBLING_BRIEFS = ROOT.parent / "claude-feature-hits"
 SIBLING_BRIEF_GLOBS = [
     "README.md", "*/README.md", "*/run.py", "*/run_tokens.py", "*/cite.py", "*/my_tool.py",
-    "*/sample.txt", "*/compare_sample.txt",
+    "*/sample.txt", "*/compare_sample.txt", "*/controls.json",
 ]
 
 # Raw fetched vendor docs and gitignored scratch are not authored surfaces, so they are out of scope.
@@ -147,6 +157,25 @@ def _label(p):
     return str(p)
 
 
+def _is_security_controls_map(p):
+    try:
+        rel = p.relative_to(SIBLING_BRIEFS)
+    except ValueError:
+        return False
+    return rel.parts[:1] == ("security_controls_map",)
+
+
+def _check_security_controls_map(bad):
+    controls_dir = SIBLING_BRIEFS / "security_controls_map"
+    if not controls_dir.exists():
+        return
+    out = subprocess.run([sys.executable, "-m", "security_controls_map.run"], cwd=SIBLING_BRIEFS,
+                         capture_output=True, text=True, timeout=30)
+    if out.returncode != 0:
+        detail = (out.stdout + out.stderr).strip()
+        bad.append("security_controls_map source/caveat gate failed:\n" + detail)
+
+
 def main():
     bad = []
     for p in _source_files():
@@ -161,9 +190,13 @@ def main():
             for neg in NEGATIVES:
                 if neg in low:
                     bad.append(f"{_label(p)}:{i}: founder-surface negative: {neg!r}")
+            for neg in SECURITY_TERMS:
+                if neg in low and not _is_security_controls_map(p):
+                    bad.append(f"{_label(p)}:{i}: founder-surface security term outside controls map: {neg!r}")
             for neg in CASE_SENSITIVE_NEGATIVES:
                 if neg in line:
                     bad.append(f"{_label(p)}:{i}: founder-surface negative: {neg!r}")
+    _check_security_controls_map(bad)
     if bad:
         print("surface gate: FAIL")
         print("\n".join(bad))

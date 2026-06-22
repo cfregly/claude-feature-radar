@@ -50,10 +50,9 @@ To try it on your own agent, edit the prompt and tools in `task_budgets/run.py`,
 `make task_budgets`. I would still keep Superset's hard billing and quota stops server-side. The task
 budget is the agent's loop-level countdown, not a replacement for your account limits.
 
-The security follow-up is Claude Code safety controls: destructive actions need explicit intent, and
-scheduled or webhook-triggered deliveries cannot approve pending actions. That matters for many-agent
-systems, but I would keep the primary Superset demo on task budgets because it maps directly to
-reliability, cost, and speed.
+The security follow-up matters for many-agent systems. I would use the public preflight and source
+map for that path, while keeping the primary Superset demo on task budgets because it maps directly
+to reliability, cost, and speed.
 
 If Superset is hitting a different many-agent failure mode, reply with the pattern and I can send the
 closest Claude example.

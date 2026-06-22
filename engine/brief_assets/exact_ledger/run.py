@@ -163,25 +163,22 @@ def run_ledger_agent(docs, start, *, trigger=TRIGGER, keep=KEEP, max_turns=MAX_T
     client = get_client()
     model = get(EXEC_MODEL)
     messages = [{"role": "user", "content": ledger_prompt(start)}]
-    kw_extra = {
-        "extra_headers": {"anthropic-beta": BETA_HEADER},        # add this: turn context editing on
-        "extra_body": {                                          # add this: clear stale tool results
-            "context_management": {
-                "edits": [{
-                    "type": "clear_tool_uses_20250919",
-                    "trigger": {"type": "input_tokens", "value": trigger},
-                    "keep": {"type": "tool_uses", "value": keep},
-                }]
-            }
-        },
+    context_management = {
+        "edits": [{
+            "type": "clear_tool_uses_20250919",
+            "trigger": {"type": "input_tokens", "value": trigger},
+            "keep": {"type": "tool_uses", "value": keep},
+        }]
     }
 
     records, final_text = [], ""
     for turn in range(max_turns):
         _mark_cache(messages)
         t0 = time.perf_counter()
-        msg = client.messages.create(
-            model=model.id, max_tokens=1024, messages=messages, tools=[READ_TOOL], **kw_extra,
+        msg = client.beta.messages.create(
+            model=model.id, max_tokens=1024, messages=messages, tools=[READ_TOOL],
+            betas=[BETA_HEADER],
+            context_management=context_management,
         )
         records.append({
             "turn": turn,

@@ -204,3 +204,34 @@ tier, every id present and matching.
   on the current doc page. This repo measures its own reduction instead of quoting that number.
 - Competitor capabilities are cited from the competitors' own docs, dated 2026-06-17. They move
   monthly. Re-run the scan before reusing them.
+
+## Security posture source ledger
+
+Verified 2026-06-22 against official docs. This is private diligence support, not automatic public
+founder copy.
+
+- Claude documents customer-managed encryption keys for first-party API traffic:
+  https://platform.claude.com/docs/en/manage-claude/cmek
+- Claude documents Access Transparency records for human access to organization data:
+  https://platform.claude.com/docs/en/manage-claude/access-transparency
+- Claude documents the Compliance API and the Activity Feed. The Activity Feed page states six-year
+  event retention:
+  https://platform.claude.com/docs/en/manage-claude/compliance-api
+  https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed
+- Claude documents Workload Identity Federation and fixed IP addresses for allowlisting:
+  https://platform.claude.com/docs/en/manage-claude/workload-identity-federation
+  https://platform.claude.com/docs/en/api/ip-addresses
+- Claude Code documents security guidance and the security-guidance plugin:
+  https://code.claude.com/docs/en/security-guidance
+- OpenAI documents API data controls and enterprise key management:
+  https://developers.openai.com/api/docs/guides/your-data
+  https://help.openai.com/en/articles/20000943-openai-enterprise-key-management-ekm-overview
+- Gemini documents API log policy, ZDR behavior, and safety review policy. Google also documents
+  security controls for Gemini Enterprise Agent Platform:
+  https://ai.google.dev/gemini-api/docs/logs-policy
+  https://ai.google.dev/gemini-api/docs/zdr
+  https://ai.google.dev/gemini-api/docs/usage-policies
+  https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/security-controls
+
+Do not quote this ledger as a ZDR or HIPAA claim. Do not turn Claude Code security guidance into a
+cross-vendor superiority claim without a separate head-to-head receipt.

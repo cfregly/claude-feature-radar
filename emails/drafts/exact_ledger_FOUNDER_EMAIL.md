@@ -9,11 +9,12 @@ The shape I keep hitting: an agent reads a long stream one record at a time (usa
 Claude context editing fixes that. It clears the old tool results in place once the context crosses a trigger you set, so the bulky text leaves the window while the turns holding your running list stay put. The whole change is one block on the request:
 
 ```python
-resp = client.messages.create(
+resp = client.beta.messages.create(
     model="claude-haiku-4-5-20251001",
     max_tokens=1024,
     messages=messages,
     tools=[read_tool],
+    betas=["context-management-2025-06-27"],                       # add this
     context_management={"edits": [{"type": "clear_tool_uses_20250919",   # add this
         "trigger": {"type": "input_tokens", "value": 30000},             # add this
         "keep": {"type": "tool_uses", "value": 1}}]},

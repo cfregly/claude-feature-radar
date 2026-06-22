@@ -116,7 +116,7 @@ def cmd_run(compare_on: bool = False) -> int:
     m = get(CLAUDE_MODEL)
     print(f"\n  search_result inline citations on {m.label} ({m.id})")
     print(f"  {len(QUESTIONS)} questions over {len(CHUNKS)} chunks you supply inline. No hosted store.")
-    print(f"  est cost $0.05, about 15s\n")
+    print(f"  est cost $0.01, about 15s\n")
     client = get_client()
     answered, cited, asked, cost, wall, rows = _ask_all(client, m.id, QUESTIONS)
     print(f"  {'question':<48}{'cited chunk':>13}{'expected':>10}{'ok':>5}")

@@ -22,7 +22,7 @@ I ran it using my API key over a small doc set. On Haiku 4.5, all 8 answers came
 
 The operational win is simple: the API returns the structured pointer and the verbatim `cited_text` in the same response, so your app can verify the source span without writing a separate quote resolver or paying output tokens for the quote.
 
-Reproduce it in about a minute for $0.01. One clone, one file to edit:
+Reproduce it in about a minute for $0.01. One clone, then edit `citations/docs/` and the questions in `citations/cite.py`:
 
 ```
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits

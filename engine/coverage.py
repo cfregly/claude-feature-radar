@@ -44,6 +44,7 @@ PORT_STATUS = {
     "eval_quality": "adapt",
     "retention_resume": "adapt",
     "cost": "build",
+    "security_posture": "build",
     "other": "build",
 }
 
@@ -82,6 +83,7 @@ SPEND_LANE = {
     "eval_quality": "ASK (a credit-spending grid, the larger slice)",
     "retention_resume": "$0 ALWAYS default (doc-grounded parity); the live kill-resume is opt-in ASK",
     "cost": "$0 ALWAYS (pure pricing model, no API call)",
+    "security_posture": "$0 ALWAYS (official-source security/admin ledger, private by default)",
     "discovery_loop": "$0 ALWAYS (stdlib doc sweep, no API call)",
     "other": "HELD until the parity check passes, then ASK (the opt-in thin proof)",
 }
@@ -136,7 +138,7 @@ _INTRINSIC_KINDS = {"discovery_loop"}
 # not reproduce on the built slice yet, so it ships no public bundle until the value is measured.
 # extended_output was promoted on 2026-06-19 (Claude emitted 230,607 output tokens in one batch turn,
 # above every competitor's documented single-request cap), so it now carries a public edges/ bundle.
-_INTERNAL_KINDS = {"cost", "eval_quality", "retention_resume", "other", "advisor_routing"}
+_INTERNAL_KINDS = {"cost", "eval_quality", "retention_resume", "security_posture", "other", "advisor_routing"}
 
 
 def gaps(rows: list[dict] | None = None) -> list[str]:

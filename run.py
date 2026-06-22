@@ -7,6 +7,7 @@
     python run.py cadence [--dry-run]      the unattended engine: sweep, dispatch, draft to outbox ($0)
     python run.py coverage                 per-demoKind, what is built vs adapt vs build (no API call)
     python run.py managed [--apply]        the Tier-2 monthly resumable runtime (wired, $0 without --apply)
+    python run.py security                 the private security/admin source-ledger receipt ($0)
     python run.py scan                     the candidate gaps, grounded in both sides' docs
     python run.py verify                   the skeptic pass: keep only what survives
     python run.py combine                  generate combination edges, skeptic-test, persist survivors
@@ -72,6 +73,8 @@ def main():
         from engine.demonstrators.advisor_routing import main as m; raise SystemExit(m())
     elif cmd in ("code-execution-state", "code_execution_state"):
         from engine.demonstrators.code_execution_state import main as m; raise SystemExit(m())
+    elif cmd in ("security", "security-posture", "security_posture"):
+        from engine.demonstrators.security_posture import main as m; raise SystemExit(m())
     elif cmd in ("eval", "eval-quality"):
         from engine.demonstrators.eval_quality import main as m; m()
     elif cmd == "scan":

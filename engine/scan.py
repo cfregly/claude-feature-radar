@@ -20,7 +20,7 @@ from __future__ import annotations
 import json
 import pathlib
 
-from engine.demokinds import demokind_for, is_known_kind, is_seeded
+from engine.demokinds import PRIVATE_ONLY_DEMOKINDS, demokind_for, is_known_kind, is_seeded
 
 # Survived the skeptic AND the competitor-parity check as genuinely Claude-ahead, ranked by
 # value to a founder times how clearly Claude leads.
@@ -229,8 +229,8 @@ CHOSEN = (
     "one sandbox script that calls it in a loop and keeps the bulky outputs out of the model context. "
     "GA, no named competitor equivalent. Measured (make programmatic-tool-calling): billed input fell about 28% on a 240-row "
     "fan-out task (Anthropic's doc reports about 24%), and the code answered correctly where the "
-    "in-context model failed. Fan-out-shaped, it adds round-trips, and it is not on Bedrock or Vertex "
-    "or ZDR. The cleanest near-binary edge is Citations: the only GA API with a per-character source "
+    "in-context model failed. Fan-out-shaped, it adds round-trips. The cleanest near-binary edge is "
+    "Citations: the only GA API with a per-character source "
     "pointer into the user's own document, the verbatim quote extracted and free of output tokens "
     "(Gemini File Search is page-level and still preview, OpenAI cites its own output). The third is "
     "long-horizon autonomy: the longest task horizon on METR's independent referee, about 1.9x the next "
@@ -323,6 +323,11 @@ def _resolved_demokind(key: str, axis: str, explicit: str | None, seed: dict | N
     return (seed.get("demoKind") if seed else None) or demokind_for(key, axis)
 
 
+def _private_only(edge: dict) -> bool:
+    kind = edge.get("demoKind") or edge.get("demo_kind") or demokind_for(edge.get("key", ""), edge.get("axis"))
+    return kind in PRIVATE_ONLY_DEMOKINDS
+
+
 def seed_for_key(live_key: str) -> dict | None:
     """Public wrapper for the live sweep. A source is pitchable only when it maps to a vetted seed
     comparison here; broad docs, blogs, and changelogs stay discovery inputs until a receipt is built."""
@@ -345,7 +350,7 @@ def current_edges() -> list[dict]:
         land = json.loads(f.read_text())
     except (json.JSONDecodeError, OSError):
         return list(DIFFERENTIATORS)
-    leads = [e for e in land.get("edges", []) if e.get("lead_score", 0) > 0]
+    leads = [e for e in land.get("edges", []) if e.get("lead_score", 0) > 0 and not _private_only(e)]
     if not leads:
         return list(DIFFERENTIATORS)
     out = []

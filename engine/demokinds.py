@@ -32,6 +32,7 @@ from __future__ import annotations
 #   code_execution_state a code sandbox keeps files across requests and a long idle.
 #   eval_quality        one (model, effort, prompt) cell wins on the believable held-out test number.
 #   cost                a workload-shaped pure-pricing-model edge, no model call, both regimes shown.
+#   security_posture    first-party security/admin docs are checked as a dated source ledger.
 #   discovery_loop      the fetch-diff-rank-persist landscape loop runs unattended for $0.
 #   other               the catch-all for narrow never-evaluated candidates behind a parity check.
 DEMO_KINDS = [
@@ -48,9 +49,12 @@ DEMO_KINDS = [
     "code_execution_state",
     "eval_quality",
     "cost",
+    "security_posture",
     "discovery_loop",
     "other",
 ]
+
+PRIVATE_ONLY_DEMOKINDS = {"security_posture"}
 
 # The seed table: a source key (the short doc slug the sweep keys on, or a built-edge folder name)
 # maps to the demoKind that proves it. This is the taxonomy this engine uses for these assignments.
@@ -115,6 +119,69 @@ KEY_TO_DEMOKIND = {
     "caching": "cost",
     "code_execution": "cost",
     "long_context": "cost",
+    # security_posture: first-party security and admin controls checked from official docs.
+    "security-posture": "security_posture",
+    "security_posture": "security_posture",
+    "cmek": "security_posture",
+    "cmek_aws_kms": "security_posture",
+    "cmek-aws-kms": "security_posture",
+    "cmek_google_cloud_kms": "security_posture",
+    "cmek-google-cloud-kms": "security_posture",
+    "cmek_azure_key_vault": "security_posture",
+    "cmek-azure-key-vault": "security_posture",
+    "access_transparency": "security_posture",
+    "access-transparency": "security_posture",
+    "api_and_data_retention": "security_posture",
+    "api-and-data-retention": "security_posture",
+    "data_residency": "security_posture",
+    "data-residency": "security_posture",
+    "compliance_api": "security_posture",
+    "compliance-api": "security_posture",
+    "compliance_api_access": "security_posture",
+    "compliance-api-access": "security_posture",
+    "compliance_activity_feed": "security_posture",
+    "compliance-activity-feed": "security_posture",
+    "compliance_integration_patterns": "security_posture",
+    "compliance-integration-patterns": "security_posture",
+    "compliance_org_data": "security_posture",
+    "compliance-org-data": "security_posture",
+    "admin_api": "security_posture",
+    "admin-api": "security_posture",
+    "admin_api_keys": "security_posture",
+    "admin-api-keys": "security_posture",
+    "authentication": "security_posture",
+    "workload_identity_federation": "security_posture",
+    "workload-identity-federation": "security_posture",
+    "wif_admin_api": "security_posture",
+    "wif-admin-api": "security_posture",
+    "wif_reference": "security_posture",
+    "wif-reference": "security_posture",
+    "ip_addresses": "security_posture",
+    "ip-addresses": "security_posture",
+    "mcp_connector": "security_posture",
+    "mcp-connector": "security_posture",
+    "claude_code_security": "security_posture",
+    "claude-code-security": "security_posture",
+    "claude_code_code_review": "security_posture",
+    "claude-code-code-review": "security_posture",
+    "claude_code_permissions": "security_posture",
+    "claude-code-permissions": "security_posture",
+    "claude_code_settings": "security_posture",
+    "claude-code-settings": "security_posture",
+    "claude_code_server_managed_settings": "security_posture",
+    "claude-code-server-managed-settings": "security_posture",
+    "claude_code_managed_mcp": "security_posture",
+    "claude-code-managed-mcp": "security_posture",
+    "claude_code_network_config": "security_posture",
+    "claude-code-network-config": "security_posture",
+    "claude_code_data_usage": "security_posture",
+    "claude-code-data-usage": "security_posture",
+    "claude_code_zero_data_retention": "security_posture",
+    "claude-code-zero-data-retention": "security_posture",
+    "claude_code_legal_compliance": "security_posture",
+    "claude-code-legal-compliance": "security_posture",
+    "security_guidance": "security_posture",
+    "security-guidance": "security_posture",
     # discovery_loop: the engine's own $0 cadence and honesty posture.
     "edges": "discovery_loop",
     "discovery_loop": "discovery_loop",
@@ -139,7 +206,7 @@ AXIS_TO_DEMOKIND = {
     "speed": "token_accounting",
     "reliability": "long_horizon_survival",
     "accuracy": "eval_quality",
-    "security": "other",
+    "security": "security_posture",
     "throughput": "token_accounting",
     # Legacy axes accepted for old landscape/test data. New sweep output should use the five pillars.
     "long-horizon": "long_horizon_survival",

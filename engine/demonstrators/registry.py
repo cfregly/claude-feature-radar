@@ -34,6 +34,7 @@ _DEMO_MODULES = (
     "engine.demonstrators.retention_resume",
     "engine.demonstrators.code_execution_state",
     "engine.demonstrators.cost_model",
+    "engine.demonstrators.security_posture",
     "engine.demonstrators.other_parity_gated",
     "engine.demonstrators.pdf_citations",
     "engine.demonstrators.search_results_grounding",

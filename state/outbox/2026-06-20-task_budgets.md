@@ -12,7 +12,7 @@ Quick builder note. If this workload looks like yours, the repo below lets you c
 
 Claude task_budget gives supported models a provider-side remaining-budget countdown for the full agentic loop (thinking, tool calls, tool results, output), so the model hands off gracefully before starting a tool action it cannot finish. On a budget-sensitive 12-record audit, near-exhausted budget produced 0 tool calls and a clean handoff while the high-budget control started the loop.
 
-Here is the receipt path: It costs about $0.01 and a few minutes to check using your own API key (about 0.1 minutes). Clone the repo and run one command:
+Here is the receipt path: Estimated check cost: $0.01 using your own API key (estimated 0.1 minutes). Clone the repo and run one command:
 
 ```
 make task_budgets
@@ -31,6 +31,5 @@ Provenance (not part of the email body):
 - edge key: task_budgets
 - axis: reliability
 - verdict: claude-ahead
-- reproduce: make task_budgets (about $0.01)
+- reproduce: make task_budgets (estimated $0.01)
 - This draft is inert. The cadence never sends. A human reviews, runs the deslop and outbound-scrutiny panel, and decides.
-

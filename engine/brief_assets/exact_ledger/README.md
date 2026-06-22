@@ -4,23 +4,25 @@
 
 [![Claude proof: 63% cheaper vs OpenAI](https://img.shields.io/badge/Claude%20proof-63%25%20cheaper%20vs%20OpenAI-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/exact_ledger/compare_sample.txt)
 
-The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
+The GIF replays the longer `sample.txt` reference in under ten seconds. The proof badge and table use the current `compare_sample.txt` receipt, so the first comparison matches what `COMPARE=1` reruns.
 
 Your agent reads a long stream one record at a time (usage logs, churn flags, support tickets) and has to report the exact set of flagged ids at the end. The record text is throwaway after each step, but the running list has to stay exact, and as the stream grows the carried context (the tokens you pay for each turn) grows with it. Claude context editing clears the old tool results in place once the context crosses a trigger you set, so the bulky text leaves the window while the turns that hold your running list stay put.
 
 ## What you get
 
 The carried context stays flat near one record instead of growing with every step, and the list comes
-back exact. The default command uses the trigger shown below and costs $0.17. The saved full-run
-receipt uses the same mechanism on a longer chain with a 45,000-token trigger. That run returned the
-exact 10/10 list, held peak carried context to about 35k tokens, cost $0.67, and finished in 60.7s.
+back exact. The default command uses the trigger shown below and costs $0.17. The current comparison
+receipt is `compare_sample.txt`. The longer `sample.txt` reference uses the same mechanism on a
+30-report chain with a 45,000-token trigger. That run returned the exact 10/10 list, held peak
+carried context to about 35k tokens, cost $0.67, and finished in 60.7s.
 
 ```python
-resp = client.messages.create(
+resp = client.beta.messages.create(
     model="claude-haiku-4-5-20251001",
     max_tokens=1024,
     messages=messages,
     tools=[read_tool],
+    betas=["context-management-2025-06-27"],                       # add this
     context_management={"edits": [{"type": "clear_tool_uses_20250919",   # add this
         "trigger": {"type": "input_tokens", "value": 30000},             # add this
         "keep": {"type": "tool_uses", "value": 1}}]},
@@ -41,9 +43,9 @@ The saved comparison receipt is `exact_ledger/compare_sample.txt`. `make exact_l
 Claude side only, currently $0.17. `make exact_ledger COMPARE=1` reproduces the head-to-head: it
 installs the optional OpenAI and Gemini SDKs, then runs all three platforms on the same chain.
 
-The earlier full-run reference from 2026-06-19 used a longer 10-of-10 chain: Claude $0.67, OpenAI
-$1.84, Gemini $2.57, all exact. The public proof badge points to the current committed comparison
-receipt above.
+The longer full-run reference in `sample.txt` is from 2026-06-19. It used a 10-of-10 chain:
+Claude $0.67, OpenAI $1.84, Gemini $2.57, all exact. The public proof badge points to the current
+committed comparison receipt above.
 
 ## Run it
 

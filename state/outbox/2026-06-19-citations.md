@@ -10,9 +10,9 @@ Hey {first_name},
 
 Quick builder note. If this workload looks like yours, the repo below lets you check the number using your own API key before you trust the claim.
 
-Citations - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop re
+Claude Citations can return source pointers for user-supplied documents, so a founder can check the exact span behind an answer.
 
-Here is the receipt path: It costs about $0.06 and a few minutes to check using your own API key (about 2.0 minutes). Clone the repo and run one command:
+Here is the receipt path: Estimated check cost: $0.01 using your own API key (estimated 2.0 minutes). Clone the repo and run one command:
 
 ```
 make citations
@@ -31,6 +31,5 @@ Provenance (not part of the email body):
 - edge key: citations
 - axis: grounding
 - verdict: claude-ahead
-- reproduce: make citations (about $0.06)
+- reproduce: make citations (estimated $0.01)
 - This draft is inert. The cadence never sends. A human reviews, runs the deslop and outbound-scrutiny panel, and decides.
-

@@ -49,6 +49,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from engine import scan  # noqa: E402  committed seed + landscape reader, anthropic-free
+from engine.demokinds import PRIVATE_ONLY_DEMOKINDS, demokind_for  # noqa: E402
 
 # The lead_basis values that are NOT regime-bounded: a stable head-to-head win, a documented
 # absence-of-evidence lead, or a within-Claude value-add. doc-grounded-parity is a parity, not a lead,
@@ -451,6 +452,12 @@ def verdict_gate(edge_key: str) -> GateResult:
     lead_score = edge.get("lead_score", edge.get("score", 0)) or 0
     fc = edge.get("fair_comparison") or {}
     lead_basis = fc.get("lead_basis", "(missing)")
+    demo_kind = edge.get("demoKind") or edge.get("demo_kind") or demokind_for(edge.get("key", ""),
+                                                                              edge.get("axis"))
+
+    if demo_kind in PRIVATE_ONLY_DEMOKINDS:
+        return GateResult(False, edge_key, verdict, lead_basis, source,
+                          f"demoKind {demo_kind!r} is private-only and cannot publish", edge=edge)
 
     # 1) The landscape verdict must be a clean, ranked claude-ahead.
     if verdict != "claude-ahead":

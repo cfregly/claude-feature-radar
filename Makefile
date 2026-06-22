@@ -1,5 +1,5 @@
 # The competitive-gap engine. Each target runs in one command.
-.PHONY: setup compare-deps mcp-deps mcp app app-check programmatic-tool-calling citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost draft publish-brief publish-misses check-claims check-docs core-imports check-surface check-receipts test ci deslop gif clean
+.PHONY: setup compare-deps mcp-deps mcp app app-check programmatic-tool-calling citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost security-posture security draft publish-brief publish-misses check-claims check-docs core-imports check-surface check-split check-receipts test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -159,6 +159,11 @@ retention-live: ## OPT-IN: the live Managed Agents kill-and-resume (start, resum
 cost: ## EDGE cost: the pure pricing-model edge over swept dated prices, both win and lose regimes with the crossover named (NO API call, NO key, $0)
 	$(PY) engine/demonstrators/cost_model.py
 
+security-posture: ## PRIVATE security_posture: official-source security/admin posture receipt (NO API call, NO key, $0)
+	$(PY) run.py security-posture --json
+
+security: security-posture
+
 draft: ## draft the founder email from the measured receipt
 	$(PY) run.py draft
 
@@ -184,6 +189,9 @@ core-imports: ## one-dependency gate: the core imports with anthropic alone, the
 check-surface: ## surface gate: no internal/private-repo leakage in source, no Claude negative on a founder email (offline, $0)
 	$(PY) scripts/check_surface.py
 
+check-split: ## split gate: public wins stay in hits, private misses stay in the private sibling checkout (offline, $0)
+	$(PY) scripts/check_split.py
+
 check-receipts: ## receipt-drift gate: every measured number in the prose traces to a committed receipt (offline, $0)
 	$(PY) scripts/check_receipts.py
 
@@ -193,7 +201,7 @@ test: ## the offline test suite (the gate boundary, the dispatch seam, the share
 deslop: check-claims ## prose gate (em-dashes, en-dashes, semicolons) plus the citations cost-claim gate
 	$(PY) scripts/deslop_check.py
 
-ci: deslop check-docs core-imports check-surface check-receipts test ## the full offline gate chain, the same one CI runs ($0)
+ci: deslop check-docs core-imports check-surface check-split check-receipts test ## the full offline gate chain, the same one CI runs ($0)
 	@echo "ci: all offline gates passed."
 
 gif: ## regenerate docs/demo.gif from demo.tape (needs vhs, ffmpeg, ttyd)

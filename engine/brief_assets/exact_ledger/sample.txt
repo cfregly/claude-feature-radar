@@ -8,11 +8,13 @@
   The change: clear the old tool results in place once context crosses the trigger, keep the most
   recent 1, so the carried context stays flat near one report.
 
-      extra_headers = {"anthropic-beta": "context-management-2025-06-27"}
-      extra_body    = {"context_management": {"edits": [
+      client.beta.messages.create(
+          ...
+          betas=["context-management-2025-06-27"],
+          context_management={"edits": [
           {"type": "clear_tool_uses_20250919",
            "trigger": {"type": "input_tokens", "value": 45000},
-           "keep": {"type": "tool_uses", "value": 1}}]}}
+           "keep": {"type": "tool_uses", "value": 1}}]})
 
   Saved full-run receipt, Claude Haiku 4.5. The default `make exact_ledger`
   check is shorter and costs $0.17; this longer receipt is the source for

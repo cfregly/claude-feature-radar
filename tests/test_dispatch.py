@@ -29,6 +29,9 @@ def test_seed_table_maps_the_built_edges():
     assert demokinds.demokind_for("cache_diagnostics") == "other"
     assert demokinds.demokind_for("task_budgets") == "other"
     assert demokinds.demokind_for("pricing") == "cost"
+    assert demokinds.demokind_for("cmek") == "security_posture"
+    assert demokinds.demokind_for("security_guidance") == "security_posture"
+    assert "security_posture" in demokinds.PRIVATE_ONLY_DEMOKINDS
 
 
 def test_seed_table_resolves_dashed_and_undashed_forms():
@@ -44,6 +47,7 @@ def test_unknown_key_falls_back_to_axis_guess_then_other():
     # crash, so a brand-new edge always routes.
     assert demokinds.demokind_for("never_seen", axis="accuracy") == "eval_quality"
     assert demokinds.demokind_for("never_seen", axis="reliability") == "long_horizon_survival"
+    assert demokinds.demokind_for("never_seen", axis="security") == "security_posture"
     assert demokinds.demokind_for("never_seen", axis="totally-unknown") == "other"
     assert demokinds.demokind_for("never_seen") == "other"
 
@@ -72,6 +76,7 @@ def test_built_demonstrators_register():
     assert REGISTRY.get("grounding_resolution") is not None
     assert REGISTRY.get("long_horizon_survival") is not None
     assert REGISTRY.get("code_execution_state") is not None
+    assert REGISTRY.get("security_posture") is not None
 
 
 def test_a_registered_demonstrator_declares_its_kind():
@@ -101,6 +106,17 @@ def test_dispatch_routes_code_execution_state_with_public_estimate():
     assert r.demo_kind == "code_execution_state"
     assert r.gate == "ask"
     assert r.estimate.command == "make code_execution_state"
+
+
+def test_dispatch_routes_security_posture_as_zero_spend_private_ledger():
+    register_all()
+    edge = {"key": "cmek", "axis": "security"}
+    r = dispatch(edge)
+    assert r.covered is True
+    assert r.demo_kind == "security_posture"
+    assert r.gate == "always"
+    assert r.estimate.usd == 0
+    assert r.estimate.command == "make security-posture"
 
 
 def test_stale_noncanonical_demokind_is_normalized():
