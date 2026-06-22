@@ -60,7 +60,7 @@ The security-testing follow-up is the sharper Arga conversation. I would separat
 primitive above from the security test plan, then run the public preflight and source map before
 turning any of it into copy.
 
-If the harder Arga bottleneck is a different part of the eval loop, reply with that shape and I can
+If the harder Arga blocker is a different part of the eval loop, reply with that shape and I can
 point you to a closer Claude pattern.
 
 Happy building,

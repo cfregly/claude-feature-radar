@@ -4,20 +4,20 @@ This committed mirror is the repo-gated text surface for the submitted Google Do
 
 ## Batch Email
 
-Subject: Congrats on YC! 5 Claude bottlenecks to test this week
+Subject: Congrats on YC! 5 production blockers to test this week
 
 Hey YC founders,
 
 Congrats on the batch! I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I've
 worked through 100+ investor-pitch sessions with founders, and the useful pattern is usually the
-same: turn this week's bottleneck into a runnable proof. I made a small public repo of Claude
+same: turn this week's production blocker into a runnable proof. I made a small public repo of Claude
 patterns you can run in one command using your own API key.
 
 The repo is here: https://github.com/cfregly/claude-feature-hits
 
-Pick the bottleneck you have this week:
+Pick the production question you have this week:
 
-| If the bottleneck is | Start here | What you get |
+| If the blocker is | Start here | What you get |
 | --- | --- | --- |
 | **cost** from agents that fan out over logs, usage rows, accounts, or app APIs | [`make programmatic_tool_calling`](https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling) | 28% fewer billed input tokens than the same Claude agent without programmatic tool calling |
 | **speed** for large outputs or long-stream work | [`make bulk_output`](https://github.com/cfregly/claude-feature-hits/tree/main/bulk_output) or [`make exact_ledger`](https://github.com/cfregly/claude-feature-hits/tree/main/exact_ledger) | one un-truncated large deliverable, or a faster exact long-stream run |
@@ -70,7 +70,7 @@ workload, such as `programmatic_tool_calling/my_tool.py`, `citations/cite.py`,
 `tool_boundary_security/policy.json`, `security_controls_map/controls.json`, or the brief README's
 `Run it on your own data` section. Most also have a short demo GIF.
 
-If you reply with the bottleneck you are working through this week, I can point you to the closest
+If you reply with the production blocker you are working through this week, I can point you to the closest
 Claude pattern.
 
 Happy building,
@@ -80,7 +80,7 @@ Applied AI, Startups, Anthropic
 
 ## Routing Appendix
 
-# YC Spring 2026 standouts, routed to a specific Claude bottleneck
+# YC Spring 2026 standouts, routed to a specific production blocker
 
 Source list: TechCrunch, "The 11 standout startups from YC's Demo Day, according to VCs," published
 2026-06-18: https://techcrunch.com/2026/06/18/the-11-standout-startups-from-ycs-demo-day-according-to-vcs/
@@ -113,7 +113,7 @@ page clearly marks a CEO founder. Re-check the page before sending because found
 | Arga Labs | Phillip | https://www.ycombinator.com/companies/arga-labs | real-world sandboxes to test agents and agent-facing software | reliability + security testing | Medium-high | https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state | `emails/yc_spring_2026/arga_labs_code_execution_state.md` |
 | Superset | Kiet | https://www.ycombinator.com/companies/superset | IDE for running 100s of coding agents in parallel | reliability + cost + speed | High | https://github.com/cfregly/claude-feature-hits/tree/main/task_budgets | `emails/yc_spring_2026/superset_task_budgets.md` |
 | Lightsprint | Ben | https://www.ycombinator.com/companies/lightsprint | collaborative product development with cloud agents | reliability | High | https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state | `emails/yc_spring_2026/lightsprint_code_execution_state.md` |
-| Silmaril | Aum | https://www.ycombinator.com/companies/silmaril | prompt-injection defense that self-improves for AI-native applications and agents | security | High | https://github.com/cfregly/claude-feature-hits/tree/main/tool_boundary_security and https://github.com/cfregly/claude-feature-hits/tree/main/security_controls_map | `emails/yc_spring_2026/silmaril_security_discovery.md` |
+| Silmaril | Aum | https://www.ycombinator.com/companies/silmaril | prompt-injection defense that self-improves for AI-native applications and agents | security | High | https://github.com/cfregly/claude-feature-hits (`make security`) | `emails/yc_spring_2026/silmaril_security_discovery.md` |
 
 ## Fit evidence
 
@@ -148,7 +148,7 @@ page clearly marks a CEO founder. Re-check the page before sending because found
   the public feature briefs here are Claude API builder patterns, not hardware or spacecraft
   activation briefs.
 - **Ploy:** marketing-copy generation could use Claude, but the public page does not expose a sharper
-  measured bottleneck than generic copy quality. A broad "try Claude" email would be noise.
+  measured production blocker than generic copy quality. A broad platform email would be noise.
 
 ## How to use
 
@@ -226,7 +226,7 @@ The security-testing follow-up is the sharper Arga conversation. I would separat
 primitive above from the security test plan, then run the public preflight and source map before
 turning any of it into copy.
 
-If the harder Arga bottleneck is a different part of the eval loop, reply with that shape and I can
+If the harder Arga blocker is a different part of the eval loop, reply with that shape and I can
 point you to a closer Claude pattern.
 
 Happy building,
@@ -243,7 +243,7 @@ Hey Gustav,
 Congrats on YC.
 
 I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I spend a lot of time working
-through the practical bottlenecks that show up after the first useful agent demo.
+through the practical blockers that show up after the first useful agent demo.
 
 I saw Complir is building AI agents for compliance and regulatory monitoring. The Claude pattern that
 maps to that workload is page-linked PDF evidence for compliance agents whose answers need to survive
@@ -282,7 +282,7 @@ The security follow-up for Complir is separate but connected. I would treat accu
 one buyer story: answer with source pointers, then map the workflow to the public controls table,
 caveats, and evidence your buyer needs.
 
-If page-linked regulatory answers are not the sharpest Complir bottleneck right now, send me the one
+If page-linked regulatory answers are not the sharpest Complir blocker right now, send me the one
 that is and I can map it to the closest Claude pattern.
 
 Happy building,
@@ -416,7 +416,7 @@ make programmatic_tool_calling
 To try it on your own workload, edit `programmatic_tool_calling/my_tool.py` with your log query tool
 and re-run the same command.
 
-If Sazabi's heavier bottleneck is accuracy over incident context or security around tool access,
+If Sazabi's heavier blocker is accuracy over incident context or security around tool access,
 send me the rough workflow and I can point you to the closest Claude pattern.
 
 Happy building,
@@ -441,19 +441,17 @@ agents. I made two small public security artifacts for exactly this boundary que
 action is high risk, which injected instructions should block or ask, what evidence gets logged, and
 which official source supports each security-control line.
 
-The Claude security surface I would map first is the exact boundary your product defends: model
-input, retrieved content, tool call, action policy, operator review, and buyer evidence. The public
-preflight is deliberately narrow. It prints 5/5 controls, 4/4 prompt-injection cases, 0 dangerous
-actions allowed, and $0.00 cost:
+The security surface I would map first is the exact boundary your product defends: model input,
+retrieved content, tool call, action policy, operator review, and buyer evidence. The public repo is
+here:
 
-https://github.com/cfregly/claude-feature-hits/tree/main/tool_boundary_security
+https://github.com/cfregly/claude-feature-hits
 
-The companion controls map is also public and zero-spend. It checks ten security rows against
-official-source snapshots and caveats before any copy ships:
+In that repo, `make security` runs two zero-spend checks: a tool-boundary preflight that prints 5/5
+controls, 4/4 prompt-injection cases, and 0 dangerous actions allowed, plus a controls map that
+checks ten official-source rows and caveats before any security copy ships.
 
-https://github.com/cfregly/claude-feature-hits/tree/main/security_controls_map
-
-The test I would build with you is not a generic "try Claude" demo. It is a prompt-injection eval
+The test I would build with you is not a generic demo. It is a prompt-injection eval
 over an agent with real tool access:
 
 ```text
@@ -592,11 +590,11 @@ make programmatic_tool_calling
 To try it on Tasklet's shape, edit `programmatic_tool_calling/my_tool.py` with one of your work-app
 tools and the inputs it fans out over.
 
-The security follow-up is also real for Tasklet. If the app-agent risk is now the sharper
-bottleneck, reply with the workflow and I can map the control boundary with the public preflight and
+The security follow-up is also real for Tasklet. If the app-agent risk is now the sharper blocker,
+reply with the workflow and I can map the control boundary with the public preflight and
 source-backed controls table.
 
-If Tasklet's heavier bottleneck is a different app-agent loop, reply with that flow and I can point
+If Tasklet's heavier blocker is a different app-agent loop, reply with that flow and I can point
 you to the closest Claude pattern.
 
 Happy building,

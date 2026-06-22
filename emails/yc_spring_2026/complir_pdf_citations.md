@@ -5,7 +5,7 @@ Hey Gustav,
 Congrats on YC.
 
 I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I spend a lot of time working
-through the practical bottlenecks that show up after the first useful agent demo.
+through the practical blockers that show up after the first useful agent demo.
 
 I saw Complir is building AI agents for compliance and regulatory monitoring. The Claude pattern that
 maps to that workload is page-linked PDF evidence for compliance agents whose answers need to survive
@@ -44,7 +44,7 @@ The security follow-up for Complir is separate but connected. I would treat accu
 one buyer story: answer with source pointers, then map the workflow to the public controls table,
 caveats, and evidence your buyer needs.
 
-If page-linked regulatory answers are not the sharpest Complir bottleneck right now, send me the one
+If page-linked regulatory answers are not the sharpest Complir blocker right now, send me the one
 that is and I can map it to the closest Claude pattern.
 
 Happy building,

@@ -47,7 +47,7 @@ make programmatic_tool_calling
 To try it on your own workload, edit `programmatic_tool_calling/my_tool.py` with your log query tool
 and re-run the same command.
 
-If Sazabi's heavier bottleneck is accuracy over incident context or security around tool access,
+If Sazabi's heavier blocker is accuracy over incident context or security around tool access,
 send me the rough workflow and I can point you to the closest Claude pattern.
 
 Happy building,

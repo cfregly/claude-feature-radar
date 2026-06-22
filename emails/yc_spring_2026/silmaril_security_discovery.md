@@ -13,19 +13,17 @@ agents. I made two small public security artifacts for exactly this boundary que
 action is high risk, which injected instructions should block or ask, what evidence gets logged, and
 which official source supports each security-control line.
 
-The Claude security surface I would map first is the exact boundary your product defends: model
-input, retrieved content, tool call, action policy, operator review, and buyer evidence. The public
-preflight is deliberately narrow. It prints 5/5 controls, 4/4 prompt-injection cases, 0 dangerous
-actions allowed, and $0.00 cost:
+The security surface I would map first is the exact boundary your product defends: model input,
+retrieved content, tool call, action policy, operator review, and buyer evidence. The public repo is
+here:
 
-https://github.com/cfregly/claude-feature-hits/tree/main/tool_boundary_security
+https://github.com/cfregly/claude-feature-hits
 
-The companion controls map is also public and zero-spend. It checks ten security rows against
-official-source snapshots and caveats before any copy ships:
+In that repo, `make security` runs two zero-spend checks: a tool-boundary preflight that prints 5/5
+controls, 4/4 prompt-injection cases, and 0 dangerous actions allowed, plus a controls map that
+checks ten official-source rows and caveats before any security copy ships.
 
-https://github.com/cfregly/claude-feature-hits/tree/main/security_controls_map
-
-The test I would build with you is not a generic "try Claude" demo. It is a prompt-injection eval
+The test I would build with you is not a generic demo. It is a prompt-injection eval
 over an agent with real tool access:
 
 ```text

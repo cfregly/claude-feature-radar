@@ -1,17 +1,17 @@
-Subject: Congrats on YC! 5 Claude bottlenecks to test this week
+Subject: Congrats on YC! 5 production blockers to test this week
 
 Hey YC founders,
 
 Congrats on the batch! I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I've
 worked through 100+ investor-pitch sessions with founders, and the useful pattern is usually the
-same: turn this week's bottleneck into a runnable proof. I made a small public repo of Claude
+same: turn this week's production blocker into a runnable proof. I made a small public repo of Claude
 patterns you can run in one command using your own API key.
 
 The repo is here: https://github.com/cfregly/claude-feature-hits
 
-Pick the bottleneck you have this week:
+Pick the production question you have this week:
 
-| If the bottleneck is | Start here | What you get |
+| If the blocker is | Start here | What you get |
 | --- | --- | --- |
 | **cost** from agents that fan out over logs, usage rows, accounts, or app APIs | [`make programmatic_tool_calling`](https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling) | 28% fewer billed input tokens than the same Claude agent without programmatic tool calling |
 | **speed** for large outputs or long-stream work | [`make bulk_output`](https://github.com/cfregly/claude-feature-hits/tree/main/bulk_output) or [`make exact_ledger`](https://github.com/cfregly/claude-feature-hits/tree/main/exact_ledger) | one un-truncated large deliverable, or a faster exact long-stream run |
@@ -64,7 +64,7 @@ workload, such as `programmatic_tool_calling/my_tool.py`, `citations/cite.py`,
 `tool_boundary_security/policy.json`, `security_controls_map/controls.json`, or the brief README's
 `Run it on your own data` section. Most also have a short demo GIF.
 
-If you reply with the bottleneck you are working through this week, I can point you to the closest
+If you reply with the production blocker you are working through this week, I can point you to the closest
 Claude pattern.
 
 Happy building,
