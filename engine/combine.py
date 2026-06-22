@@ -62,12 +62,14 @@ ALREADY_BUILT = [
     "demonstrator: three mixed user-source types cited inline with typed pointers in a single call)",
 ]
 
+PILLARS = ["cost", "speed", "reliability", "accuracy", "security"]
+
 GEN_SYSTEM = (
     "You are a staff engineer who has shipped production agents on Anthropic Claude, OpenAI, and "
     "Google Gemini, and your job is to find COMBINATION edges on the Claude Developer Platform: a "
     "stack of two or three Claude features on ONE founder workload where the value COMPOUNDS beyond "
     "what any single feature gives, in a currency a founder pays for (cost, speed, reliability, "
-    "correctness, long-horizon, or less glue code). A single feature that is parity alone can become "
+    "accuracy, or security). A single feature that is parity alone can become "
     "a real edge when stacked. For each candidate: name the 2-3 features, the concrete founder "
     "workload that exercises the stack (the task, the agent shape, the document set or request "
     "volume), what compounds and in which currency, and the BEST equivalent stack OpenAI or Gemini "
@@ -102,8 +104,7 @@ _TOOL = {
                         "workload": {"type": "string",
                                      "description": "the concrete founder workload that exercises the stack"},
                         "founder_axis": {"type": "string",
-                                         "enum": ["cost", "speed", "reliability", "correctness",
-                                                  "long-horizon", "grounding", "glue-code"]},
+                                         "enum": PILLARS},
                         "compounded_value": {"type": "string",
                                              "description": "what the stack does that no single feature does, in the axis currency"},
                         "competitor_best_stack": {"type": "string",

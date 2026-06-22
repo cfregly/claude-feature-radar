@@ -55,7 +55,7 @@ def test_draft_prefers_the_routing_estimate_over_the_seed_repro():
 
 
 def test_draft_never_falls_back_to_scraped_evidence_quote():
-    edge = {"key": "search_results", "axis": "grounding", "verdict": "claude-ahead", "lead_score": 2,
+    edge = {"key": "search_results", "axis": "accuracy", "verdict": "claude-ahead", "lead_score": 2,
             "demoKind": "byo_rag_grounding", "evidence_quote": "Search results - Claude API Docs Messages Managed Agents",
             "fair_comparison": {"repro": {"command": "make search-results", "est_cost_usd": 0.06, "est_time_s": 120}}}
     text = cadence._draft_email(edge, None)
@@ -112,7 +112,7 @@ def temp_repo(tmp_path, monkeypatch):
             {"key": "programmatic_tool_calling", "axis": "cost", "verdict": "claude-ahead", "lead_score": 2, "score": 6,
              "demoKind": "token_accounting",
              "fair_comparison": {"repro": {"command": "make programmatic-tool-calling", "est_cost_usd": 0.08, "est_time_s": 90}}},
-            {"key": "managed_agents", "axis": "retention", "verdict": "parity", "lead_score": 0,
+            {"key": "managed_agents", "axis": "reliability", "verdict": "parity", "lead_score": 0,
              "score": 0, "demoKind": "retention_resume", "fair_comparison": {}},
         ],
         "capabilities": {}, "content_hashes": {}, "coverage": {},

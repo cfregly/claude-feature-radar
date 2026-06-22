@@ -274,7 +274,7 @@ def temp_repo(tmp_path, monkeypatch):
              "lead_score": 2, "score": 6, "demoKind": "token_accounting",
              "fair_comparison": {"repro": {"command": "make programmatic-tool-calling",
                                            "est_cost_usd": 0.08, "est_time_s": 90}}},
-            {"key": "managed_agents", "axis": "retention", "verdict": "parity", "lead_score": 0,
+            {"key": "managed_agents", "axis": "reliability", "verdict": "parity", "lead_score": 0,
              "score": 0, "demoKind": "retention_resume", "fair_comparison": {}},
         ],
         "capabilities": {}, "content_hashes": {}, "coverage": {},

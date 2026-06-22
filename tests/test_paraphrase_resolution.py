@@ -111,7 +111,7 @@ def test_interface_routes_claude_ahead_only_when_every_competitor_ran():
     competitors = demo.run_competitor_arms({}, spec)
     verdict = demo.score(claude, competitors, spec)
     assert verdict.verdict == "claude-ahead"
-    edge = {"key": "citations", "axis": "grounding", "demoKind": "grounding_resolution",
+    edge = {"key": "citations", "axis": "accuracy", "demoKind": "grounding_resolution",
             "fair_comparison": {"lead_basis": "head-to-head"}, "claim": "x"}
     receipt = demo.receipt(edge, claude, competitors, verdict, spec)
     assert receipt.verdict == "claude-ahead"     # every competitor arm ran, so the contract lets it stand

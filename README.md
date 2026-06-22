@@ -1,16 +1,16 @@
 # claude-feature-radar
 
-A forkable repo that repeatedly finds live Claude platform feature edges, and turns them into
-runnable code for builders to reproduce in their own environment.
+A private engine that repeatedly finds live Claude platform feature edges, proves them on real
+workloads, and publishes only verified Claude wins into public runnable briefs.
 
 The Claude Developer Platform ships every month, so the sharpest edge moves. This repo re-checks the
-live docs, ranks the genuine differentiators by what a founder building a product actually prices
-(cost, speed, reliability, correctness), and ships each as a one-command benchmark that reads its
-numbers off a real API call. Do not trust the writeup, re-run it.
+live docs, ranks the genuine differentiators by what a founder building a product actually prices:
+cost, speed, reliability, accuracy, and security. It ships only the winning public pattern, with
+numbers read from a real API call. Do not trust the writeup, re-run it.
 
 ![demo](docs/demo.gif)
 
-Each edge below is proven on a real task, with the receipt committed in `edges/<edge>/sample.txt`.
+Each edge below is proven on a real task, with saved output committed in `edges/<edge>/sample.txt`.
 The distilled, founder-facing versions, the ones a founder clones and reproduces in a single
 command, live in the companion repo [`claude-feature-hits`](https://github.com/cfregly/claude-feature-hits).
 
@@ -37,7 +37,7 @@ regions of 60 sales rows each (240 rows), find the highest-revenue region.
 | plain tool use | 9,451 | all 240 rows flow through the model's context |
 | programmatic | 6,828 | the sandbox aggregates, only the answer (east) reaches the model |
 
-A 28% input-token cut against the same Claude agent without programmatic tool calling, and the sandbox returns the exact winner. This pays off when your agent calls a tool many times over data it then crunches (the fan-out shape). The full receipt is [`edges/programmatic-tool-calling/sample.txt`](edges/programmatic-tool-calling/sample.txt).
+A 28% input-token cut against the same Claude agent without programmatic tool calling, and the sandbox returns the exact winner. This pays off when your agent calls a tool many times over data it then crunches (the fan-out shape). The full saved output is [`edges/programmatic-tool-calling/sample.txt`](edges/programmatic-tool-calling/sample.txt).
 
 ```bash
 make programmatic-tool-calling          # about $0.08 on Sonnet, needs ANTHROPIC_API_KEY
@@ -57,7 +57,7 @@ Feature references, fetched 2026-06-18:
 ## Supporting edge: Citations, a verifiable per-character source pointer (`make citations`)
 
 For a product built over your users' own documents (contracts, clinical notes, financial filings,
-support docs), the trust layer is the click-through to the exact sentence a claim came from. Turn on
+support docs), the accuracy layer is the click-through to the exact sentence a claim came from. Turn on
 `citations: {"enabled": true}` per document and Claude returns each claim with a character range plus
 the verbatim quote, extracted and guaranteed by the API to resolve, free of output tokens, with zero
 resolver code on your side.
@@ -74,7 +74,7 @@ Measured over 8 questions on 3 plain-text documents, each citation graded agains
 Claude returns a per-character pointer into your user's own document, guaranteed to resolve, with the
 verbatim quote free of output tokens and no resolver code to maintain. The per-edge writeup is
 [`edges/citations/README.md`](edges/citations/README.md). The founder-facing brief is
-[`claude-feature-hits/citations`](https://github.com/cfregly/claude-feature-hits). The full receipt
+[`claude-feature-hits/citations`](https://github.com/cfregly/claude-feature-hits). The full saved output
 is [`edges/citations/sample.txt`](edges/citations/sample.txt).
 
 ```bash
@@ -87,7 +87,7 @@ Feature references, fetched 2026-06-18:
 
 ## Supporting edge: PDF citations, page pointers for directly supplied PDFs (`make pdf-citations`)
 
-When a user uploads a PDF and asks a question immediately, the trust layer is the page a human can
+When a user uploads a PDF and asks a question immediately, the accuracy layer is the page a human can
 check. Claude Citations can return a `page_location` citation for a PDF supplied directly in the
 request, with the page number and quoted source text. The app does not need to persist the document in
 a hosted search store or write its own page resolver.
@@ -104,11 +104,11 @@ source page:
 Claude answered every question and returned a correct-page citation for every answer. OpenAI and
 Gemini answered the same direct-PDF questions but returned no pointer into the supplied PDF on this
 direct-file path. The edge is direct-PDF grounding, not a claim about hosted vector-store search. The
-full receipt is [`edges/pdf-citations/sample.txt`](edges/pdf-citations/sample.txt), with machine data
+full saved output is [`edges/pdf-citations/sample.txt`](edges/pdf-citations/sample.txt), with machine data
 in [`edges/pdf-citations/receipt.json`](edges/pdf-citations/receipt.json).
 
 ```bash
-make pdf-citations # cents-scale direct-PDF citation receipt, needs all three keys
+make pdf-citations # cents-scale direct-PDF citation run, needs all three keys
 ```
 
 Feature references, fetched 2026-06-19:
@@ -121,7 +121,7 @@ Feature references, fetched 2026-06-19:
 
 ## Supporting edge: Search results, citations into your own RAG chunks (`make search-results`)
 
-If you run your own retriever (pgvector, a custom reranker, multi-tenant isolation), the trust layer
+If you run your own retriever (pgvector, a custom reranker, multi-tenant isolation), the accuracy layer
 is a deep link from each answer to the exact chunk it came from. Pass your retrieved passages as
 `search_result` content blocks with `citations: {"enabled": true}` and Claude returns each claim with a
 `search_result_location`: the chunk index, the block span inside it, and the verbatim quote, free of
@@ -139,7 +139,7 @@ holds the answer:
 
 All three cited the correct source. Claude did it inline, resolver-free, with a block-level pointer and
 zero persisted objects, where the others each stood up a hosted store of six objects and returned a
-coarser pointer. The full receipt is [`edges/search-results/sample.txt`](edges/search-results/sample.txt),
+coarser pointer. The full saved output is [`edges/search-results/sample.txt`](edges/search-results/sample.txt),
 with machine data in [`edges/search-results/receipt.json`](edges/search-results/receipt.json).
 
 ```bash
@@ -168,7 +168,7 @@ Measured over one mixed-source request with three facts, one unique fact per sou
 
 All three answered correctly. Only Claude returned pointers into the supplied content, and it returned
 all three location types in the same response. The edge is the one-request inline mixed-source path,
-not a claim about hosted file-search stores. The full receipt is
+not a claim about hosted file-search stores. The full saved output is
 [`edges/grounding-stack/sample.txt`](edges/grounding-stack/sample.txt), with machine data in
 [`edges/grounding-stack/receipt.json`](edges/grounding-stack/receipt.json).
 
@@ -201,7 +201,7 @@ Measured over 3 web-research questions, each forced to search the live web, 2026
 
 All three cited web URLs, but only Claude returned the verbatim source quote on every citation.
 OpenAI's `url_citation` and Gemini's grounding segments index the model's own answer text and carry
-only a URL and title, so a claim is not checkable without re-fetching the page. The full receipt is
+only a URL and title, so a claim is not checkable without re-fetching the page. The full saved output is
 [`edges/web-citations/sample.txt`](edges/web-citations/sample.txt), with machine data in
 [`edges/web-citations/receipt.json`](edges/web-citations/receipt.json).
 
@@ -233,7 +233,7 @@ container, then re-reading the same container after a 31-minute idle:
 While warm, Claude and OpenAI both reuse a container. After the idle, Claude read its file back while
 OpenAI's container had been discarded (the documented 20-minute idle expiry, measured as a real `400`),
 and Gemini has no reusable container to begin with. The win is durability and cross-call persistence.
-The full receipt is [`edges/code-execution-state/sample.txt`](edges/code-execution-state/sample.txt), with machine
+The full saved output is [`edges/code-execution-state/sample.txt`](edges/code-execution-state/sample.txt), with machine
 data in [`edges/code-execution-state/receipt.json`](edges/code-execution-state/receipt.json).
 
 ```bash
@@ -265,7 +265,7 @@ Measured over one request per arm asking for a long enumerated document, 2026-06
 Claude emitted 230,607 output tokens in one request and finished the deliverable un-truncated, about
 1.8x GPT-5.5's documented ceiling and 3.5x Gemini's. The win is the single un-truncated turn above 128k
 output. It is beta and batch-only, so the Batch API runs asynchronously, minutes not seconds. The full
-receipt is [`edges/bulk-extended-output/sample.txt`](edges/bulk-extended-output/sample.txt), with
+saved output is [`edges/bulk-extended-output/sample.txt`](edges/bulk-extended-output/sample.txt), with
 machine data in [`edges/bulk-extended-output/receipt.json`](edges/bulk-extended-output/receipt.json).
 
 ```bash
@@ -293,7 +293,7 @@ at the end. The corpus is deterministic and the ground truth is computed in code
 | Gemini 3.1 Pro Preview with full context | yes | $2.57 | 201.0s | 434,629 |
 
 All three arms got the exact list. Claude won on cost and time: about 64% cheaper and 63% faster than
-the exact OpenAI run, and about 74% cheaper and 70% faster than the exact Gemini run. The full receipt
+the exact OpenAI run, and about 74% cheaper and 70% faster than the exact Gemini run. The full saved output
 is [`edges/exact-list-ledger/sample.txt`](edges/exact-list-ledger/sample.txt), with machine data in
 [`edges/exact-list-ledger/receipt.json`](edges/exact-list-ledger/receipt.json).
 
@@ -323,7 +323,7 @@ cached-prefix requests across all four documented miss-reason variants.
 
 Claude identified 4/4 documented cache-miss reason variants and reduced the manual cache-miss suspect
 list from four prompt-prefix surfaces to one for each miss. The edge is observability: a typed,
-per-request reason for every silent cache miss. The full receipt is
+per-request reason for every silent cache miss. The full saved output is
 [`edges/cache-diagnostics/sample.txt`](edges/cache-diagnostics/sample.txt), with machine data in
 [`edges/cache-diagnostics/receipt.json`](edges/cache-diagnostics/receipt.json).
 
@@ -356,12 +356,12 @@ hand off before making that external tool call.
 
 Claude saw the low remaining `task_budget` and handed off before the first tool call. The high-budget
 Claude control, OpenAI closest controls, and Gemini closest controls all started the tool loop. The
-edge is budget-control reliability, not a universal cost claim. The full receipt is
+edge is budget-control reliability, not a universal cost claim. The full saved output is
 [`edges/task-budgets/sample.txt`](edges/task-budgets/sample.txt), with machine data in
 [`edges/task-budgets/receipt.json`](edges/task-budgets/receipt.json).
 
 ```bash
-make task-budget # bounded live receipt, needs all three keys
+make task-budget # bounded live measured run, needs all three keys
 ```
 
 Feature references, fetched 2026-06-19:
@@ -382,11 +382,11 @@ make app-check                    # the forkable app on the shipped example, the
 Cost expectations: every benchmark reads its numbers off a real API call. `make programmatic-tool-calling` is about $0.08,
 `make citations` about $0.06, `make pdf-citations` about $0.09, `make search-results` about $0.06,
 `make grounding-stack` about $0.03, `make cache-diagnostics` is cents-scale, `make task-budget` is a
-bounded live receipt, and `make ledger` about $5 on the shipped full task. There is no hidden spend,
-and each target prints its receipt before it commits anything.
+bounded live measured run, and `make ledger` about $5 on the shipped full task. There is no hidden spend,
+and each target prints its saved output before it commits anything.
 
 The citations edge runs on the Anthropic key alone and proves Claude's structured source-pointer
-receipt. Cross-vendor grounding comparisons live in the sibling edges, each with its own stated task
+saved output. Cross-vendor grounding comparisons live in the sibling edges, each with its own stated task
 shape and optional SDK/key requirements.
 
 ## Drive the engine from a chat window (MCP server)

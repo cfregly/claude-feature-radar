@@ -20,15 +20,15 @@ resp = client.messages.create(
 )
 ```
 
-I keep two receipts separate because they answer different questions. The longer stress run used a
+I keep two measured outputs separate because they answer different questions. The longer stress run used a
 30-report chain: the agent returned the exact 10/10 list, held peak carried context to about 35k
 tokens, and finished at $0.67 in 60.7s.
 
 The head-to-head table below uses a shorter 8-report chain so the comparison is cheap to rerun with
-your own API keys. All three returned the exact list, so this is cost at equal correctness on the
+your own API keys. All three returned the exact list, so this is cost at equal accuracy on the
 same 8-report comparison workload:
 
-| Stack | Cost, this run | Wall time | Correctness | Versus Claude |
+| Stack | Cost, this run | Wall time | Accuracy | Versus Claude |
 | --- | ---: | ---: | --- | --- |
 | Claude `claude-haiku-4-5-20251001`, context editing | $0.17 | 14.3s | exact | best |
 | OpenAI `gpt-5.5`, compaction | $0.46 | 31.6s | exact | Claude 63% cheaper |
@@ -44,11 +44,11 @@ make exact_ledger
 ```
 
 Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/exact_ledger
-Committed comparison receipt: https://github.com/cfregly/claude-feature-hits/blob/main/exact_ledger/compare_sample.txt
+Committed comparison output: https://github.com/cfregly/claude-feature-hits/blob/main/exact_ledger/compare_sample.txt
 
 Docs: https://platform.claude.com/docs/en/build-with-claude/context-editing
 
-Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make exact_ledger COMPARE=1`. It runs all three side by side on the same short chain. In the captured comparison, the three rows total $0.98 because each competitor runs the full agent. The table above is the committed comparison receipt.
+Want the whole table, not just the Claude side? Set `OPENAI_API_KEY` and `GEMINI_API_KEY` too and run `make exact_ledger COMPARE=1`. It runs all three side by side on the same short chain. In the captured comparison, the three rows total $0.98 because each competitor runs the full agent. The table above is the committed comparison output.
 
 To run it on your own data, edit `exact_ledger/run.py`: point the reader at your records and your flag rule, then run `make exact_ledger` again.
 

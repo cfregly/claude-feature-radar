@@ -61,7 +61,7 @@ def list_edges(leads_only: bool = False, verdict: str = "", limit: int = 0) -> d
 
     Each row carries the verdict (claude-ahead, parity, claude-behind, never-evaluated), the
     genuine-lead basis and score, the value score, the axis a founder prices (cost, speed,
-    reliability, grounding), the demoKind, the source doc URL, and the reproduction command and
+    reliability, accuracy, security), the demoKind, the source doc URL, and the reproduction command and
     estimate when one exists. Rows come back sorted by score, highest first.
 
     Args:

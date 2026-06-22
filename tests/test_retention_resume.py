@@ -37,7 +37,7 @@ def test_retention_resume_registers():
 
 def test_dispatch_routes_managed_agents_to_retention_resume_as_a_zero_cost_always():
     register_all()
-    r = dispatch({"key": "managed_agents", "axis": "retention"})
+    r = dispatch({"key": "managed_agents", "axis": "reliability"})
     assert r.covered is True
     assert r.demo_kind == "retention_resume"
     # the DEFAULT path spends nothing (the live kill-resume is the opt-in), so it is an ALWAYS, not ASK.
@@ -48,7 +48,7 @@ def test_dispatch_routes_managed_agents_to_retention_resume_as_a_zero_cost_alway
 
 def test_dispatch_routes_memory_tool_to_retention_resume():
     register_all()
-    r = dispatch({"key": "memory_tool", "axis": "retention"})
+    r = dispatch({"key": "memory_tool", "axis": "reliability"})
     assert r.demo_kind == "retention_resume"
     assert r.covered is True
 
@@ -76,7 +76,7 @@ def test_receipt_default_is_parity_with_three_dated_grounding_rows():
     d = rr.RetentionResumeDemonstrator()
     claude = d.run_claude_arm({}, {})
     v = d.score(claude, [], {})
-    edge = {"key": "managed_agents", "axis": "retention", "demoKind": "retention_resume",
+    edge = {"key": "managed_agents", "axis": "reliability", "demoKind": "retention_resume",
             "fair_comparison": {"lead_basis": "doc-grounded-parity"}, "claim": "durable resume"}
     receipt = d.receipt(edge, claude, [], v, {"estimate": {"usd": 0.0, "command": "make retention"}})
     assert receipt.verdict == "parity"
@@ -94,7 +94,7 @@ def test_receipt_never_claims_claude_ahead_even_with_a_claude_ahead_proposal():
     d = rr.RetentionResumeDemonstrator()
     claude = d.run_claude_arm({}, {})
     rogue = Verdict(verdict="claude-ahead", passed=True, metric={})
-    edge = {"key": "managed_agents", "axis": "retention", "demoKind": "retention_resume",
+    edge = {"key": "managed_agents", "axis": "reliability", "demoKind": "retention_resume",
             "fair_comparison": {"lead_basis": "doc-grounded-parity"}, "claim": "x"}
     receipt = d.receipt(edge, claude, [], rogue, {"estimate": {}})
     assert receipt.verdict == "never-evaluated"            # downgraded: no competitor arm ran
@@ -162,7 +162,7 @@ def test_live_verdict_is_within_claude_only_never_claude_ahead():
     v = d.score(claude, d.run_competitor_arms({}, spec), spec)
     assert v.verdict == "within-claude-only"   # a continuity + bundle proof, never a head-to-head lead
     assert v.passed is True
-    edge = {"key": "managed_agents", "axis": "retention", "demoKind": "retention_resume",
+    edge = {"key": "managed_agents", "axis": "reliability", "demoKind": "retention_resume",
             "fair_comparison": {"lead_basis": "doc-grounded-parity"}, "claim": "x"}
     receipt = d.receipt(edge, claude, [], v, {"estimate": {"usd": 1.5, "command": "make retention-live"}})
     assert receipt.verdict == "within-claude-only"

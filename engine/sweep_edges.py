@@ -46,20 +46,35 @@ from engine.sources_registry import sources
 UA = "claude-feature-radar/edges (+local-sweep; stdlib-urllib)"
 TIMEOUT = 20
 
-# value_score: a small fixed weight per axis a founder pays for. Deterministic, no model call.
-# The axes match engine/scan.py's "axis" field and the CLAUDE.md cost/reliability/long-horizon/
-# correctness framing. A higher number is an axis a founder feels more directly in the bill or the
-# outcome. These are weights, not measurements, so they live here as code, not as a quoted receipt.
+# value_score: a small fixed weight per pillar a founder pays for. Deterministic, no model call.
+# The canonical pillars are cost, speed, reliability, accuracy, and security. Legacy axes are
+# normalized at ingest so the engine does not drift back to trust, grounding, correctness, or DX as
+# top-level story.
 AXIS_VALUE = {
     "cost": 3,
+    "security": 3,
     "reliability": 3,
-    "long-horizon": 3,
-    "correctness": 2,
+    "accuracy": 2,
     "speed": 2,
-    "observability": 1,
-    "dx": 1,
     "unknown": 1,
 }
+
+AXIS_ALIASES = {
+    "grounding": "accuracy",
+    "correctness": "accuracy",
+    "trust": "accuracy",
+    "long-horizon": "reliability",
+    "retention": "reliability",
+    "agentic-success": "reliability",
+    "observability": "reliability",
+    "dx": "reliability",
+    "large-output": "speed",
+}
+
+
+def canonical_axis(axis: str | None) -> str:
+    a = (axis or "unknown").strip().lower()
+    return AXIS_ALIASES.get(a, a if a in AXIS_VALUE else "unknown")
 
 # A beta-header token looks like managed-agents-2026-04-01 or context-management-2025-06-27: a slug
 # followed by an ISO date. The normalizer pulls it out of the snapshot when present so the maturity
@@ -203,7 +218,7 @@ def normalize(fetch_result: dict, seed_axis: str) -> dict:
     src = fetch_result["src"]
     base = {
         "vendor": src.vendor, "key": src.key, "source_url": src.url,
-        "kind": src.kind, "fetched_date": today(), "axis": seed_axis,
+        "kind": src.kind, "fetched_date": today(), "axis": canonical_axis(seed_axis),
     }
     if fetch_result["status"] != "fetched":
         # No fresh body. Carry the status so the diff records this as unknown, never absence.
@@ -290,7 +305,7 @@ def _lead_score(claude_cap: dict, competitor_caps: list[dict], all_fetched_ok: b
 
 
 def _value_score(cap: dict) -> int:
-    return AXIS_VALUE.get(cap.get("axis", "unknown"), 1)
+    return AXIS_VALUE.get(canonical_axis(cap.get("axis", "unknown")), 1)
 
 
 def rank(caps: dict, all_competitor_fetched_ok: bool) -> list[dict]:
@@ -304,7 +319,7 @@ def rank(caps: dict, all_competitor_fetched_ok: bool) -> list[dict]:
         lead, verdict = _lead_score(cap, competitors, all_competitor_fetched_ok)
         v = _value_score(cap)
         edge = {
-            "key": cap["key"], "vendor": "claude", "axis": cap.get("axis", "unknown"),
+            "key": cap["key"], "vendor": "claude", "axis": canonical_axis(cap.get("axis", "unknown")),
             "status": cap.get("status"), "beta_header": cap.get("beta_header"),
             "fetched_date": cap.get("fetched_date"),
             "evidence_quote": cap.get("evidence_quote", ""), "source_url": cap.get("source_url"),
@@ -343,35 +358,35 @@ def _seed_axis_for(key: str) -> str:
         if d["key"] == key or key in d["key"] or d["key"].replace("-", "_") == key:
             return d["axis"]
     table = {
-        "programmatic_tool_calling": "cost", "citations": "reliability", "context_editing": "reliability",
-        "memory_tool": "long-horizon", "prompt_caching": "cost", "code_execution": "cost",
-        "managed_agents": "long-horizon", "pricing": "cost", "compaction": "reliability",
+        "programmatic_tool_calling": "cost", "citations": "accuracy", "context_editing": "reliability",
+        "memory_tool": "reliability", "prompt_caching": "cost", "code_execution": "cost",
+        "managed_agents": "reliability", "pricing": "cost", "compaction": "reliability",
         "file_search": "reliability", "caching": "cost", "overview": "unknown",
         "release_notes": "unknown",
-        "beta_headers": "unknown", "managed_agents_overview": "long-horizon",
-        "managed_agents_sessions": "long-horizon", "managed_agents_environments": "long-horizon",
-        "managed_agents_multi_agent": "long-horizon", "fallback_credit": "correctness",
-        "adaptive_thinking": "correctness", "effort": "correctness", "task_budgets": "cost",
-        "fast_mode": "speed", "structured_outputs": "correctness", "batch_processing": "cost",
-        "search_results": "grounding", "web_search_tool": "grounding",
-        "web_fetch_tool": "grounding", "advisor_tool": "correctness", "bash_tool": "dx",
-        "computer_use": "agentic-success", "text_editor": "dx", "tool_search": "cost",
-        "fine_grained_tool_streaming": "speed", "context_windows": "long-horizon",
-        "mid_conversation_system": "agentic-success", "cache_diagnostics": "observability",
-        "token_counting": "cost", "files": "dx", "pdf_support": "grounding",
-        "document_processing": "grounding", "agent_skills": "dx", "mcp_connector": "dx",
-        "thinking": "correctness", "interactions": "agentic-success", "tools": "dx",
-        "reasoning": "correctness", "rate_limits": "cost", "google_search": "grounding",
-        "long_context": "long-horizon",
-        "claude_code_changelog": "agentic-success", "claude_code_whats_new": "agentic-success",
-        "claude_code_overview": "agentic-success", "claude_code_github_actions": "agentic-success",
-        "claude_code_sdk": "agentic-success", "claude_code_hooks": "dx",
-        "claude_code_plugins": "dx", "claude_code_github_releases": "agentic-success",
-        "news": "unknown", "opus_4_8": "agentic-success", "fable_mythos_5": "agentic-success",
-        "fable_mythos_access": "unknown", "claude_4": "agentic-success",
+        "beta_headers": "unknown", "managed_agents_overview": "reliability",
+        "managed_agents_sessions": "reliability", "managed_agents_environments": "reliability",
+        "managed_agents_multi_agent": "reliability", "fallback_credit": "security",
+        "adaptive_thinking": "accuracy", "effort": "accuracy", "task_budgets": "reliability",
+        "fast_mode": "speed", "structured_outputs": "accuracy", "batch_processing": "speed",
+        "search_results": "accuracy", "web_search_tool": "accuracy",
+        "web_fetch_tool": "accuracy", "advisor_tool": "cost", "bash_tool": "security",
+        "computer_use": "reliability", "text_editor": "reliability", "tool_search": "cost",
+        "fine_grained_tool_streaming": "speed", "context_windows": "reliability",
+        "mid_conversation_system": "speed", "cache_diagnostics": "cost",
+        "token_counting": "cost", "files": "security", "pdf_support": "accuracy",
+        "document_processing": "accuracy", "agent_skills": "reliability", "mcp_connector": "security",
+        "thinking": "accuracy", "interactions": "reliability", "tools": "reliability",
+        "reasoning": "accuracy", "rate_limits": "cost", "google_search": "accuracy",
+        "long_context": "reliability",
+        "claude_code_changelog": "reliability", "claude_code_whats_new": "reliability",
+        "claude_code_overview": "reliability", "claude_code_github_actions": "security",
+        "claude_code_sdk": "reliability", "claude_code_hooks": "security",
+        "claude_code_plugins": "reliability", "claude_code_github_releases": "reliability",
+        "news": "unknown", "opus_4_8": "accuracy", "fable_mythos_5": "accuracy",
+        "fable_mythos_access": "unknown", "claude_4": "accuracy",
         "claude_apps_release_notes": "unknown", "claude_devs_x": "unknown",
     }
-    return table.get(key, "unknown")
+    return canonical_axis(table.get(key, "unknown"))
 
 
 # ----- coverage (which ranked edges already have a built email) ----------------------------------
@@ -396,12 +411,12 @@ EDGE_DIR_FOR = {  # source key -> existing edges/<dir>, so the changelog flags w
 
 RECEIPT_EDGE_INFO = {
     "exact-list-ledger": {
-        "axis": "cost and speed",
+        "axis": "cost",
         "source_key": "context_editing",
         "why": "exact long-stream state, lower cost and faster than exact competitor arms",
     },
     "cache-diagnostics": {
-        "axis": "observability",
+        "axis": "cost",
         "source_key": "cache_diagnostics",
         "why": "cache-miss root cause returned by Claude, counters only on competitors",
     },
@@ -411,27 +426,27 @@ RECEIPT_EDGE_INFO = {
         "why": "near-depleted full-loop budget marker stopped before the first external tool call",
     },
     "pdf-citations": {
-        "axis": "grounding",
+        "axis": "accuracy",
         "source_key": "pdf_support",
         "why": "direct-PDF page pointers resolved to the correct supplied page",
     },
     "search-results": {
-        "axis": "grounding",
+        "axis": "accuracy",
         "source_key": "search_results",
         "why": "developer-supplied RAG chunks cited inline without a hosted store",
     },
     "grounding-stack": {
-        "axis": "grounding",
+        "axis": "accuracy",
         "source_key": "citations+pdf_support+search_results",
         "why": "text, PDF, and RAG chunk pointers returned in one mixed-source request",
     },
     "web-citations": {
-        "axis": "grounding",
+        "axis": "accuracy",
         "source_key": "web_search_tool",
         "why": "web citations carried a verbatim source quote, not only a URL",
     },
     "bulk-extended-output": {
-        "axis": "large-output",
+        "axis": "speed",
         "source_key": "batch_processing",
         "why": "one un-truncated batch response exceeded every competitor documented output cap",
     },
@@ -661,13 +676,13 @@ def write_brief(ranked: list[dict], covered: set[str], date: str) -> str:
     if promoted:
         lines += [
             "",
-            "## Receipt-backed promoted edges from live runs",
+            "## Measured-output promoted edges from live runs",
             "",
             "These are subfeatures or feature stacks that cleared a committed `promotable_edge: true` "
-            "receipt. They stay promoted even when the broader source key remains in the held queue "
+            "measured output. They stay promoted even when the broader source key remains in the held queue "
             "for deeper subfeature search.",
             "",
-            "| Edge bundle | Axis | Source key or stack | Receipt | Why it counts |",
+            "| Edge bundle | Axis | Source key or stack | Saved output | Why it counts |",
             "|-------------|------|---------------------|---------|---------------|",
         ]
         for p in promoted:

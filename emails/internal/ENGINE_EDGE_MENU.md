@@ -10,16 +10,20 @@ Every benchmark reads its numbers off a live API call. Costs are the actual run,
 
 ## Pick by your bottleneck
 
-Three questions cover most builders. Find yours, run those two or three commands first.
+Five questions cover most builders. Find yours, run those two or three commands first.
 
-- Is the bottleneck **trust**, answers over your users' own documents that have to be verifiable? Start
-  with the grounding edges.
+- Is the bottleneck **accuracy**, answers over your users' own documents that have to be verifiable?
+  Start with the citation edges.
 - Is the bottleneck **the bill at scale**, an agent that fans out over data or carries a big context?
   Start with the cost edges.
+- Is the bottleneck **speed**, large outputs or long-stream work where elapsed time is the pain? Start
+  with bulk output and exact ledger.
 - Is the bottleneck **a long-running or stateful agent** that has to finish and keep its state? Start
   with the reliability edges.
+- Is the bottleneck **security**, tool access, prompt injection, audit, or encryption boundaries?
+  Start with a discovery path before turning it into a public brief.
 
-## Trust: answers your users can verify
+## Accuracy: answers your users can verify
 
 A wrong, uncited answer over a contract or a clinical note is a churn event. These edges return a
 pointer back to the exact source, guaranteed by the API, with no resolver code on your side.

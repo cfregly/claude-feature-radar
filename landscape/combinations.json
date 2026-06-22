@@ -25,7 +25,7 @@
         "prompt caching"
       ],
       "workload": "A multi-day autonomous repo-migration/coding agent running hundreds of turns over a large codebase, far exceeding any single window; clear_tool_uses drops stale tool results, the memory tool writes durable decisions/state to its file store, and caching keeps the trimmed stable prefix warm.",
-      "founder_axis": "long-horizon",
+      "founder_axis": "reliability",
       "compounded_value": "The agent runs effectively unbounded turns without overflow because context editing bounds the live window, the memory tool preserves facts across the clears, and caching keeps input cost low on the surviving prefix. Bounded-context + persistence + cheap reuse together is not achievable with any one of the three.",
       "competitor_best_stack": "OpenAI Responses with hand-rolled summarization + external file store, or Gemini context caching + manual truncation. Both require custom glue and neither ships a native clear-tool-results-yet-persist-facts primitive, so reliability and effort are worse at the same turn count.",
       "conflict": "none",
@@ -39,14 +39,14 @@
         "prompt caching",
         "Citations"
       ],
-      "workload": "Load an entire ~700k-token codebase or regulatory corpus once, cache it, then serve hundreds of grounded Q&A requests with inline character-level citation pointers \u2014 no vector DB or chunking pipeline.",
+      "workload": "Load an entire ~700k-token codebase or regulatory corpus once, cache it, then serve hundreds of grounded Q&A requests with inline character-level citation pointers — no vector DB or chunking pipeline.",
       "founder_axis": "cost",
       "compounded_value": "The giant prefix is paid once at cache-write then read-discounted across N queries, and every answer still carries verifiable typed citation spans, giving cheap grounded retrieval-quality answers without building or paying for a retrieval stack.",
       "competitor_best_stack": "Gemini 2M context + context caching matches the cost amortization on the huge prefix but exposes only coarse grounding metadata, not inline span-precise Citations; OpenAI has no 1M-class window at all so it must chunk and re-embed, losing the single-call grounding.",
       "conflict": "none",
       "id": "combo-3",
       "skeptic_verdict": "KILLED",
-      "skeptic_why": "Gemini 2M context + context caching matches the named cost axis dollar-for-dollar on the amortized prefix; span-precise Citations is a correctness perk, not a cost one, so on the stated currency the combo dies."
+      "skeptic_why": "Gemini 2M context + context caching matches the named cost axis dollar-for-dollar on the amortized prefix; span-precise Citations is an accuracy perk, not a cost one, so on the stated currency the combo dies."
     },
     {
       "features": [
@@ -56,7 +56,7 @@
       ],
       "workload": "An ops agent wired to 10+ MCP servers (Jira, Salesforce, internal APIs) that each return verbose JSON; allowed_callers keeps MCP outputs out of model context and context editing clears anything that does leak, across long multi-hour sessions.",
       "founder_axis": "cost",
-      "compounded_value": "Fat third-party payloads never pollute or overflow the model context, so the agent stays both cheap (no re-billed JSON) and reliable (no derailment from noise) across long sessions \u2014 a stability-plus-cost effect neither MCP nor PTC delivers alone.",
+      "compounded_value": "Fat third-party payloads never pollute or overflow the model context, so the agent stays both cheap (no re-billed JSON) and reliable (no derailment from noise) across long sessions — a stability-plus-cost effect neither MCP nor PTC delivers alone.",
       "competitor_best_stack": "OpenAI and Gemini both support MCP now, but the connector returns full tool output into model context with no allowed_callers equivalent, so you pay for and risk derailment from every verbose payload; only manual post-hoc trimming approximates context editing.",
       "conflict": "none",
       "id": "combo-4",
@@ -70,13 +70,13 @@
         "memory tool"
       ],
       "workload": "Multi-session contract / due-diligence review over hundreds of PDFs: cite clauses inline per request and persist extracted obligations and redlines to the memory store so the knowledge base compounds across weeks of sessions.",
-      "founder_axis": "correctness",
+      "founder_axis": "accuracy",
       "compounded_value": "Each session grounds every assertion to an exact PDF span while the accumulating cross-document obligation set persists in memory, so a reviewer builds a verifiable, growing audit trail rather than re-deriving findings each session.",
       "competitor_best_stack": "OpenAI file search + Assistants thread persistence approximates the memory layer but its citations are coarse and unreliable; Gemini PDF input + Search grounding lacks span-precise inline Citations. Neither matches verifiable-span + durable-cross-doc-state together.",
       "conflict": "none",
       "id": "combo-5",
       "skeptic_verdict": "SURVIVES",
-      "skeptic_why": "OpenAI file-search citations are coarse and Gemini Search grounding lacks span-precise inline pointers, so neither can deliver the verifiable-span + durable cross-doc audit trail that the correctness currency demands."
+      "skeptic_why": "OpenAI file-search citations are coarse and Gemini Search grounding lacks span-precise inline pointers, so neither can deliver the verifiable-span + durable cross-doc audit trail that the accuracy currency demands."
     },
     {
       "features": [
@@ -86,12 +86,12 @@
       ],
       "workload": "Overnight extraction/classification over ~500k documents using an Agent Skill that encodes the standard operating procedure; the cached skill+schema prefix is amortized across the entire batch.",
       "founder_axis": "cost",
-      "compounded_value": "Batch discount stacks on top of cache-read discount on a large shared prefix, while the Skill removes per-job prompt assembly glue \u2014 three reductions on one bulk job.",
+      "compounded_value": "Batch discount stacks on top of cache-read discount on a large shared prefix, while the Skill removes per-job prompt assembly glue — three reductions on one bulk job.",
       "competitor_best_stack": "OpenAI Batch (50% off) + automatic prompt caching captures most of the dollar win and you can simply inline the SOP into the prompt; Agent Skills saves glue code, not tokens, so the competitor roughly matches on the pure cost axis here. Honestly close to parity.",
       "conflict": "none",
       "id": "combo-6",
       "skeptic_verdict": "KILLED",
-      "skeptic_why": "OpenAI Batch (50%) + automatic prompt caching captures the entire named cost win on the shared prefix and the SOP can be inlined, since Skills saves glue not tokens\u2014author-admitted parity."
+      "skeptic_why": "OpenAI Batch (50%) + automatic prompt caching captures the entire named cost win on the shared prefix and the SOP can be inlined, since Skills saves glue not tokens—author-admitted parity."
     },
     {
       "features": [
@@ -100,13 +100,13 @@
         "effort knob"
       ],
       "workload": "A high-stakes triage agent (legal or clinical intake) that escalates only hard cases: the effort knob raises the thinking budget on demand and the advisor tool pulls a structured second-opinion subagent on low-confidence steps.",
-      "founder_axis": "correctness",
-      "compounded_value": "Reasoning spend is allocated adaptively and a structured second opinion is fetched only on hard branches, lifting correctness on the tail of difficult cases without paying maximum thinking tokens on every routine request.",
+      "founder_axis": "accuracy",
+      "compounded_value": "Reasoning spend is allocated adaptively and a structured second opinion is fetched only on hard branches, lifting accuracy on the tail of difficult cases without paying maximum thinking tokens on every routine request.",
       "competitor_best_stack": "OpenAI o-series reasoning_effort plus a hand-rolled critic/second-pass call, or Gemini thinking budget + self-critique, reproduces most of the pattern; neither has a native advisor primitive but the behavior is reproducible with extra glue, so the competitor partially matches.",
       "conflict": "context editing clear_tool_uses is not fully compatible with advisor blocks, so this stack must avoid adding context editing",
       "id": "combo-7",
       "skeptic_verdict": "KILLED",
-      "skeptic_why": "OpenAI reasoning_effort + a hand-rolled critic pass (or Gemini thinking budget + self-critique) reproduces the adaptive-spend-plus-second-opinion behavior, matching the correctness currency at the cost of a little glue."
+      "skeptic_why": "OpenAI reasoning_effort + a hand-rolled critic pass (or Gemini thinking budget + self-critique) reproduces the adaptive-spend-plus-second-opinion behavior, matching the accuracy currency at the cost of a little glue."
     }
   ],
   "note": "Candidates only. A combination ships only after a demonstrator measures it at promotable_edge: true, the way engine/demonstrators/grounding_stack.py proves its stack. competitor_best_stack and the skeptic verdict are the internal both-directions read."

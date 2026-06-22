@@ -1,57 +1,68 @@
-Subject: Congrats on YC! 3 Claude demos to run this week
+Subject: Congrats on YC! 5 Claude bottlenecks to test this week
 
 Hey YC founders,
 
-Congrats on the batch! I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. Quick builder note from my own testing: I made a small public repo of Claude features that you can run in one command using your own API key.
+Congrats on the batch! I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I've
+worked through 100+ investor-pitch sessions with founders, and the useful pattern is usually the
+same: turn this week's bottleneck into a runnable proof. I made a small public repo of Claude
+patterns you can run in one command using your own API key.
 
 The repo is here: https://github.com/cfregly/claude-feature-hits
 
 Pick the bottleneck you have this week:
 
-| If you are building | Start here | What you get |
+| If the bottleneck is | Start here | What you get |
 | --- | --- | --- |
-| an agent that calls tools many times over logs, accounts, usage rows, or app APIs | [`make programmatic_tool_calling`](https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling) | 28% fewer billed input tokens than the same Claude agent without programmatic tool calling |
-| a product that answers over user PDFs or docs | [`make pdf_citations`](https://github.com/cfregly/claude-feature-hits/tree/main/pdf_citations) or [`make citations`](https://github.com/cfregly/claude-feature-hits/tree/main/citations) | page-level pointers for PDFs and character-level pointers for text docs |
-| a multi-step code or data agent | [`make code_execution_state`](https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state) | sandbox files that survive across separate requests |
+| **cost** from agents that fan out over logs, usage rows, accounts, or app APIs | [`make programmatic_tool_calling`](https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling) | 28% fewer billed input tokens than the same Claude agent without programmatic tool calling |
+| **speed** for large outputs or long-stream work | [`make bulk_output`](https://github.com/cfregly/claude-feature-hits/tree/main/bulk_output) or [`make exact_ledger`](https://github.com/cfregly/claude-feature-hits/tree/main/exact_ledger) | one un-truncated large deliverable, or a faster exact long-stream run |
+| **reliability** for multi-step code, data, or build agents | [`make code_execution_state`](https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state) or [`make task_budgets`](https://github.com/cfregly/claude-feature-hits/tree/main/task_budgets) | sandbox files that survive across separate requests, or loop-level budget handoffs |
+| **accuracy** for answers over PDFs, docs, filings, or retrieved chunks | [`make pdf_citations`](https://github.com/cfregly/claude-feature-hits/tree/main/pdf_citations) or [`make citations`](https://github.com/cfregly/claude-feature-hits/tree/main/citations) | page-level pointers for PDFs and character-level pointers for text docs |
+| **security** for regulated data, MCP connectors, prompt injection, or agent attack surface | reply with that workflow | I can point you to the right Claude pattern: CMEK, Compliance API, Claude Code security review, enterprise-managed MCP auth, or a tool-boundary security review |
 
 The code hooks are small:
 
 ```py
-# 1. Many-tool-call agents: let Claude's sandbox call your custom tool.
+# Cost: let Claude's sandbox call your custom tool.
 tools=[
     {"type": "code_execution_20260120", "name": "code_execution"},
     {"name": "query_usage", "input_schema": {...},
      "allowed_callers": ["code_execution_20260120"]},
 ]
 
-# 2. PDF/doc answers: enable source pointers on the document.
+# Accuracy: enable source pointers on the document.
 doc = {
     "type": "document",
     "source": {"type": "base64", "media_type": "application/pdf", "data": pdf_b64},
     "citations": {"enabled": True},
 }
 
-# 3. Multi-step code/data agents: keep working in the same code-execution workspace.
-container_id = first_response.container.id  # save this from request 1
-next_response = client.beta.messages.create(..., container=container_id)  # request 2 reuses it
+# Reliability: keep working in the same code-execution workspace.
+container_id = first_response.container.id
+next_response = client.beta.messages.create(..., container=container_id)
 ```
 
-For the many-tool-call path, Claude writes one sandbox script that loops over your tool, crunches the bulky rows there, and sends only the answer back to the model. On my run, the same usage-style workload went from 9,451 to 6,828 billed input tokens, 28% fewer than the same Claude agent without programmatic tool calling. It costs $0.08 to reproduce.
+For the many-tool-call path, Claude writes one sandbox script that loops over your tool, crunches the
+bulky rows there, and sends only the answer back to the model. On my run, the same usage-style
+workload went from 9,451 to 6,828 billed input tokens, 28% fewer than the same Claude agent without
+programmatic tool calling. It costs $0.08 to reproduce.
 
 Run it:
 
 ```shell
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
 # Get an API key: https://console.anthropic.com/
+# If this send has a startup credit code, include it here: <insert-credit-code>
 export ANTHROPIC_API_KEY=your-api-key
-make programmatic_tool_calling   # many tool calls
-make document_citations          # PDF and text-doc answers
-make code_execution_state        # multi-step agents
+make programmatic_tool_calling   # cost and speed for fan-out agents
+make document_citations          # accuracy for PDF and text-doc answers
+make code_execution_state        # reliability for multi-step agents
 ```
 
-Each brief has a short demo GIF, the code, sample output, the exact cost, and the one file to edit for your own workload.
+Each brief has a short demo GIF, the code, sample output, the exact cost, and the one file to edit
+for your own workload.
 
-If you reply with the bottleneck you are working through this week, I can point you to the closest Claude pattern.
+If you reply with the bottleneck you are working through this week, I can point you to the closest
+Claude pattern.
 
 Happy building,
 

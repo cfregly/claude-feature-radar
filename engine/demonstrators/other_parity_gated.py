@@ -67,7 +67,7 @@ from engine.demonstrators.shared import platform
 
 PARITY_CHECKS = {
     "fallback_credit": {
-        "axis": "correctness",
+        "axis": "accuracy",
         "claude_surface": "server-side model fallback (Fable/Mythos) with a fallback credit: recover "
                           "from a refusal by falling back to another model inside a single call",
         "competitor_surface": "client-side retry loop a founder builds on a competitor (no named "
@@ -83,7 +83,7 @@ PARITY_CHECKS = {
         "parity_verdict": "unchecked",   # no skeptic pass run against a fetched competitor surface yet
     },
     "cache_diagnostics": {
-        "axis": "observability",
+        "axis": "cost",
         "claude_surface": "per-request cache_miss_reason in the usage object: an explainer of WHY a "
                           "cache read missed (prefix below the minimum, changed prefix, expired TTL)",
         "competitor_surface": "OpenAI and Gemini usage objects (no named per-request cache-miss-reason "
@@ -172,7 +172,7 @@ PARITY_CHECKS = {
         "parity_verdict": "unchecked",
     },
     "build_velocity": {
-        "axis": "agentic-success",
+        "axis": "reliability",
         "claude_surface": "Claude Code as a programmable build surface: the @claude GitHub Action opens "
                           "PRs following CLAUDE.md, runs review on every PR, runs headless in CI; "
                           "plugins bundle skills, agents, hooks, and MCP as one marketplace unit",

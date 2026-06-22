@@ -4,21 +4,29 @@ Hey Jonny,
 
 Congrats on getting Tasklet into YC.
 
-I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I spend my time on the mechanics that make agents cheaper, more reliable, and easier to ship.
+I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I spend my time on the
+mechanics that make agents cheaper, faster, safer, and easier to ship.
 
-I saw Tasklet is building agents that call work-app APIs to get tasks done. The Claude pattern that maps to that workload is app-API fan-out where the agent makes many calls, inspects bulky intermediate results, and returns one action.
+I saw Tasklet is building agents that call work-app APIs to get tasks done. The Claude pattern that
+maps to that workload is app-API fan-out where the agent makes many calls, inspects bulky
+intermediate results, and returns one action.
 
-Without a filter point, every API result flows into the model context. Claude programmatic tool calling gives you that filter point. Mark your tool as callable from code execution, then Claude can write a sandbox script that loops over the tool and returns only the answer the model needs.
+Without a filter point, every API result flows into the model context. Claude programmatic tool
+calling gives you that filter point. Mark your tool as callable from code execution, then Claude can
+write a sandbox script that loops over the tool and returns only the answer the model needs.
 
 ```python
 tools=[
-    {"type": "code_execution_20260120", "name": "code_execution"},  # add this
+    {"type": "code_execution_20260120", "name": "code_execution"},
     {"name": "fetch_workspace_task", "input_schema": {...},
-     "allowed_callers": ["code_execution_20260120"]},               # app results run in the sandbox
+     "allowed_callers": ["code_execution_20260120"]},
 ]
 ```
 
-Using my API key, the measured fan-out run went from 9,451 to 6,828 billed input tokens, with the exact winner returned from the sandbox. That is 28% fewer billed input tokens than the same Claude agent without programmatic tool calling. That is the shape: many tool calls, bulky results, one final answer.
+Using my API key, the measured fan-out run went from 9,451 to 6,828 billed input tokens, with the
+exact winner returned from the sandbox. That is 28% fewer billed input tokens than the same Claude
+agent without programmatic tool calling. That is the shape: many tool calls, bulky results, one final
+answer.
 
 Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
 
@@ -31,9 +39,16 @@ export ANTHROPIC_API_KEY=your-api-key
 make programmatic_tool_calling
 ```
 
-To try it on Tasklet's shape, edit `programmatic_tool_calling/my_tool.py` with one of your work-app tools and the inputs it fans out over.
+To try it on Tasklet's shape, edit `programmatic_tool_calling/my_tool.py` with one of your work-app
+tools and the inputs it fans out over.
 
-If Tasklet's heavier bottleneck is a different app-agent loop, reply with that flow and I can point you to the closest Claude pattern.
+The security follow-up is also real for Tasklet: as soon as an agent can act through MCP or app APIs,
+the control plane matters. I would look at enterprise-managed MCP auth, connector action
+restrictions, and a tool-boundary review so personal accounts, destructive tools, and free-form
+inputs do not become the production risk.
+
+If Tasklet's heavier bottleneck is a different app-agent loop, reply with that flow and I can point
+you to the closest Claude pattern.
 
 Happy building,
 

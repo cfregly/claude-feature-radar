@@ -473,7 +473,7 @@ def run_benchmark(edge: str, confirm: bool = False, max_usd: float = DEFAULT_MAX
             "exit_code": proc.returncode, "estimate": estimate, "command": plan["command"],
             "output_tail": tail,
             "message": f"Ran {plan['command']} (exit {proc.returncode}). It spent about ${est:.2f} on "
-                       "your key. Nothing was sent or pushed. The receipt is in the engine's data/ "
+                       "your key. Nothing was sent or pushed. The saved output is in the engine's data/ "
                        "and the printed tail above."}
 
 

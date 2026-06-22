@@ -136,14 +136,18 @@ KEY_TO_DEMOKIND = {
 # absence-of-evidence rule already holds for an unevaluated lead.
 AXIS_TO_DEMOKIND = {
     "cost": "cost",
+    "speed": "token_accounting",
     "reliability": "long_horizon_survival",
+    "accuracy": "eval_quality",
+    "security": "other",
+    "throughput": "token_accounting",
+    # Legacy axes accepted for old landscape/test data. New sweep output should use the five pillars.
     "long-horizon": "long_horizon_survival",
     "retention": "retention_resume",
     "grounding": "grounding_resolution",
     "agentic-success": "long_horizon_survival",
     "correctness": "eval_quality",
-    "throughput": "token_accounting",
-    "speed": "token_accounting",
+    "trust": "grounding_resolution",
     "observability": "other",
     "dx": "other",
     "unknown": "other",

@@ -8,7 +8,7 @@ The things these tests protect:
   - demoKind resolves from the seed table, then a best-effort axis guess, then "other", never crashes.
   - dispatch routes a built edge to its demonstrator with a surfaced estimate (no spend before a
     human sees the number), and files a build-a-demonstrator ASK stub for an unmapped kind.
-  - the Receipt honesty contract: a claude-ahead verdict is downgraded to never-evaluated when a
+  - the saved-output honesty contract: a claude-ahead verdict is downgraded to never-evaluated when a
     competitor arm did not run and the lead is not an all-fetched absence-of-evidence.
   - the estimate-surfaced gate check in engine.gate.audit().
 """
@@ -42,10 +42,16 @@ def test_seed_table_resolves_dashed_and_undashed_forms():
 def test_unknown_key_falls_back_to_axis_guess_then_other():
     # A key not in the seed table guesses from the axis, and an unknown axis lands on "other". Never a
     # crash, so a brand-new edge always routes.
-    assert demokinds.demokind_for("never_seen", axis="grounding") == "grounding_resolution"
-    assert demokinds.demokind_for("never_seen", axis="retention") == "retention_resume"
+    assert demokinds.demokind_for("never_seen", axis="accuracy") == "eval_quality"
+    assert demokinds.demokind_for("never_seen", axis="reliability") == "long_horizon_survival"
     assert demokinds.demokind_for("never_seen", axis="totally-unknown") == "other"
     assert demokinds.demokind_for("never_seen") == "other"
+
+
+def test_legacy_axis_aliases_still_route_old_data():
+    assert demokinds.demokind_for("never_seen", axis="grounding") == "grounding_resolution"
+    assert demokinds.demokind_for("never_seen", axis="correctness") == "eval_quality"
+    assert demokinds.demokind_for("never_seen", axis="long-horizon") == "long_horizon_survival"
 
 
 def test_is_seeded_separates_table_keys_from_guesses():
@@ -121,7 +127,7 @@ def test_dispatch_holds_an_unchecked_other_candidate_with_a_precondition_stub():
     # The "other" kind now HAS a demonstrator (the parity-gated one), so an unchecked candidate is
     # DECLINED pending its parity check: an ASK stub that holds the edge, never pitched, never a crash.
     register_all()
-    edge = {"key": "fallback_credit", "axis": "correctness", "demoKind": "other"}
+    edge = {"key": "fallback_credit", "axis": "accuracy", "demoKind": "other"}
     r = dispatch(edge)
     assert r.demonstrator is None            # declined: held until the parity check passes
     assert r.gate == "ask"
@@ -130,7 +136,7 @@ def test_dispatch_holds_an_unchecked_other_candidate_with_a_precondition_stub():
 
 def test_dispatch_stamps_the_resolved_kind_onto_an_unstamped_edge():
     register_all()
-    edge = {"key": "citations", "axis": "grounding"}  # no demoKind field
+    edge = {"key": "citations", "axis": "accuracy"}  # no demoKind field
     r = dispatch(edge)
     assert edge["demoKind"] == "grounding_resolution"  # stamped so applicable() can read it
     assert r.covered is True
@@ -227,7 +233,7 @@ def test_grounding_correction_demotes_retention_to_parity():
     # managed_agents and memory_tool must never carry an absence-of-evidence Claude-only lead. The
     # correction re-grades them to doc-grounded parity, zeroing the lead so they are never pitched.
     for key in ("managed_agents", "memory_tool"):
-        edge = {"key": key, "axis": "retention", "verdict": "claude-ahead", "lead_score": 2,
+        edge = {"key": key, "axis": "reliability", "verdict": "claude-ahead", "lead_score": 2,
                 "score": 6, "fair_comparison": {"lead_basis": "absence-of-evidence"}}
         out = scan.apply_grounding_correction(edge)
         assert out["verdict"] == "parity"
@@ -239,7 +245,7 @@ def test_grounding_correction_demotes_context_editing_to_parity():
     from engine import scan
     # context editing vs server-side compaction is parity, so the long-horizon LEADERSHIP claim
     # anchors on METR, not context editing.
-    edge = {"key": "context_editing", "axis": "long-horizon", "verdict": "claude-ahead",
+    edge = {"key": "context_editing", "axis": "reliability", "verdict": "claude-ahead",
             "lead_score": 2, "score": 6, "fair_comparison": {"lead_basis": "absence-of-evidence"}}
     out = scan.apply_grounding_correction(edge)
     assert out["verdict"] == "parity" and out["lead_score"] == 0

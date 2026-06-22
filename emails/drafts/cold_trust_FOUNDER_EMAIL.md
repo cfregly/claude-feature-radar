@@ -1,11 +1,11 @@
-Subject: A Claude primitive for grounded answers your users can verify
+Subject: A Claude primitive for source-linked answers your users can verify
 
 Hey {first_name},
 
 Congrats on the batch. Quick note if your product answers questions over your users' own documents, a
 contract, a policy, a clinical note, a financial filing.
 
-The hard part is trust. A user needs to click from the answer straight to the sentence it came from,
+The hard part is accuracy. A user needs to click from the answer straight to the sentence it came from,
 with the source already attached to the claim.
 
 Turn on citations per document and Claude returns each claim with a pointer into that document and the
