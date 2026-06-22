@@ -20,7 +20,7 @@ from __future__ import annotations
 import json
 import pathlib
 
-from engine.demokinds import demokind_for, is_seeded
+from engine.demokinds import demokind_for, is_known_kind, is_seeded
 
 # Survived the skeptic AND the competitor-parity check as genuinely Claude-ahead, ranked by
 # value to a founder times how clearly Claude leads.
@@ -36,20 +36,21 @@ DIFFERENTIATORS = [
                  "and keeps the bulky tool outputs out of the model context.",
         "why": "No named OpenAI or Google equivalent keeps a developer's own custom-tool OUTPUTS out "
                "of context (allowed_callers). OpenAI ships a code interpreter and tool search but not "
-               "this, an absence-of-evidence lead. GA, no beta header (2026-06-18). Measured (make "
+               "this, an absence-of-evidence lead. This receipt path uses no beta header. Programmatic "
+               "tool calling requires code_execution_20260120 or later (checked 2026-06-22). Measured (make "
                "programmatic-tool-calling): on a 240-row fan-out task billed input fell from 9,451 to 6,828 tokens, about "
                "28% (Anthropic's own doc reports about 24%), and the sandbox code answered correctly "
                "where the in-context model failed. Fan-out-shaped (sequential tasks flat to +8%), it "
                "adds round-trips, and it is not on Bedrock or Vertex and not ZDR-eligible.",
         "fair_comparison": {
             "task_shape": "fan-out, 4 regions x ~60 rows",
-            "claude_config": {"feature": "allowed_callers", "beta_on": True, "model": "sonnet"},
+            "claude_config": {"feature": "allowed_callers", "beta_on": False, "model": "sonnet"},
             "competitor_arms": [{"vendor": "openai", "surface": "code_interpreter", "best_config": True},
                                 {"vendor": "gemini", "surface": "code_execution", "best_config": True}],
             "isolate": "only programmatic-tool-calling toggled; memory and prompt held constant",
             "score_gate": "answers_match AND mode_b_input < mode_a_input",
             "lead_basis": "absence-of-evidence",
-            "maturity": {"claude": "ga", "beta_header": None, "fetched_date": "2026-06-18"},
+            "maturity": {"claude": "ga", "beta_header": None, "fetched_date": "2026-06-22"},
             "repro": {"command": "make programmatic-tool-calling", "est_cost_usd": 0.08, "est_time_s": 90},
         },
     },
@@ -114,7 +115,7 @@ DIFFERENTIATORS = [
     },
     {
         "key": "code-execution-state", "axis": "reliability", "rank": 4,
-        "demoKind": "retention_resume",
+        "demoKind": "code_execution_state",
         "claim": "The code-execution sandbox keeps its container and files across separate requests and "
                  "for 30 days, so a multi-step agent's state survives between turns and across a long idle.",
         "why": "Claude returns a reusable container id (response.container.id); pass it as container=<id> "
@@ -183,14 +184,14 @@ DIFFERENTIATORS = [
     },
     {
         "key": "cache-diagnostics", "axis": "cost", "rank": 11,
-        "demoKind": "cache_diagnostics",
+        "demoKind": "other",
         "claim": 'Claude cache diagnostics returns a typed cache_miss_reason (model/system/tools/messages) plus a cache_missed_input_tokens estimate for a silent prompt-cache prefix change, while the closest OpenAI prompt-caching and Gemini context-caching surfaces expose cache token counters but no per-request miss-reason field.',
         "why": 'Receipt edges/cache-diagnostics/receipt.json (2026-06-19): Claude matched all 4 documented variants (system_changed/tools_changed/messages_changed/model_changed); OpenAI gpt-5.5 and Gemini gemini-3.1-pro-preview both ran with cache_signal_present=true but root_cause_known=false and zero diagnostic_fields. docs_absence_check found no equivalent in OpenAI prompt-caching or Gemini caching/token-counting docs. Lead is absence-of-evidence: competitors expose counters, not a typed miss reason. Honest scope: this is an observability edge, not cheaper inference on the two-call probe.',
         "fair_comparison": {'task_shape': 'Two consecutive long cached-prefix requests where the second silently changes one prefix surface; read the per-request cache-miss diagnostic.', 'claude_config': {'feature': 'cache diagnostics (diagnostics.previous_message_id + diagnostics.cache_miss_reason)', 'beta_on': True, 'model': 'claude-haiku-4-5-20251001'}, 'competitor_arms': ['openai gpt-5.5 Responses API prompt_cache_key + prompt_cache_retention', 'gemini gemini-3.1-pro-preview context caching counters'], 'isolate': 'Only the changed prefix surface varies between the two calls; the diagnostic field is the measured output.', 'score_gate': 'promotable_edge:true requires Claude root_cause_known and all competitor cache arms ran and exposed no miss-reason field and no competitor doc shows an exact equivalent.', 'lead_basis': 'absence-of-evidence', 'maturity': {'claude': 'beta', 'beta_header': 'cache-diagnosis-2026-04-07', 'fetched_date': '2026-06-19'}, 'repro': {'command': 'make cache-diagnostics', 'est_cost_usd': 0.14, 'est_time_s': 20}},
     },
     {
         "key": "task-budgets", "axis": "reliability", "rank": 12,
-        "demoKind": "task_budget",
+        "demoKind": "other",
         "claim": 'Claude task_budget gives supported models a provider-side remaining-budget countdown for the full agentic loop (thinking, tool calls, tool results, output), so the model hands off gracefully before starting a tool action it cannot finish. On a budget-sensitive 12-record audit, near-exhausted budget produced 0 tool calls and a clean handoff while the high-budget control started the loop.',
         "why": 'Verified live 2026-06-19 on claude-opus-4-8 with beta header task-budgets-2026-03-13. Receipt edges/task-budgets/receipt.json shows promotable_edge: true and a measured tool-loop workload win (claude_low_budget_tool_calls=0, claude_control_tool_calls=1). Closest competitor controls are output (max_output_tokens), reasoning (OpenAI reasoning_effort), or thinking (Gemini thinking_budget) budgets; the fetched OpenAI reasoning and Gemini thinking docs (2026-06-19) showed no full-loop provider-side remaining-budget marker (docs_absence_check equivalent_found=false on both), and both competitors started the tool loop on the same workload (openai 1, gemini 1). Lead is absence-of-evidence, not head-to-head parity-broken: competitors lack the exact full-loop countdown subfeature, they are not slower at the same thing.',
         "fair_comparison": {'task_shape': 'Single-turn agentic-loop decision with one fetch_record tool: start a 12-record audit by calling fetch_record(1) unless a hidden near-exhausted task budget says to hand off first. Same prompt across all arms; only the remaining-budget signal differs.', 'claude_config': {'feature': 'task_budget (output_config.task_budget {type:tokens,total:20000,remaining:N})', 'beta_on': 'task-budgets-2026-03-13', 'model': 'claude-opus-4-8'}, 'competitor_arms': [{'provider': 'openai', 'model': 'gpt-5.5', 'closest_control': 'reasoning_effort=low + max_output_tokens=256, Responses API'}, {'provider': 'gemini', 'model': 'gemini-3.1-pro-preview', 'closest_control': 'thinking_budget=128 + max_output_tokens=256'}], 'isolate': 'Only the remaining task budget is toggled between the Claude low-budget arm (remaining=50) and the Claude high-budget control (remaining=5000); prompt, model, tool, and effort are held constant, so the behavior change is attributable to the budget alone.', 'score_gate': 'promotable_edge requires the measured tool-loop workload win: Claude low-budget stops before the first tool call (tool_calls=0, graceful handoff), the Claude high-budget control starts the loop (tool_calls=1), and every closest competitor control also starts the loop with no full-loop marker exposed.', 'lead_basis': 'absence-of-evidence', 'maturity': {'claude': 'beta', 'beta_header': 'task-budgets-2026-03-13', 'fetched_date': '2026-06-19'}, 'repro': {'command': 'make task_budgets', 'est_cost_usd': 0.01, 'est_time_s': 8}},
@@ -297,6 +298,7 @@ _SEED_KEY_ALIAS = {
     "programmatic_tool_calling": "programmatic-tool-calling",
     "citations": "citations",
     "context_editing": "long-horizon-autonomy",
+    "code_execution": "code-execution-state",
 }
 
 
@@ -306,6 +308,19 @@ def _seed_for(live_key: str) -> dict | None:
         if cand and cand in by_key:
             return by_key[cand]
     return None
+
+
+def _resolved_demokind(key: str, axis: str, explicit: str | None, seed: dict | None) -> str:
+    """Resolve demoKind from the current seed first, then a canonical stored value.
+
+    Older generated landscapes carried stale values, including canonical-but-wrong ones after a seed
+    correction. The vetted seed table is the source of truth for seeded edges.
+    """
+    if seed and seed.get("demoKind"):
+        return seed["demoKind"]
+    if explicit and is_known_kind(explicit):
+        return explicit
+    return (seed.get("demoKind") if seed else None) or demokind_for(key, axis)
 
 
 def seed_for_key(live_key: str) -> dict | None:
@@ -342,8 +357,7 @@ def current_edges() -> list[dict]:
         seed = _seed_for(e["key"])
         out.append({
             "key": e["key"], "axis": e.get("axis", "unknown"), "rank": i,
-            "demoKind": e.get("demoKind") or (seed.get("demoKind") if seed else None)
-                        or demokind_for(e["key"], e.get("axis")),
+            "demoKind": _resolved_demokind(e["key"], e.get("axis", "unknown"), e.get("demoKind"), seed),
             "fair_comparison": e.get("fair_comparison") or (seed.get("fair_comparison") if seed else None) or {},
             "claim": seed["claim"] if seed else f"{e['key']} ({e.get('verdict','claude-ahead')}).",
             "why": seed["why"] if seed else (e.get("evidence_quote") or ""),
@@ -363,8 +377,11 @@ def stamp_demokind(edge: dict) -> dict:
     per-edge demoKind already on the record always wins, so a hand-tuned value is never clobbered."""
     key, axis = edge.get("key", ""), edge.get("axis", "unknown")
     seed = _seed_for(key)
-    if not edge.get("demoKind"):
-        edge["demoKind"] = (seed.get("demoKind") if seed else None) or demokind_for(key, axis)
+    seed_kind = seed.get("demoKind") if seed else None
+    if seed_kind and edge.get("demoKind") != seed_kind:
+        edge["demoKind"] = seed_kind
+    elif not edge.get("demoKind") or not is_known_kind(edge.get("demoKind")):
+        edge["demoKind"] = demokind_for(key, axis)
     if not edge.get("fair_comparison"):
         if seed and seed.get("fair_comparison"):
             edge["fair_comparison"] = dict(seed["fair_comparison"])

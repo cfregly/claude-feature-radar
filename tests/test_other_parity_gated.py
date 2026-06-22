@@ -135,3 +135,9 @@ def test_estimates_are_bounded_under_the_per_demo_cap():
     for key in opg.PARITY_CHECKS:
         est = d.estimate({"key": key}, {})
         assert 0 < est.usd <= 6.0                    # a bounded thin proof, well under the per-demo cap
+
+
+def test_promoted_estimates_use_public_make_targets():
+    d = opg.OtherParityGatedDemonstrator()
+    assert d.estimate({"key": "cache_diagnostics"}, {}).command == "make cache_diagnostics"
+    assert d.estimate({"key": "task_budgets"}, {}).command == "make task_budgets"

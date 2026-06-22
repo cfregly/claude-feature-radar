@@ -24,8 +24,10 @@ calls the developer's OWN tools in a loop and filters the results before they ev
 context window. Add `allowed_callers: ["code_execution_20260120"]` to a tool and Claude is strongly guided to
 invoke it from code rather than make one round trip per call (it is guidance, not a hard API block,
 so a client still handles a direct tool_use). The bulky tool OUTPUTS go to the sandbox, not the model, so
-the developer is not billed input tokens for data the model never needs to read. GA, no beta header.
-Models (per the docs): Fable 5, Mythos 5, Opus 4.5 to 4.8, Sonnet 4.5 to 4.6 (not Haiku). The runnable demos use Sonnet and Opus. Source, re-fetched 2026-06-18:
+the developer is not billed input tokens for data the model never needs to read. This receipt path uses
+no beta header. Programmatic tool calling requires `code_execution_20260120` or later. Models (per the
+docs): Fable 5, Mythos 5, Opus 4.5 to 4.8, Sonnet 4.5 to 4.6 (not Haiku). The runnable demos use
+Sonnet and Opus. Source, re-fetched 2026-06-22:
 https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 
 The win is workload-shaped. It needs a FAN-OUT task: the model has to call the tool many times for the

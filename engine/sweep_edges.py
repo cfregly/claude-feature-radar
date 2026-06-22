@@ -383,6 +383,7 @@ EDGE_DIR_FOR = {  # source key -> existing edges/<dir>, so the changelog flags w
     "pricing": "cost-model",
     "memory_tool": "retention-resume",
     "managed_agents": "retention-resume",
+    "code_execution": "code-execution-state",
     "fallback_credit": "parity-gated",
     "cache_diagnostics": "cache-diagnostics",
     "task_budgets": "task-budgets",

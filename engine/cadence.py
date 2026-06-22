@@ -52,6 +52,27 @@ from engine.demonstrators.registry import register_all
 # outbox is not under the paths scripts/deslop_check.py scans, so the cadence checks it itself).
 BANNED = {"—": "em-dash", "–": "en-dash", ";": "semicolon"}
 
+PUBLIC_COMMANDS = {
+    "programmatic_tool_calling": "make programmatic_tool_calling",
+    "citations": "make citations",
+    "pdf_citations": "make pdf_citations",
+    "search_results": "make search_results",
+    "grounding_stack": "make grounding_stack",
+    "web_citations": "make web_citations",
+    "bulk_extended_output": "make bulk_output",
+    "exact_list_ledger": "make exact_ledger",
+    "code_execution_state": "make code_execution_state",
+    "cache_diagnostics": "make cache_diagnostics",
+    "task_budgets": "make task_budgets",
+}
+
+PUBLIC_CLAIMS = {
+    "search_results": "Claude can cite developer-supplied RAG chunks inline with typed source pointers and zero hosted objects.",
+    "cache_diagnostics": "Claude can name the cache-miss cause on a request where competitor usage objects expose counters but no typed root-cause field.",
+    "task_budgets": "Claude task budgets can make a near-exhausted agent hand off before starting a tool action it cannot finish.",
+    "code_execution_state": "Claude code execution can reuse the same sandbox across separate requests, so files written in one turn are readable later.",
+}
+
 
 # ----- draft-to-outbox (ALWAYS, $0, deterministic, no model call) --------------------------------
 
@@ -68,6 +89,28 @@ def _anchor_edge(ranked: list[dict], covered_keys: set[str]) -> dict | None:
     return leads[0]
 
 
+def _norm_key(key: str) -> str:
+    return (key or "").strip().lower().replace("-", "_")
+
+
+def _public_command(edge: dict, command: str) -> str:
+    key = _norm_key(edge.get("key", ""))
+    return PUBLIC_COMMANDS.get(key, command)
+
+
+def _safe_claim(edge: dict) -> str:
+    """Founder-facing claim text. Never falls back to evidence_quote, which can contain scraped page chrome."""
+    claim = (edge.get("claim") or "").strip()
+    if claim:
+        return claim
+    key = _norm_key(edge.get("key", ""))
+    if key in PUBLIC_CLAIMS:
+        return PUBLIC_CLAIMS[key]
+    label = key.replace("_", " ") if key else "this edge"
+    axis = (edge.get("axis") or "platform").replace("-", " ")
+    return f"Claude has a measured {axis} edge for {label}. Review the source and receipt before sending."
+
+
 def _draft_email(edge: dict, routing_for_edge: dict | None) -> str:
     """A deterministic, deslop-clean founder email for one edge, filled from the edge's standard fields
     (claim, verdict, axis, fair_comparison.repro). NO model call: this is the $0 cadence draft, not the
@@ -77,13 +120,13 @@ def _draft_email(edge: dict, routing_for_edge: dict | None) -> str:
     fc = edge.get("fair_comparison") or {}
     repro = fc.get("repro") or {}
     est = (routing_for_edge or {}).get("estimate") or {}
-    command = est.get("command") or repro.get("command") or "make"
+    command = _public_command(edge, est.get("command") or repro.get("command") or "make")
     cost = est.get("usd", repro.get("est_cost_usd", 0.0)) or 0.0
     minutes = round((est.get("wall_clock_s", repro.get("est_time_s", 0.0)) or 0.0) / 60.0, 1)
-    claim = (edge.get("claim") or edge.get("evidence_quote") or edge.get("key", "")).strip()
+    claim = _safe_claim(edge)
     cost_line = ("It costs nothing to check" if cost <= 0
-                 else f"It costs about ${cost:.2f} and a few minutes to check using your own API key")
-    time_clause = f" (about {minutes} minutes)" if minutes else ""
+                 else f"Estimated check cost: ${cost:.2f} using your own API key")
+    time_clause = f" (estimated {minutes} minutes)" if minutes else ""
 
     lines = [
         f"# Founder email draft (cadence, {edge.get('key','')}, {edge.get('axis','')})",
@@ -126,7 +169,7 @@ def _draft_email(edge: dict, routing_for_edge: dict | None) -> str:
         f"- edge key: {edge.get('key','')}",
         f"- axis: {edge.get('axis','')}",
         f"- verdict: {edge.get('verdict','')}",
-        f"- reproduce: {command} (about ${cost:.2f})",
+        f"- reproduce: {command} (estimated ${cost:.2f})",
         "- This draft is inert. The cadence never sends. A human reviews, runs the deslop and "
         "outbound-scrutiny panel, and decides.",
         "",

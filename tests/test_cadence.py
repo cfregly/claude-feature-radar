@@ -39,17 +39,31 @@ def test_draft_is_deslop_clean():
 
 def test_draft_carries_the_command_cost_and_claim():
     text = cadence._draft_email(_edge(), None)
-    assert "make programmatic-tool-calling" in text
+    assert "make programmatic_tool_calling" in text
     assert "$0.08" in text
     assert "sandbox script" in text                   # the claim is on the surface
     assert "{repo_link}" in text                       # the link placeholder is preserved
+    assert "about $" not in text
 
 
 def test_draft_prefers_the_routing_estimate_over_the_seed_repro():
     routing = {"key": "programmatic_tool_calling", "estimate": {"usd": 0.09, "wall_clock_s": 120, "command": "make programmatic-tool-calling"}}
     text = cadence._draft_email(_edge(), routing)
     assert "$0.09" in text                             # the live estimate wins
-    assert "2.0 minutes" in text
+    assert "estimated 2.0 minutes" in text
+    assert "make programmatic_tool_calling" in text
+
+
+def test_draft_never_falls_back_to_scraped_evidence_quote():
+    edge = {"key": "search_results", "axis": "grounding", "verdict": "claude-ahead", "lead_score": 2,
+            "demoKind": "byo_rag_grounding", "evidence_quote": "Search results - Claude API Docs Messages Managed Agents",
+            "fair_comparison": {"repro": {"command": "make search-results", "est_cost_usd": 0.06, "est_time_s": 120}}}
+    text = cadence._draft_email(edge, None)
+    assert "Search results - Claude API Docs" not in text
+    assert "developer-supplied RAG chunks" in text
+    assert "make search_results" in text
+    assert "Estimated check cost: $0.06" in text
+    assert "about $" not in text
 
 
 def test_deslop_outbox_catches_a_banned_char():

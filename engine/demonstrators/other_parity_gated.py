@@ -231,6 +231,16 @@ class OtherParityGatedDemonstrator(BaseDemonstrator):
         is unblocked. Each thin proof is a small bounded run, well under the per-demo cap. fallback and
         cache-miss are cents, the Claude Code loop is a few minutes of headless CI."""
         key = edge.get("key", "")
+        if key == "cache_diagnostics":
+            return CostEstimate(
+                usd=0.14, wall_clock_s=20.0, command="make cache_diagnostics",
+                note="promoted cache diagnostics proof; live API spend only after explicit approval",
+            )
+        if key == "task_budgets":
+            return CostEstimate(
+                usd=0.01, wall_clock_s=8.0, command="make task_budgets",
+                note="promoted task budget proof; live API spend only after explicit approval",
+            )
         if key == "build_velocity":
             return CostEstimate(
                 usd=0.5, wall_clock_s=300.0, command="(opt-in) the Claude Code issue-to-PR loop",

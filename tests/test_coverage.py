@@ -23,7 +23,8 @@ def test_public_kinds_report_a_bundle_and_internal_kinds_register_without_one():
     register_all()
     by_kind = {r["demo_kind"]: r for r in cov.coverage()}
     # The public kinds ship a built bundle (README + sample + emails) and a registered demonstrator.
-    for kind in ("token_accounting", "grounding_resolution", "long_horizon_survival"):
+    for kind in ("token_accounting", "grounding_resolution", "long_horizon_survival",
+                 "code_execution_state"):
         assert by_kind[kind]["registered"] is True
         assert by_kind[kind]["has_bundle"] is True
         assert by_kind[kind]["bundle"]                # the edges/<dir> name
@@ -36,6 +37,7 @@ def test_public_kinds_report_a_bundle_and_internal_kinds_register_without_one():
 def test_port_status_labels_match_the_framework_asset_mapping():
     by_kind = {r["demo_kind"]: r for r in cov.coverage()}
     assert by_kind["token_accounting"]["port_status"] == "exists"
+    assert by_kind["code_execution_state"]["port_status"] == "build"
     assert by_kind["eval_quality"]["port_status"] == "adapt"
     assert by_kind["retention_resume"]["port_status"] == "adapt"
     assert by_kind["cost"]["port_status"] == "build"

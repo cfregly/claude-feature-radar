@@ -48,6 +48,7 @@ from dataclasses import dataclass, field
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
 
 from engine.demonstrators.base import Arm, BaseDemonstrator, CostEstimate, Verdict
+from engine.demonstrators.registry import register
 from engine.demonstrators.shared import platform
 
 CLAUDE_MODEL = os.environ.get("CES_CLAUDE_MODEL", "sonnet")
@@ -57,6 +58,7 @@ CODE_EXEC_BETA = "code-execution-2025-08-25"
 CLAUDE_TOOL = "code_execution_20250825"
 OPENAI_IDLE_EXPIRY_MIN = 20  # documented: OpenAI code_interpreter container expires after 20 min idle
 STATE_PATH_REL = "data/code_execution_state_pending.json"
+RECEIPT_PATH_REL = "edges/code-execution-state/receipt.json"
 
 
 def _state_path():
@@ -66,6 +68,16 @@ def _state_path():
 
 def _nonce() -> str:
     return f"NONCE{int(time.time())}{os.urandom(2).hex()}"
+
+
+def _committed_receipt() -> dict:
+    """Read the committed code-execution-state receipt without running any live arm."""
+    from common.client import repo_root
+    path = repo_root() / RECEIPT_PATH_REL
+    try:
+        return json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError):
+        return {}
 
 
 # --------------------------------------------------------------------------- Claude
@@ -313,6 +325,104 @@ def _verdict(verify: dict) -> dict:
             ] if f
         ],
     }
+
+
+# --------------------------------------------------------------------------- Demonstrator adapter
+
+class CodeExecutionStateDemonstrator(BaseDemonstrator):
+    demo_kind = "code_execution_state"
+
+    def applicable(self, edge: dict) -> bool:
+        key = (edge.get("key") or "").replace("-", "_")
+        return super().applicable(edge) and key in {"code_execution_state", "code_execution"}
+
+    def estimate(self, edge, spec):
+        repro = (edge.get("fair_comparison") or {}).get("repro") or {}
+        return CostEstimate(
+            usd=float(repro.get("est_cost_usd", 0.05)),
+            wall_clock_s=float(repro.get("est_time_s", 60.0)),
+            command="make code_execution_state",
+            note="two-phase code execution state proof; live API spend only after explicit approval",
+        )
+
+    def run_claude_arm(self, edge, spec):
+        receipt = _committed_receipt()
+        verify = receipt.get("verify", {})
+        claude = verify.get("claude", {})
+        verdict = receipt.get("verdict", {})
+        platform.used("reliability", "committed code-execution-state receipt")
+        return Arm(
+            provider="anthropic",
+            model=CLAUDE_MODEL,
+            ran=bool(receipt),
+            cost_usd=float(claude.get("cost", 0.0) or 0.0) + float(claude.get("reread_cost", 0.0) or 0.0),
+            metric=verdict,
+            note="read from the committed code-execution-state receipt; no live arm ran in dispatch",
+        )
+
+    def run_competitor_arms(self, edge, spec):
+        receipt = _committed_receipt()
+        verify = receipt.get("verify", {})
+        openai = verify.get("openai", {})
+        gemini = verify.get("gemini", {})
+        return [
+            Arm(
+                provider="openai",
+                model=OPENAI_MODEL,
+                ran=bool(openai),
+                cost_usd=float(openai.get("cost", 0.0) or 0.0) + float(openai.get("reread_cost", 0.0) or 0.0),
+                metric={
+                    "warm_persisted": openai.get("warm_persisted"),
+                    "survived_idle": openai.get("survived_idle"),
+                },
+                note=openai.get("reread_note", ""),
+            ),
+            Arm(
+                provider="gemini",
+                model=GEMINI_MODEL,
+                ran=bool(gemini),
+                cost_usd=float(gemini.get("cost", 0.0) or 0.0),
+                metric={"cross_call_persisted": gemini.get("cross_call_persisted")},
+                note="no reusable container handle in the tested setup",
+            ),
+        ]
+
+    def score(self, claude, competitors, spec):
+        passed = bool((claude.metric or {}).get("promotable_edge"))
+        return Verdict(
+            verdict="claude-ahead" if passed else "never-evaluated",
+            passed=passed,
+            metric=claude.metric or {},
+            note="committed receipt shows Claude survived the idle gap while competitor arms did not",
+        )
+
+    def receipt(self, edge, claude, competitors, verdict, spec):
+        receipt = _committed_receipt()
+        sources = receipt.get("sources", {})
+        return self.build_receipt(
+            edge, claude, competitors, verdict, spec,
+            workload={
+                "task_shape": "write a nonce, reuse the code sandbox, and re-read after a long idle",
+                "models": {"claude": CLAUDE_MODEL, "openai": OPENAI_MODEL, "gemini": GEMINI_MODEL},
+                "features_on": [CLAUDE_TOOL],
+                "assumptions": "live two-phase receipt is committed; dispatch reads it offline",
+            },
+            grounding=[
+                {"claim": "Claude code execution container reuse and retention",
+                 "source_url": sources.get("claude_code_execution", ""), "date": receipt.get("date", "")},
+                {"claim": "OpenAI code interpreter idle expiry",
+                 "source_url": sources.get("openai_code_interpreter", ""), "date": receipt.get("date", "")},
+                {"claim": "Gemini code execution no reusable container handle in the tested setup",
+                 "source_url": sources.get("gemini_code_execution", ""), "date": receipt.get("date", "")},
+            ],
+            fairness={
+                "best_to_best": "same write-then-reread workload across each vendor's code sandbox",
+                "isolate": "only container reuse and lifetime differ",
+            },
+        )
+
+
+register(CodeExecutionStateDemonstrator())
 
 
 # --------------------------------------------------------------------------- CLI

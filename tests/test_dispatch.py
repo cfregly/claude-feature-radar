@@ -25,6 +25,9 @@ def test_seed_table_maps_the_built_edges():
     assert demokinds.demokind_for("citations") == "grounding_resolution"
     assert demokinds.demokind_for("context_editing") == "long_horizon_survival"
     assert demokinds.demokind_for("managed_agents") == "retention_resume"
+    assert demokinds.demokind_for("code_execution_state") == "code_execution_state"
+    assert demokinds.demokind_for("cache_diagnostics") == "other"
+    assert demokinds.demokind_for("task_budgets") == "other"
     assert demokinds.demokind_for("pricing") == "cost"
 
 
@@ -32,6 +35,7 @@ def test_seed_table_resolves_dashed_and_undashed_forms():
     # The built-edge folder form and the slug form both resolve to the same demoKind.
     assert demokinds.demokind_for("programmatic-tool-calling") == "token_accounting"
     assert demokinds.demokind_for("context-editing") == "long_horizon_survival"
+    assert demokinds.demokind_for("code-execution-state") == "code_execution_state"
     assert demokinds.demokind_for("cost_and_effort") == demokinds.demokind_for("cost-and-effort")
 
 
@@ -61,6 +65,7 @@ def test_built_demonstrators_register():
     assert REGISTRY.get("token_accounting") is not None
     assert REGISTRY.get("grounding_resolution") is not None
     assert REGISTRY.get("long_horizon_survival") is not None
+    assert REGISTRY.get("code_execution_state") is not None
 
 
 def test_a_registered_demonstrator_declares_its_kind():
@@ -80,6 +85,26 @@ def test_dispatch_routes_a_built_edge_with_a_surfaced_estimate():
     assert r.estimate is not None and r.estimate.usd > 0  # PTC spends a credit
     assert r.gate == "ask"                                  # so it waits for approval
     assert r.estimate.command == "make programmatic-tool-calling"
+
+
+def test_dispatch_routes_code_execution_state_with_public_estimate():
+    register_all()
+    edge = {"key": "code_execution", "axis": "reliability", "demoKind": "code_execution_state"}
+    r = dispatch(edge)
+    assert r.covered is True
+    assert r.demo_kind == "code_execution_state"
+    assert r.gate == "ask"
+    assert r.estimate.command == "make code_execution_state"
+
+
+def test_stale_noncanonical_demokind_is_normalized():
+    from engine import scan
+    edge = {"key": "task_budgets", "axis": "reliability", "demoKind": "task_budget"}
+    scan.stamp_demokind(edge)
+    assert edge["demoKind"] == "other"
+    edge = {"key": "code-execution-state", "axis": "reliability", "demoKind": "retention_resume"}
+    scan.stamp_demokind(edge)
+    assert edge["demoKind"] == "code_execution_state"
 
 
 def test_dispatch_files_a_build_stub_for_an_off_taxonomy_kind():

@@ -276,6 +276,22 @@ def test_rank_keeps_parity_but_below_leads():
     assert ranked[0]["score"] > parity["score"]
 
 
+def test_rank_keeps_promoted_public_edges_evaluated():
+    caps = {
+        "claude:cache_diagnostics": _cap("claude", "cache_diagnostics", axis="observability"),
+        "claude:task_budgets": _cap("claude", "task_budgets", axis="reliability"),
+        "claude:code_execution": _cap("claude", "code_execution", axis="reliability"),
+    }
+    ranked = se.rank(caps, all_competitor_fetched_ok=True)
+    by_key = {e["key"]: e for e in ranked}
+    assert by_key["cache_diagnostics"]["verdict"] == "claude-ahead"
+    assert by_key["cache_diagnostics"]["demoKind"] == "other"
+    assert by_key["task_budgets"]["verdict"] == "claude-ahead"
+    assert by_key["task_budgets"]["demoKind"] == "other"
+    assert by_key["code_execution"]["verdict"] == "claude-ahead"
+    assert by_key["code_execution"]["demoKind"] == "code_execution_state"
+
+
 def test_rank_holds_leads_when_competitors_unfetched():
     # If competitors did not fetch, even a no-competitor Claude cap is never-evaluated, score 0.
     caps = {"claude:lead": _cap("claude", "lead")}

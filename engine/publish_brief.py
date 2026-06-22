@@ -268,7 +268,7 @@ PLANS: dict[str, BriefPlan] = {
     "cache-diagnostics": BriefPlan(
         slug="cache_diagnostics",
         title='Cache diagnostics',
-        demo_kind="cache_diagnostics",
+        demo_kind="other",
         doc_url="https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics",
         files=(
             VendorFile("common/client.py", "common/client.py"),
@@ -283,7 +283,7 @@ PLANS: dict[str, BriefPlan] = {
     "task-budgets": BriefPlan(
         slug="task_budgets",
         title='Task budgets',
-        demo_kind="task_budget",
+        demo_kind="other",
         doc_url="https://platform.claude.com/docs/en/build-with-claude/task-budgets",
         files=(
             VendorFile("common/client.py", "common/client.py"),
@@ -690,8 +690,9 @@ my_tool.py, on the same model, and prints YOUR own numbers:
           model, so you are not billed input tokens for data the model never reads.
 
 It prints the billed-input table for both modes, the input-token reduction, the dollar delta at the
-model's published input price, and an upfront cost-and-time line BEFORE it spends anything. Source,
-re-fetched 2026-06-18:
+model's published input price, and an upfront cost-and-time line BEFORE it spends anything. This receipt
+path uses no beta header. Programmatic tool calling requires `code_execution_20260120` or later. Source,
+re-fetched 2026-06-22:
 https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 
   python -m {slug}.run_tokens            run the example (or your tool) and print the before-and-after table
@@ -1089,7 +1090,7 @@ The founder-facing artifact for the {slug} brief. A multi-step agent that runs c
 keep state between turns. Claude's code execution sandbox keeps its container and its files across
 separate Messages API requests: save the container id returned by the first response, pass it as
 container=<id> on the next request, and a file written in turn 1 is there in turn 2. Containers live 30 days. Source,
-re-fetched 2026-06-18: https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool
+re-fetched 2026-06-22: https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool
 
   python -m {slug}.run            write a value, then read it back from the reused container
   python -m {slug}.run --check    the self-test: ASSERT the value reads back from the reused container
@@ -1115,8 +1116,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from .common.models import get  # noqa: E402  the verified id + price registry, anthropic-free
 from .common.pricing import cost_usd  # noqa: E402  real usage object -> real dollars, anthropic-free
 
-# Code execution is a beta: set this header and add the code_execution tool (verified 2026-06-18 against
-# the live doc). The container id comes back on the response and is reusable for 30 days.
+# This receipt stays pinned to the header/tool pair it measured. The current docs list
+# code_execution_20250825 for file operations and same-container reuse, while PTC uses
+# code_execution_20260120 because allowed_callers runs tools from inside the sandbox.
 CODE_EXEC_BETA = "code-execution-2025-08-25"
 CODE_EXEC_TOOL = "code_execution_20250825"
 MODELS = {{"sonnet": "claude-sonnet-4-6", "opus": "claude-opus-4-8"}}

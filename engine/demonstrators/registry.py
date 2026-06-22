@@ -32,6 +32,7 @@ _DEMO_MODULES = (
     "edges.context-editing.demo",
     "engine.demonstrators.eval_quality",
     "engine.demonstrators.retention_resume",
+    "engine.demonstrators.code_execution_state",
     "engine.demonstrators.cost_model",
     "engine.demonstrators.other_parity_gated",
     "engine.demonstrators.pdf_citations",

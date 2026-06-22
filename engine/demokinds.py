@@ -29,6 +29,7 @@ from __future__ import annotations
 #   advisor_routing      a cheap executor consults a frontier advisor inside ONE request (cost-at-quality).
 #   long_horizon_survival a long, tool-heavy load FINISHES and stays correct where the other errors.
 #   retention_resume    a stateful feature survives a kill and re-attach, with a negative control.
+#   code_execution_state a code sandbox keeps files across requests and a long idle.
 #   eval_quality        one (model, effort, prompt) cell wins on the believable held-out test number.
 #   cost                a workload-shaped pure-pricing-model edge, no model call, both regimes shown.
 #   discovery_loop      the fetch-diff-rank-persist landscape loop runs unattended for $0.
@@ -44,6 +45,7 @@ DEMO_KINDS = [
     "extended_output",
     "long_horizon_survival",
     "retention_resume",
+    "code_execution_state",
     "eval_quality",
     "cost",
     "discovery_loop",
@@ -93,6 +95,8 @@ KEY_TO_DEMOKIND = {
     # bundle and time-axis win, never a Claude-only capability (see engine/scan.py).
     "memory_tool": "retention_resume",
     "managed_agents": "retention_resume",
+    "code_execution_state": "code_execution_state",
+    "code-execution-state": "code_execution_state",
     # eval_quality: a (model, effort, prompt) cell wins on the held-out test number.
     "cost-and-effort": "eval_quality",
     "cost_and_effort": "eval_quality",
