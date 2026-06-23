@@ -57,12 +57,16 @@ def _check_internal_kinds(hits: Path, misses: Path, fail: list[str]) -> None:
     from engine.coverage import _INTERNAL_KINDS
 
     expected = {
-        "cost": ["edges/cost-model/README.md", "edges/cost-model/sample.txt", "edges/cost-model/PRODUCT_EMAIL.md"],
-        "eval_quality": ["edges/eval-quality/README.md", "edges/eval-quality/sample.txt", "edges/eval-quality/PRODUCT_EMAIL.md"],
-        "retention_resume": ["edges/retention-resume/README.md", "edges/retention-resume/sample.txt", "edges/retention-resume/PRODUCT_EMAIL.md"],
-        "security_posture": ["edges/security-posture/FINDING.md"],
-        "other": ["edges/parity-gated/README.md", "edges/parity-gated/sample.txt", "edges/parity-gated/PRODUCT_EMAIL.md"],
-        "advisor_routing": ["edges/advisor-tool/FINDING.md"],
+        "cost": ["misses/cost-model/BRIEF.md", "misses/cost-model/sample.txt", "misses/cost-model/PRODUCT_NOTE.md"],
+        "eval_quality": ["misses/eval-quality/BRIEF.md", "misses/eval-quality/sample.txt", "misses/eval-quality/PRODUCT_NOTE.md"],
+        "retention_resume": [
+            "misses/retention-resume/BRIEF.md",
+            "misses/retention-resume/sample.txt",
+            "misses/retention-resume/PRODUCT_NOTE.md",
+        ],
+        "security_posture": ["misses/security-posture/BRIEF.md", "misses/security-posture/FINDING.md"],
+        "other": ["misses/parity-gated/BRIEF.md", "misses/parity-gated/sample.txt", "misses/parity-gated/PRODUCT_NOTE.md"],
+        "advisor_routing": ["misses/advisor-tool/BRIEF.md", "misses/advisor-tool/FINDING.md"],
     }
     forbidden_public_markers = {
         "cost": ["cost-model", "cost_model"],
@@ -90,14 +94,19 @@ def _misses_has_note(misses: Path, misses_files: list[str], edge_key: str, slug:
     key_forms = sorted({edge_key, edge_key.replace("-", "_"), edge_key.replace("_", "-"), slug, slug.replace("_", "-")})
     likely_paths = [
         f"head_to_head/{slug}/README.md",
-        f"edges/{edge_key}/PRODUCT_EMAIL.md",
-        f"edges/{edge_key}/FINDING.md",
-        "edges/parity-gated/PRODUCT_EMAIL.md",
-        "briefs/2026-06-19-edge-vetting.md",
+        f"misses/{edge_key}/PRODUCT_NOTE.md",
+        f"misses/{edge_key}/FINDING.md",
+        f"misses/{edge_key}/BRIEF.md",
+        "misses/parity-gated/PRODUCT_NOTE.md",
+        "archive/briefs/2026-06-19-edge-vetting.md",
     ]
     if any((misses / rel).exists() and _contains_any(misses, key_forms, [rel]) for rel in likely_paths):
         return True
-    return _contains_any(misses, key_forms, [rel for rel in misses_files if rel.startswith(("edges/", "head_to_head/", "briefs/"))])
+    return _contains_any(
+        misses,
+        key_forms,
+        [rel for rel in misses_files if rel.startswith(("misses/", "head_to_head/", "archive/briefs/"))],
+    )
 
 
 def _check_publishable_plans(hits: Path, misses: Path, fail: list[str]) -> None:
