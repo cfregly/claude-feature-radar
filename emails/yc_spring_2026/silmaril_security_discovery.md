@@ -14,14 +14,18 @@ action is high risk, which injected instructions should block or ask, what evide
 which official source supports each security-control line.
 
 The security surface I would map first is the exact boundary your product defends: model input,
-retrieved content, tool call, action policy, operator review, and buyer evidence. The public repo is
-here:
+retrieved content, tool call, action policy, operator review, and buyer evidence.
 
-https://github.com/cfregly/claude-feature-hits
+The prompt-injection preflight is here:
 
-In that repo, `make security` runs two zero-spend checks: a tool-boundary preflight that prints 5/5
-controls, 4/4 prompt-injection cases, and 0 dangerous actions allowed, plus a controls map that
-checks ten official-source rows and caveats before any security copy ships.
+https://github.com/cfregly/claude-feature-hits/tree/main/tool_boundary_security
+
+The source-backed controls map is here:
+
+https://github.com/cfregly/claude-feature-hits/tree/main/security_controls_map
+
+Run both with `make security`. The run is zero-spend: 5/5 controls, 4/4 prompt-injection cases,
+0 dangerous actions allowed, and ten official-source controls rows checked before security copy ships.
 
 The test I would build with you is not a generic demo. It is a prompt-injection eval
 over an agent with real tool access:

@@ -23,7 +23,7 @@ Pick the production question you have this week:
 | **speed** for large outputs or long-stream work | [`make bulk_output`](https://github.com/cfregly/claude-feature-hits/tree/main/bulk_output) or [`make exact_ledger`](https://github.com/cfregly/claude-feature-hits/tree/main/exact_ledger) | one un-truncated large deliverable, or a faster exact long-stream run |
 | **reliability** for multi-step code, data, or build agents | [`make code_execution_state`](https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state) or [`make task_budgets`](https://github.com/cfregly/claude-feature-hits/tree/main/task_budgets) | sandbox files that survive across separate requests, or loop-level budget handoffs |
 | **accuracy** for answers over PDFs, docs, filings, or retrieved chunks | [`make pdf_citations`](https://github.com/cfregly/claude-feature-hits/tree/main/pdf_citations) or [`make citations`](https://github.com/cfregly/claude-feature-hits/tree/main/citations) | page-level pointers for PDFs and character-level pointers for text docs |
-| **security** for regulated data, MCP connectors, prompt injection, or agent attack surface | [`make security`](https://github.com/cfregly/claude-feature-hits#clone-and-run) | a local prompt-injection gate plus a source-backed controls map, both $0.00 |
+| **security** for regulated data, MCP connectors, prompt injection, or agent attack surface | [`make tool_boundary_security`](https://github.com/cfregly/claude-feature-hits/tree/main/tool_boundary_security) + [`make security_controls_map`](https://github.com/cfregly/claude-feature-hits/tree/main/security_controls_map) | a local prompt-injection gate plus a source-backed controls map, both $0.00 |
 
 The code hooks are small:
 
@@ -113,7 +113,7 @@ page clearly marks a CEO founder. Re-check the page before sending because found
 | Arga Labs | Phillip | https://www.ycombinator.com/companies/arga-labs | real-world sandboxes to test agents and agent-facing software | reliability + security testing | Medium-high | https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state | `emails/yc_spring_2026/arga_labs_code_execution_state.md` |
 | Superset | Kiet | https://www.ycombinator.com/companies/superset | IDE for running 100s of coding agents in parallel | reliability + cost + speed | High | https://github.com/cfregly/claude-feature-hits/tree/main/task_budgets | `emails/yc_spring_2026/superset_task_budgets.md` |
 | Lightsprint | Ben | https://www.ycombinator.com/companies/lightsprint | collaborative product development with cloud agents | reliability | High | https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state | `emails/yc_spring_2026/lightsprint_code_execution_state.md` |
-| Silmaril | Aum | https://www.ycombinator.com/companies/silmaril | prompt-injection defense that self-improves for AI-native applications and agents | security | High | https://github.com/cfregly/claude-feature-hits (`make security`) | `emails/yc_spring_2026/silmaril_security_discovery.md` |
+| Silmaril | Aum | https://www.ycombinator.com/companies/silmaril | prompt-injection defense that self-improves for AI-native applications and agents | security | High | https://github.com/cfregly/claude-feature-hits/tree/main/tool_boundary_security and https://github.com/cfregly/claude-feature-hits/tree/main/security_controls_map | `emails/yc_spring_2026/silmaril_security_discovery.md` |
 
 ## Fit evidence
 
@@ -442,14 +442,18 @@ action is high risk, which injected instructions should block or ask, what evide
 which official source supports each security-control line.
 
 The security surface I would map first is the exact boundary your product defends: model input,
-retrieved content, tool call, action policy, operator review, and buyer evidence. The public repo is
-here:
+retrieved content, tool call, action policy, operator review, and buyer evidence.
 
-https://github.com/cfregly/claude-feature-hits
+The prompt-injection preflight is here:
 
-In that repo, `make security` runs two zero-spend checks: a tool-boundary preflight that prints 5/5
-controls, 4/4 prompt-injection cases, and 0 dangerous actions allowed, plus a controls map that
-checks ten official-source rows and caveats before any security copy ships.
+https://github.com/cfregly/claude-feature-hits/tree/main/tool_boundary_security
+
+The source-backed controls map is here:
+
+https://github.com/cfregly/claude-feature-hits/tree/main/security_controls_map
+
+Run both with `make security`. The run is zero-spend: 5/5 controls, 4/4 prompt-injection cases,
+0 dangerous actions allowed, and ten official-source controls rows checked before security copy ships.
 
 The test I would build with you is not a generic demo. It is a prompt-injection eval
 over an agent with real tool access:
