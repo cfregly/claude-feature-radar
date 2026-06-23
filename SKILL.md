@@ -5,7 +5,7 @@ description: >-
   Gemini, then emit the assets: a founder email anchored on a genuinely Claude-only capability, a
   product-team email on what competitors have that Claude does not, and a reproducible benchmark
   bundle a founder can run themselves. Use when someone wants to find what Claude has that others
-  lack, run a best-to-best cost / speed / security / correctness benchmark, generate live-evangelism assets, or
+  lack, run a best-to-best cost / speed / reliability / accuracy / security benchmark, generate live-evangelism assets, or
   keep competitive intelligence current as the platforms ship every month. Triggers on "competitive
   engine", "what does Claude have that OpenAI or Gemini do not", "fair Claude vs competitor
   benchmark", "live evangelism", "founder email", "competitive gap", or "what do competitors have
@@ -75,12 +75,12 @@ These are why the output is trusted. Break one and the trust is gone.
    while OpenAI's `input_tokens` and Gemini's `prompt_token_count` include them, so carried context is
    input plus cache_read plus cache_creation on Claude (all three input buckets) and the total field on
    the others. Pull every price live, report the caching config, and run the competitor's stronger
-   model before a quality claim. When a number cannot be made comparable, drop it. Credibility is the
+   model before an Accuracy/correctness claim. When a number cannot be made comparable, drop it. Credibility is the
    whole asset.
 8. **A mechanism is not a value, a feature is measured where it bites, and one variable moves at a
    time.** Naming what a feature does (held context at 3k instead of 36k) is a mechanism, not a value.
-   The value is a measured change in cost, speed, correctness, or reliability, shown in the regime
-   where the feature pays off, with everything else held constant so the win is attributable. A
+   The value is a measured change in one of the five feature-hit pillars, shown in the regime where
+   the feature pays off, with everything else held constant so the win is attributable. A
    feature that only helps at scale is measured at scale: `edges/context-editing/demo.py` holds the memory
    tool and the prompt constant in both arms and toggles ONLY context editing, so the result (editing
    off crashes at the window, editing on finishes) is attributable to context editing alone. The
@@ -101,8 +101,8 @@ These are why the output is trusted. Break one and the trust is gone.
    collapses every model to a cost-and-speed race Claude may lose, so the benchmark must be a real job
    where the edge decides the outcome. Re-run the whole search every time, the platform ships monthly
    and the edge moves. Search and rank BEFORE you build, never anchor on the first measurable thing.
-   Any genuine value-add is a valid anchor even if narrow, provided it is measured on an axis a founder
-   pays for (cost, speed, reliability, long-running, correctness) AGAINST the competitor at its best,
+   Any genuine value-add is a valid anchor even if narrow, provided it is measured on a pillar a founder
+   pays for (cost, speed, reliability, accuracy, or security) AGAINST the competitor at its best,
    not just against Claude without the feature. A feature-on-versus-off result is a within-Claude
    value-add until the cross-vendor arm is run, so label it as exactly that.
 10. **Understand the mechanism, then find the workload where the edge appears.** Before claiming or
@@ -112,14 +112,14 @@ These are why the output is trusted. Break one and the trust is gone.
     stresses the mechanism. Use the mechanism to design a REAL workload that exercises it (a long
     tool-heavy agent, large per-call payloads, a many-document answer), state the workload and the
     founder situation it maps to plainly, and measure. Reliability under load, long-horizon completion,
-    correctness under load, and cost at scale are real-world edges, so surface them rather than
+    accuracy under load, cost at scale, speed under load, and security boundaries are real-world edges, so surface them rather than
     dismissing a feature on a naive test. This vets the feature and finds its genuine win condition, it
     never manufactures a rigged one.
 
 11. **Compare at subfeature depth, then explain it plainly.** The comparison unit is the smallest
     meaningful mechanism that changes builder value, not the broad marketing feature. For every
     candidate, write the subfeature claim first: what changes in the API call, what the model sees,
-    what the client receives, and which cost, latency, correctness, or reliability number should move.
+    what the client receives, and which cost, speed, reliability, accuracy, or security number should move.
     Compare the competitor's closest subfeature, not only its headline feature. If the competitor has
     the umbrella capability but lacks the exact mode, field, lifecycle behavior, or token-accounting
     behavior, record the candidate as parity-gated and test it. If it survives, explain that
@@ -142,7 +142,7 @@ These are why the output is trusted. Break one and the trust is gone.
     never exposes a Claude negative. No "Claude got it wrong" baseline, no "where Claude loses". Reframe
     any benefit with an unflattering flip side in the positive (exact totals because the math runs in
     code). Speak the founder's language: explain every term (fan out, tool use, rollups, allowed_callers,
-    rows to code), lead with the value a founder prices (cost, speed, reliability, accuracy), write cost
+    rows to code), lead with the value a founder prices (cost, speed, reliability, accuracy, or security), write cost
     as a dollar figure like $0.06, label every table column plainly with the key number where a quick
     scan expects it, keep it warm, and review it cold as a founder with five seconds. The founder-facing
     checklist, read cold as a busy YC founder with five seconds: open with a warm personal note to the YC
@@ -213,13 +213,14 @@ and drop anything a competitor already matches. For docs-new subfeatures, test t
 raw API surface before ranking. A documented field that is not accepted by the current API/key is a
 held discrepancy, not a public edge. Then RANK what survives by value to a founder times
 how clearly Claude leads, and carry the global maximum forward as the anchor, not the first thing that
-was easy to measure. This produces two lists: Claude's genuine differentiators, ranked, and Claude's
-genuine gaps. Map each to the founder priority stack: cost, speed, security, then reduced maintenance
-and heavy lifting.
+    was easy to measure. This produces two lists: Claude's genuine differentiators, ranked, and Claude's
+    genuine gaps. Map each to the five feature-hit pillars: cost, speed, reliability, accuracy, and
+    security. These are feature outcomes, not the radar architecture or activation funnel. A feature can
+    carry multiple pillars only when each pillar has its own receipt.
 
 ### 2. Benchmark best to best
-Run the same long-horizon agent on each platform at full strength and measure the outcomes a
-founder pays for: total cost, wall-clock time, and correctness.
+Run the same long-horizon agent on each platform at full strength and measure the feature-hit
+outcomes a founder pays for: cost, speed, reliability, accuracy, and security where applicable.
 
 ```
 make compare    # OpenAI (Responses + compaction + caching) vs Claude (context editing + memory + caching)

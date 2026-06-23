@@ -52,7 +52,7 @@ Run it:
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
 # Get an API key: https://console.anthropic.com/
 export ANTHROPIC_API_KEY=your-api-key
-make programmatic_tool_calling   # cost and speed for fan-out agents
+make programmatic_tool_calling   # cost for fan-out agents
 make citations                   # accuracy for text-doc answers
 make code_execution_state        # reliability for multi-step agents
 make security                    # security preflight plus source-backed controls map

@@ -59,19 +59,19 @@ Company pages and founder greetings were last reviewed from public YC pages on 2
 
 | Company | Workload | Primary blocker | Public pattern |
 | --- | --- | --- | --- |
-| Sazabi | Observability over logs, Slack, and agent investigations | Cost + speed | Programmatic tool calling |
+| Sazabi | Observability over logs, Slack, and agent investigations | Cost | Programmatic tool calling |
 | Tasklet | Work agents calling APIs, MCP servers, browsers, and code sandboxes | Cost + security follow-up | Programmatic tool calling |
-| Complir | Compliance agents over regulations, product data, and documentation | Accuracy + security | PDF citations |
-| Arga Labs | Real-world sandboxes to test agents and agent-facing software | Reliability + security testing | Code execution state |
-| Superset | IDE for running hundreds of coding agents in parallel | Reliability + cost + speed | Task budgets |
+| Complir | Compliance agents over regulations, product data, and documentation | Accuracy + security follow-up | PDF citations |
+| Arga Labs | Real-world sandboxes to test agents and agent-facing software | Reliability + security-testing follow-up | Code execution state |
+| Superset | IDE for running hundreds of coding agents in parallel | Reliability | Task budgets |
 | Lightsprint | Collaborative product development with cloud agents | Reliability | Code execution state |
 | Silmaril | Prompt-injection defense for AI-native applications and agents | Security | Tool-boundary security + controls map |
 
 ## Representative Routed Drafts
 
-### Sazabi: cost and speed for log-triage agents
+### Sazabi: cost pattern for log-triage agents
 
-Subject: Congrats on YC! Cost and speed for log-triage agents
+Subject: Congrats on YC! A cost pattern for log-triage agents
 
 Hey Sherwood,
 

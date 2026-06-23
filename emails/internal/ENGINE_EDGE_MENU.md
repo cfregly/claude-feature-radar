@@ -45,7 +45,16 @@ the bytes the model does not need out of what you pay for.
 |---|---|---|---|
 | Programmatic tool calling | The model writes one sandbox script that calls your tool in a loop and returns only the answer, so the bulky outputs never hit the context. | 9,451 to 6,828 billed input tokens, about 28% fewer than the same Claude agent without the feature, same answer | `make programmatic-tool-calling` |
 | Cache diagnostics | When a prompt-cache hit silently turns into a miss, the API names which prefix changed. | Root cause named on all 4 documented miss reasons, where the others expose only counters | `make cache-diagnostics` |
+
+## Speed: finish the same work faster
+
+Speed means same-workload runtime advantage: wall-clock latency, throughput, p50/p95, or fewer turns
+to complete the same job. It is not time-to-value or a one-command reproduction path.
+
+| Edge | What you get | Measured output | Run |
+|---|---|---|---|
 | Bulk extended output | One batch turn writes a deliverable larger than the other models can produce in a single request. | 230,607 output tokens in one turn, past the 128k and 65k single-request caps | `make bulk-output` |
+| Exact-list ledger | A long tool-heavy stream where the agent keeps a precise running list and the context stays bounded. | Exact list returned at $0.67 and 60.7s, cheaper and faster than the other exact runs | `make ledger` |
 
 ## Reliability: long-running, stateful agents
 
@@ -54,7 +63,6 @@ measured in the regime where that bites.
 
 | Edge | What you get | Measured output | Run |
 |---|---|---|---|
-| Exact-list ledger | A long tool-heavy stream where the agent keeps a precise running list and the context stays bounded. | Exact list returned at $0.67 and 60.7s, cheaper and faster than the other exact runs | `make ledger` |
 | Task budgets | An advisory budget across the whole agent loop, so the agent hands off cleanly near a cap instead of truncating mid-action. | Clean handoff with 0 tool calls when the budget said stop | `make task-budget` |
 | Code-execution state | The sandbox keeps your files across separate requests, and keeps them when the user steps away. | Read the file back after a 31-minute idle, where the other container had expired | `make code-execution-state` then `make code-execution-state-verify` |
 

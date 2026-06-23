@@ -1,4 +1,4 @@
-Subject: Congrats on YC! Cost and speed for log-triage agents
+Subject: Congrats on YC! A cost pattern for log-triage agents
 
 Hey Sherwood,
 
@@ -12,7 +12,7 @@ I saw Sazabi is building AI-native observability around logs, Slack, and agent-d
 investigations. The Claude pattern that maps to that workload is log-triage fan-out without dragging
 every intermediate result into the model context.
 
-That workload can get expensive and slow fast. Every log slice or trace payload your tool returns
+That workload can get expensive fast. Every log slice or trace payload your tool returns
 becomes model context unless you move the crunching somewhere else. Claude programmatic tool calling
 lets the model write one sandbox script that calls your own tool in a loop, filters and aggregates
 there, and returns only the fix-relevant answer.

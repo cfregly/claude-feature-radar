@@ -25,11 +25,11 @@ page clearly marks a CEO founder. Re-check the page before sending because found
 
 | Company | Founder greeting | Founder source | What they build | Pillar | Fit confidence | Public brief URL | Company-specific draft |
 |---|---|---|---|---|---|---|---|
-| Sazabi | Sherwood | https://www.ycombinator.com/companies/sazabi | AI-native observability over logs, Slack, and agent investigations | cost + speed | High | https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling | `emails/yc_spring_2026/sazabi_programmatic_tool_calling.md` |
+| Sazabi | Sherwood | https://www.ycombinator.com/companies/sazabi | AI-native observability over logs, Slack, and agent investigations | cost | High | https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling | `emails/yc_spring_2026/sazabi_programmatic_tool_calling.md` |
 | Tasklet | Jonny | https://www.ycombinator.com/companies/tasklet-2 | work agents that call APIs, MCP servers, browsers, and code sandboxes | cost + security follow-up | High | https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling | `emails/yc_spring_2026/tasklet_programmatic_tool_calling.md` |
-| Complir | Gustav | https://www.ycombinator.com/companies/complir | compliance agents over regulations, product data, and documentation | accuracy + security | High | https://github.com/cfregly/claude-feature-hits/tree/main/pdf_citations | `emails/yc_spring_2026/complir_pdf_citations.md` |
-| Arga Labs | Phillip | https://www.ycombinator.com/companies/arga-labs | real-world sandboxes to test agents and agent-facing software | reliability + security testing | Medium-high | https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state | `emails/yc_spring_2026/arga_labs_code_execution_state.md` |
-| Superset | Kiet | https://www.ycombinator.com/companies/superset | IDE for running 100s of coding agents in parallel | reliability + cost + speed | High | https://github.com/cfregly/claude-feature-hits/tree/main/task_budgets | `emails/yc_spring_2026/superset_task_budgets.md` |
+| Complir | Gustav | https://www.ycombinator.com/companies/complir | compliance agents over regulations, product data, and documentation | accuracy + security follow-up | High | https://github.com/cfregly/claude-feature-hits/tree/main/pdf_citations | `emails/yc_spring_2026/complir_pdf_citations.md` |
+| Arga Labs | Phillip | https://www.ycombinator.com/companies/arga-labs | real-world sandboxes to test agents and agent-facing software | reliability + security-testing follow-up | Medium-high | https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state | `emails/yc_spring_2026/arga_labs_code_execution_state.md` |
+| Superset | Kiet | https://www.ycombinator.com/companies/superset | IDE for running 100s of coding agents in parallel | reliability | High | https://github.com/cfregly/claude-feature-hits/tree/main/task_budgets | `emails/yc_spring_2026/superset_task_budgets.md` |
 | Lightsprint | Ben | https://www.ycombinator.com/companies/lightsprint | collaborative product development with cloud agents | reliability | High | https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state | `emails/yc_spring_2026/lightsprint_code_execution_state.md` |
 | Silmaril | Aum | https://www.ycombinator.com/companies/silmaril | prompt-injection defense that self-improves for AI-native applications and agents | security | High | https://github.com/cfregly/claude-feature-hits/tree/main/tool_boundary_security and https://github.com/cfregly/claude-feature-hits/tree/main/security_controls_map | `emails/yc_spring_2026/silmaril_security_discovery.md` |
 
@@ -37,7 +37,7 @@ page clearly marks a CEO founder. Re-check the page before sending because found
 
 - **Sazabi:** high. YC page describes logs, Slack as the primary entry point, background agents, and
   agentic query patterns. Programmatic tool calling maps to fan-out over log and incident data, where
-  cost and elapsed time move together.
+  billed input tokens move.
 - **Tasklet:** high. YC page explicitly says agents connect to APIs and MCP, take actions, crunch
   numbers, process data, and write or run code in a cloud sandbox. Programmatic tool calling maps to
   many app/API calls with bulky intermediate results. A security follow-up should map the exact tool

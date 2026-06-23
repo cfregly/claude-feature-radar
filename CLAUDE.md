@@ -30,7 +30,7 @@ The traps that already bit this repo, all caught in `docs/FINDINGS.md`:
 - **Cost depends on the caching config.** Caching changes the bill and interacts with context editing
   (clearing invalidates the cache). Report the config, and toggle caching on AND off to see it.
 - **A cheap-tier win is a model-tier win.** Run the competitor's stronger model before any
-  correctness or quality claim.
+  Accuracy/correctness claim.
 - **An unambiguous prompt, or you measure prompt-following.** A placeholder like `Answer: K` gets
   echoed literally by some models.
 When a number cannot be made apples to apples, say so and drop it. Credibility is the whole asset.
@@ -60,9 +60,9 @@ beta, on both sides. Never handicap a competitor to make Claude look better, and
 Claude either. Concretely: no older API when a newer one exists (use OpenAI's Responses API, not
 Chat Completions), never disable a competitor's caching, compaction, or parallel execution, and
 turn Claude's full stack on too (context editing, memory, caching). The comparison exists to find
-the truth, not to win an argument. If our best loses to their best on cost, speed, or quality, that
-is the finding: report it plainly and write the product-team alert below. A rigged win destroys the
-founder trust this whole repo is built to earn.
+the truth, not to win an argument. If our best loses to their best on cost, speed, reliability,
+accuracy, or security, that is the finding: report it plainly and write the product-team alert
+below. A rigged win destroys the founder trust this whole repo is built to earn.
 
 When a doc names a newer tool version, model, beta header, parameter, or response field, verify the
 whole chain before classifying the edge: current docs, latest package-manager SDK version, installed
@@ -116,11 +116,28 @@ for $0.35" is a finding, because the reader can see what they get. Lead with the
 so-what: what the reader can now do, decide, build, or stop building. If a result carries no worth to
 the reader, cut it.
 
+## Five feature-hit pillars are the taxonomy
+These pillars classify the measured outcome of a reproduced Claude feature. They are not the radar
+architecture, not the build workflow, and not the activation funnel.
+- **Cost:** billed dollars, tokens, or avoidable context moved down with the quality bar held.
+- **Speed:** same-workload runtime advantage: lower wall-clock latency, higher throughput, better
+  p50/p95, or fewer turns to finish the same job. Do not use Speed for time-to-value, build-path
+  speed, or a one-command reproduction path.
+- **Reliability:** a long-running or stateful workflow keeps state, stops cleanly, survives real
+  user use, or passes tool-contract and CI gates.
+- **Accuracy:** correctness, grounding, citations, evals, and honesty cases that let a user verify
+  the answer.
+- **Security:** tool/data boundary diligence, prompt-injection resistance, access controls, audit
+  evidence, and source-backed caveats.
+
+A feature can carry multiple pillars only when each pillar has its own receipt. Otherwise tag the
+candidate with the single proven pillar and keep the rest as follow-up.
+
 ## A mechanism is not a value, and a feature is measured where it bites
 The trap this repo fell into, and the critique that fixed it: it showed context editing holding a
 short agent at 3k tokens instead of 36k and called that the benefit. Holding context smaller is a
-MECHANISM. The value is a measured change in what a founder pays for, cost, speed, correctness, or
-reliability, and at that size there was none (the window is 200k to 1M), with the meter even showing
+MECHANISM. The value is a measured change in one of the five feature-hit pillars, and at that size
+there was none (the window is 200k to 1M), with the meter even showing
 the managed run cost slightly MORE because clearing rewrites the cached prefix. The claim had no
 so-what and should never have shipped.
 - State the value as a measured number, or do not claim it.
@@ -162,8 +179,8 @@ is global, and it can come from anywhere on the platform.
   a benchmark or write a line of the email, never anchor on the first thing you can measure and rank
   afterward.
 - Any genuine, measured value-add is a valid anchor, even a narrow one. A specific task type is fine
-  to highlight when the edge is real on an axis a founder pays for (cost, speed, reliability,
-  long-running, correctness). Do not dismiss a niche win for being niche, and do not inflate a
+  to highlight when the edge is real on a pillar a founder pays for (cost, speed, reliability,
+  accuracy, or security). Do not dismiss a niche win for being niche, and do not inflate a
   broad-sounding claim that does not measure. The ranking sets the emphasis, it does not gate whether
   a real edge may be used.
 - Measure the edge against the COMPETITOR, not just against Claude without the feature. "Claude with
@@ -187,9 +204,9 @@ what lets you design a REAL workload where the difference shows up as a number a
   mechanism, and which founder situation it maps to. A reader must see exactly what was tested and
   why it is realistic, never a black-box "Claude wins."
 - Surface the real-world edges, do not dismiss them. Reliability under a long context, finishing a
-  long-horizon job, correctness under load, cost at scale: these are the edges a founder actually
-  lives with, and a toy benchmark hides them. If the naive test shows parity, push the workload
-  toward the real condition before concluding there is no edge.
+  long-horizon job, accuracy under load, cost at scale, speed under load, and security boundaries:
+  these are the edges a founder actually lives with, and a toy benchmark hides them. If the naive
+  test shows parity, push the workload toward the real condition before concluding there is no edge.
 - This is validation, not spin. Working through the mechanism vets the feature, you learn its limits,
   where it loses, and the exact condition for its win. Getting creative means finding the genuine
   real-world condition where the edge exists, never manufacturing a rigged one. The comparison stays
@@ -201,8 +218,8 @@ feature labels when the implementation details differ. Compare the exact subfeat
 and the exact output the developer receives.
 
 - For every candidate, write the subfeature claim before writing the benchmark: what changes in the
-  API call, what the model sees, what the client receives, and which tokens, latency, correctness, or
-  reliability number should move.
+  API call, what the model sees, what the client receives, and which cost, speed, reliability,
+  accuracy, or security number should move.
 - Compare the competitor's closest subfeature, not just the competitor's headline feature. If the
   competitor has the umbrella capability but lacks the specific mode, field, or lifecycle behavior,
   record the candidate as parity-gated and test it.
@@ -232,7 +249,8 @@ calling parity.
 - Compare against the competitor's BEST achievable combination, not a single competitor feature. The
   honest question is whether OpenAI or Gemini can assemble an equivalent stack on the same workload, in
   the same request count, with the same guarantees. A Claude combination is an edge only when the
-  competitor's best combination cannot match it on cost, speed, reliability, correctness, or glue code.
+  competitor's best combination cannot match it on cost, speed, reliability, accuracy, security, or
+  required glue code.
 - Watch for combinations that CONFLICT, and record them. Some Claude features are mutually exclusive.
   Citations returns a 400 with structured outputs, search results is incompatible with structured
   outputs, and context editing clear_tool_uses is not fully compatible with advisor blocks. A conflict is
@@ -438,7 +456,7 @@ path needed to understand the edge must ship inside the public repo or link to a
 
 The both-directions honesty in this file (surface where Claude ties or loses, write the product-team alert) governs the internal analysis and the reviewer, not the founder-facing surface. Public assets, meaning the founder emails, the briefs, and the landing README a founder clones, show only verified Claude wins and never expose a Claude negative. No "Claude got it wrong" baseline, no "where Claude loses on price or speed". Reframe any benefit that has an unflattering flip side as the positive, so programmatic tool calling gives exact totals because the math runs in code, never "the model got it wrong without it". The losing and parity cells stay in the internal brief and the product alert, never in the founder's inbox.
 
-Speak the founder's language on every founder-facing word. Explain every term a founder would not parse on a glance (fan out, tool use, rollups, allowed_callers, rows to code). Lead with the value a founder prices, which is cost, speed, reliability, and accuracy. Write cost as a concrete dollar figure like $0.06. Label every table column in plain terms with the key number where a quick scan expects it, and keep it warm. The founder emails are saved as .md, here in the engine repo under emails/, and are never committed to the public hits repo.
+Speak the founder's language on every founder-facing word. Explain every term a founder would not parse on a glance (fan out, tool use, rollups, allowed_callers, rows to code). Lead with the value a founder prices, which is cost, speed, reliability, accuracy, or security. Write cost as a concrete dollar figure like $0.06. Label every table column in plain terms with the key number where a quick scan expects it, and keep it warm. The founder emails are saved as .md, here in the engine repo under emails/, and are never committed to the public hits repo.
 
 ## Founder email and brief checklist (every email, every brief, the README CTA landing)
 
