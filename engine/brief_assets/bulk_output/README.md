@@ -4,8 +4,6 @@
 
 [![Claude proof: 80% above 128k cap](https://img.shields.io/badge/Claude%20proof-80%25%20above%20128k%20cap-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/bulk_output/sample.txt)
 
-The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
-
 You run a nightly job that turns each backlog row into one long deliverable: a full report, a big generated dataset. When a single deliverable runs past a model's per-request output ceiling, you fall back to a chunk-and-stitch loop with its own stitching-failure surface. Claude extended output, on the Message Batches API (the async bulk endpoint) with the beta header `output-300k-2026-03-24`, lifts the single-request `max_tokens` ceiling far past where the other vendors stop, so the whole thing lands in one turn.
 
 ## What you get

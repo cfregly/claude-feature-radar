@@ -58,13 +58,8 @@ make code_execution_state
 To try it on your own builder, edit `code_execution_state/run.py` with two real build-agent steps and
 re-run the same command.
 
-The product-design follow-up is Claude Design into Claude Code: design or prototype, then hand the
-implementation to a coding agent. I would keep the first Lightsprint demo on reliability, because the
-agent that cannot preserve files, tests, and scratch state across sessions will not feel collaborative
-for long.
-
 If the state boundary in Lightsprint is somewhere else, reply with the rough workflow and I can point
-you to the more relevant Claude pattern.
+you to the more relevant Claude pattern, the design-to-code handoff included.
 
 Happy building,
 

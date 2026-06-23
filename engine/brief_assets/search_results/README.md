@@ -4,8 +4,6 @@
 
 [![Claude proof: 0 hosted objects](https://img.shields.io/badge/Claude%20proof-0%20hosted%20objects-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/search_results/sample.txt)
 
-The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
-
 You already run your own retriever over your users' data (pgvector, your own embeddings) and you want every answer to deep-link to the exact passage it came from. The common path ships those passages into a second hosted vector store. With Claude you pass the chunks your retriever already returned straight into the request and get inline citations back, no second store.
 
 ## What you get

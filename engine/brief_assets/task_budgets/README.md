@@ -4,8 +4,6 @@
 
 [![Claude proof: 1 to 0 tool calls](https://img.shields.io/badge/Claude%20proof-1%20to%200%20tool%20calls-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/task_budgets/sample.txt)
 
-The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
-
 Your agent runs a long tool loop over your users' data: it fetches records, calls APIs, reasons, and writes a result. When it runs low on budget mid-loop, it starts the next tool call anyway and stops in the middle of an action, leaving a half-finished job and a bill you never planned for. Claude's `task_budget` hands the model a token budget for the whole agentic loop (the cycle where it thinks, calls a tool, reads the result, and repeats), with a server-side countdown it sees the entire time, so it paces itself and hands off cleanly as the budget runs low.
 
 ## What you get

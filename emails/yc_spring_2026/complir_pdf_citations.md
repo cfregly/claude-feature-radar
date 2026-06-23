@@ -40,12 +40,8 @@ make pdf_citations
 To try it on your own data, edit `pdf_citations/run.py` with a regulation PDF and the questions your
 agent needs to answer.
 
-The security follow-up for Complir is separate but connected. I would treat accuracy and security as
-one buyer story: answer with source pointers, then map the workflow to the public controls table,
-caveats, and evidence your buyer needs.
-
-If page-linked regulatory answers are not the sharpest Complir blocker right now, send me the one
-that is and I can map it to the closest Claude pattern.
+If page-linked regulatory answers are not the sharpest Complir blocker right now, reply with the one
+that is and I can map it to the closest Claude pattern, security evidence included.
 
 Happy building,
 

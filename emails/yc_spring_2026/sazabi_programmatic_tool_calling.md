@@ -10,7 +10,7 @@ designed in early.
 
 I saw Sazabi is building AI-native observability around logs, Slack, and agent-driven
 investigations. The Claude pattern that maps to that workload is log-triage fan-out without dragging
-every row into the model context.
+every intermediate result into the model context.
 
 That workload can get expensive and slow fast. Every log slice or trace payload your tool returns
 becomes model context unless you move the crunching somewhere else. Claude programmatic tool calling
@@ -29,7 +29,7 @@ response = client.messages.create(
 )
 ```
 
-Using my API key, the same fan-out task on 240 rows went from 9,451 to 6,828 billed input tokens,
+Using my API key, the same fan-out task over 240 returned results went from 9,451 to 6,828 billed input tokens,
 with the exact winner returned from the sandbox. That is 28% fewer billed input tokens than the same
 Claude agent without programmatic tool calling.
 

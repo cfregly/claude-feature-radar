@@ -6,7 +6,7 @@ Congrats on the batch. Here is a quick builder tip if you run a long agent that 
 
 The shape I keep hitting: an agent reads a long stream one record at a time (usage logs, churn flags, support tickets) and has to report the exact set of flagged ids at the end. The record text is throwaway after each step, but the running list has to stay exact. As the stream grows, every old record stays in the window, so the carried context (the tokens you pay for each turn) climbs with it, and so does the bill.
 
-Claude context editing fixes that. It clears the old tool results in place once the context crosses a trigger you set, so the bulky text leaves the window while the turns holding your running list stay put. The whole change is one block on the request:
+Claude context editing fixes that. It clears the old tool outputs in place once the context crosses a trigger you set, so the bulky text leaves the window while the turns holding your running list stay put. The whole change is one block on the request:
 
 ```python
 resp = client.beta.messages.create(

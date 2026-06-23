@@ -4,8 +4,6 @@
 
 [![Claude proof: 3/3 source pointers](https://img.shields.io/badge/Claude%20proof-3%2F3%20source%20pointers-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/grounding_stack/sample.txt)
 
-The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
-
 Your doc-QA agent answers over mixed sources at once: a plain-text note your user left, a PDF they just uploaded, and a chunk your retriever (RAG, the step that fetches matching snippets from a knowledge base) pulled from their wiki. Users can click back to where each fact came from. Claude Citations gives you that in one `client.messages.create` call: turn citations on per source and Claude returns a typed pointer for each, a character range for the text, a page range for the PDF, and a chunk span for the RAG result.
 
 ## What you get

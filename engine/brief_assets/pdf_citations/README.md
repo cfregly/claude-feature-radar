@@ -4,8 +4,6 @@
 
 [![Claude proof: 5/5 page pointers](https://img.shields.io/badge/Claude%20proof-5%2F5%20page%20pointers-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/pdf_citations/sample.txt)
 
-The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
-
 Your product answers questions over a PDF your user just uploaded: a lease, a 10-K, an insurance policy, a vendor contract. Your user verifies the answer in one click by jumping to the exact page it came from. With Claude Citations you hand Claude the PDF directly in the request and every answer comes back with a page pointer, so there is no page resolver to write and no vector store to stand up first.
 
 ## What you get

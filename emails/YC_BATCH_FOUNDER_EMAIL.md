@@ -13,7 +13,7 @@ Pick the production question you have this week:
 
 | If the blocker is | Start here | What you get |
 | --- | --- | --- |
-| **cost** from agents that fan out over logs, usage rows, accounts, or app APIs | [`make programmatic_tool_calling`](https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling) | 28% fewer billed input tokens than the same Claude agent without programmatic tool calling |
+| **cost** from agents that fan out over logs, usage results, accounts, or app APIs | [`make programmatic_tool_calling`](https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling) | 28% fewer billed input tokens than the same Claude agent without programmatic tool calling |
 | **speed** for large outputs or long-stream work | [`make bulk_output`](https://github.com/cfregly/claude-feature-hits/tree/main/bulk_output) or [`make exact_ledger`](https://github.com/cfregly/claude-feature-hits/tree/main/exact_ledger) | one un-truncated large deliverable, or a faster exact long-stream run |
 | **reliability** for multi-step code, data, or build agents | [`make code_execution_state`](https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state) or [`make task_budgets`](https://github.com/cfregly/claude-feature-hits/tree/main/task_budgets) | sandbox files that survive across separate requests, or loop-level budget handoffs |
 | **accuracy** for answers over PDFs, docs, filings, or retrieved chunks | [`make pdf_citations`](https://github.com/cfregly/claude-feature-hits/tree/main/pdf_citations) or [`make citations`](https://github.com/cfregly/claude-feature-hits/tree/main/citations) | page-level pointers for PDFs and character-level pointers for text docs |
@@ -42,7 +42,7 @@ next_response = client.beta.messages.create(..., container=container_id)
 ```
 
 For the many-tool-call path, Claude writes one sandbox script that loops over your tool, crunches the
-bulky rows there, and sends only the answer back to the model. On my run, the same usage-style
+bulky intermediate results there, and sends only the answer back to the model. On my run, the same usage-style
 workload went from 9,451 to 6,828 billed input tokens, 28% fewer than the same Claude agent without
 programmatic tool calling. It costs $0.08 to reproduce.
 
@@ -51,7 +51,6 @@ Run it:
 ```shell
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
 # Get an API key: https://console.anthropic.com/
-# If this send has a startup credit code, include it here: <insert-credit-code>
 export ANTHROPIC_API_KEY=your-api-key
 make programmatic_tool_calling   # cost and speed for fan-out agents
 make citations                   # accuracy for text-doc answers

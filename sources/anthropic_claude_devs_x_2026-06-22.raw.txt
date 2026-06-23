@@ -12,6 +12,19 @@ https://nitter.net/ClaudeDevs
 https://nitter.net/pic/pbs.twimg.com%2Fprofile_images%2F2044472418815893504%2Fxf14RxM8_400x400.png
 128
 128
+The Japan Claude Community Ambassador program is here! 🇯🇵 Ambassadors have hosted 290+ meetups in 107 cities across 37 countries, with 40,000+ attendees building together. Now open from Hokkaido to Okinawa. 日本の皆さん、ぜひご応募ください！ https://claude.com/ja/community/ambassadors
+@ClaudeDevs
+The Japan Claude Community Ambassador program is here! 🇯🇵
+Ambassadors have hosted 290+ meetups in 107 cities across 37 countries, with 40,000+ attendees building together.
+Now open from Hokkaido to Okinawa. 日本の皆さん、ぜひご応募ください！
+claude.com/ja/community/amba…
+Link
+Claude コミュニティ アンバサダー | Claude by Anthropic
+あなたの街で Claude のコミュニティを構築し、主導しましょう。アンバサダーはイベントを主催し、地元のビルダーとつながり、Anthropic と協力して Claude の未来を形作ります。
+claude.com ]]>
+Mon, 22 Jun 2026 23:36:28 GMT
+2069202892368773468
+https://nitter.net/ClaudeDevs/status/2069202892368773468#m
 Update: we've gone ahead and reset 5-hour and weekly usage limits for everyone, across all plans. Enjoy your weekend!
 @ClaudeDevs
 Update: we've gone ahead and reset 5-hour and weekly usage limits for everyone, across all plans. Enjoy your weekend!
@@ -198,12 +211,3 @@ platform.claude.com/docs/en/…
 Fri, 12 Jun 2026 18:00:34 GMT
 2065494482460836183
 https://nitter.net/ClaudeDevs/status/2065494482460836183#m
-Claude Managed Agents can operate in a sandbox you control, on your own infrastructure or with any provider you choose. Today we added new guides for @blaxelAI, @e2b, @googlecloud, @namespacelabs, and @superserve_ai, so you can choose the best fit for your use case.
-@ClaudeDevs
-Claude Managed Agents can operate in a sandbox you control, on your own infrastructure or with any provider you choose.
-Today we added new guides for @blaxelAI , @e2b , @googlecloud , @namespacelabs , and @superserve_ai , so you can choose the best fit for your use case.
-Video
-]]>
-Fri, 12 Jun 2026 18:00:33 GMT
-2065494480837583297
-https://nitter.net/ClaudeDevs/status/2065494480837583297#m

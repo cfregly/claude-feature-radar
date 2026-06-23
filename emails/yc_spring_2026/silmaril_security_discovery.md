@@ -24,8 +24,8 @@ The source-backed controls map is here:
 
 https://github.com/cfregly/claude-feature-hits/tree/main/security_controls_map
 
-Run both with `make security`. The run is zero-spend: 5/5 controls, 4/4 prompt-injection cases,
-0 dangerous actions allowed, and ten official-source controls rows checked before security copy ships.
+Run both with `make security`. The run is zero-spend and catches every injected instruction in the
+test set: 4/4 cases blocked and 0 dangerous actions allowed, with a source-backed controls map behind it.
 
 The test I would build with you is not a generic demo. It is a prompt-injection eval
 over an agent with real tool access:
@@ -37,7 +37,7 @@ evidence: tool call, refusal, source, and audit event
 ```
 
 That gives you the security pillar in the same language buyers use: which attack chain was stopped,
-which boundary caught it, and what the operator does next.
+which boundary stopped it, and what the operator does next.
 
 Run it:
 
@@ -47,7 +47,7 @@ make security
 ```
 
 If useful, reply with one prompt-injection workflow you use in demos. I can point you to the closest
-Claude security pattern, the exact eval shape, and the source row I would map it to.
+Claude security pattern, the exact eval shape, and the source line I would map it to.
 
 Happy building,
 

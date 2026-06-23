@@ -4,7 +4,7 @@
 
 [![Claude proof: 31 min idle kept](https://img.shields.io/badge/Claude%20proof-31%20min%20idle%20kept-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/code_execution_state/sample.txt)
 
-The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call. The default command proves same-container reuse without making you wait. The linked long-idle output shows the long-idle comparison.
+The default command proves same-container reuse without making you wait. The linked long-idle output shows the long-idle comparison.
 
 A multi-step agent that runs code does real work across several separate API calls: ingest a CSV of signups, clean it, build a cohort table, render a churn chart. The hard part is state. If the sandbox does not survive between calls, you re-upload the file and re-run setup every turn, plus write your own checkpointing glue. Claude's code execution tool keeps the container (the sandbox where your code runs) and its files across separate requests, so a file written in one turn is there in the next.
 

@@ -4,8 +4,6 @@
 
 [![Claude proof: 8/8 source pointers](https://img.shields.io/badge/Claude%20proof-8%2F8%20source%20pointers-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/citations/sample.txt)
 
-The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
-
 When your app answers over a user's own documents (contracts, policies, support tickets), users need the source behind each answer. Claude's Citations feature returns a structured pointer for every claim: the document, a character range, and the verbatim quote at that range. Your own code verifies each answer against that exact source span.
 
 ## What you get

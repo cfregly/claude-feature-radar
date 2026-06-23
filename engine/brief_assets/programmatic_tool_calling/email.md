@@ -4,9 +4,9 @@ Hey {first_name},
 
 Congrats on the batch, that is a real milestone. Quick builder tip in case it helps.
 
-If you meter usage per cohort or run analytics across regions, your agent calls one of your own tools many times, then crunches what comes back. Every one of those calls dumps its rows into the model's context, and you pay input tokens for all of them, even the rows the agent never uses to answer.
+If you meter usage per cohort or run analytics across regions, your agent calls one of your own tools many times, then crunches what comes back. Every one of those calls dumps its outputs into the model's context, and you pay input tokens for all of them, even the outputs the agent never uses to answer.
 
-[Programmatic tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling) moves that work off the model. Claude writes one script that loops over your tool inside a code sandbox (a server-side scratchpad that runs the rows), keeps only what matters, and passes just the answer back. The rows stay in the sandbox, so they never hit the context.
+[Programmatic tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling) moves that work off the model. Claude writes one script that loops over your tool inside a code sandbox (a server-side scratchpad that runs the outputs), keeps only what matters, and passes just the answer back. The tool outputs stay in the sandbox, so they never hit the context.
 
 You add the code execution tool, then one line to the tool you already pass. `allowed_callers` is the one that does the work: it tells Claude your tool can be called from the sandbox instead of through the model.
 
@@ -17,7 +17,7 @@ response = client.messages.create(
     tools=[
         {"type": "code_execution_20260120", "name": "code_execution"},   # add this
         { "name": "query_region_sales", "input_schema": {...},   # your tool, unchanged
-          "allowed_callers": ["code_execution_20260120"] },        # add this line: rows run in the sandbox, not the model context
+          "allowed_callers": ["code_execution_20260120"] },        # add this line: tool outputs stay in the sandbox, not the model context
     ],
 )
 ```
@@ -26,12 +26,12 @@ Same task, same model (Sonnet 4.6), the only change is the feature on or off:
 
 | your run | input tokens billed | what it means |
 |---|---:|---|
-| without programmatic tool calling | 9,451 | every row lands in the model's context |
+| without programmatic tool calling | 9,451 | every tool output lands in the model's context |
 | with programmatic tool calling | 6,828 | only the answer reaches the model |
 
 28% fewer input tokens on my run, with the exact winner returned from the sandbox. The saving grows with the size of the fan-out (an agent calling one tool many times over data it then crunches).
 
-Why I am sending this for your workload: `allowed_callers` lets Claude call your own tool from the code sandbox and return only the computed answer to the model. For metering across many cohorts, that is the difference between paying for every row and paying for the answer.
+Why I am sending this for your workload: `allowed_callers` lets Claude call your own tool from the code sandbox and return only the computed answer to the model. For metering across many cohorts, that is the difference between paying for every tool output and paying for the answer.
 
 I ran it using my own API key for $0.08, takes around two minutes. To see it yourself, one clone and one command:
 

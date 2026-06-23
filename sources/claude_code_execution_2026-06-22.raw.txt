@@ -20,19 +20,6 @@ Code execution is not currently available on Amazon Bedrock or Vertex AI.
  For Claude Mythos Preview , code execution is supported on the Claude API and Microsoft Foundry only. It is not available for Mythos Preview on Amazon Bedrock, Vertex AI, or Claude Platform on AWS.
  Quick start
 Here's a simple example that asks Claude to perform a calculation:
-cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
-response = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 4096 ,
-messages = [
-{
-"role" : "user" ,
-"content" : "Calculate the mean and standard deviation of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]" ,
-}
-],
-tools = [{ "type" : "code_execution_20250825" , "name" : "code_execution" }],
-)
-print (response)
  How code execution works
 When you add the code execution tool to your API request:
 Claude evaluates whether code execution would help answer your question
@@ -77,62 +64,8 @@ Text files (.txt, .md, .py, and others)
 Upload your file using the Files API
 Reference the file in your message using a container_upload content block
 Include the code execution tool in your API request
-cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
-# Upload a file
-file_object = client.beta.files.upload(
-file = open ( "data.csv" , "rb" ),
-)
-# Use the file_id with code execution
-response = client.beta.messages.create(
-model = "claude-opus-4-8" ,
-betas = [ "files-api-2025-04-14" ],
-max_tokens = 4096 ,
-messages = [
-{
-"role" : "user" ,
-"content" : [
-{ "type" : "text" , "text" : "Analyze this CSV data" },
-{ "type" : "container_upload" , "file_id" : file_object.id},
-],
-}
-],
-tools = [{ "type" : "code_execution_20250825" , "name" : "code_execution" }],
-)
-print (response)
  Retrieve generated files
 When Claude creates files during code execution, you can retrieve these files using the Files API:
-CLI Python TypeScript C# Go Java PHP Ruby  # Initialize the client
-client = Anthropic()
-# Request code execution that creates files
-response = client.beta.messages.create(
-model = "claude-opus-4-8" ,
-betas = [ "files-api-2025-04-14" ],
-max_tokens = 4096 ,
-messages = [
-{
-"role" : "user" ,
-"content" : "Create a matplotlib visualization and save it as output.png" ,
-}
-],
-tools = [{ "type" : "code_execution_20250825" , "name" : "code_execution" }],
-)
-# Extract file IDs from the response
-def extract_file_ids ( response ):
-file_ids = []
-for item in response.content:
-if item.type == "bash_code_execution_tool_result" :
-content_item = item.content
-if content_item.type == "bash_code_execution_result" :
-# concrete-typed list: List[BashCodeExecutionOutputBlock]
-for file in content_item.content:
-file_ids.append( file .file_id)
-return file_ids
-# Download the created files
-for file_id in extract_file_ids(response):
-file_metadata = client.beta.files.retrieve_metadata(file_id)
-file_content = client.beta.files.download(file_id)
-file_content.write_to_file(file_metadata.filename)
-print ( f "Downloaded: { file_metadata.filename } " )
  Tool definition
 The code execution tool requires no additional parameters:
 JSON  {
@@ -250,7 +183,7 @@ Output  {
 }
 }
 Error codes by tool type:
-Tool Error Code Description All tools unavailable The tool is temporarily unavailable All tools execution_time_exceeded Execution exceeded maximum time limit All tools container_expired Container expired and is no longer available All tools invalid_tool_input Invalid parameters provided to the tool All tools too_many_requests Rate limit exceeded for tool usage bash output_file_too_large Command output exceeded the maximum size text_editor file_not_found File doesn't exist (for view/edit operations) text_editor string_not_found The old_str not found in file (for str_replace)
+Tool Error Code Description All tools unavailable The tool is temporarily unavailable All tools execution_time_exceeded Execution exceeded maximum time limit All tools container_expired Container expired and is no longer available All tools invalid_tool_input Invalid parameters provided to the tool All tools too_many_requests Rate limit exceeded for tool usage bash output_file_too_large Command output exceeded the maximum size
  pause_turn stop reason
 The response may include a pause_turn stop reason, which indicates that the API paused a long-running turn. You may
 provide the response back as-is in a subsequent request to let Claude continue its turn, or modify the content if you
@@ -283,34 +216,6 @@ Utilities : tqdm, python-dateutil, pytz, joblib, unzip, unrar, 7zip, bc, rg (rip
 You can reuse an existing container across multiple API requests by providing the container ID from a previous response.
 This allows you to maintain created files between requests.
  Example
-cURL CLI Python TypeScript C# Go Java PHP Ruby  # First request: Create a file with a random number
-response1 = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 4096 ,
-messages = [
-{
-"role" : "user" ,
-"content" : "Write a file with a random number and save it to '/tmp/number.txt'" ,
-}
-],
-tools = [{ "type" : "code_execution_20250825" , "name" : "code_execution" }],
-)
-# Extract the container ID from the first response
-container_id = response1.container.id
-# Second request: Reuse the container to read the file
-response2 = client.messages.create(
-container = container_id, # Reuse the same container
-model = "claude-opus-4-8" ,
-max_tokens = 4096 ,
-messages = [
-{
-"role" : "user" ,
-"content" : "Read the number from '/tmp/number.txt' and calculate its square" ,
-}
-],
-tools = [{ "type" : "code_execution_20250825" , "name" : "code_execution" }],
-)
-print (response2)
  Streaming
 With streaming enabled, you'll receive code execution events as they occur:
 event: content_block_start
@@ -362,4 +267,95 @@ Code execution runs in server-side sandbox containers. Container data, including
 For ZDR eligibility across all features, see API and data retention .
  Using code execution with Agent Skills
 The code execution tool enables Claude to use Agent Skills . Skills are modular capabilities consisting of instructions, scripts, and resources that extend Claude's functionality.
-Learn more in Agent Skills and Using Agent Skills with the API . Was this page helpful?   Model compatibility Platform availability Quick start How code execution works When Claude runs code Using code execution with other execution tools How to use the tool Upload and analyze your own files Retrieve generated files Tool definition Response format Bash command response File operation responses Results Errors Containers Runtime environment Resource limits Networking and security Pre-installed libraries Container reuse Example Streaming Batch requests Usage and pricing Upgrade to latest tool version What's changed Backward compatibility Upgrade steps Programmatic tool calling Data retention Using code execution with Agent Skills
+Learn more in Agent Skills and Using Agent Skills with the API . Was this page helpful?   Model compatibility Platform availability Quick start How code execution works When Claude runs code Using code execution with other execution tools How to use the tool Upload and analyze your own files Retrieve generated files Tool definition Response format Bash command response File operation responses Results Errors Containers Runtime environment Resource limits Networking and security Pre-installed libraries Container reuse Example Streaming Batch requests Usage and pricing Upgrade to latest tool version What's changed Backward compatibility Upgrade steps Programmatic tool calling Data retention Using code execution with Agent Skills cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
+response = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 4096 ,
+messages = [
+{
+"role" : "user" ,
+"content" : "Calculate the mean and standard deviation of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]" ,
+}
+],
+tools = [{ "type" : "code_execution_20250825" , "name" : "code_execution" }],
+)
+print (response) cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
+# Upload a file
+file_object = client.beta.files.upload(
+file = open ( "data.csv" , "rb" ),
+)
+# Use the file_id with code execution
+response = client.beta.messages.create(
+model = "claude-opus-4-8" ,
+betas = [ "files-api-2025-04-14" ],
+max_tokens = 4096 ,
+messages = [
+{
+"role" : "user" ,
+"content" : [
+{ "type" : "text" , "text" : "Analyze this CSV data" },
+{ "type" : "container_upload" , "file_id" : file_object.id},
+],
+}
+],
+tools = [{ "type" : "code_execution_20250825" , "name" : "code_execution" }],
+)
+print (response) CLI Python TypeScript C# Go Java PHP Ruby  # Initialize the client
+client = Anthropic()
+# Request code execution that creates files
+response = client.beta.messages.create(
+model = "claude-opus-4-8" ,
+betas = [ "files-api-2025-04-14" ],
+max_tokens = 4096 ,
+messages = [
+{
+"role" : "user" ,
+"content" : "Create a matplotlib visualization and save it as output.png" ,
+}
+],
+tools = [{ "type" : "code_execution_20250825" , "name" : "code_execution" }],
+)
+# Extract file IDs from the response
+def extract_file_ids ( response ):
+file_ids = []
+for item in response.content:
+if item.type == "bash_code_execution_tool_result" :
+content_item = item.content
+if content_item.type == "bash_code_execution_result" :
+# concrete-typed list: List[BashCodeExecutionOutputBlock]
+for file in content_item.content:
+file_ids.append( file .file_id)
+return file_ids
+# Download the created files
+for file_id in extract_file_ids(response):
+file_metadata = client.beta.files.retrieve_metadata(file_id)
+file_content = client.beta.files.download(file_id)
+file_content.write_to_file(file_metadata.filename)
+print ( f "Downloaded: { file_metadata.filename } " ) text_editor file_not_found File doesn't exist (for view/edit operations) text_editor string_not_found The old_str not found in file (for str_replace) cURL CLI Python TypeScript C# Go Java PHP Ruby  # First request: Create a file with a random number
+response1 = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 4096 ,
+messages = [
+{
+"role" : "user" ,
+"content" : "Write a file with a random number and save it to '/tmp/number.txt'" ,
+}
+],
+tools = [{ "type" : "code_execution_20250825" , "name" : "code_execution" }],
+)
+# Extract the container ID from the first response
+container_id = response1.container.id
+# Second request: Reuse the container to read the file
+response2 = client.messages.create(
+container = container_id, # Reuse the same container
+model = "claude-opus-4-8" ,
+max_tokens = 4096 ,
+messages = [
+{
+"role" : "user" ,
+"content" : "Read the number from '/tmp/number.txt' and calculate its square" ,
+}
+],
+tools = [{ "type" : "code_execution_20250825" , "name" : "code_execution" }],
+)
+print (response2)

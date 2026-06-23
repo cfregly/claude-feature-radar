@@ -179,7 +179,7 @@ hood, what the competitor's nearest equivalent does, and exactly where each one 
 understanding is the creative engine of this repo. A naive head-to-head on a toy task usually shows
 parity, because the task never stresses the thing the feature is good at. Knowing the mechanism is
 what lets you design a REAL workload where the difference shows up as a number a founder would feel.
-- Learn the mechanism on both sides. Claude's context editing clears tool results in place, OpenAI's
+- Learn the mechanism on both sides. Claude's context editing clears tool outputs in place, OpenAI's
   compaction summarizes them (and can drop a detail), Gemini carries the full window (and pays for
   it). Those are different failure modes, and the difference only appears under load.
 - Find the workload where it bites, and make the workload explicit. Name the real scenario (a long

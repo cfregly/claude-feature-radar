@@ -17,7 +17,7 @@ support escalations.
 
 The mechanism matters:
 
-- Claude context editing clears old tool results in place, so bulky report text leaves context while
+- Claude context editing clears old tool outputs in place, so bulky report text leaves context while
   the assistant turns that carry the running ledger stay intact.
 - OpenAI Responses compaction summarizes prior context and carries forward the state through its
   compacted item.
@@ -60,7 +60,7 @@ Receipt: [`repeated_runs.json`](repeated_runs.json).
 - This is a long-stream exact-ledger edge. It is not a generic context-editing claim.
 - The win is not that competitors failed. They both got the exact list on the full run.
 - The win is that Claude got the exact list with less cost and time on this workload.
-- The edge depends on the workload shape: large disposable tool results plus a precise accumulated
+- The edge depends on the workload shape: large disposable tool outputs plus a precise accumulated
   state that must stay exact.
 - The cost margin is config-sensitive: about 65% cheaper at keep=1 and about 8% at keep=3, with every
   arm exact across 5 runs in both. Aggressive clearing is where the large gap comes from.

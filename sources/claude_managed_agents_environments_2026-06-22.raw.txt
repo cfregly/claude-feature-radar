@@ -11,30 +11,14 @@ curl CLI Python TypeScript C# Go Java PHP Ruby  ant beta:environments create 
 The name must be unique within your organization and workspace.
  Use the environment in a session
 Pass the environment ID as a string when creating a session .
+curl Python TypeScript C# Go Java PHP Ruby  session = client.beta.sessions.create(
+agent = agent.id,
+environment_id = environment.id,
+)
  Configuration options
  Packages
 The packages field pre-installs packages into the sandbox before the agent starts. Packages are installed by their respective package managers and cached across sessions that share the same environment. When multiple package managers are specified, they run in alphabetical order (apt, cargo, gem, go, npm, pip). You can optionally pin specific versions; the default is latest.
-Supported package managers:
-Field Package manager Example apt System packages (apt-get) "ffmpeg" cargo Rust (cargo) " [email protected] " gem Ruby (gem) "rails:7.1.0" go Go modules "golang.org/x/tools/cmd/goimports@latest" npm Node.js (npm) " [email protected] "
- Networking
-The networking field controls the sandbox's outbound network access. It does not impact the web_search or web_fetch tools' allowed domains.
-Mode Description unrestricted Full outbound network access, except for a general safety blocklist. This is the default. limited Restricts sandbox network access to the allowed_hosts list. Further access is enabled through the allow_package_managers and allow_mcp_servers bool.
- For production deployments, use limited networking with an explicit allowed_hosts list. Follow the principle of least privilege by granting only the minimum network access your agent requires, and regularly audit your allowed domains.
-When using limited networking:
-allowed_hosts specifies domains the sandbox can reach. Specify bare hostnames or wildcard patterns (such as *.example.com ); do not include a URL scheme.
-allow_mcp_servers permits outbound access to MCP server endpoints configured on the agent, beyond those listed in the allowed_hosts array. Defaults to false .
-allow_package_managers permits outbound access to public package registries (such as PyPI and npm) beyond those listed in the allowed_hosts array. Defaults to false .
- Environment lifecycle
-Environments persist until explicitly archived or deleted.
-Multiple sessions can reference the same environment.
-Each session gets its own sandbox instance. Sessions do not share file system state.
-Environments are not versioned. If you frequently update your environments, you may want to log these updates on your side, to map environment state with sessions.
- Manage environments
- Pre-installed runtimes
-Cloud sandboxes include common runtimes out of the box. See Sandbox reference for the full list of pre-installed languages, databases, and utilities. Was this page helpful?   Create an environment Use the environment in a session Configuration options Packages Networking Environment lifecycle Manage environments Pre-installed runtimes curl Python TypeScript C# Go Java PHP Ruby  session = client.beta.sessions.create(
-agent = agent.id,
-environment_id = environment.id,
-) curl CLI Python TypeScript C# Go Java PHP Ruby  ant beta:environments create << 'YAML'
+curl CLI Python TypeScript C# Go Java PHP Ruby  ant beta:environments create << 'YAML'
 name: data-analysis
 config:
 type: cloud
@@ -47,7 +31,13 @@ npm:
 - express
 networking:
 type: unrestricted
-YAML pip Python (pip) "pandas==2.2.0" curl Python TypeScript C# Go Java PHP Ruby  config = {
+YAML
+Supported package managers:
+Field Package manager Example apt System packages (apt-get) "ffmpeg" cargo Rust (cargo) " [email protected] " gem Ruby (gem) "rails:7.1.0" go Go modules "golang.org/x/tools/cmd/goimports@latest" npm Node.js (npm) " [email protected] " pip Python (pip) "pandas==2.2.0"
+ Networking
+The networking field controls the sandbox's outbound network access. It does not impact the web_search or web_fetch tools' allowed domains.
+Mode Description unrestricted Full outbound network access, except for a general safety blocklist. This is the default. limited Restricts sandbox network access to the allowed_hosts list. Further access is enabled through the allow_package_managers and allow_mcp_servers bool.
+curl Python TypeScript C# Go Java PHP Ruby  config = {
 "type" : "cloud" ,
 "networking" : {
 "type" : "limited" ,
@@ -55,7 +45,19 @@ YAML pip Python (pip) "pandas==2.2.0" curl Python TypeScript C# Go Java PHP Ruby
 "allow_mcp_servers" : True ,
 "allow_package_managers" : True ,
 },
-} curl CLI Python TypeScript C# Go Java PHP Ruby  # List environments
+}
+ For production deployments, use limited networking with an explicit allowed_hosts list. Follow the principle of least privilege by granting only the minimum network access your agent requires, and regularly audit your allowed domains.
+When using limited networking:
+allowed_hosts specifies domains the sandbox can reach. Specify bare hostnames or wildcard patterns (such as *.example.com ); do not include a URL scheme.
+allow_mcp_servers permits outbound access to MCP server endpoints configured on the agent, beyond those listed in the allowed_hosts array. Defaults to false .
+allow_package_managers permits outbound access to public package registries (such as PyPI and npm) beyond those listed in the allowed_hosts array. Defaults to false .
+ Environment lifecycle
+Environments persist until explicitly archived or deleted.
+Multiple sessions can reference the same environment.
+Each session gets its own sandbox instance. Sessions do not share file system state.
+Environments are not versioned. If you frequently update your environments, you may want to log these updates on your side, to map environment state with sessions.
+ Manage environments
+curl CLI Python TypeScript C# Go Java PHP Ruby  # List environments
 ant beta:environments list
 # Retrieve a specific environment
 ant beta:environments retrieve --environment-id " $ENVIRONMENT_ID "
@@ -63,3 +65,5 @@ ant beta:environments retrieve --environment-id " $ENVIRONMENT_ID "
 ant beta:environments archive --environment-id " $ENVIRONMENT_ID "
 # Delete an environment (only if no sessions reference it)
 ant beta:environments delete --environment-id " $ENVIRONMENT_ID "
+ Pre-installed runtimes
+Cloud sandboxes include common runtimes out of the box. See Sandbox reference for the full list of pre-installed languages, databases, and utilities. Was this page helpful?   Create an environment Use the environment in a session Configuration options Packages Networking Environment lifecycle Manage environments Pre-installed runtimes

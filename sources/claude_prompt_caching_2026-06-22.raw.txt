@@ -1,7 +1,7 @@
 Source: https://platform.claude.com/docs/en/build-with-claude/prompt-caching
 Snapshot fetched 2026-06-22. Verbatim excerpts for citation grounding.
 
-Prompt caching - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop reasons and fallback Refusals and fallback Fallback credit Model capabilities Extended thinking Adaptive thinking Effort Task budgets (beta) Fast mode (research preview) Structured outputs Citations Streaming Messages Batch processing Search results Streaming refusals Multilingual support Embeddings Tools Overview How tool use works Tutorial: Build a tool-using agent Define tools Handle tool calls Parallel tool use Tool Runner (SDK) Strict tool use Tool use with prompt caching Server tools Troubleshooting Web search tool Web fetch tool Code execution tool Advisor tool Memory tool Bash tool Computer use tool Text editor tool Tool infrastructure Tool reference Manage tool context Tool combinations Tool search Programmatic tool calling Fine-grained tool streaming Context management Context windows Compaction Context editing Prompt caching Mid-conversation system messages Build an orchestration mode Cache diagnostics (beta) Token counting Working with files Files API PDF support Images and vision Skills Overview Quickstart Best practices Skills for enterprise Skills in the API MCP Remote MCP servers MCP connector MCP tunnels  Claude on cloud platforms Amazon Bedrock Amazon Bedrock (legacy) Claude Platform on AWS Microsoft Foundry Vertex AI  Log in  Messages  Prompt caching Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Solutions AI agents Code modernization Coding Customer support Education Financial services Government Life sciences Partners Claude on AWS Google Cloud's Vertex AI Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Company Anthropic Careers Economic Futures Research News Responsible Scaling Policy Security and compliance Transparency Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Help and security Availability Status Support Discord Terms and policies Privacy policy Responsible disclosure policy Terms of service: Commercial Terms of service: Consumer Usage policy Messages / Context management Prompt caching Copy page  Copy page  Was this page helpful?   How prompt caching works Pricing Supported models Automatic caching How automatic caching works in multi-turn conversations TTL support Combining with block-level caching What stays the same Edge cases Explicit cache breakpoints Structuring your prompt Understanding cache breakpoint costs Caching strategies and considerations Cache limitations What can be cached What cannot be cached What invalidates the cache Tracking cache performance Caching with thinking blocks Cache storage and sharing Best practices for effective caching Optimizing for different use cases Troubleshooting common issues 1-hour cache duration When to use the 1-hour cache Mixing different TTLs Pre-warming the cache How it works Typical usage pattern Limitations Replacing the max_tokens=1 workaround Prompt caching examples Data retention FAQ Prompt caching optimizes your API usage by allowing resuming from specific prefixes in your prompts. This significantly reduces processing time and costs for repetitive tasks or prompts with consistent elements.
+Prompt caching - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Intro to Claude Quickstart Building with Claude Features overview Using the Messages API Stop reasons and fallback Refusals and fallback Fallback credit Model capabilities Extended thinking Adaptive thinking Effort Task budgets (beta) Fast mode (research preview) Structured outputs Citations Streaming Messages Batch processing Search results Streaming refusals Multilingual support Embeddings Tools Overview How tool use works Tutorial: Build a tool-using agent Define tools Handle tool calls Parallel tool use Tool Runner (SDK) Strict tool use Tool use with prompt caching Server tools Troubleshooting Web search tool Web fetch tool Code execution tool Advisor tool Memory tool Bash tool Computer use tool Text editor tool Tool infrastructure Tool reference Manage tool context Tool combinations Tool search Programmatic tool calling Fine-grained tool streaming Context management Context windows Compaction Context editing Prompt caching Mid-conversation system messages Build an orchestration mode Cache diagnostics (beta) Token counting Working with files Files API PDF support Images and vision Skills Overview Quickstart Best practices Skills for enterprise Skills in the API MCP Remote MCP servers MCP connector MCP tunnels  Claude on cloud platforms Amazon Bedrock Amazon Bedrock (legacy) Claude Platform on AWS Microsoft Foundry Vertex AI  Log in  Messages  Prompt caching Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Solutions AI agents Code modernization Coding Customer support Education Financial services Government Life sciences Partners Claude on AWS Google Cloud's Vertex AI Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Company Anthropic Careers Economic Futures Research News Responsible Scaling Policy Security and compliance Transparency Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Help and security Availability Status Support Discord Terms and policies Privacy policy Responsible disclosure policy Terms of service: Commercial Terms of service: Consumer Usage policy Messages / Context management Prompt caching Copy page  Copy page  Prompt caching optimizes your API usage by allowing resuming from specific prefixes in your prompts. This significantly reduces processing time and costs for repetitive tasks or prompts with consistent elements.
  This feature is eligible for Zero Data Retention (ZDR) . When your organization has a ZDR arrangement, data sent through this feature is not stored after the API response is returned.
 There are two ways to enable prompt caching:
 Automatic caching : Add a single cache_control field at the top level of your request. The system automatically applies the cache breakpoint to the last cacheable block and moves it forward as conversations grow. Best for multi-turn conversations where the growing message history should be cached automatically.
@@ -37,7 +37,7 @@ By default, the cache has a 5-minute lifetime. The cache is refreshed for no add
  Prompt caching caches the full prefix Prompt caching references the entire prompt - tools , system , and messages (in that order) up to and including the block designated with cache_control .
  Pricing
 Prompt caching introduces a new pricing structure. The table below shows the price per million tokens for each supported model:
-Model Base Input Tokens 5m Cache Writes 1h Cache Writes Cache Hits & Refreshes Output Tokens Claude Fable 5 $10 / MTok $12.50 / MTok $20 / MTok $1 / MTok $50 / MTok Claude Mythos 5 ( limited availability ) $10 / MTok $12.50 / MTok $20 / MTok $1 / MTok $50 / MTok Claude Opus 4.8 $5 / MTok $6.25 / MTok $10 / MTok $0.50 / MTok $25 / MTok Claude Opus 4.7 $5 / MTok $6.25 / MTok $10 / MTok $0.50 / MTok $25 / MTok
+Model Base Input Tokens 5m Cache Writes 1h Cache Writes Cache Hits & Refreshes Output Tokens Claude Fable 5 $10 / MTok $12.50 / MTok $20 / MTok $1 / MTok $50 / MTok Claude Mythos 5 ( limited availability ) $10 / MTok $12.50 / MTok $20 / MTok $1 / MTok $50 / MTok Claude Opus 4.8 $5 / MTok $6.25 / MTok $10 / MTok $0.50 / MTok $25 / MTok Claude Opus 4.7 $5 / MTok $6.25 / MTok $10 / MTok $0.50 / MTok $25 / MTok Claude Opus 4.6 $5 / MTok $6.25 / MTok $10 / MTok $0.50 / MTok $25 / MTok Claude Opus 4.5 $5 / MTok $6.25 / MTok $10 / MTok $0.50 / MTok $25 / MTok Claude Opus 4.1 ( deprecated ) $15 / MTok $18.75 / MTok $30 / MTok $1.50 / MTok $75 / MTok Claude Opus 4 ( retired, except on Vertex AI ) $15 / MTok $18.75 / MTok $30 / MTok $1.50 / MTok $75 / MTok Claude Sonnet 4.6 $3 / MTok $3.75 / MTok $6 / MTok $0.30 / MTok $15 / MTok Claude Sonnet 4.5 $3 / MTok $3.75 / MTok $6 / MTok $0.30 / MTok $15 / MTok Claude Sonnet 4 ( retired, except on Bedrock and Vertex AI ) $3 / MTok $3.75 / MTok $6 / MTok $0.30 / MTok $15 / MTok Claude Haiku 4.5 $1 / MTok $1.25 / MTok $2 / MTok $0.10 / MTok $5 / MTok Claude Haiku 3.5 ( retired, except on Bedrock and Vertex AI ) $0.80 / MTok $1 / MTok $1.60 / MTok $0.08 / MTok $4 / MTok
  The table above reflects the following pricing multipliers for prompt caching:
 5-minute cache write tokens are 1.25 times the base input tokens price
 1-hour cache write tokens are 2 times the base input tokens price
@@ -47,6 +47,22 @@ These multipliers stack with other pricing modifiers such as the Batch API disco
 Prompt caching (both automatic and explicit) is supported on all active Claude models .
  Automatic caching
 Automatic caching is the simplest way to enable prompt caching. Instead of placing cache_control on individual content blocks, add a single cache_control field at the top level of your request body. The system automatically applies the cache breakpoint to the last cacheable block.
+cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
+response = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 1024 ,
+cache_control = { "type" : "ephemeral" },
+system = "You are a helpful assistant that remembers our conversation." ,
+messages = [
+{ "role" : "user" , "content" : "My name is Alex. I work on machine learning." },
+{
+"role" : "assistant" ,
+"content" : "Nice to meet you, Alex! How can I help with your ML work today?" ,
+},
+{ "role" : "user" , "content" : "What did I say I work on?" },
+],
+)
+print (response.usage.model_dump_json())
  How automatic caching works in multi-turn conversations
 With automatic caching, the cache point moves forward automatically as conversations grow. Each new request caches everything up to the last cacheable block, and previous content is read from cache.
 Request Content Cache behavior Request 1 System + User(1) + Asst(1) + User(2) ◀ cache Everything written to cache Request 2 System + User(1) + Asst(1) + User(2) + Asst(2) + User(3) ◀ cache System through User(2) read from cache; Asst(2) + User(3) written to cache Request 3 System + User(1) + Asst(1) + User(2) + Asst(2) + User(3) + Asst(3) + User(4) ◀ cache System through User(3) read from cache; Asst(3) + User(4) written to cache
@@ -145,7 +161,7 @@ Empty text blocks cannot be cached.
 Modifications to cached content can invalidate some or all of the cache.
 As described in Structuring your prompt , the cache follows the hierarchy: tools → system → messages . Changes at each level invalidate that level and all subsequent levels.
 The following table shows which parts of the cache are invalidated by different types of changes. ✘ indicates that the cache is invalidated, while ✓ indicates that the cache remains valid.
-What changes Tools cache System cache Messages cache Impact Tool definitions ✘ ✘ ✘ Modifying tool definitions (names, descriptions, parameters) invalidates the entire cache Web search toggle ✓ ✘ ✘ Enabling/disabling web search modifies the system prompt Citations toggle ✓ ✘ ✘ Enabling/disabling citations modifies the system prompt Speed setting ✓ ✘ ✘ Switching between speed: "fast" and standard speed invalidates system and message caches
+What changes Tools cache System cache Messages cache Impact Tool definitions ✘ ✘ ✘ Modifying tool definitions (names, descriptions, parameters) invalidates the entire cache Web search toggle ✓ ✘ ✘ Enabling/disabling web search modifies the system prompt Citations toggle ✓ ✘ ✘ Enabling/disabling citations modifies the system prompt Speed setting ✓ ✘ ✘ Switching between speed: "fast" and standard speed invalidates system and message caches Tool choice ✓ ✓ ✘ Changes to tool_choice parameter only affect message blocks Images ✓ ✓ ✘ Adding/removing images anywhere in the prompt affects message blocks Thinking parameters ✓ ✓ ✘ Changes to extended thinking settings (enable/disable, budget) affect message blocks Non-tool results passed to extended thinking requests ✓ ✓ Model-specific On Opus 4.5+ and Sonnet 4.6+, thinking blocks are preserved by default, so the cache remains valid (✓). On earlier Opus/Sonnet models and all Haiku models, all previously-cached thinking blocks are stripped from context, and any messages that follow those thinking blocks are removed from the cache (✘). For more details, see Caching with thinking blocks .
  On Claude Opus 4.8, you can add a new system instruction partway through a conversation without invalidating the system or message caches. Append a {"role": "system"} message to messages instead of editing the top-level system field, so the cached prefix stays unchanged. See Mid-conversation system messages .
  Tracking cache performance
 Monitor cache performance using these API response fields, within usage in the response (or message_start event if streaming ):
@@ -158,7 +174,10 @@ cache_creation_input_tokens = tokens before breakpoint being cached now (writes)
 input_tokens = tokens after your last breakpoint (not eligible for cache)
 Example: If you have a request with 100,000 tokens of cached content (read from cache), 0 tokens of new content being cached, and 50 tokens in your user message (after the cache breakpoint):
 cache_read_input_tokens : 100,000
-: 0
+cache_creation_input_tokens : 0
+input_tokens : 50
+Total input tokens processed : 100,050 tokens
+This is important for understanding both costs and rate limits, as input_tokens will typically be much smaller than your total input when using caching effectively.
  Caching with thinking blocks
 When using extended thinking with prompt caching, thinking blocks have special behavior:
 Automatic caching alongside other content : While thinking blocks cannot be explicitly marked with cache_control , they get cached as part of the request content when you make subsequent API calls with tool results. This commonly happens during tool use when you pass thinking blocks back to continue the conversation.
@@ -269,6 +288,23 @@ Cache pre-warming lets you load your system prompt or tool definitions into the 
 Set max_tokens: 0 in your request. The API reads your prompt into the model and writes the cache at any cache_control breakpoint, then returns immediately without generating any output. The response has an empty content array, stop_reason: "max_tokens" , and a fully populated usage block.
 Place the cache_control breakpoint on the last block that is shared with the follow-up request (typically your system prompt or tool definitions), not on the placeholder user message. Otherwise the cache entry is keyed to the placeholder and the follow-up request won't hit it. This means using an explicit cache breakpoint rather than automatic caching , since automatic caching places the breakpoint on the last block, which here is the placeholder. The placeholder user message can be any string with non-whitespace content (the examples here use "warmup" ); its content is read into the model but never answered.
  A pre-warm request incurs a cache write charge if the prefix is not already cached, the same as any other request. Check usage.cache_creation_input_tokens in the response to confirm a write occurred. Zero output tokens are billed.
+cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
+# Fire this before users arrive to warm the shared system-prompt cache.
+prewarm = client.messages.create(
+model = "claude-opus-4-8" ,
+max_tokens = 0 ,
+system = [
+{
+"type" : "text" ,
+"text" : "You are an expert software engineer with deep knowledge of distributed systems..." ,
+"cache_control" : { "type" : "ephemeral" },
+}
+],
+messages = [{ "role" : "user" , "content" : "warmup" }],
+)
+print (prewarm.stop_reason) # "max_tokens"
+print (prewarm.content) # []
+print (prewarm.usage)
 The API returns an empty content array:
 Output  {
 "id" : "msg_01XFDUDYJgAACzvnptvVoYEL" ,
@@ -348,41 +384,10 @@ Before max_tokens: 0 was available, some applications used max_tokens: 1 warm-up
  Prompt caching examples
 To help you get started with prompt caching, the prompt caching cookbook provides detailed examples and best practices.
 The following code snippets showcase various prompt caching patterns. These examples demonstrate how to implement caching in different scenarios, helping you understand the practical applications of this feature:
-Large context caching example
+Large context caching example Caching tool definitions Continuing a multi-turn conversation Putting it all together: Multiple cache breakpoints
  Data retention
 Prompt caching (both automatic and explicit) is ZDR eligible. Anthropic does not store the raw text of your prompts or Claude's responses.
 KV (key-value) cache representations and cryptographic hashes of cached content are held in memory only and are not stored at rest. Cached entries have a minimum lifetime of 5 minutes (standard) or 1 hour (extended), after which they are promptly, though not immediately, deleted. Cache entries are isolated between organizations and, on the Claude API, Claude Platform on AWS, and Microsoft Foundry (beta), between workspaces within an organization.
 For ZDR eligibility across all features, see API and data retention .
  FAQ
-Do I need multiple cache breakpoints or is one at the end sufficient? Do cache breakpoints add extra cost? Claude Opus 4.6 $5 / MTok $6.25 / MTok $10 / MTok $0.50 / MTok $25 / MTok Claude Opus 4.5 $5 / MTok $6.25 / MTok $10 / MTok $0.50 / MTok $25 / MTok Claude Opus 4.1 ( deprecated ) $15 / MTok $18.75 / MTok $30 / MTok $1.50 / MTok $75 / MTok Claude Opus 4 ( retired, except on Vertex AI ) $15 / MTok $18.75 / MTok $30 / MTok $1.50 / MTok $75 / MTok Claude Sonnet 4.6 $3 / MTok $3.75 / MTok $6 / MTok $0.30 / MTok $15 / MTok Claude Sonnet 4.5 $3 / MTok $3.75 / MTok $6 / MTok $0.30 / MTok $15 / MTok Claude Sonnet 4 ( retired, except on Bedrock and Vertex AI ) $3 / MTok $3.75 / MTok $6 / MTok $0.30 / MTok $15 / MTok Claude Haiku 4.5 $1 / MTok $1.25 / MTok $2 / MTok $0.10 / MTok $5 / MTok Claude Haiku 3.5 ( retired, except on Bedrock and Vertex AI ) $0.80 / MTok $1 / MTok $1.60 / MTok $0.08 / MTok $4 / MTok cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
-response = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 1024 ,
-cache_control = { "type" : "ephemeral" },
-system = "You are a helpful assistant that remembers our conversation." ,
-messages = [
-{ "role" : "user" , "content" : "My name is Alex. I work on machine learning." },
-{
-"role" : "assistant" ,
-"content" : "Nice to meet you, Alex! How can I help with your ML work today?" ,
-},
-{ "role" : "user" , "content" : "What did I say I work on?" },
-],
-)
-print (response.usage.model_dump_json()) Tool choice ✓ ✓ ✘ Changes to tool_choice parameter only affect message blocks Images ✓ ✓ ✘ Adding/removing images anywhere in the prompt affects message blocks Thinking parameters ✓ ✓ ✘ Changes to extended thinking settings (enable/disable, budget) affect message blocks Non-tool results passed to extended thinking requests ✓ ✓ Model-specific On Opus 4.5+ and Sonnet 4.6+, thinking blocks are preserved by default, so the cache remains valid (✓). On earlier Opus/Sonnet models and all Haiku models, all previously-cached thinking blocks are stripped from context, and any messages that follow those thinking blocks are removed from the cache (✘). For more details, see Caching with thinking blocks . cache_creation_input_tokens input_tokens : 50 Total input tokens processed : 100,050 tokens This is important for understanding both costs and rate limits, as input_tokens will typically be much smaller than your total input when using caching effectively. cURL CLI Python TypeScript C# Go Java PHP Ruby  client = anthropic.Anthropic()
-# Fire this before users arrive to warm the shared system-prompt cache.
-prewarm = client.messages.create(
-model = "claude-opus-4-8" ,
-max_tokens = 0 ,
-system = [
-{
-"type" : "text" ,
-"text" : "You are an expert software engineer with deep knowledge of distributed systems..." ,
-"cache_control" : { "type" : "ephemeral" },
-}
-],
-messages = [{ "role" : "user" , "content" : "warmup" }],
-)
-print (prewarm.stop_reason) # "max_tokens"
-print (prewarm.content) # []
-print (prewarm.usage) Caching tool definitions Continuing a multi-turn conversation Putting it all together: Multiple cache breakpoints How do I calculate total input tokens from the usage fields? What is the cache lifetime? How many cache breakpoints can I use? Is prompt caching available for all models? How does prompt caching work with extended thinking? How do I enable prompt caching? Can I use prompt caching with other API features? How does prompt caching affect pricing? Can I manually clear the cache? How can I track the effectiveness of my caching strategy? What can break the cache? How does prompt caching handle privacy and data separation? Can I use prompt caching with the Batches API? Why am I seeing the error `AttributeError: 'Beta' object has no attribute 'prompt_caching'` in Python? Why am I seeing 'TypeError: Cannot read properties of undefined (reading 'messages')'?
+Do I need multiple cache breakpoints or is one at the end sufficient? Do cache breakpoints add extra cost? How do I calculate total input tokens from the usage fields? What is the cache lifetime? How many cache breakpoints can I use? Is prompt caching available for all models? How does prompt caching work with extended thinking? How do I enable prompt caching? Can I use prompt caching with other API features? How does prompt caching affect pricing? Can I manually clear the cache? How can I track the effectiveness of my caching strategy? What can break the cache? How does prompt caching handle privacy and data separation? Can I use prompt caching with the Batches API? Why am I seeing the error `AttributeError: 'Beta' object has no attribute 'prompt_caching'` in Python? Why am I seeing 'TypeError: Cannot read properties of undefined (reading 'messages')'? Was this page helpful?   How prompt caching works Pricing Supported models Automatic caching How automatic caching works in multi-turn conversations TTL support Combining with block-level caching What stays the same Edge cases Explicit cache breakpoints Structuring your prompt Understanding cache breakpoint costs Caching strategies and considerations Cache limitations What can be cached What cannot be cached What invalidates the cache Tracking cache performance Caching with thinking blocks Cache storage and sharing Best practices for effective caching Optimizing for different use cases Troubleshooting common issues 1-hour cache duration When to use the 1-hour cache Mixing different TTLs Pre-warming the cache How it works Typical usage pattern Limitations Replacing the max_tokens=1 workaround Prompt caching examples Data retention FAQ

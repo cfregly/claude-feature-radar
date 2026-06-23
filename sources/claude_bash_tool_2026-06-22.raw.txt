@@ -105,7 +105,7 @@ return False , f "Command ' { executable } ' is not in the allowlist"
 for token in tokens[ 1 :]:
 if token in SHELL_OPERATORS or token.startswith(( "$" , "`" )):
 return False , f "Shell operator ' { token } ' is not allowed"
-return True , None  This check is a first line of defense. For stronger isolation, run validated commands with shell=False and pass shlex.split(command) as the argument list, so the shell never interprets the string.
+return True , None 
  Handle errors
 When implementing the bash tool, handle various error scenarios:
 Command execution timeout Command not found Permission denied
@@ -158,4 +158,4 @@ No streaming: Results returned after completion
 The bash tool is most powerful when combined with the text editor and other tools.
  If you're also using the code execution tool , Claude has access to two separate execution environments: your local bash session and Anthropic's sandboxed container. State is not shared between them. See Using code execution with other execution tools for guidance on prompting Claude to distinguish between environments.
  Next steps
- Tool use overview Learn about tool use with Claude  Text editor tool View and edit text files with Claude Was this page helpful?   Overview Use cases Quick start How it works Parameters Example: Multi-step automation Implement the bash tool Handle errors Follow implementation best practices Security Key recommendations Pricing Common patterns Development workflows File operations System tasks Limitations Combining with other tools Next steps
+ Tool use overview Learn about tool use with Claude  Text editor tool View and edit text files with Claude Was this page helpful?   Overview Use cases Quick start How it works Parameters Example: Multi-step automation Implement the bash tool Handle errors Follow implementation best practices Security Key recommendations Pricing Common patterns Development workflows File operations System tasks Limitations Combining with other tools Next steps This check is a first line of defense. For stronger isolation, run validated commands with shell=False and pass shlex.split(command) as the argument list, so the shell never interprets the string.

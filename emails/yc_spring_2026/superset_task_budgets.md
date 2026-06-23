@@ -4,7 +4,7 @@ Hey Kiet,
 
 Congrats on the YC batch.
 
-I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I work on the operational edges
+I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I work on the operational details
 that appear once agents are running in parallel, not just in a demo.
 
 I saw Superset helps engineers run 100s of coding agents in parallel. The Claude pattern that maps to
@@ -12,7 +12,7 @@ that workload is loop-level task budgeting, so each agent can stop cleanly befor
 it cannot finish.
 
 Claude task budgets give the model a token budget for the whole agent loop: thinking, tool calls,
-tool results, and output. The model sees a running countdown and can hand off cleanly before starting
+tool outputs, and output. The model sees a running countdown and can hand off cleanly before starting
 work it cannot pay for. At Superset scale, that matters because a small overshoot multiplied across
 hundreds of parallel coding agents becomes real latency, queue pressure, and bill variance.
 
@@ -50,12 +50,8 @@ To try it on your own agent, edit the prompt and tools in `task_budgets/run.py`,
 `make task_budgets`. I would still keep Superset's hard billing and quota stops server-side. The task
 budget is the agent's loop-level countdown, not a replacement for your account limits.
 
-The security follow-up matters for many-agent systems. I would use the public preflight and source
-map for that path, while keeping the primary Superset demo on task budgets because it maps directly
-to reliability, cost, and speed.
-
 If Superset is hitting a different many-agent failure mode, reply with the pattern and I can send the
-closest Claude example.
+closest Claude example, the security path for many-agent systems included.
 
 Happy building,
 

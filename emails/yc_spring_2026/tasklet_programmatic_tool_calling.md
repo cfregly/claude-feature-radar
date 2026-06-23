@@ -42,12 +42,8 @@ make programmatic_tool_calling
 To try it on Tasklet's shape, edit `programmatic_tool_calling/my_tool.py` with one of your work-app
 tools and the inputs it fans out over.
 
-The security follow-up is also real for Tasklet. If the app-agent risk is now the sharper blocker,
-reply with the workflow and I can map the control boundary with the public preflight and
-source-backed controls table.
-
-If Tasklet's heavier blocker is a different app-agent loop, reply with that flow and I can point
-you to the closest Claude pattern.
+If a different app-agent loop is the sharper blocker, reply with the flow and I can point you to the
+closest Claude pattern, including the tool-boundary path for app-agent risk.
 
 Happy building,
 

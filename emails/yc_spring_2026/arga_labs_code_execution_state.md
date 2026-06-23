@@ -56,12 +56,8 @@ make code_execution_state
 To try it on your own workflow, edit `code_execution_state/run.py` with two real test-agent steps and
 re-run the same command.
 
-The security-testing follow-up is the sharper Arga conversation. I would separate the reliability
-primitive above from the security test plan, then run the public preflight and source map before
-turning any of it into copy.
-
-If the harder Arga blocker is a different part of the eval loop, reply with that shape and I can
-point you to a closer Claude pattern.
+If a different part of the eval loop is the harder Arga blocker, reply with that shape and I can
+point you to a closer Claude pattern, the security-testing path included.
 
 Happy building,
 

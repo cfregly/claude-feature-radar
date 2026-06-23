@@ -4,8 +4,6 @@
 
 [![Claude proof: 75% fewer suspects](https://img.shields.io/badge/Claude%20proof-75%25%20fewer%20suspects-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/cache_diagnostics/sample.txt)
 
-The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
-
 Your cached prefix stopped hitting and your token bill jumped. The only signal is `cache_read_input_tokens` dropping to zero, with no clue what changed. A timestamp in the system prompt, a reordered tool, or an edit to an earlier message silently breaks the cache. Claude cache diagnostics compares two consecutive requests and names the exact part of the prompt that diverged, so you fix the root cause instead of guessing.
 
 ## What you get

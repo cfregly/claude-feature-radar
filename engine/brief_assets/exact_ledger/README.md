@@ -4,9 +4,9 @@
 
 [![Claude proof: 63% cheaper vs OpenAI](https://img.shields.io/badge/Claude%20proof-63%25%20cheaper%20vs%20OpenAI-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/exact_ledger/compare_sample.txt)
 
-The GIF replays the longer `sample.txt` reference in under ten seconds. The proof badge and table use the current `compare_sample.txt` receipt, so the first comparison matches what `COMPARE=1` reruns.
+The proof badge and table use the current `compare_sample.txt` receipt, so the first comparison matches what `COMPARE=1` reruns.
 
-Your agent reads a long stream one record at a time (usage logs, churn flags, support tickets) and has to report the exact set of flagged ids at the end. The record text is throwaway after each step, but the running list has to stay exact, and as the stream grows the carried context (the tokens you pay for each turn) grows with it. Claude context editing clears the old tool results in place once the context crosses a trigger you set, so the bulky text leaves the window while the turns that hold your running list stay put.
+Your agent reads a long stream one record at a time (usage logs, churn flags, support tickets) and has to report the exact set of flagged ids at the end. The record text is throwaway after each step, but the running list has to stay exact, and as the stream grows the carried context (the tokens you pay for each turn) grows with it. Claude context editing clears the old tool outputs in place once the context crosses a trigger you set, so the bulky text leaves the window while the turns that hold your running list stay put.
 
 ## What you get
 

@@ -1,12 +1,10 @@
-# Meter usage per cohort for the price of the answer, not every row
+# Meter usage per cohort for the price of the answer, not every tool output
 
 ![demo](https://raw.githubusercontent.com/cfregly/claude-feature-hits/main/programmatic_tool_calling/demo.gif)
 
 [![Claude proof: 28% fewer input tokens](https://img.shields.io/badge/Claude%20proof-28%25%20fewer%20input%20tokens-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/programmatic_tool_calling/sample.txt)
 
-The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
-
-When your agent meters usage per cohort or runs analytics across regions, it calls one of your own tools many times, then crunches what comes back. Every one of those calls dumps its rows into the model's context, and you pay input tokens for all of them, even the rows the agent never uses. Programmatic tool calling runs your tool inside a code sandbox (a server-side scratchpad that runs the rows), keeps only what matters, and passes just the answer to the model. The rows stay in the sandbox, so they never reach the context.
+When your agent meters usage per cohort or runs analytics across regions, it calls one of your own tools many times, then crunches what comes back. Every one of those calls dumps its outputs into the model's context, and you pay input tokens for all of them, even the outputs the agent never uses. Programmatic tool calling runs your tool inside a code sandbox (a server-side scratchpad that crunches the outputs for you), keeps only what matters, and passes just the answer to the model. The tool outputs stay in the sandbox, so they never reach the context.
 
 ## What you get
 
@@ -19,23 +17,23 @@ response = client.messages.create(
     tools=[
         {"type": "code_execution_20260120", "name": "code_execution"},   # add this
         { "name": "query_region_sales", "input_schema": {...},   # your tool, unchanged
-          "allowed_callers": ["code_execution_20260120"] },        # add this line: the rows run in the sandbox, not the model context
+          "allowed_callers": ["code_execution_20260120"] },        # add this line: tool outputs stay in the sandbox, not the model context
     ],
 )
 ```
 
-The measured run, same task and same model (Sonnet 4.6), the only change is the feature on or off: fan out across several regions of sample sales rows (a fan-out is one agent calling one tool many times), then find the highest-revenue region.
+The measured run, same task and same model (Sonnet 4.6), the only change is the feature on or off: fan out across several regions of sample sales outputs (a fan-out is one agent calling one tool many times), then find the highest-revenue region.
 
 | your run | input tokens billed | what it means |
 |---|---:|---|
-| without programmatic tool calling | 9,451 | every row lands in the model's context |
+| without programmatic tool calling | 9,451 | every tool output lands in the model's context |
 | **with programmatic tool calling** | **6,828** | only the answer reaches the model |
 
 That is **28% fewer input tokens**, with the exact winner returned from the sandbox. Every cell is read live off the API's own `usage` object, so re-running shifts the count a little. The saving grows with the size of the fan-out.
 
 ## Why I built this on Claude
 
-`allowed_callers` lets Claude call your own tool from the code sandbox and return only the computed answer to the model. For metering across many cohorts, that is the difference between paying for every row and paying for the answer.
+`allowed_callers` lets Claude call your own tool from the code sandbox and return only the computed answer to the model. For metering across many cohorts, that is the difference between paying for every tool output and paying for the answer.
 
 ## Run it ($0.08)
 

@@ -4,7 +4,7 @@ Part of [claude-feature-radar](../../README.md). A reliability lever for a long,
 labeled **beta**: it keeps a job that would otherwise hit the context window finishing instead of
 erroring.
 
-**What it is.** `context_management` with `clear_tool_uses_20250919` clears stale tool results out of
+**What it is.** `context_management` with `clear_tool_uses_20250919` clears stale tool outputs out of
 the context in place once a token trigger is crossed, keeping the most recent few. A long tool-heavy
 agent's window stays bounded instead of climbing to the wall.
 

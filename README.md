@@ -25,8 +25,8 @@ win on this page has already beaten its toughest reading.
 ## Lead edge: programmatic tool calling, about 28% fewer billed input tokens than the same Claude agent without the feature (`make programmatic-tool-calling`)
 
 If your agent calls a tool many times over data it then crunches (usage rollups across cohorts,
-plan-limit checks across accounts, log or trace triage), every tool result flows into the model's
-context and you pay input tokens for all of it, even the rows the model only sums and throws away.
+plan-limit checks across accounts, log or trace triage), every tool output flows into the model's
+context and you pay input tokens for all of it, even the outputs the model only sums and throws away.
 
 Claude has a feature for this, no beta header. Add `allowed_callers: ["code_execution_20260120"]` to a tool and
 include the code execution tool, and Claude writes one sandbox script that calls your tool in a loop,
@@ -34,11 +34,11 @@ filters and aggregates there, and returns only the answer. The bulky outputs go 
 the model.
 
 Measured on the same fan-out task two ways, same model (Sonnet 4.6), same answer required: across 4
-regions of 60 sales rows each (240 rows), find the highest-revenue region.
+regions of 60 sales outputs each (240 outputs), find the highest-revenue region.
 
-| mode | billed input tokens | what happens to the 240 rows |
+| mode | billed input tokens | what happens to the 240 outputs |
 |---|--:|:--|
-| plain tool use | 9,451 | all 240 rows flow through the model's context |
+| plain tool use | 9,451 | all 240 outputs flow through the model's context |
 | programmatic | 6,828 | the sandbox aggregates, only the answer (east) reaches the model |
 
 A 28% input-token cut against the same Claude agent without programmatic tool calling, and the sandbox returns the exact winner. This pays off when your agent calls a tool many times over data it then crunches (the fan-out shape). The full saved output is [`edges/programmatic-tool-calling/sample.txt`](edges/programmatic-tool-calling/sample.txt).
@@ -283,7 +283,7 @@ Feature references, fetched 2026-06-19:
 
 ## Supporting edge: Exact-list ledger, less cost and time on a long stream (`make ledger`)
 
-Some agent tasks do not need every old tool result in context. They need a precise running state: the
+Some agent tasks do not need every old tool output in context. They need a precise running state: the
 exact set of flagged transaction ids, incident ids, support escalations, or compliance findings.
 
 The ledger edge tests that shape directly. The agent reads 30 large reports, about 20,000 tokens each,
@@ -344,7 +344,7 @@ Feature references, fetched 2026-06-19:
 
 Long-running agents need a clean handoff before they start work that cannot fit the remaining budget.
 Output caps and reasoning budgets can limit pieces of a call, but they do not give the model a
-provider-side remaining-budget marker for the full loop of thinking, tool calls, tool results, and
+provider-side remaining-budget marker for the full loop of thinking, tool calls, tool outputs, and
 output.
 
 The task-budget edge tests the first dangerous moment: the agent is about to begin a 12-record audit

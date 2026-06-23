@@ -4,7 +4,7 @@ Part of [claude-feature-radar](../../README.md). This is a measured tool-loop co
 
 ## What It Is
 
-A long-running agent is about to start a tool loop. With Claude `task_budget`, the model sees a provider-side remaining-budget marker for the full loop, including thinking, tool calls, tool results, and output. When the marker is near exhaustion, Claude can hand off before starting a tool action that should not begin under an exhausted budget.
+A long-running agent is about to start a tool loop. With Claude `task_budget`, the model sees a provider-side remaining-budget marker for the full loop, including thinking, tool calls, tool outputs, and output. When the marker is near exhaustion, Claude can hand off before starting a tool action that should not begin under an exhausted budget.
 
 ## The Measured Proof
 

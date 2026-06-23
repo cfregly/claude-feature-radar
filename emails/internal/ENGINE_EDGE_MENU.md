@@ -43,7 +43,7 @@ the bytes the model does not need out of what you pay for.
 
 | Edge | What you get | Measured output | Run |
 |---|---|---|---|
-| Programmatic tool calling | The model writes one sandbox script that calls your tool in a loop and returns only the answer, so the bulky rows never hit the context. | 9,451 to 6,828 billed input tokens, about 28% fewer than the same Claude agent without the feature, same answer | `make programmatic-tool-calling` |
+| Programmatic tool calling | The model writes one sandbox script that calls your tool in a loop and returns only the answer, so the bulky outputs never hit the context. | 9,451 to 6,828 billed input tokens, about 28% fewer than the same Claude agent without the feature, same answer | `make programmatic-tool-calling` |
 | Cache diagnostics | When a prompt-cache hit silently turns into a miss, the API names which prefix changed. | Root cause named on all 4 documented miss reasons, where the others expose only counters | `make cache-diagnostics` |
 | Bulk extended output | One batch turn writes a deliverable larger than the other models can produce in a single request. | 230,607 output tokens in one turn, past the 128k and 65k single-request caps | `make bulk-output` |
 

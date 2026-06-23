@@ -4,8 +4,6 @@
 
 [![Claude proof: 9/9 source quotes](https://img.shields.io/badge/Claude%20proof-9%2F9%20source%20quotes-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/web_citations/sample.txt)
 
-The GIF replays the saved `sample.txt` output in under ten seconds, so you can see the command and value before running a live call.
-
 Your agent reads live web pages and reports back, a competitor-pricing watcher, a market-research bot, a rules-page monitor. When a teammate asks "where does it say that?", a bare URL means re-reading the whole page. Claude's web search tool returns each web-grounded claim with the verbatim source sentence attached, so the reader checks the exact line in seconds.
 
 ## What you get
