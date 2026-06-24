@@ -25,6 +25,9 @@ produces three things:
 The platforms ship monthly, so a hard-coded claim rots fast. This re-verifies and tells the truth
 in both directions, including when Claude loses.
 
+The promotion bar is adversarially-confirmed to add value. A candidate stays private or held until
+the skeptic pass, exact sources, and receipts prove a founder-valued outcome survived.
+
 ## The rules, non-negotiable
 
 These are why the output is trusted. Break one and the trust is gone.

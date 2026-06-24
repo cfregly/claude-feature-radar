@@ -73,10 +73,12 @@ def test_absent_sibling_is_skipped(monkeypatch, tmp_path):
 def test_adversarial_value_bar_is_encoded_in_claude_md():
     """The repo operating rules must keep the hard promotion bar explicit."""
     bad = []
-    cs._check_claude_bar(bad)
+    cs._check_value_bar(bad)
     assert bad == []
+    for rel in cs.VALUE_BAR_DOCS:
+        text = (ROOT / rel).read_text(errors="ignore")
+        assert cs.VALUE_BAR in text
     text = (ROOT / "CLAUDE.md").read_text(errors="ignore")
-    assert cs.VALUE_BAR in text
     assert "Try to disprove the claim before promoting it" in text
 
 
