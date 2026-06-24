@@ -24,23 +24,26 @@ _SPEC.loader.exec_module(cs)
 
 
 def test_security_dir_constant_points_at_an_existing_folder():
-    """The folder the whitelist and the source/caveat gate both key off must exist in the public repo
-    when it is checked out beside the engine. This is the assertion that turns a future rename red."""
+    """The folders the whitelist and no-key runner gates key off must exist in the public repo when it
+    is checked out beside the engine. This is the assertion that turns a future rename red."""
     if not cs.SIBLING_BRIEFS.exists():
         pytest.skip("public sibling repo not checked out locally")
-    controls_dir = cs.SIBLING_BRIEFS / cs.SIBLING_SECURITY_DIR
-    assert controls_dir.is_dir(), (
-        f"{cs.SIBLING_SECURITY_DIR!r} is not a folder in the sibling public repo: the whitelist and "
-        "the source/caveat gate both point at a folder that does not exist"
-    )
+    for name in cs.SIBLING_SECURITY_RUNNERS:
+        controls_dir = cs.SIBLING_BRIEFS / name
+        assert controls_dir.is_dir(), (
+            f"{name!r} is not a folder in the sibling public repo: the whitelist and runner gate "
+            "point at a folder that does not exist"
+        )
 
 
 def test_in_brief_security_term_is_whitelisted_and_out_of_brief_is_not():
     """A ZDR or CMEK line is allowed inside the security brief (its own runner verifies sources and
     caveats) and forbidden anywhere else on a founder surface."""
     inside = cs.SIBLING_BRIEFS / cs.SIBLING_SECURITY_DIR / "README.md"
+    policy = cs.SIBLING_BRIEFS / cs.SIBLING_SECURITY_POLICY_DIR / "run.py"
     outside = cs.SIBLING_BRIEFS / "programmatic_tool_calling" / "README.md"
     assert cs._is_security_brief(inside) is True
+    assert cs._is_security_brief(policy) is True
     assert cs._is_security_brief(outside) is False
 
 
@@ -54,7 +57,8 @@ def test_missing_security_folder_fails_loudly(monkeypatch, tmp_path):
     bad = []
     cs._check_security_brief(bad)
     assert bad, "a present sibling with no security brief folder must fail the gate"
-    assert cs.SIBLING_SECURITY_DIR in bad[0]
+    assert cs.SIBLING_SECURITY_DIR in "\n".join(bad)
+    assert cs.SIBLING_SECURITY_POLICY_DIR in "\n".join(bad)
 
 
 def test_absent_sibling_is_skipped(monkeypatch, tmp_path):
@@ -67,20 +71,23 @@ def test_absent_sibling_is_skipped(monkeypatch, tmp_path):
 
 
 def test_public_security_companion_briefs_are_contractually_present():
-    """The public security surface is intentionally split: a live behavioral feature hit plus the
-    source/caveat guard that validates security-copy claims."""
+    """The public security surface is intentionally split: a live behavioral feature hit, an MCP
+    authorization posture guard, and the source/caveat guard that validates security-copy claims."""
     if not cs.SIBLING_BRIEFS.exists():
         pytest.skip("public sibling repo not checked out locally")
     tool_dir = cs.SIBLING_BRIEFS / "tool_boundary_security"
+    mcp_dir = cs.SIBLING_BRIEFS / cs.SIBLING_SECURITY_POLICY_DIR
     guard_dir = cs.SIBLING_BRIEFS / cs.SIBLING_SECURITY_DIR
 
     for required in ("README.md", "run.py", "sample.txt"):
         assert (tool_dir / required).is_file(), f"tool_boundary_security is missing {required}"
+    for required in ("README.md", "run.py", "policy.json", "sample.txt"):
+        assert (mcp_dir / required).is_file(), f"{cs.SIBLING_SECURITY_POLICY_DIR} is missing {required}"
     for required in ("README.md", "run.py", "controls.json"):
         assert (guard_dir / required).is_file(), f"{cs.SIBLING_SECURITY_DIR} is missing {required}"
 
     makefile = (cs.SIBLING_BRIEFS / "Makefile").read_text(errors="ignore")
-    assert "security: tool_boundary_security security_claims_guard" in makefile
+    assert "security: tool_boundary_security mcp_authorization_security security_claims_guard" in makefile
 
 
 def test_public_readme_names_security_feature_hit_and_guardrail():
@@ -91,4 +98,5 @@ def test_public_readme_names_security_feature_hit_and_guardrail():
     readme = (cs.SIBLING_BRIEFS / "README.md").read_text(errors="ignore")
     assert "Security means tool and data boundaries plus source-backed security claims." in readme
     assert "The security feature hit is `tool_boundary_security`." in readme
+    assert "`mcp_authorization_security`" in readme
     assert "`security_claims_guard`" in readme

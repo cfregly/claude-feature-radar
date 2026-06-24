@@ -49,6 +49,34 @@ docs.claude.com, cited in `docs/VERIFIED_FACTS.md`. Every claim about a competit
 that competitor's own public docs, dated. Anything you cannot verify is marked unverified, not
 guessed. The platform ships monthly, so verify against the live doc, not memory.
 
+## A specific finding is closed only by its own source, never by reasoning around it
+This rule exists because it was broken, and the cost was a confident wrong answer wearing the costume
+of a careful one. A review correctly flagged a distinct Claude surface (Enterprise-Managed MCP
+Authorization, the identity-provider-provisioned connector access the `security_posture` ledger should
+track) as missing. The finding was then re-graded to "already covered" by reading ADJACENT docs
+(workload identity federation and the managed-mcp server-restriction page) and reasoning by proximity,
+without ever fetching the source the finding named. The grounding rule above was cited as the
+justification, which inverted it: that rule forbids asserting what you cannot verify, and it was used
+to license not verifying and then asserting the opposite. Never again.
+
+- You may not dismiss, downgrade, re-grade, or close a specific finding to "no action", "already
+  covered", "parity", or "no equivalent" by reasoning from adjacent, neighboring, or similar-looking
+  sources. The ONLY thing that closes a specific finding is fetching the exact source it names (the
+  doc, the URL, the file and line, or the primary source for the named feature, date, flag, or claim)
+  and reading it. Proximity is not verification.
+- Specificity raises the bar, it does not lower it. When a finding names a date, a feature, an
+  identity provider, a flag, a response field, or a file and line, that specificity is the reason to
+  verify THAT exact claim against THAT exact source, never a reason to wave it off as noise.
+- "I cannot verify it" never licenses asserting the opposite. If you cannot fetch the named source,
+  the finding stays OPEN and labeled unverified, never closed as "already covered". Asserting a
+  negative ("no distinct surface", "no equivalent", "already tracked") is itself a claim that needs
+  its own grounding, held to this same rule.
+- A finding from a structured review or audit outranks a quicker, shallower later check. Do not
+  override a finding produced at depth with an ad-hoc pass done at less depth. Match or exceed the
+  depth that produced it, or leave it open.
+- Record the closure. When you close a finding, cite the exact source you fetched and what it said. A
+  closure with no fetched primary source named is not valid, and must be treated as still open.
+
 ## Verify both sides, then keep what survives
 The engine finds a real capability gap, not a winning argument. It checks the Claude side and
 the competitor side and throws out any framing that does not survive a skeptic. An overstated

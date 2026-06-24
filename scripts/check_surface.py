@@ -76,11 +76,13 @@ BRIEF_ASSET_GLOBS = [
     "brief_assets/*/sample.txt", "brief_assets/*/compare_sample.txt",
 ]
 SIBLING_BRIEFS = ROOT.parent / "claude-feature-hits"
-# The one public brief allowed to carry source-backed security terms (ZDR, HIPAA, CMEK, and the rest).
-# Its own runner verifies every row against an official source and a caveat. The folder name lives in
-# exactly one place so a rename cannot silently disarm both the whitelist and the source/caveat gate
-# at once, the way the earlier rename of this folder did.
+# Public security artifacts allowed to carry source-backed security terms. Each has a no-key runner
+# that the surface gate invokes when the sibling repo is present. The folder names live here so a
+# rename cannot silently disarm both the whitelist and the runner gate at once.
 SIBLING_SECURITY_DIR = "security_claims_guard"
+SIBLING_SECURITY_POLICY_DIR = "mcp_authorization_security"
+SIBLING_SECURITY_TERM_DIRS = (SIBLING_SECURITY_DIR, SIBLING_SECURITY_POLICY_DIR)
+SIBLING_SECURITY_RUNNERS = (SIBLING_SECURITY_DIR, SIBLING_SECURITY_POLICY_DIR)
 SIBLING_BRIEF_GLOBS = [
     "README.md", "*/README.md", "*/run.py", "*/run_tokens.py", "*/cite.py", "*/my_tool.py",
     "*/sample.txt", "*/compare_sample.txt", "*/controls.json",
@@ -168,28 +170,29 @@ def _is_security_brief(p):
         rel = p.relative_to(SIBLING_BRIEFS)
     except ValueError:
         return False
-    return rel.parts[:1] == (SIBLING_SECURITY_DIR,)
+    return rel.parts[:1] in {(name,) for name in SIBLING_SECURITY_TERM_DIRS}
 
 
 def _check_security_brief(bad):
     # When the public repo is not checked out beside the engine (isolated CI), there is nothing to
-    # verify, so skip. But when the sibling IS present and the security brief folder is gone, that is
-    # the exact silent-disarm a folder rename causes, so fail loudly instead of returning quietly.
+    # verify, so skip. But when the sibling IS present and a public security artifact is gone, that is
+    # a silent-disarm risk, so fail loudly instead of returning quietly.
     if not SIBLING_BRIEFS.exists():
         return
-    controls_dir = SIBLING_BRIEFS / SIBLING_SECURITY_DIR
-    if not controls_dir.exists():
-        bad.append(
-            f"security brief folder {SIBLING_SECURITY_DIR!r} is missing from the sibling "
-            "claude-feature-hits checkout: the source/caveat gate cannot run and the founder-surface "
-            "security-term whitelist points at a folder that does not exist"
-        )
-        return
-    out = subprocess.run([sys.executable, "-m", f"{SIBLING_SECURITY_DIR}.run"], cwd=SIBLING_BRIEFS,
-                         capture_output=True, text=True, timeout=30)
-    if out.returncode != 0:
-        detail = (out.stdout + out.stderr).strip()
-        bad.append(f"{SIBLING_SECURITY_DIR} source/caveat gate failed:\n" + detail)
+    for name in SIBLING_SECURITY_RUNNERS:
+        brief_dir = SIBLING_BRIEFS / name
+        if not brief_dir.exists():
+            bad.append(
+                f"security brief folder {name!r} is missing from the sibling claude-feature-hits "
+                "checkout: its runner cannot execute and the founder-surface security-term whitelist "
+                "points at a folder that does not exist"
+            )
+            continue
+        out = subprocess.run([sys.executable, "-m", f"{name}.run"], cwd=SIBLING_BRIEFS,
+                             capture_output=True, text=True, timeout=30)
+        if out.returncode != 0:
+            detail = (out.stdout + out.stderr).strip()
+            bad.append(f"{name} public security gate failed:\n" + detail)
 
 
 def main():

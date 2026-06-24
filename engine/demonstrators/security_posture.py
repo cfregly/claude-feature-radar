@@ -6,12 +6,15 @@ announcements and records the caveats that prevent unsupported ZDR, HIPAA, CMEK,
 Transparency claims. It makes no model call, runs no competitor arms, and never emits a claude-ahead
 verdict.
 
-The security pillar ships two public companion briefs in the sibling public hits repo, each with its
+The security pillar ships three public companion briefs in the sibling public hits repo, each with its
 own runner, separate from this private ledger:
   - security_claims_guard: a $0 no-network checker that every public security-claim row has an
     official-source snapshot and a caveat. Its runner is invoked by the engine surface gate
-    (scripts/check_surface.py), and it is the one public brief allowed to carry source-backed security
+    (scripts/check_surface.py), and it is the broad public-copy guard for source-backed security
     terms (ZDR, HIPAA, CMEK, and the rest).
+  - mcp_authorization_security: a $0 no-network checker for Enterprise-Managed MCP Authorization
+    rollout posture. It verifies IdP-managed connector authorization, group scope, client coverage,
+    revocation, audit evidence, and the official Claude/MCP source markers.
   - tool_boundary_security: a live prompt-injection and tool-boundary demo (six Claude calls, about
     $0.02) that shows untrusted instructions never authorize a side-effecting tool. It is a behavioral
     demo with its own receipt, not a source-claims brief, so it needs no source/caveat runner. The
