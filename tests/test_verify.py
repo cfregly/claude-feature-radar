@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from engine.verify import _claim_keys, _parse_openai_verdicts
+from engine.verify import _claim_keys, _parse_openai_verdicts, _run_openai
 
 
 def test_claim_keys_preserves_order():
@@ -57,3 +57,9 @@ def test_parse_openai_verdicts_rejects_invalid_verdict_value():
     })
     with pytest.raises(SystemExit, match="invalid verdict"):
         _parse_openai_verdicts(text, ["prompt_caching"])
+
+
+def test_openai_judge_is_required_when_selected(monkeypatch):
+    monkeypatch.setattr("engine.verify.get_openai_client", lambda: None)
+    with pytest.raises(SystemExit, match="OPENAI_API_KEY"):
+        _run_openai("key: prompt_caching\nclaim Claude is ahead: x\nwhy: y", budget=None)

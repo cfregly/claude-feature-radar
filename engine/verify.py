@@ -183,8 +183,10 @@ def _run_claude(body: str, budget: BudgetLedger) -> None:
 def _run_openai(body: str, budget: BudgetLedger) -> None:
     client = get_openai_client()
     if client is None:
-        print("\n  OpenAI skeptic skipped: OPENAI_API_KEY is not set.\n")
-        return
+        raise SystemExit(
+            "OpenAI skeptic is required by VERIFY_JUDGES but OPENAI_API_KEY is not set. "
+            "Set the key or explicitly run VERIFY_JUDGES=claude if you are doing a Claude-only local check."
+        )
     expected_keys = _claim_keys(body)
     messages = [{"role": "user", "content": _verdict_prompt(body, expected_keys)}]
     max_tokens = _verdict_max_tokens()
