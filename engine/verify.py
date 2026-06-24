@@ -8,7 +8,9 @@ anything reaches an inbox.
 from __future__ import annotations
 
 import argparse
+import json
 import os
+import re
 
 from common.client import get_client
 from common.models import get, request_kwargs
@@ -25,6 +27,67 @@ SYSTEM = (
     "to build that competing combination before you let a claim survive. Reply with exactly one "
     "line per claim, in the form: <KILLED|SURVIVES> - <key> - <one sentence why>."
 )
+
+OPENAI_SYSTEM = (
+    "You are a skeptical startup CTO who has shipped on OpenAI, Google Gemini, and Anthropic "
+    "Claude. For each claimed capability gap, decide whether it survives scrutiny or is "
+    "overstated. Be harsh. If a competitor has a near-equivalent, the claim is overstated. Think "
+    "combinatorially: a single Claude feature can read as a real edge while the competitor can "
+    "assemble an equivalent STACK of two or three of its own features on the same workload, so try "
+    "to build that competing combination before you let a claim survive.\n\n"
+    "Return only strict JSON, with no markdown, no code fence, no table, and no prose outside the "
+    "JSON object. The schema is exactly: "
+    '{"verdicts":[{"key":"<claim key>","verdict":"KILLED|SURVIVES","why":"<one sentence>"}]}. '
+    "Return exactly one verdict for every expected key, and no extra keys."
+)
+
+
+def _claim_keys(body: str) -> list[str]:
+    return re.findall(r"^key:\s*(\S+)\s*$", body, flags=re.MULTILINE)
+
+
+def _parse_openai_verdicts(text: str, expected_keys: list[str]) -> dict[str, dict[str, str]]:
+    """Parse and validate the OpenAI judge contract.
+
+    This intentionally rejects markdown tables, bullet lists, code fences, and loose prose. A judge
+    that cannot produce the exact machine-readable shape is not allowed to silently pass the gate.
+    """
+    try:
+        data = json.loads(text.strip())
+    except json.JSONDecodeError as exc:
+        raise SystemExit(f"OpenAI skeptic returned invalid JSON: {exc.msg}") from exc
+    if not isinstance(data, dict):
+        raise SystemExit("OpenAI skeptic returned invalid JSON verdicts: top level must be an object")
+    verdicts = data.get("verdicts")
+    if not isinstance(verdicts, list):
+        raise SystemExit("OpenAI skeptic returned invalid JSON verdicts: missing verdicts list")
+
+    expected = set(expected_keys)
+    found: dict[str, dict[str, str]] = {}
+    for i, row in enumerate(verdicts, start=1):
+        if not isinstance(row, dict):
+            raise SystemExit(f"OpenAI skeptic returned invalid verdict row {i}: row must be an object")
+        key = row.get("key")
+        verdict = row.get("verdict")
+        why = row.get("why")
+        if not isinstance(key, str) or key not in expected:
+            raise SystemExit(f"OpenAI skeptic returned invalid verdict row {i}: unknown or missing key")
+        if key in found:
+            raise SystemExit(f"OpenAI skeptic returned duplicate verdict for key {key!r}")
+        if verdict not in {"KILLED", "SURVIVES"}:
+            raise SystemExit(f"OpenAI skeptic returned invalid verdict for key {key!r}")
+        if not isinstance(why, str) or not why.strip():
+            raise SystemExit(f"OpenAI skeptic returned empty why for key {key!r}")
+        found[key] = {"key": key, "verdict": verdict, "why": why.strip()}
+
+    missing = [key for key in expected_keys if key not in found]
+    extra = [key for key in found if key not in expected]
+    if missing or extra:
+        raise SystemExit(
+            "OpenAI skeptic returned incomplete verdict coverage: "
+            f"missing={missing or []} extra={extra or []}"
+        )
+    return found
 
 
 def _body() -> str:
@@ -95,10 +158,16 @@ def _run_openai(body: str, budget: BudgetLedger) -> None:
     if client is None:
         print("\n  OpenAI skeptic skipped: OPENAI_API_KEY is not set.\n")
         return
-    messages = [{"role": "user", "content": body}]
+    expected_keys = _claim_keys(body)
+    prompt = (
+        f"{OPENAI_SYSTEM}\n\n"
+        f"Expected keys, in order: {json.dumps(expected_keys)}\n\n"
+        f"Claims:\n{body}"
+    )
+    messages = [{"role": "user", "content": prompt}]
     max_tokens = _verdict_max_tokens()
     reservation = budget.preflight("verify:openai-gpt-5.5-xhigh-skeptic", "gpt-top",
-                                   messages=messages, max_tokens=max_tokens, system=SYSTEM)
+                                   messages=messages, max_tokens=max_tokens, system=OPENAI_SYSTEM)
     try:
         result = runner_call(client, "gpt-top", messages, max_tokens=max_tokens, effort="xhigh")
     except Exception as e:
@@ -109,10 +178,11 @@ def _run_openai(body: str, budget: BudgetLedger) -> None:
         result.cost_usd,
         usage={"input_tokens": result.input_tokens, "output_tokens": result.output_tokens},
     )
+    verdicts = _parse_openai_verdicts(result.text, expected_keys)
     print(f"\n  Skeptic pass ({get('gpt-top').label}, xhigh reasoning):\n")
-    for line in result.text.splitlines():
-        if line.strip():
-            print(f"    {line.strip()}")
+    for key in expected_keys:
+        row = verdicts[key]
+        print(f"    {row['verdict']} - {key} - {row['why']}")
     print()
 
 

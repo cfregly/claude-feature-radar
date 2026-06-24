@@ -73,6 +73,8 @@ def main():
         from engine.demonstrators.advisor_routing import main as m; raise SystemExit(m())
     elif cmd in ("code-execution-state", "code_execution_state"):
         from engine.demonstrators.code_execution_state import main as m; raise SystemExit(m())
+    elif cmd in ("ptc-cache-context", "ptc_cache_context"):
+        from engine.demonstrators.ptc_cache_context import main as m; raise SystemExit(m())
     elif cmd in ("security", "security-posture", "security_posture"):
         from engine.demonstrators.security_posture import main as m; raise SystemExit(m())
     elif cmd in ("eval", "eval-quality"):

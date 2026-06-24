@@ -3,7 +3,7 @@ DEEP_BUDGET_USD ?= 2.00
 DEEP_BUDGET_LABEL ?= grind-deep
 DEEP_EFFORT ?= xhigh
 VERIFY_JUDGES ?= claude
-.PHONY: setup compare-deps mcp-deps mcp app app-check programmatic-tool-calling citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost security-posture security draft publish-brief publish-misses check-claims check-docs core-imports check-surface check-split check-receipts test ci deslop gif clean
+.PHONY: setup compare-deps mcp-deps mcp app app-check programmatic-tool-calling ptc-cache-context citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost security-posture security draft publish-brief publish-misses check-claims check-docs core-imports check-surface check-split check-receipts test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -32,6 +32,9 @@ app-check: ## the app self-test: run the shipped example and assert the PTC inva
 
 programmatic-tool-calling: ## EDGE: programmatic tool calling, the input-token receipt on a fan-out task (needs ANTHROPIC_API_KEY, about $0.08)
 	$(PY) edges/programmatic-tool-calling/demo.py
+
+ptc-cache-context: ## EDGE MODEL: PTC + cache + 1M-context cost cliff over verified prices (NO API call, $0)
+	$(PY) run.py ptc-cache-context
 
 citations: ## EDGE: Claude Citations, a verifiable per-character source pointer into your user's own documents, one Claude arm (needs ANTHROPIC_API_KEY, $0.01)
 	$(PY) edges/citations/demo.py
