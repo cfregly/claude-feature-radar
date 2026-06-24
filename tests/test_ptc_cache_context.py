@@ -1,4 +1,6 @@
-from engine.demonstrators.ptc_cache_context import compute_proof, ptc_receipt
+import json
+
+from engine.demonstrators.ptc_cache_context import COMMITTED_OUT_PATH, compute_proof, ptc_receipt
 
 
 def test_ptc_receipt_parses_committed_sample():
@@ -25,3 +27,8 @@ def test_ptc_cache_context_requires_the_1m_window_for_the_large_prefix():
     assert fit["prefix_tokens"] == 700_000
     assert fit["fits_claude_1m_with_ptc_summary"] is True
     assert fit["fits_400k_context_with_prefix"] is False
+
+
+def test_ptc_cache_context_committed_receipt_matches_the_model():
+    receipt = json.loads(COMMITTED_OUT_PATH.read_text())
+    assert receipt["cliff"] == compute_proof()["cliff"]

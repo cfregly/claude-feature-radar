@@ -49,7 +49,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from engine import scan  # noqa: E402  committed seed + landscape reader, anthropic-free
-from engine.adversarial import VALUE_LEAD_BASES, value_confirmed  # noqa: E402
+from engine.adversarial import VALUE_LEAD_BASES, receipt_value_positive, value_confirmed  # noqa: E402
 from engine.demokinds import PRIVATE_ONLY_DEMOKINDS, demokind_for  # noqa: E402
 
 # The lead_basis values that are NOT regime-bounded: a stable head-to-head win, a documented
@@ -326,11 +326,15 @@ def _landscape_edges() -> tuple[list[dict], str]:
     if f.exists():
         try:
             land = json.loads(f.read_text())
-            return land.get("edges", []), f"landscape/landscape.json (as_of {land.get('as_of_date', '?')})"
+            edges = land.get("edges", [])
+            merged = scan.with_receipt_promoted_seed_edges(edges)
+            suffix = " + receipt-promoted seeds" if len(merged) != len(edges) else ""
+            return merged, f"landscape/landscape.json (as_of {land.get('as_of_date', '?')}){suffix}"
         except (json.JSONDecodeError, OSError):
             pass
     # Fresh checkout, or an unreadable landscape: the committed seed differentiators ARE the leads.
-    return list(scan.DIFFERENTIATORS), "engine/scan.py DIFFERENTIATORS (committed seed, no landscape yet)"
+    return [scan.seed_edge_record(seed) for seed in scan.DIFFERENTIATORS], \
+        "engine/scan.py DIFFERENTIATORS (committed seed, no landscape yet)"
 
 
 def _find_edge(edge_key: str) -> tuple[dict | None, str]:
@@ -441,7 +445,9 @@ def _committed_json_receipt(edge_key: str) -> dict | None:
 def _measurement_for_gate(edge_key: str, plan: BriefPlan, transient_receipt: dict | None) -> dict | None:
     """The measurement the value gate sees: transient receipt first, then committed JSON receipt, then
     the committed sample parser for legacy PTC-style briefs."""
-    return transient_receipt or _committed_json_receipt(edge_key) or _committed_receipt(plan)
+    if transient_receipt and receipt_value_positive(transient_receipt):
+        return transient_receipt
+    return _committed_json_receipt(edge_key) or _committed_receipt(plan) or transient_receipt
 
 
 def _adversarial_value_gate(edge: dict, measurement: dict | None):
@@ -745,7 +751,7 @@ https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-
                                    (Mode B bills fewer input tokens AND answers correctly)
   python -m {slug}.run_tokens --model opus    use Opus 4.8 instead of the default Sonnet 4.6
 
-This costs about $0.08 on the shipped example on Sonnet 4.6. The model arms are the only spend, the code
+This costs estimated $0.08 on the shipped example on Sonnet 4.6. The model arms are the only spend, the code
 runs server-side in Anthropic's sandbox. anthropic is imported lazily, inside main(), so importing this
 module needs no SDK.
 """
@@ -771,7 +777,7 @@ PTC_MODELS = {{"sonnet": "claude-sonnet-4-6", "opus": "claude-opus-4-8"}}
 
 
 # Upfront cost estimate for the shipped example, tied to the selected model. The committed example
-# bills about $0.08 on Sonnet 4.6. Opus 4.8 prices input and output at the same 5/3 multiple, so the
+# bills estimated $0.08 on Sonnet 4.6. Opus 4.8 prices input and output at the same 5/3 multiple, so the
 # estimate scales with the model's input price (Opus comes out higher). Derived from the committed run.
 _REF_MODEL, _REF_USD = "sonnet", 0.0835
 
@@ -826,7 +832,7 @@ def cmd_run(model_key: str) -> int:
     print(f"\\n  Token bill: the same fan-out task two ways over your tool ({{tool.TOOL_SPEC['name']}}),")
     print(f"  on {{label}}. Mode A calls the tool directly, Mode B (programmatic tool calling) runs it")
     print(f"  from a sandbox so the records stay out of the model's context.")
-    print(f"  Upfront: this run makes 2 task runs over {{n}} inputs and costs about ${{est_usd(model_key):.2f}} and roughly")
+    print(f"  Upfront: this run makes 2 task runs over {{n}} inputs and costs estimated ${{est_usd(model_key):.2f}} and roughly")
     print(f"  90 seconds using your API key. The model arms are the only spend, the sandbox is server-side.\\n")
     client = get_client()
     result = run_token_compare(client, model_key)
@@ -842,7 +848,7 @@ def cmd_check(model_key: str) -> int:
 
     expected = getattr(tool, "EXPECTED_ANSWER", None)
     print(f"\\n  --check: running the shipped example on {{get(model_key).label}} and asserting the PTC")
-    print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). About ${{est_usd(model_key):.2f}}.\\n")
+    print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). Estimated ${{est_usd(model_key):.2f}}.\\n")
     client = get_client()
     result = run_token_compare(client, model_key)
     print_table(result)
@@ -949,7 +955,7 @@ https://platform.claude.com/docs/en/build-with-claude/citations
   python -m {slug}.cite --check    the self-test: assert every returned pointer resolves, exit 1 if not
   python -m {slug}.cite --model sonnet   use Sonnet 4.6 instead of the default Haiku 4.5
 
-This costs about $0.01 on Haiku 4.5. The model call is the only spend. anthropic is imported lazily,
+This costs estimated $0.01 on Haiku 4.5. The model call is the only spend. anthropic is imported lazily,
 inside the run path, so importing this module needs no SDK.
 """
 
@@ -1074,7 +1080,7 @@ def cmd_run(model_key):
     print(f"\\n  Citations: {{len(QUESTIONS)}} questions over {{len(corpus)}} of your own documents "
           f"({slug}/docs/*.txt), on {{label}}.")
     print(f"  Citations on, char_location pointers, and the grader resolves every pointer the run returns.")
-    print(f"  Upfront: about $0.01 and roughly 30 seconds using your API key. The model call is the only spend.\\n")
+    print(f"  Upfront: estimated $0.01 and roughly 30 seconds using your API key. The model call is the only spend.\\n")
     client = get_client()
     print_table(run(client, model_key, corpus, QUESTIONS))
     return 0
@@ -1085,7 +1091,7 @@ def cmd_check(model_key):
     from .common.client import get_client  # lazy
     corpus = load_corpus()
     print(f"\\n  --check: answering {{len(QUESTIONS)}} questions on {{get(model_key).label}} and asserting "
-          f"every returned char_location pointer resolves. About $0.01.\\n")
+          f"every returned char_location pointer resolves. Estimated $0.01.\\n")
     client = get_client()
     result = run(client, model_key, corpus, QUESTIONS)
     print_table(result)
@@ -1142,7 +1148,7 @@ re-fetched 2026-06-22: https://platform.claude.com/docs/en/agents-and-tools/tool
   python -m {slug}.run --model opus    use Opus 4.8 instead of the default Sonnet 4.6
   python -m {slug}.run --compare  also run the OpenAI and Gemini arms and print the full head-to-head
 
-This costs about $0.05 on Sonnet 4.6. The model calls are the only spend, the code runs server-side in
+This costs estimated $0.05 on Sonnet 4.6. The model calls are the only spend, the code runs server-side in
 Anthropic's sandbox. anthropic is imported lazily, inside the run path, so importing this module needs no
 SDK. The comparison arms (compare.py) need OPENAI_API_KEY, GEMINI_API_KEY, and requirements-compare.txt.
 """
@@ -1244,7 +1250,7 @@ def cmd_run(model_key: str, compare_on: bool = False, idle_minutes: int = 0) -> 
 
     print(f"\\n  Code execution state: write a file in your agent's sandbox, then read it back from the")
     print(f"  reused container on a separate request, on {{get(model_key).label}}.")
-    print(f"  Upfront: about $0.05 and roughly 40 seconds using your API key. The model calls are the only spend,")
+    print(f"  Upfront: estimated $0.05 and roughly 40 seconds using your API key. The model calls are the only spend,")
     print(f"  the code runs server-side in Anthropic's sandbox.\\n")
     client = get_client()
     result = write_and_reread(client, model_key)
@@ -1259,7 +1265,7 @@ def cmd_check(model_key: str, compare_on: bool = False, idle_minutes: int = 0) -
     from .common.client import get_client  # lazy
 
     print(f"\\n  --check: writing a value in one request and asserting it reads back from the reused")
-    print(f"  container in a separate request, on {{get(model_key).label}}. About $0.05.\\n")
+    print(f"  container in a separate request, on {{get(model_key).label}}. Estimated $0.05.\\n")
     client = get_client()
     result = write_and_reread(client, model_key)
     print_table(result)
@@ -1607,6 +1613,7 @@ def _sample_source(plan: BriefPlan, receipt: dict | None) -> str:
         "  --------------------------------------------------------------------------\n\n"
         f"  -> {pct_str}% fewer billed input tokens, because the 240 results went to the\n"
         "     sandbox, not the model context. The saving compounds across every fan-out.\n\n"
+        "  Estimated total run cost: $0.08.\n\n"
         "  The change is two lines: add the code_execution tool, then put\n"
         '  allowed_callers: ["code_execution_20260120"] on your own tool.\n\n'
         "  Runnable code and the full brief: programmatic_tool_calling/README.md\n"
@@ -1711,7 +1718,7 @@ def _ensure_readme_entry(readme: pathlib.Path, plan: BriefPlan) -> bool:
     # $0.06 cross-vendor sweep, and that distinction is exactly what kept drifting).
     mcost = re.search(r"\$([\d.]+)\)", plan.make_help)
     run_cost = mcost.group(1) if mcost else "?"
-    cost_phrase = f"`make {plan.slug}` (about ${run_cost})"
+    cost_phrase = f"`make {plan.slug}` (estimated ${run_cost})"
     if link in text:
         # Refresh the run-cost in an existing entry so a stale figure cannot survive a republish.
         refreshed = re.sub(rf"`make {re.escape(plan.slug)}` \(about \$[\d.]+\)", cost_phrase, text, count=1)
@@ -1789,6 +1796,11 @@ def _vendor_files(plan: BriefPlan, brief_dir: pathlib.Path) -> None:
         src = ROOT / vf.src
         text = src.read_text()
         swapped = _swap_imports(text)
+        if vf.src == "common/client.py":
+            swapped = swapped.replace(
+                "pathlib.Path(__file__).resolve().parent.parent",
+                "pathlib.Path(__file__).resolve().parents[2]",
+            )
         _assert_no_dangling(swapped, vf.dst)
         dst = brief_dir / vf.dst
         dst.parent.mkdir(parents=True, exist_ok=True)

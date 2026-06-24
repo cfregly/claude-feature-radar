@@ -18,18 +18,26 @@ from engine.adversarial import ValueGate
 # --------------------------------------------------------------------------- the gate, on real edges
 
 
-def test_current_programmatic_tool_calling_is_held_by_the_adversarial_gate():
-    """The old anchor has a receipt, but the current adversarial report killed the broad framing."""
+def test_current_programmatic_tool_calling_passes_the_adversarial_gate():
+    """The current measured PTC framing is confirmed by both adversarial judges."""
     gate = pb.verdict_gate("programmatic-tool-calling")
-    assert not gate.ok
+    assert gate.ok
     assert gate.verdict == "claude-ahead"
-    assert "adversarial value gate" in gate.reason
+    assert "adversarially confirmed" in gate.reason
 
 
 def test_slug_and_folder_key_both_resolve():
-    """Both the live sweep slug and the built-edge folder resolve to the same held edge."""
-    assert not pb.verdict_gate("programmatic_tool_calling").ok
-    assert not pb.verdict_gate("programmatic-tool-calling").ok
+    """Both the live sweep slug and the built-edge folder resolve to the same confirmed edge."""
+    assert pb.verdict_gate("programmatic_tool_calling").ok
+    assert pb.verdict_gate("programmatic-tool-calling").ok
+
+
+def test_receipt_backed_seed_edge_resolves_with_live_landscape_present():
+    edge, src = pb._find_edge("bulk-extended-output")
+    assert edge is not None
+    assert edge["key"] == "bulk-extended-output"
+    assert edge["lead_score"] > 0
+    assert "receipt-promoted seeds" in src
 
 
 @pytest.mark.parametrize("edge_key", [
@@ -176,6 +184,12 @@ def test_committed_receipt_ignores_the_transient_json(monkeypatch):
     # and the generated receipt snapshot the gif replays carries those committed numbers, not a scratch run
     sample = pb._sample_source(pb.PLANS["programmatic-tool-calling"], r)
     assert "9,451" in sample and "6,828" in sample and "correct" not in sample
+
+
+def test_gate_measurement_uses_committed_receipt_when_transient_has_no_positive_verdict():
+    transient = {"total_cost": 0.1, "arms": []}
+    measurement = pb._measurement_for_gate("web-citations", pb.PLANS["web-citations"], transient)
+    assert measurement["verdict"]["promotable_edge"] is True
 
 
 # --------------------------------------------------------------------------- write-nothing on refusal

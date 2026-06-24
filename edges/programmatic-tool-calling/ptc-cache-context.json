@@ -1,0 +1,75 @@
+{
+  "basis": {
+    "ptc_live_receipt": {
+      "source": "edges/programmatic-tool-calling/sample.txt",
+      "plain_tool_use_billed_input_tokens": 9451,
+      "programmatic_tool_calling_billed_input_tokens": 6828,
+      "input_reduction_pct": 27.8
+    },
+    "claude_model": {
+      "key": "opus",
+      "label": "Claude Opus 4.8",
+      "context_window": 1000000
+    },
+    "competitor_best_stack": {
+      "key": "gpt-top",
+      "label": "GPT-5.5",
+      "context_window": 1050000,
+      "assumption": "best-case automatic cache hits on every post-first turn, but no PTC equivalent"
+    }
+  },
+  "workload": {
+    "stable_prefix_tokens": 700000,
+    "turns": 100,
+    "raw_tool_output_tokens_per_turn": 200000,
+    "ptc_summary_tokens_per_turn": 2000,
+    "answer_output_tokens_per_turn": 300,
+    "cache_ttl": "1h"
+  },
+  "context_fit": {
+    "prefix_tokens": 700000,
+    "prefix_plus_raw_tool_tokens": 900000,
+    "prefix_plus_ptc_summary_tokens": 702000,
+    "fits_claude_1m_with_raw_tool_output": true,
+    "fits_claude_1m_with_ptc_summary": true,
+    "fits_400k_context_with_prefix": false
+  },
+  "scenarios": {
+    "claude_no_cache_no_ptc": {
+      "cache_write_usd": 0.0,
+      "cache_read_usd": 0.0,
+      "fresh_input_usd": 450.0,
+      "output_usd": 0.75,
+      "total_usd": 450.75
+    },
+    "claude_cache_no_ptc": {
+      "cache_write_usd": 7.0,
+      "cache_read_usd": 34.65,
+      "fresh_input_usd": 100.0,
+      "output_usd": 0.75,
+      "total_usd": 142.4
+    },
+    "openai_best_cache_1m_no_ptc": {
+      "cache_write_usd": 0.0,
+      "cache_read_usd": 34.65,
+      "fresh_input_usd": 100.0,
+      "output_usd": 0.9,
+      "total_usd": 135.55
+    },
+    "claude_cache_ptc": {
+      "cache_write_usd": 7.0,
+      "cache_read_usd": 34.65,
+      "fresh_input_usd": 1.0,
+      "output_usd": 0.75,
+      "total_usd": 43.4
+    }
+  },
+  "cliff": {
+    "savings_vs_claude_cache_no_ptc_usd": 99.0,
+    "savings_vs_openai_best_cache_no_ptc_usd": 92.15,
+    "reduction_vs_claude_cache_no_ptc_pct": 69.5,
+    "reduction_vs_uncached_no_ptc_pct": 90.4,
+    "reduction_vs_openai_best_cache_no_ptc_pct": 68.0
+  },
+  "honest_reading": "PTC is the unique leg: cache and 1M context are not enough if raw custom-tool output keeps returning to the model as fresh input. The proof is deterministic cost arithmetic over verified prices, grounded by the committed live PTC receipt."
+}

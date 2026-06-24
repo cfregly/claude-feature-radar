@@ -38,6 +38,7 @@ DEFAULT_WORKLOAD = {
 
 PTC_RECEIPT = pathlib.Path("edges/programmatic-tool-calling/sample.txt")
 OUT_PATH = pathlib.Path("data/last_ptc_cache_context.json")
+COMMITTED_OUT_PATH = pathlib.Path("edges/programmatic-tool-calling/ptc-cache-context.json")
 
 
 def _mtok_cost(tokens: int, usd_per_mtok: float) -> float:
@@ -247,7 +248,7 @@ def _print_receipt(receipt: dict) -> None:
         f"    - 700k prefix fits a 1M window: {fit['fits_claude_1m_with_ptc_summary']}; "
         f"fits a 400k window: {fit['fits_400k_context_with_prefix']}"
     )
-    print(f"\n  wrote receipt to {OUT_PATH}\n")
+    print(f"\n  wrote receipts to {OUT_PATH} and {COMMITTED_OUT_PATH}\n")
 
 
 def main(argv=None):
@@ -257,6 +258,7 @@ def main(argv=None):
     receipt = compute_proof()
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(receipt, indent=2) + "\n")
+    COMMITTED_OUT_PATH.write_text(json.dumps(receipt, indent=2) + "\n")
     if args.json:
         print(json.dumps(receipt, indent=2))
     else:

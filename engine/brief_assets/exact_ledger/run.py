@@ -254,7 +254,7 @@ def cmd_run(a) -> int:
 
 def cmd_check(a) -> int:
     """Cheap live self-test. Asserts the win invariant: the exact list is preserved AND context
-    editing held the carried context flat (peak well below the unbounded sum). About $0.17."""
+    editing held the carried context flat (peak well below the unbounded sum). Estimated $0.17."""
     docs, start = build_chain(DOCS, DOC_TOKENS)
     print(f"\n  self-test: exact list preserved with context held flat (~$0.17, {get(EXEC_MODEL).label})")
     print(f"  beta header: {BETA_HEADER}\n")

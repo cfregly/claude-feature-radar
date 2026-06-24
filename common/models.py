@@ -26,10 +26,10 @@ class Model:
     effort_levels: tuple[str, ...]   # () means the model has no effort knob
     thinking_mode: str               # "adaptive" | "manual" | "none"
     provider: str = "anthropic"      # "anthropic" | "openai" | "gemini"
-    verified: str = "2026-06-18"     # date this table's prices were last checked against the live pages
+    verified: str = "2026-06-23"     # date this table's prices were last checked against the live pages
 
 
-# Verified 2026-06-18 against platform.claude.com (pricing, effort, adaptive-thinking) and a live call.
+# Verified 2026-06-23 against platform.claude.com (pricing, effort, adaptive-thinking) and a live call.
 # Claude Mythos 5 is also PTC-capable and priced like Fable 5 on the live page, but it is limited
 # availability and no code path resolves it, so it stays a doc-support fact (docs/CITED_FACTS.md), not a
 # runtime registry row. The registry carries only models the code actually selects and runs.
@@ -66,18 +66,17 @@ MODELS: dict[str, Model] = {
         effort_levels=("low", "medium", "high", "xhigh", "max"),
         thinking_mode="adaptive",          # always on; may be access-gated on a given key
     ),
-    # OpenAI and Gemini comparison models. This is the ONE verified competitor price table: the OpenAI
-    # and Gemini arms (engine/openai_arm.py, engine/gemini_arm.py) and the citations DIY arms all read
-    # cost from these rows, never a local copy. Input, cached-input, and output prices re-verified live
-    # 2026-06-18 against the providers' pricing pages (developers.openai.com/api/docs/pricing,
+    # OpenAI and Gemini comparison models. This is the ONE verified competitor price table: every
+    # optional comparison arm reads cost from these rows, never a local copy. Input, cached-input, and output prices re-verified
+    # 2026-06-23 against the providers' pricing pages (developers.openai.com/api/docs/pricing,
     # ai.google.dev/gemini-api/docs/pricing), Standard tier, every id present and matching. cache_read
     # is the providers' discounted cached-input tier (the cached column on those pages). The cache_write
     # fields stay 0 on purpose: OpenAI automatic caching and Gemini implicit caching charge no separate
     # cache-WRITE fee, only the cheaper read on a hit, so there is nothing to bill there. These rows run
     # only when the matching key is set, and the cross-vendor runner pulls the SDK lazily, so the
     # one-dependency core is untouched. effort is the harness label sent straight through (OpenAI
-    # reasoning_effort, Gemini thinking_level, both take low/medium/high). "minimal" is excluded: OpenAI
-    # rejects it with a 400. Gemini's long-context (>200k) and audio rate tiers are not modeled here; the
+    # reasoning_effort, Gemini thinking_level). GPT-5.5 also supports none and xhigh. "minimal" is
+    # excluded: OpenAI rejects it with a 400. Gemini's long-context (>200k) and audio rate tiers are not modeled here; the
     # benchmark workloads are text under 200k, so the Standard text rate is the one that bills.
     "gpt-nano": Model(
         key="gpt-nano", id="gpt-5.4-nano", label="GPT-5.4 nano", tier="fast", provider="openai",
@@ -104,7 +103,6 @@ MODELS: dict[str, Model] = {
         effort_levels=("low", "medium", "high"), thinking_mode="none",
     ),
     "gpt-top": Model(
-        # GPT-5.5 reasoning.effort xhigh support re-verified 2026-06-24 against the OpenAI model docs.
         key="gpt-top", id="gpt-5.5", label="GPT-5.5", tier="frontier", provider="openai",
         input_per_mtok=5.0, output_per_mtok=30.0,
         cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.50,

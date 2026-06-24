@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from engine.verify import _claim_keys, _parse_openai_verdicts, _run_openai
+from engine.verify import _body, _claim_keys, _merge_reports, _parse_openai_verdicts, _run_openai
 
 
 def test_claim_keys_preserves_order():
@@ -63,3 +63,32 @@ def test_openai_judge_is_required_when_selected(monkeypatch):
     monkeypatch.setattr("engine.verify.get_openai_client", lambda: None)
     with pytest.raises(SystemExit, match="OPENAI_API_KEY"):
         _run_openai("key: prompt_caching\nclaim Claude is ahead: x\nwhy: y", budget=None)
+
+
+def test_body_can_target_receipt_promoted_keys():
+    body = _body(["bulk-extended-output"])
+    assert _claim_keys(body) == ["bulk-extended-output"]
+    assert "one un-truncated deliverable above 128k output tokens" in body
+
+
+def test_merge_reports_replaces_alias_equivalent_rows():
+    existing = {
+        "reports": [{
+            "judge": "openai",
+            "model": "gpt-5.5",
+            "verdicts": [
+                {"key": "programmatic_tool_calling", "verdict": "KILLED", "why": "old"},
+                {"key": "task_budgets", "verdict": "KILLED", "why": "keep"},
+            ],
+        }]
+    }
+    new = [{
+        "judge": "openai",
+        "model": "gpt-5.5",
+        "verdicts": [{"key": "programmatic-tool-calling", "verdict": "SURVIVES", "why": "new"}],
+    }]
+    rows = _merge_reports(existing, new)[0]["verdicts"]
+    assert rows == [
+        {"key": "task_budgets", "verdict": "KILLED", "why": "keep"},
+        {"key": "programmatic-tool-calling", "verdict": "SURVIVES", "why": "new"},
+    ]

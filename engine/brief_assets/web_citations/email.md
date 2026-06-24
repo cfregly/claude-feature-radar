@@ -27,7 +27,7 @@ How it compares, on the same 3 questions:
 | OpenAI | 0                             |
 | Gemini | 0                             |
 
-Run it yourself. About $0.12, under a minute:
+Run it yourself. Estimated $0.12, under a minute:
 
 ```
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits

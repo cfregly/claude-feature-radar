@@ -9,6 +9,7 @@ manufacture a false Claude lead. They run fully offline, with no network.
 import json
 
 from engine.demonstrators import security_posture as sp
+from engine import scan
 from engine import sweep_edges as se
 from engine.sources_registry import Source, sources
 
@@ -18,6 +19,35 @@ from engine.sources_registry import Source, sources
 def test_registry_has_all_three_vendors():
     vendors = {s.vendor for s in sources()}
     assert {"claude", "openai", "gemini"} <= vendors
+
+
+def test_current_edges_keeps_receipt_promoted_seeds_when_landscape_exists(tmp_path, monkeypatch):
+    landscape = {
+        "as_of_date": "2026-06-24",
+        "edges": [{
+            "key": "programmatic_tool_calling",
+            "axis": "cost",
+            "verdict": "claude-ahead",
+            "lead_score": 2,
+            "value_score": 3,
+            "score": 6,
+            "fair_comparison": {
+                "lead_basis": "absence-of-evidence",
+                "task_shape": "fan-out",
+                "score_gate": "input tokens lower",
+            },
+        }],
+    }
+    p = tmp_path / "landscape.json"
+    p.write_text(json.dumps(landscape))
+    monkeypatch.setattr(scan, "_landscape_path", lambda: p)
+
+    rows = scan.current_edges()
+    by_key = {row["key"]: row for row in rows}
+    assert by_key["programmatic_tool_calling"]["lead_score"] == 2
+    assert "bulk-extended-output" in by_key
+    assert "code-execution-state" in by_key
+    assert "exact-list-ledger" in by_key
 
 
 def test_registry_entries_are_well_formed():

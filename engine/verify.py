@@ -16,7 +16,7 @@ import re
 from common.client import get_client
 from common.models import get, request_kwargs
 from common.runner import call as runner_call, get_openai_client
-from engine.adversarial import write_report
+from engine.adversarial import equivalent_keys, load_report, write_report
 from engine.budget import BudgetLedger
 from engine.scan import current_edges
 
@@ -111,10 +111,28 @@ def _report_rows(expected_keys: list[str], verdicts: dict[str, dict[str, str]]) 
     return [verdicts[key] for key in expected_keys]
 
 
-def _body() -> str:
+def _selected_edges(keys: list[str] | None = None) -> list[dict]:
+    edges = current_edges()
+    if not keys:
+        return edges
+    wanted = set()
+    for key in keys:
+        wanted.update(equivalent_keys(key))
+    selected = [edge for edge in edges if edge.get("key") in wanted]
+    found = set()
+    for edge in selected:
+        found.update(equivalent_keys(edge.get("key", "")))
+    missing = [key for key in keys if key not in found and not (equivalent_keys(key) & found)]
+    if missing:
+        available = ", ".join(edge.get("key", "?") for edge in edges)
+        raise SystemExit(f"unknown verify key(s): {missing}; available keys: {available}")
+    return selected
+
+
+def _body(keys: list[str] | None = None) -> str:
     return "\n\n".join(
         f"key: {c['key']}\nclaim Claude is ahead: {c['claim']}\nwhy: {c['why']}"
-        for c in current_edges()  # the freshly ranked landscape edges, the seed on a fresh checkout
+        for c in _selected_edges(keys)  # freshly ranked landscape edges plus receipt-promoted seeds
     )
 
 
@@ -214,6 +232,32 @@ def _run_openai(body: str, budget: BudgetLedger) -> None:
     }
 
 
+def _merge_reports(existing: dict, new_reports: list[dict]) -> list[dict]:
+    """Replace rows for freshly judged keys while preserving previous rows for other keys."""
+    by_judge = {r.get("judge", "unknown"): dict(r) for r in existing.get("reports", [])}
+    for report in new_reports:
+        judge = report.get("judge", "unknown")
+        previous = by_judge.get(judge, {})
+        replace = set()
+        for row in report.get("verdicts", []):
+            replace.update(equivalent_keys(row.get("key", "")))
+        old_rows = [row for row in previous.get("verdicts", []) if row.get("key") not in replace]
+        merged = dict(previous)
+        merged.update(report)
+        merged["verdicts"] = old_rows + report.get("verdicts", [])
+        by_judge[judge] = merged
+    order = []
+    for report in existing.get("reports", []):
+        judge = report.get("judge", "unknown")
+        if judge not in order:
+            order.append(judge)
+    for report in new_reports:
+        judge = report.get("judge", "unknown")
+        if judge not in order:
+            order.append(judge)
+    return [by_judge[judge] for judge in order]
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Run the paid skeptic pass under a budget cap.")
     parser.add_argument("--budget-usd", type=float, default=None,
@@ -222,9 +266,14 @@ def main(argv=None):
                         help="Budget ledger label. Defaults to RADAR_BUDGET_LABEL or grind-deep.")
     parser.add_argument("--judges", default=os.environ.get("RADAR_VERIFY_JUDGES", "claude"),
                         help="Comma-separated judges: claude or claude,openai. OpenAI uses GPT-5.5 xhigh.")
+    parser.add_argument("--keys", default="",
+                        help="Optional comma-separated edge keys to verify. Use with --merge-report for batches.")
+    parser.add_argument("--merge-report", action="store_true",
+                        help="Merge this batch into the existing adversarial report instead of replacing it.")
     args = parser.parse_args(argv)
     budget = BudgetLedger.from_env(cap_usd=args.budget_usd, label=args.budget_label)
-    body = _body()
+    keys = [k.strip() for k in args.keys.split(",") if k.strip()]
+    body = _body(keys or None)
     reports = []
     for judge in [j.strip().lower() for j in args.judges.split(",") if j.strip()]:
         if judge == "claude":
@@ -236,7 +285,8 @@ def main(argv=None):
         if report:
             reports.append(report)
     if reports:
-        path = write_report(reports)
+        out_reports = _merge_reports(load_report(), reports) if args.merge_report else reports
+        path = write_report(out_reports)
         print(f"  wrote adversarial value report to {path.relative_to(pathlib.Path.cwd())}\n")
 
 

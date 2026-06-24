@@ -95,8 +95,8 @@ def test_every_confirm_gated_action_is_caught_if_run_unattended():
 
 
 def test_publish_brief_without_confirm_refuses_a_held_edge():
-    """PTC has a receipt, but the current adversarial report holds the broad framing."""
-    r = mt.publish_brief("programmatic-tool-calling", confirm=False)
+    """Task budgets has a receipt, but the current adversarial report holds the framing."""
+    r = mt.publish_brief("task-budgets", confirm=False)
     assert r["gate_ok"] is False
     assert r["published"] is False
     assert r["refused"] is True

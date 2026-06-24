@@ -232,7 +232,7 @@ def cmd_check(model_key: str, compare_on: bool = False) -> int:
     from .common.client import get_client  # lazy
 
     print(f"\n  --check: asking questions over a directly-supplied PDF and asserting every answer carries")
-    print(f"  a pointer to the correct page, on {get(model_key).label}. About $0.05.\n")
+    print(f"  a pointer to the correct page, on {get(model_key).label}. Estimated $0.05.\n")
     client = get_client()
     result = answer_with_page_pointers(client, model_key, make_sample_pdf())
     print_table(result)

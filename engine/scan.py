@@ -290,6 +290,10 @@ def _landscape_path() -> pathlib.Path:
     return pathlib.Path(__file__).resolve().parent.parent / "landscape" / "landscape.json"
 
 
+def _repo_root() -> pathlib.Path:
+    return pathlib.Path(__file__).resolve().parent.parent
+
+
 # The live sweep keys a source by its short doc slug (programmatic_tool_calling, context_editing), while the seed
 # DIFFERENTIATORS key by the built-edge folder name (programmatic-tool-calling, long-horizon-autonomy).
 # This alias map resolves a live key to its seed so a built edge carries the vetted, measured claim
@@ -328,6 +332,75 @@ def _private_only(edge: dict) -> bool:
     return kind in PRIVATE_ONLY_DEMOKINDS
 
 
+def _receipt_value_positive(receipt: dict | None) -> bool:
+    if not receipt:
+        return False
+    verdict = receipt.get("verdict")
+    if isinstance(verdict, dict):
+        if "promotable_edge" in verdict:
+            return bool(verdict.get("promotable_edge"))
+        if "positive_signal" in verdict:
+            return bool(verdict.get("positive_signal"))
+    if isinstance(verdict, str):
+        return verdict == "claude-ahead" and bool(receipt.get("passed", True))
+    if "passed" in receipt:
+        return bool(receipt.get("passed"))
+    if "mode_b_correct" in receipt:
+        return bool(receipt.get("mode_b_correct")) and float(receipt.get("pct_input_reduction") or 0) > 0
+    if "pct_input_reduction" in receipt:
+        return float(receipt.get("pct_input_reduction") or 0) > 0
+    return False
+
+
+def _positive_committed_receipt(edge_key: str) -> dict | None:
+    path = _repo_root() / "edges" / edge_key / "receipt.json"
+    if not path.exists():
+        return None
+    try:
+        receipt = json.loads(path.read_text())
+    except (json.JSONDecodeError, OSError):
+        return None
+    return receipt if _receipt_value_positive(receipt) else None
+
+
+def seed_edge_record(seed: dict, *, rank: int | None = None) -> dict:
+    """Return a seed in the same value-gate shape as a swept landscape lead."""
+    out = dict(seed)
+    out.setdefault("verdict", "claude-ahead")
+    out.setdefault("lead_score", 1)
+    out.setdefault("value_score", max(1, 13 - int(out.get("rank") or 99)))
+    out.setdefault("score", (out.get("lead_score") or 0) * (out.get("value_score") or 1))
+    if rank is not None:
+        out["rank"] = rank
+    return out
+
+
+def receipt_promoted_seed_edges() -> list[dict]:
+    """Committed measured edges remain candidates even when the live doc sweep omits the source key."""
+    out = []
+    for seed in DIFFERENTIATORS:
+        if _positive_committed_receipt(seed["key"]):
+            out.append(seed_edge_record(seed))
+    return out
+
+
+def _equivalent_surface_keys(key: str) -> set[str]:
+    return {key, key.replace("-", "_"), key.replace("_", "-")}
+
+
+def with_receipt_promoted_seed_edges(edges: list[dict]) -> list[dict]:
+    """Merge committed receipt-promoted seeds into a swept edge list without duplicating exact slugs."""
+    out = list(edges)
+    seen: set[str] = set()
+    for edge in out:
+        seen.update(_equivalent_surface_keys(edge.get("key", "")))
+    for seed in receipt_promoted_seed_edges():
+        if seen.isdisjoint(_equivalent_surface_keys(seed["key"])):
+            out.append(seed)
+            seen.update(_equivalent_surface_keys(seed["key"]))
+    return out
+
+
 def seed_for_key(live_key: str) -> dict | None:
     """Public wrapper for the live sweep. A source is pitchable only when it maps to a vetted seed
     comparison here; broad docs, blogs, and changelogs stay discovery inputs until a receipt is built."""
@@ -345,14 +418,14 @@ def current_edges() -> list[dict]:
     makes: they stay in the landscape but are never pitched."""
     f = _landscape_path()
     if not f.exists():
-        return list(DIFFERENTIATORS)
+        return [seed_edge_record(seed) for seed in DIFFERENTIATORS]
     try:
         land = json.loads(f.read_text())
     except (json.JSONDecodeError, OSError):
-        return list(DIFFERENTIATORS)
+        return [seed_edge_record(seed) for seed in DIFFERENTIATORS]
     leads = [e for e in land.get("edges", []) if e.get("lead_score", 0) > 0 and not _private_only(e)]
     if not leads:
-        return list(DIFFERENTIATORS)
+        return [seed_edge_record(seed) for seed in DIFFERENTIATORS]
     out = []
     for i, e in enumerate(leads, 1):
         # Map the live edge to the consumer shape. Reuse the rich seed claim/why when the key matches
@@ -367,9 +440,11 @@ def current_edges() -> list[dict]:
             "claim": seed["claim"] if seed else f"{e['key']} ({e.get('verdict','claude-ahead')}).",
             "why": seed["why"] if seed else (e.get("evidence_quote") or ""),
             "verdict": e.get("verdict", "claude-ahead"), "score": e.get("score"),
+            "lead_score": e.get("lead_score", 1), "value_score": e.get("value_score"),
             "evidence_quote": e.get("evidence_quote", ""), "source_url": e.get("source_url"),
+            "status": e.get("status"),
         })
-    return out
+    return with_receipt_promoted_seed_edges(out)
 
 
 def stamp_demokind(edge: dict) -> dict:

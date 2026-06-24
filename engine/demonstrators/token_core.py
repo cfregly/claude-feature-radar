@@ -45,7 +45,7 @@ import json
 import time
 
 # The code execution tool block, and the toggle that turns a plain tool into a programmatic one.
-# These are the exact strings the live doc names. check_docs.py asserts the demo still ships them.
+# These are the exact strings the live doc names. The docs-vs-code gate asserts the demo still ships them.
 CODE_EXEC_TOOL = {"type": "code_execution_20260120", "name": "code_execution"}
 PTC_CALLER = "code_execution_20260120"
 

@@ -10,6 +10,9 @@ from dataclasses import dataclass
 
 from .models import get
 
+WEB_SEARCH_PER_REQUEST = 10.0 / 1000.0
+BATCH_DISCOUNT = 0.5
+
 
 def _field(usage, name: str) -> int:
     return getattr(usage, name, 0) or 0
@@ -21,13 +24,15 @@ class CostBreakdown:
     output: float
     cache_read: float
     cache_write: float
+    server_tool: float
     total: float
 
     def __str__(self) -> str:
         return (
             f"${self.total:.6f}  "
             f"(in ${self.input:.6f} + out ${self.output:.6f} + "
-            f"cache_read ${self.cache_read:.6f} + cache_write ${self.cache_write:.6f})"
+            f"cache_read ${self.cache_read:.6f} + cache_write ${self.cache_write:.6f} + "
+            f"server_tool ${self.server_tool:.6f})"
         )
 
 
@@ -54,12 +59,29 @@ def cost_breakdown(model: str, usage) -> CostBreakdown:
     out = out_tok * m.output_per_mtok / 1e6
     read = read_tok * m.cache_read_per_mtok / 1e6
     write = (w5 * m.cache_write_5m_per_mtok + w1 * m.cache_write_1h_per_mtok) / 1e6
-    return CostBreakdown(inp, out, read, write, inp + out + read + write)
+    server_tool = server_tool_cost_usd(usage)
+    return CostBreakdown(inp, out, read, write, server_tool, inp + out + read + write + server_tool)
 
 
 def cost_usd(model: str, usage) -> float:
     """Total dollar cost of one response."""
     return cost_breakdown(model, usage).total
+
+
+def batch_cost_usd(model: str, usage) -> float:
+    """Total dollar cost of one Anthropic Message Batch response."""
+    b = cost_breakdown(model, usage)
+    token_cost = b.input + b.output + b.cache_read + b.cache_write
+    return token_cost * BATCH_DISCOUNT + b.server_tool
+
+
+def server_tool_cost_usd(usage) -> float:
+    """Server-tool dollar cost that is knowable from the response usage object."""
+    stu = getattr(usage, "server_tool_use", None)
+    if stu is None:
+        return 0.0
+    web_search_requests = _field(stu, "web_search_requests")
+    return web_search_requests * WEB_SEARCH_PER_REQUEST
 
 
 def cost_from_buckets(model: str, *, fresh_input: int, cached: int, output: int) -> float:
@@ -68,8 +90,7 @@ def cost_from_buckets(model: str, *, fresh_input: int, cached: int, output: int)
     For the inclusive-input providers (OpenAI, Gemini) the reported input field already counts the
     cached tokens, so the caller passes fresh_input = reported_input - cached. The cached bucket bills
     at the model's cache-read rate (those providers' discounted cached-input tier), the fresh and
-    output buckets at the input and output rates. This is the single cost model the OpenAI and Gemini
-    arms (engine/openai_arm.py, engine/gemini_arm.py) and the citations DIY arms now share, so a
+    output buckets at the input and output rates. This is the single cost model the optional OpenAI and Gemini comparison arms share, so a
     competitor price lives in exactly one place, common/models.py.
     """
     m = get(model)

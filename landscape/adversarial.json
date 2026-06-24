@@ -4,36 +4,105 @@
   "rule": "Any KILLED verdict by a current adversarial judge holds the edge. SURVIVES means the judge could not construct a stronger competitor stack or reduce the value to DX, native packaging, or a mechanism with no measured founder outcome.",
   "reports": [
     {
-      "judge": "openai",
-      "model": "gpt-5.5",
-      "label": "GPT-5.5",
+      "judge": "claude",
+      "model": "claude-opus-4-8",
+      "label": "Claude Opus 4.8",
       "effort": "xhigh",
-      "cost_usd": 0.2198,
+      "cost_usd": 0.055955,
       "verdicts": [
         {
           "key": "programmatic_tool_calling",
-          "verdict": "KILLED",
-          "why": "OpenAI or Gemini can reproduce the same fan-out/token-shielding pattern with a single custom execute-script or batch tool that runs the loop in the developer sandbox and returns only a compact result, so Claude's native packaging is DX rather than a durable gap."
+          "verdict": "SURVIVES",
+          "why": "Keeping custom-tool outputs out of context while the model drives the loop yields a measured ~28% token cut plus an accuracy win, and recreating it on OpenAI/Gemini requires building a whole sandbox-plus-tool-dispatch runtime that no native feature provides, not trivial glue."
         },
         {
           "key": "task_budgets",
           "verdict": "KILLED",
-          "why": "A competitor agent runner can combine usage accounting, max output/reasoning/thinking caps, and tool-approval or preflight budget gates to prevent low-budget tool execution on the same workload, making Claude's provider-side countdown nicer but not unmatched."
+          "why": "The full-loop countdown is self-admitted absence-of-evidence with only a 0-vs-1 tool-call behavioral artifact, easily recreated by tracking token spend and gating/injecting budget warnings, with no measured cost, speed, or reliability outcome a founder pays for."
         },
         {
           "key": "cache_diagnostics",
           "verdict": "KILLED",
-          "why": "Prompt-cache counters plus client-side canonical request hashing and section diffs give OpenAI or Gemini users the same practical root-cause diagnosis for model/system/tools/messages changes, so the typed Claude field is convenience observability."
+          "why": "It is explicitly an observability nicety with no cost win, and the typed miss-reason is trivially derivable by diffing your own prompt prefixes that you already control, so it is just a named field, not a founder outcome."
         },
         {
           "key": "citations",
           "verdict": "KILLED",
-          "why": "Inline files or extracted page chunks plus structured outputs and a deterministic quote/source resolver give OpenAI or Gemini the no-store mixed-source citation path in practice, leaving Claude with native DX and token-accounting niceties rather than a hard capability gap."
+          "why": "The claim concedes granularity coarsens to page-level on PDFs and that DIY verbatim-quote plus str.find resolves at parity on frontier models, leaving only no-store convenience, a thinner integration path, and a marginal token quirk that the competent DIY stack matches."
         },
         {
           "key": "search_results",
           "verdict": "KILLED",
-          "why": "Passing RAG chunks inline with stable IDs and requiring structured chunk/span/quote output lets OpenAI or Gemini return the same zero-hosted-object pointers through a small resolver, so comparing only against hosted File Search overstates the gap."
+          "why": "The measured 4.5x cost and setup-call advantage is against a file-search strawman; the real best competitor stack is the model emitting a verbatim quote plus normalized str.find on the same inline chunks, which the citations evidence itself shows reaches frontier-model parity with no store and trivial glue."
+        },
+        {
+          "key": "exact-list-ledger",
+          "verdict": "KILLED",
+          "why": "The cost/speed delta is confounded by model-tier mismatch (cheap Haiku vs full-frontier gpt-5.5 and Gemini 3.1 Pro) and is config-fragile (only ~8% cheaper at keep=3), so a competitor pairing its own cheap tier like gpt-5-mini or Gemini Flash with native compaction recreates equal-accuracy cost and speed on the same workload."
+        }
+      ]
+    },
+    {
+      "judge": "openai",
+      "model": "gpt-5.5",
+      "label": "GPT-5.5",
+      "effort": "xhigh",
+      "cost_usd": 0.230005,
+      "verdicts": [
+        {
+          "key": "programmatic_tool_calling",
+          "verdict": "SURVIVES",
+          "why": "The fan-out workload shows a real token-cost and correctness win, and OpenAI/Gemini lack a native stack that lets model-written code loop over developer tools while keeping bulky intermediate outputs out of context without building an equivalent custom sandbox or batch layer."
+        },
+        {
+          "key": "task_budgets",
+          "verdict": "KILLED",
+          "why": "The exact provider-side countdown is distinctive, but the founder-valued outcome can be recreated with ordinary app-side budget accounting, tool gating, and low-token handoff prompts, so this is mostly native control packaging."
+        },
+        {
+          "key": "cache_diagnostics",
+          "verdict": "KILLED",
+          "why": "Typed cache miss reasons are useful observability, but a competitor stack can hash and diff model, system, tools, and message prefixes itself, and the evidence shows no measured cost, speed, or reliability win."
+        },
+        {
+          "key": "citations",
+          "verdict": "KILLED",
+          "why": "Best-to-best competitor stacks can inline or locally extract sources, require structured source IDs or quotes, and resolve citations deterministically, leaving Claude's edge mostly native packaging, token-accounting convenience, and no-store DX rather than unique accuracy or security."
+        },
+        {
+          "key": "search_results",
+          "verdict": "KILLED",
+          "why": "For preselected RAG chunks, the best OpenAI/Gemini stack is inline chunks plus structured citation fields and a quote or span resolver, not hosted file search, so the measured store/setup delta is not a durable capability gap."
+        },
+        {
+          "key": "code-execution-state",
+          "verdict": "KILLED",
+          "why": "A reusable Claude container is nice DX, but competitors can preserve long-idle workspace state with code execution plus Files/File API or object storage and rehydrate it, and the receipt only proves a 31-minute nonce rather than a founder-valued 30-day reliability edge."
+        },
+        {
+          "key": "bulk-extended-output",
+          "verdict": "KILLED",
+          "why": "The measured cap is real, but emitting over 128k tokens in one batch call is mostly packaging because a competitor can chunk, continue, and stitch the same artifact at similar token cost, while Claude is async and no accuracy or speed win is shown."
+        },
+        {
+          "key": "exact-list-ledger",
+          "verdict": "SURVIVES",
+          "why": "Under the stated no-memory long-stream workload, Claude and OpenAI both hit exactness repeatedly but Claude is materially cheaper and faster than the tested OpenAI compaction and Gemini full-context stacks at equal accuracy."
+        },
+        {
+          "key": "pdf-citations",
+          "verdict": "KILLED",
+          "why": "The direct-PDF page quote object is convenient, but file-search/file-search-store or deterministic page extraction plus structured-output citations can produce the founder-valued page-plus-quote result, and the receipt does not compare total cost, latency, or security against that stack."
+        },
+        {
+          "key": "grounding-stack",
+          "verdict": "KILLED",
+          "why": "Native three-way citation typing is nice, but serializing plain text, PDF pages, and search-result chunks into a unified source map and using OpenAI/Gemini structured citations with quote-offset validation recreates the workload without hosted vector stores, so the evidence mainly proves one-call packaging."
+        },
+        {
+          "key": "web-citations",
+          "verdict": "KILLED",
+          "why": "Claude's source-quote web citation object is higher fidelity, but competitors can pair URL citations or search results with page fetch, URL-context extraction, and deterministic quote matching, while the receipt shows equal answer and URL-citation success with no measured user-value delta beyond native packaging and token accounting."
         }
       ]
     }
