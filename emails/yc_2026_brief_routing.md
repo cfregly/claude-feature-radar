@@ -14,9 +14,10 @@ pattern, measured once using my API key, so a founder can rerun the brief before
 own workload.
 
 The five pillars are cost, speed, reliability, accuracy, and security. The public repo carries the
-wins and preflight gates that are already runnable. Security routes now have two public pieces: the
-measured prompt-injection tool-boundary preflight and the source-backed controls map. Keep the email
-copy narrow and let the controls map carry the official-source caveats.
+wins and preflight gates that are already runnable. Security routes now have four public pieces: the
+measured prompt-injection tool-boundary preflight, audit-evidence validation, MCP authorization
+posture, and the source-backed security-claims guard. Keep the email copy narrow and let the guards
+carry the official-source caveats.
 
 ## Routed
 
@@ -31,7 +32,7 @@ page clearly marks a CEO founder. Re-check the page before sending because found
 | Arga Labs | Phillip | https://www.ycombinator.com/companies/arga-labs | real-world sandboxes to test agents and agent-facing software | reliability + security-testing follow-up | Medium-high | https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state | `emails/yc_spring_2026/arga_labs_code_execution_state.md` |
 | Superset | Kiet | https://www.ycombinator.com/companies/superset | IDE for running 100s of coding agents in parallel | reliability | High | https://github.com/cfregly/claude-feature-hits/tree/main/task_budgets | `emails/yc_spring_2026/superset_task_budgets.md` |
 | Lightsprint | Ben | https://www.ycombinator.com/companies/lightsprint | collaborative product development with cloud agents | reliability | High | https://github.com/cfregly/claude-feature-hits/tree/main/code_execution_state | `emails/yc_spring_2026/lightsprint_code_execution_state.md` |
-| Silmaril | Aum | https://www.ycombinator.com/companies/silmaril | prompt-injection defense that self-improves for AI-native applications and agents | security | High | https://github.com/cfregly/claude-feature-hits/tree/main/tool_boundary_security and https://github.com/cfregly/claude-feature-hits/tree/main/security_claims_guard | `emails/yc_spring_2026/silmaril_security_discovery.md` |
+| Silmaril | Aum | https://www.ycombinator.com/companies/silmaril | prompt-injection defense that self-improves for AI-native applications and agents | security | High | https://github.com/cfregly/claude-feature-hits/tree/main/tool_boundary_security and https://github.com/cfregly/claude-feature-hits/tree/main/audit_evidence_security and https://github.com/cfregly/claude-feature-hits/tree/main/mcp_authorization_security and https://github.com/cfregly/claude-feature-hits/tree/main/security_claims_guard | `emails/yc_spring_2026/silmaril_security_discovery.md` |
 
 ## Fit evidence
 
@@ -57,8 +58,9 @@ page clearly marks a CEO founder. Re-check the page before sending because found
   Design-to-code and coding-agent workflow specifics are useful follow-up, not the lead demo.
 - **Silmaril:** high security conversation. YC page describes prompt-injection defense that
   self-improves for AI-native applications and agents. The right route is a founder-to-founder
-  security note around the workflow, the measured `tool_boundary_security` preflight, and the
-  `security_claims_guard` source table.
+  security note around the workflow, the measured `tool_boundary_security` preflight,
+  `audit_evidence_security`, `mcp_authorization_security`, and the `security_claims_guard` source
+  table.
 
 ## Not routed into this email appendix
 
@@ -77,5 +79,6 @@ keep the link count low. Every public brief is runnable at `cfregly/claude-featu
 https://github.com/cfregly/claude-feature-hits
 
 Security-specific drafts are different by design. They can point to `tool_boundary_security` for the
-measured prompt-injection preflight and `security_claims_guard` for the official-source caveats. Do
-not turn the controls map into broad claims in the email.
+measured prompt-injection preflight, `audit_evidence_security` for audit evidence,
+`mcp_authorization_security` for MCP authorization posture, and `security_claims_guard` for the
+official-source caveats. Do not turn any guard into broad claims in the email.

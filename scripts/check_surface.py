@@ -81,8 +81,17 @@ SIBLING_BRIEFS = ROOT.parent / "claude-feature-hits"
 # rename cannot silently disarm both the whitelist and the runner gate at once.
 SIBLING_SECURITY_DIR = "security_claims_guard"
 SIBLING_SECURITY_POLICY_DIR = "mcp_authorization_security"
-SIBLING_SECURITY_TERM_DIRS = (SIBLING_SECURITY_DIR, SIBLING_SECURITY_POLICY_DIR)
-SIBLING_SECURITY_RUNNERS = (SIBLING_SECURITY_DIR, SIBLING_SECURITY_POLICY_DIR)
+SIBLING_SECURITY_AUDIT_DIR = "audit_evidence_security"
+SIBLING_SECURITY_TERM_DIRS = (
+    SIBLING_SECURITY_DIR,
+    SIBLING_SECURITY_POLICY_DIR,
+    SIBLING_SECURITY_AUDIT_DIR,
+)
+SIBLING_SECURITY_RUNNERS = (
+    SIBLING_SECURITY_DIR,
+    SIBLING_SECURITY_POLICY_DIR,
+    SIBLING_SECURITY_AUDIT_DIR,
+)
 SIBLING_BRIEF_GLOBS = [
     "README.md", "*/README.md", "*/run.py", "*/run_tokens.py", "*/cite.py", "*/my_tool.py",
     "*/sample.txt", "*/compare_sample.txt", "*/controls.json",

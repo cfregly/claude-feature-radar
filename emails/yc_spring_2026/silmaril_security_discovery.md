@@ -9,9 +9,9 @@ teams moving agent demos into production, where the hard questions are cost, spe
 accuracy, and security at the same time.
 
 I saw Silmaril is building prompt-injection defense that self-improves for AI-native applications and
-agents. I made two small public security artifacts for exactly this boundary question: which tool
-action is high risk, which injected instructions should block or ask, what evidence gets logged, and
-which official source supports each security-control line.
+agents. I made four small public security artifacts for exactly this boundary question: which tool
+action is high risk, which injected instructions should block or ask, what evidence gets logged, how
+MCP authorization is scoped, and which official source supports each security-control line.
 
 The security surface I would map first is the exact boundary your product defends: model input,
 retrieved content, tool call, action policy, operator review, and buyer evidence.
@@ -20,13 +20,21 @@ The prompt-injection preflight is here:
 
 https://github.com/cfregly/claude-feature-hits/tree/main/tool_boundary_security
 
-The source-backed controls map is here:
+The audit-evidence check is here:
+
+https://github.com/cfregly/claude-feature-hits/tree/main/audit_evidence_security
+
+The MCP authorization check is here:
+
+https://github.com/cfregly/claude-feature-hits/tree/main/mcp_authorization_security
+
+The source-backed claims guard is here:
 
 https://github.com/cfregly/claude-feature-hits/tree/main/security_claims_guard
 
-Run both with `make security`. The source-backed controls map is $0.00 and needs no key or network.
-The prompt-injection preflight makes six live Claude calls for $0.02 and blocks all three injected
-instructions in the test set, with 0 unsafe tool executions.
+Run all four with `make security`. The audit, MCP auth, and source-backed claim guards are $0.00 and
+need no API key or network. The prompt-injection preflight makes twelve live Claude calls for $0.04
+and passes 12/12 model decisions, with 0 unsafe tool executions.
 
 The test I would build with you is not a generic demo. It is a prompt-injection eval
 over an agent with real tool access:

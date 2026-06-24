@@ -6,7 +6,7 @@ announcements and records the caveats that prevent unsupported ZDR, HIPAA, CMEK,
 Transparency claims. It makes no model call, runs no competitor arms, and never emits a claude-ahead
 verdict.
 
-The security pillar ships three public companion briefs in the sibling public hits repo, each with its
+The security pillar ships four public companion briefs in the sibling public hits repo, each with its
 own runner, separate from this private ledger:
   - security_claims_guard: a $0 no-network checker that every public security-claim row has an
     official-source snapshot and a caveat. Its runner is invoked by the engine surface gate
@@ -15,12 +15,15 @@ own runner, separate from this private ledger:
   - mcp_authorization_security: a $0 no-network checker for Enterprise-Managed MCP Authorization
     rollout posture. It verifies IdP-managed connector authorization, group scope, client coverage,
     revocation, audit evidence, and the official Claude/MCP source markers.
-  - tool_boundary_security: a live prompt-injection and tool-boundary demo (six Claude calls, about
-    $0.02) that shows untrusted instructions never authorize a side-effecting tool. It is a behavioral
-    demo with its own receipt, not a source-claims brief, so it needs no source/caveat runner. The
-    surface gate scans its prose for wins-only compliance like every other public brief.
-Both are external-only public briefs, not engine demonstrators behind the demoKind registry, so the
-absence of a demoKind or coverage row for them is by design, not a gap.
+  - audit_evidence_security: a $0 no-network checker that validates JSONL audit evidence for
+    security-sensitive tool decisions. It verifies untrusted-source labels, evidence pointers, block /
+    ask / continue decisions, and safe execution records.
+  - tool_boundary_security: a live prompt-injection and tool-boundary demo (twelve Claude calls,
+    about $0.04) that shows untrusted instructions never authorize a side-effecting tool. It is a
+    behavioral demo with its own receipt, not a source-claims brief, so it needs no source/caveat
+    runner. The surface gate scans its prose for wins-only compliance like every other public brief.
+These are external-only public briefs, not engine demonstrators behind the demoKind registry, so the
+absence of demoKind or coverage rows for them is by design, not a gap.
 """
 
 from __future__ import annotations

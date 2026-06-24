@@ -72,22 +72,26 @@ def test_absent_sibling_is_skipped(monkeypatch, tmp_path):
 
 def test_public_security_companion_briefs_are_contractually_present():
     """The public security surface is intentionally split: a live behavioral feature hit, an MCP
-    authorization posture guard, and the source/caveat guard that validates security-copy claims."""
+    authorization posture guard, an audit-evidence checker, and the source/caveat guard that
+    validates security-copy claims."""
     if not cs.SIBLING_BRIEFS.exists():
         pytest.skip("public sibling repo not checked out locally")
     tool_dir = cs.SIBLING_BRIEFS / "tool_boundary_security"
+    audit_dir = cs.SIBLING_BRIEFS / cs.SIBLING_SECURITY_AUDIT_DIR
     mcp_dir = cs.SIBLING_BRIEFS / cs.SIBLING_SECURITY_POLICY_DIR
     guard_dir = cs.SIBLING_BRIEFS / cs.SIBLING_SECURITY_DIR
 
     for required in ("README.md", "run.py", "sample.txt"):
         assert (tool_dir / required).is_file(), f"tool_boundary_security is missing {required}"
+    for required in ("README.md", "run.py", "audit_log.jsonl", "sample.txt"):
+        assert (audit_dir / required).is_file(), f"{cs.SIBLING_SECURITY_AUDIT_DIR} is missing {required}"
     for required in ("README.md", "run.py", "policy.json", "sample.txt"):
         assert (mcp_dir / required).is_file(), f"{cs.SIBLING_SECURITY_POLICY_DIR} is missing {required}"
     for required in ("README.md", "run.py", "controls.json"):
         assert (guard_dir / required).is_file(), f"{cs.SIBLING_SECURITY_DIR} is missing {required}"
 
     makefile = (cs.SIBLING_BRIEFS / "Makefile").read_text(errors="ignore")
-    assert "security: tool_boundary_security mcp_authorization_security security_claims_guard" in makefile
+    assert "security: tool_boundary_security audit_evidence_security mcp_authorization_security security_claims_guard" in makefile
 
 
 def test_public_readme_names_security_feature_hit_and_guardrail():
@@ -98,5 +102,6 @@ def test_public_readme_names_security_feature_hit_and_guardrail():
     readme = (cs.SIBLING_BRIEFS / "README.md").read_text(errors="ignore")
     assert "Security means tool and data boundaries plus source-backed security claims." in readme
     assert "The security feature hit is `tool_boundary_security`." in readme
+    assert "`audit_evidence_security`" in readme
     assert "`mcp_authorization_security`" in readme
     assert "`security_claims_guard`" in readme
