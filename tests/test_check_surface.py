@@ -70,6 +70,16 @@ def test_absent_sibling_is_skipped(monkeypatch, tmp_path):
     assert bad == []
 
 
+def test_adversarial_value_bar_is_encoded_in_claude_md():
+    """The repo operating rules must keep the hard promotion bar explicit."""
+    bad = []
+    cs._check_claude_bar(bad)
+    assert bad == []
+    text = (ROOT / "CLAUDE.md").read_text(errors="ignore")
+    assert cs.VALUE_BAR in text
+    assert "Try to disprove the claim before promoting it" in text
+
+
 def test_public_security_companion_briefs_are_contractually_present():
     """The public security surface is intentionally split: a live behavioral feature hit, an MCP
     authorization posture guard, an audit-evidence checker, and the source/caveat guard that

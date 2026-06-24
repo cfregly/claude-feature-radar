@@ -82,6 +82,25 @@ The engine finds a real capability gap, not a winning argument. It checks the Cl
 the competitor side and throws out any framing that does not survive a skeptic. An overstated
 claim in a founder's inbox is worse than no claim.
 
+## Adversarially-confirmed to add value is the bar
+
+A candidate does not become a feature hit because it is plausible, new, source-backed, or easy to
+demo. It becomes a hit only when it is adversarially-confirmed to add value: the skeptic pass or an
+equivalent adversarial review has tried to break it, the exact sources and receipts still hold, and
+the surviving claim moves a pillar a founder pays for: cost, speed, reliability, accuracy, security,
+or less glue code.
+
+- Write the value hypothesis before building the benchmark: workload, reader, pillar, expected
+  movement, and the competitor or baseline that could kill it.
+- Try to disprove the claim before promoting it. Look for parity, a stronger competitor stack, a
+  stale source, a hidden beta caveat, an unfair model tier, a toy workload, a confounder, and a
+  mechanism with no so-what.
+- If the adversarial read breaks the claim or finds no measured value, route it to the private misses
+  ledger, keep it as a private source-ledger item, or label it within-Claude only.
+  It does not become founder copy.
+- Promotion requires a closure record: exact source, receipt, run command, model ids, cost, time, and
+  what the skeptic tried that did not break the value.
+
 ## Compare best to best, latest to latest
 Every comparison uses each platform's LATEST API and ALL of its best features, including alpha and
 beta, on both sides. Never handicap a competitor to make Claude look better, and never handicap

@@ -14,6 +14,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SELF = "check_surface.py"
+VALUE_BAR = "adversarially-confirmed to add value"
 
 # Rule 1: no internal build-process or external-repo leakage in committed source. The repo must read
 # as self-contained (CLAUDE.md "keep it forkable: no references to anything outside this repo").
@@ -204,8 +205,22 @@ def _check_security_brief(bad):
             bad.append(f"{name} public security gate failed:\n" + detail)
 
 
+def _check_claude_bar(bad):
+    text = (ROOT / "CLAUDE.md").read_text(errors="ignore")
+    required = [
+        VALUE_BAR,
+        "Write the value hypothesis before building the benchmark",
+        "Try to disprove the claim before promoting it",
+        "Promotion requires a closure record",
+    ]
+    for needle in required:
+        if needle not in text:
+            bad.append(f"CLAUDE.md: missing adversarial value-bar rule: {needle!r}")
+
+
 def main():
     bad = []
+    _check_claude_bar(bad)
     for p in _source_files():
         text = p.read_text(errors="ignore")
         for pat, why in FORBIDDEN:
