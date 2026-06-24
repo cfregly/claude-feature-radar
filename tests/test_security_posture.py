@@ -26,12 +26,13 @@ def test_security_sources_are_registered_for_the_sweep():
     keys = {(vendor, key) for vendor, key, _ in entries}
     for key in sp.REQUIRED_KEYS:
         assert ("claude", key) in keys
+    assert "enterprise_managed_mcp_authorization" in REQUIRED_SOURCE_KEYS["mcp_ip"]
     assert sum(1 for vendor, key, _ in entries if vendor == "claude" and key == "mcp_connector") == 1
     assert ("claude", "ip_addresses") in keys
     for vendor, key, url in entries:
         if vendor == "claude" and key in sp.REQUIRED_KEYS:
             assert url.startswith(("https://platform.claude.com/", "https://docs.claude.com/",
-                                   "https://code.claude.com/"))
+                                   "https://code.claude.com/", "https://claude.com/blog/"))
 
 
 def test_security_posture_holds_when_snapshots_are_missing(tmp_path, monkeypatch):
@@ -74,7 +75,7 @@ def test_receipt_carries_required_caveats(tmp_path, monkeypatch):
     caveats = receipt["workload"]["caveats"]
 
     for key in ("zdr", "hipaa_baa", "access_transparency", "cmek", "mcp_connector",
-                "ip_allowlisting"):
+                "enterprise_managed_mcp_authorization", "ip_allowlisting"):
         assert key in caveats
         assert caveats[key] == CAVEATS[key]
     assert "ZDR" in receipt["workload"]["not_claimed"]

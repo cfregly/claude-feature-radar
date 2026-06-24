@@ -167,9 +167,9 @@ https://github.com/cfregly/claude-feature-hits/tree/main/tool_boundary_security
 
 The source-backed controls map is here:
 
-https://github.com/cfregly/claude-feature-hits/tree/main/security_controls_map
+https://github.com/cfregly/claude-feature-hits/tree/main/security_claims_guard
 
-Run both with `make security`. The run is zero-spend and catches every injected instruction in the test set: 4/4 cases blocked and 0 dangerous actions allowed, with a source-backed controls map behind it.
+Run both with `make security`. The source-backed controls map is $0.00 and needs no key or network. The prompt-injection preflight makes six live Claude calls for $0.02 and blocks all three injected instructions in the test set, with 0 unsafe tool executions.
 
 The test I would build with you is not generic:
 

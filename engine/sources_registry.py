@@ -86,6 +86,7 @@ SOURCES: list[Source] = [
     Source("claude", "pdf_support", "https://platform.claude.com/docs/en/build-with-claude/pdf-support", "doc"),
     Source("claude", "agent_skills", "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview", "doc"),
     Source("claude", "mcp_connector", "https://platform.claude.com/docs/en/agents-and-tools/mcp-connector", "doc"),
+    Source("claude", "enterprise_managed_mcp_authorization", "https://claude.com/blog/enterprise-managed-auth", "blog"),
     # Security and admin posture: official first-party Anthropic sources only. These feed the private
     # security_posture ledger and never create a public edge by themselves.
     Source("claude", "cmek", "https://platform.claude.com/docs/en/manage-claude/cmek", "doc"),

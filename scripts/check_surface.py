@@ -55,7 +55,8 @@ NEGATIVES = [
 
 SECURITY_TERMS = [
     # Security posture details belong in private source-backed reviews, not public founder copy,
-    # except for the public security_controls_map brief, whose own runner verifies sources and caveats.
+    # except for the public security brief (SIBLING_SECURITY_DIR), whose own runner verifies sources
+    # and caveats.
     "zdr", "zero data retention", "hipaa", "baa", "business associate agreement",
     "cmek", "customer-managed encryption", "access transparency",
     "compliance api", "admin api", "blanket coverage",
@@ -75,6 +76,11 @@ BRIEF_ASSET_GLOBS = [
     "brief_assets/*/sample.txt", "brief_assets/*/compare_sample.txt",
 ]
 SIBLING_BRIEFS = ROOT.parent / "claude-feature-hits"
+# The one public brief allowed to carry source-backed security terms (ZDR, HIPAA, CMEK, and the rest).
+# Its own runner verifies every row against an official source and a caveat. The folder name lives in
+# exactly one place so a rename cannot silently disarm both the whitelist and the source/caveat gate
+# at once, the way the earlier rename of this folder did.
+SIBLING_SECURITY_DIR = "security_claims_guard"
 SIBLING_BRIEF_GLOBS = [
     "README.md", "*/README.md", "*/run.py", "*/run_tokens.py", "*/cite.py", "*/my_tool.py",
     "*/sample.txt", "*/compare_sample.txt", "*/controls.json",
@@ -157,23 +163,33 @@ def _label(p):
     return str(p)
 
 
-def _is_security_controls_map(p):
+def _is_security_brief(p):
     try:
         rel = p.relative_to(SIBLING_BRIEFS)
     except ValueError:
         return False
-    return rel.parts[:1] == ("security_controls_map",)
+    return rel.parts[:1] == (SIBLING_SECURITY_DIR,)
 
 
-def _check_security_controls_map(bad):
-    controls_dir = SIBLING_BRIEFS / "security_controls_map"
-    if not controls_dir.exists():
+def _check_security_brief(bad):
+    # When the public repo is not checked out beside the engine (isolated CI), there is nothing to
+    # verify, so skip. But when the sibling IS present and the security brief folder is gone, that is
+    # the exact silent-disarm a folder rename causes, so fail loudly instead of returning quietly.
+    if not SIBLING_BRIEFS.exists():
         return
-    out = subprocess.run([sys.executable, "-m", "security_controls_map.run"], cwd=SIBLING_BRIEFS,
+    controls_dir = SIBLING_BRIEFS / SIBLING_SECURITY_DIR
+    if not controls_dir.exists():
+        bad.append(
+            f"security brief folder {SIBLING_SECURITY_DIR!r} is missing from the sibling "
+            "claude-feature-hits checkout: the source/caveat gate cannot run and the founder-surface "
+            "security-term whitelist points at a folder that does not exist"
+        )
+        return
+    out = subprocess.run([sys.executable, "-m", f"{SIBLING_SECURITY_DIR}.run"], cwd=SIBLING_BRIEFS,
                          capture_output=True, text=True, timeout=30)
     if out.returncode != 0:
         detail = (out.stdout + out.stderr).strip()
-        bad.append("security_controls_map source/caveat gate failed:\n" + detail)
+        bad.append(f"{SIBLING_SECURITY_DIR} source/caveat gate failed:\n" + detail)
 
 
 def main():
@@ -191,12 +207,12 @@ def main():
                 if neg in low:
                     bad.append(f"{_label(p)}:{i}: founder-surface negative: {neg!r}")
             for neg in SECURITY_TERMS:
-                if neg in low and not _is_security_controls_map(p):
-                    bad.append(f"{_label(p)}:{i}: founder-surface security term outside controls map: {neg!r}")
+                if neg in low and not _is_security_brief(p):
+                    bad.append(f"{_label(p)}:{i}: founder-surface security term outside security brief: {neg!r}")
             for neg in CASE_SENSITIVE_NEGATIVES:
                 if neg in line:
                     bad.append(f"{_label(p)}:{i}: founder-surface negative: {neg!r}")
-    _check_security_controls_map(bad)
+    _check_security_brief(bad)
     if bad:
         print("surface gate: FAIL")
         print("\n".join(bad))

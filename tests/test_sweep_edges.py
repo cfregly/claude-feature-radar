@@ -181,7 +181,7 @@ def test_security_registry_sources_are_official_and_seeded_to_security():
         src = entries.get(("claude", key))
         assert src is not None, f"missing required security source {key}"
         assert src.url.startswith(("https://platform.claude.com/", "https://docs.claude.com/",
-                                   "https://code.claude.com/"))
+                                   "https://code.claude.com/", "https://claude.com/blog/"))
         assert se._seed_axis_for(key) == "security"
     assert sum(1 for s in sources() if s.vendor == "claude" and s.key == "mcp_connector") == 1
     assert ("claude", "ip_addresses") in entries

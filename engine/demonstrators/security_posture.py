@@ -1,9 +1,23 @@
-"""security_posture: private source-ledger demonstrator for Anthropic security and admin docs.
+"""security_posture: private source-ledger demonstrator for Anthropic security/admin sources.
 
 Security is a radar pillar, but security diligence is not a public founder win by default. This
-demonstrator proves only that the engine tracks the official Anthropic security/admin source set and
-records the caveats that prevent unsupported ZDR, HIPAA, CMEK, or Access Transparency claims. It makes
-no model call, runs no competitor arms, and never emits a claude-ahead verdict.
+demonstrator proves only that the engine tracks the official Anthropic security/admin docs and product
+announcements and records the caveats that prevent unsupported ZDR, HIPAA, CMEK, or Access
+Transparency claims. It makes no model call, runs no competitor arms, and never emits a claude-ahead
+verdict.
+
+The security pillar ships two public companion briefs in the sibling public hits repo, each with its
+own runner, separate from this private ledger:
+  - security_claims_guard: a $0 no-network checker that every public security-claim row has an
+    official-source snapshot and a caveat. Its runner is invoked by the engine surface gate
+    (scripts/check_surface.py), and it is the one public brief allowed to carry source-backed security
+    terms (ZDR, HIPAA, CMEK, and the rest).
+  - tool_boundary_security: a live prompt-injection and tool-boundary demo (six Claude calls, about
+    $0.02) that shows untrusted instructions never authorize a side-effecting tool. It is a behavioral
+    demo with its own receipt, not a source-claims brief, so it needs no source/caveat runner. The
+    surface gate scans its prose for wins-only compliance like every other public brief.
+Both are external-only public briefs, not engine demonstrators behind the demoKind registry, so the
+absence of a demoKind or coverage row for them is by design, not a gap.
 """
 
 from __future__ import annotations
@@ -59,6 +73,7 @@ REQUIRED_SOURCE_KEYS = {
         "cmek_azure_key_vault",
     ],
     "mcp_ip": [
+        "enterprise_managed_mcp_authorization",
         "mcp_connector",
         "ip_addresses",
     ],
@@ -82,6 +97,11 @@ CAVEATS = {
         "applies only to data written after enablement."
     ),
     "mcp_connector": "MCP connector is explicitly not ZDR eligible and uses its own retention policy.",
+    "enterprise_managed_mcp_authorization": (
+        "Enterprise-managed MCP authorization is beta, Team/Enterprise scoped, and Okta-at-launch via "
+        "Cross App Access. It centralizes connector authorization through an IdP but is not a ZDR, "
+        "HIPAA, CMEK, or compliance guarantee."
+    ),
     "ip_allowlisting": (
         "IP allowlisting is relevant for inbound API or Console access and outbound MCP or web "
         "requests, not a compliance guarantee."
@@ -233,7 +253,7 @@ class SecurityPostureDemonstrator(BaseDemonstrator):
             verdict,
             {"estimate": self.estimate(edge, spec).to_dict()},
             workload={
-                "scope": "official Anthropic security and admin docs only",
+                "scope": "official Anthropic security and admin sources only",
                 "categories": list(REQUIRED_SOURCE_KEYS),
                 "not_claimed": ["ZDR", "HIPAA", "BAA", "CMEK blanket coverage",
                                 "Access Transparency blanket coverage", "competitor inferiority"],
