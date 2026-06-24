@@ -100,6 +100,10 @@ or less glue code.
   It does not become founder copy.
 - Promotion requires a closure record: exact source, receipt, run command, model ids, cost, time, and
   what the skeptic tried that did not break the value.
+- The code gate is `engine/adversarial.py`. `make verify` writes `landscape/adversarial.json`.
+  Publishing, MCP lead lists, cadence drafts, and the paid founder-email drafter must call
+  `value_confirmed`. A `KILLED` verdict from any current adversarial judge holds the edge until the
+  framing is narrowed and re-tested.
 
 ## Compare best to best, latest to latest
 Every comparison uses each platform's LATEST API and ALL of its best features, including alpha and

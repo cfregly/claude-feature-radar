@@ -13,7 +13,8 @@ import json
 
 from common.client import get_client, repo_root
 from common.models import get, request_kwargs
-from engine.scan import current_anchor
+from engine import adversarial
+from engine.scan import current_edges
 
 # A demonstrator persists its standard Receipt to one of these, newest-wins. demoKind-agnostic: the
 # drafter reads the Receipt shape, never a per-feature field, so a ported demonstrator needs no edit
@@ -80,10 +81,17 @@ BASE_SYSTEM = (
 
 
 def main():
+    confirmed = adversarial.confirmed_edges(current_edges())
+    if not confirmed:
+        raise SystemExit(
+            "No adversarially-confirmed value edge is currently available. Run make verify with "
+            "the adversarial judges, narrow any killed framing, then draft."
+        )
+    anchor = f"{confirmed[0].get('claim', '')}\n\nWhy: {confirmed[0].get('why', '')}".strip()
     client = get_client()
     prompt = (
         f"Write a short cold email to a new YC batch from a founder who builds with Claude. "
-        f"Anchor on this gap: {current_anchor()}\n\n"
+        f"Anchor on this gap: {anchor}\n\n"
         f"The measured proof to cite: {_receipt()}\n\n"
         f"The reader has tried all three big model platforms. Get them to clone a repo and run a "
         f"two-minute demo using their own API key. Give a subject line and a body. Use {{repo_link}} as "

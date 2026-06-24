@@ -12,24 +12,24 @@ import json
 import pytest
 
 from engine import publish_brief as pb
+from engine.adversarial import ValueGate
 
 
 # --------------------------------------------------------------------------- the gate, on real edges
 
 
-def test_clean_win_passes_the_gate():
-    """programmatic-tool-calling is the engine's anchor: claude-ahead, ranked, absence-of-evidence. The
-    gate must pass it (reading the committed landscape or the seed fallback)."""
+def test_current_programmatic_tool_calling_is_held_by_the_adversarial_gate():
+    """The old anchor has a receipt, but the current adversarial report killed the broad framing."""
     gate = pb.verdict_gate("programmatic-tool-calling")
-    assert gate.ok, gate.reason
+    assert not gate.ok
     assert gate.verdict == "claude-ahead"
-    assert gate.lead_basis in pb.PUBLISHABLE_LEAD_BASES
+    assert "adversarial value gate" in gate.reason
 
 
 def test_slug_and_folder_key_both_resolve():
-    """Both the live sweep slug (programmatic_tool_calling) and the built-edge folder name resolve to the same passing edge."""
-    assert pb.verdict_gate("programmatic_tool_calling").ok
-    assert pb.verdict_gate("programmatic-tool-calling").ok
+    """Both the live sweep slug and the built-edge folder resolve to the same held edge."""
+    assert not pb.verdict_gate("programmatic_tool_calling").ok
+    assert not pb.verdict_gate("programmatic-tool-calling").ok
 
 
 @pytest.mark.parametrize("edge_key", [
@@ -60,12 +60,23 @@ def test_unknown_edge_is_refused_not_crashed():
 def _synthetic_edge(monkeypatch, *, verdict, lead_score, lead_basis, key="programmatic-tool-calling"):
     edge = {
         "key": key, "axis": "cost", "verdict": verdict, "lead_score": lead_score,
-        "fair_comparison": {"lead_basis": lead_basis},
+        "fair_comparison": {"lead_basis": lead_basis, "task_shape": "task", "score_gate": "gate"},
     }
     monkeypatch.setattr(pb, "_find_edge", lambda k: (dict(edge), "synthetic"))
     # No receipt veto in the synthetic-edge rule tests: keep the receipt out of the way.
     monkeypatch.setattr(pb, "_receipt_path", lambda k: None)
     return edge
+
+
+def _pass_adversarial_gate(monkeypatch):
+    monkeypatch.setattr(pb, "_adversarial_value_gate",
+                        lambda edge, measurement: ValueGate(True, "ok", key=edge.get("key", "")))
+
+
+def test_synthetic_confirmed_value_passes(monkeypatch, tmp_path):
+    _synthetic_edge(monkeypatch, verdict="claude-ahead", lead_score=5, lead_basis="head-to-head")
+    _pass_adversarial_gate(monkeypatch)
+    assert pb.verdict_gate("programmatic-tool-calling").ok
 
 
 def test_behind_verdict_refused(monkeypatch):
@@ -129,6 +140,7 @@ def test_disagreeing_receipt_vetoes(monkeypatch, tmp_path):
 
 def test_agreeing_receipt_passes(monkeypatch, tmp_path):
     _synthetic_edge(monkeypatch, verdict="claude-ahead", lead_score=5, lead_basis="absence-of-evidence")
+    _pass_adversarial_gate(monkeypatch)
     good = tmp_path / "last_programmatic_tool_calling.json"
     good.write_text(json.dumps({"mode_b_correct": True, "pct_input_reduction": 28.0,
                                 "mode_a": {"billed_input": 9451}, "mode_b": {"billed_input": 6828}}))

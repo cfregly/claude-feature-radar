@@ -49,12 +49,13 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from engine import scan  # noqa: E402  committed seed + landscape reader, anthropic-free
+from engine.adversarial import VALUE_LEAD_BASES, value_confirmed  # noqa: E402
 from engine.demokinds import PRIVATE_ONLY_DEMOKINDS, demokind_for  # noqa: E402
 
 # The lead_basis values that are NOT regime-bounded: a stable head-to-head win, a documented
 # absence-of-evidence lead, or a within-Claude value-add. doc-grounded-parity is a parity, not a lead,
 # and a cost-model lead is a price-regime lead that flips on the next price change, so neither is here.
-PUBLISHABLE_LEAD_BASES = ("head-to-head", "absence-of-evidence", "within-claude-only")
+PUBLISHABLE_LEAD_BASES = tuple(sorted(VALUE_LEAD_BASES))
 
 # Keys we refuse outright regardless of how their lead_basis is labeled. cost-model is regime-bounded by
 # construction (it wins only in one price regime), so it never publishes even if a record mislabels it.
@@ -420,6 +421,33 @@ def _committed_receipt(plan: BriefPlan) -> dict | None:
     }
 
 
+def _committed_json_receipt(edge_key: str) -> dict | None:
+    """Read a committed edges/<folder>/receipt.json when one exists."""
+    plan = _plan_for(edge_key)
+    folders = [edge_key, edge_key.replace("_", "-")]
+    if plan:
+        folders.extend(k for k, v in PLANS.items() if v is plan)
+    for folder in dict.fromkeys(folders):
+        p = ROOT / "edges" / folder / "receipt.json"
+        if not p.exists():
+            continue
+        try:
+            return json.loads(p.read_text())
+        except (json.JSONDecodeError, OSError):
+            return None
+    return None
+
+
+def _measurement_for_gate(edge_key: str, plan: BriefPlan, transient_receipt: dict | None) -> dict | None:
+    """The measurement the value gate sees: transient receipt first, then committed JSON receipt, then
+    the committed sample parser for legacy PTC-style briefs."""
+    return transient_receipt or _committed_json_receipt(edge_key) or _committed_receipt(plan)
+
+
+def _adversarial_value_gate(edge: dict, measurement: dict | None):
+    return value_confirmed(edge, measurement, require_receipt=True, require_adversarial=True)
+
+
 # --------------------------------------------------------------------------- the verdict gate
 
 
@@ -495,13 +523,23 @@ def verdict_gate(edge_key: str) -> GateResult:
                               "vetoes the publish", edge=edge, receipt_path=rpath, receipt=receipt)
 
     # 4) A built brief plan must exist (we only publish edges we can vendor a runnable brief for).
-    if _plan_for(edge_key) is None:
+    plan = _plan_for(edge_key)
+    if plan is None:
         return GateResult(False, edge_key, verdict, lead_basis, source,
                           f"no vendor plan for {edge_key!r}: a runnable brief cannot be assembled yet",
                           edge=edge, receipt_path=rpath, receipt=receipt)
 
+    # 5) The central value bar: measured value plus a clean adversarial overlay. A current KILLED
+    #    verdict holds the edge even when old receipts still exist.
+    measurement = _measurement_for_gate(edge_key, plan, receipt)
+    value_gate = _adversarial_value_gate(edge, measurement)
+    if not value_gate.ok:
+        return GateResult(False, edge_key, verdict, lead_basis, source,
+                          f"adversarial value gate failed: {value_gate.reason}",
+                          edge=edge, receipt_path=rpath, receipt=receipt)
+
     return GateResult(True, edge_key, verdict, lead_basis, source,
-                      "clean claude-ahead, ranked, non-regime-bounded, receipt agrees",
+                      "clean claude-ahead, ranked, non-regime-bounded, measured, adversarially confirmed",
                       edge=edge, receipt_path=rpath, receipt=receipt)
 
 

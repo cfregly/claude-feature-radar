@@ -10,36 +10,37 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import pathlib
 import re
 
 from common.client import get_client
 from common.models import get, request_kwargs
 from common.runner import call as runner_call, get_openai_client
+from engine.adversarial import write_report
 from engine.budget import BudgetLedger
 from engine.scan import current_edges
 
-SYSTEM = (
+JUDGE_SYSTEM = (
     "You are a skeptical startup CTO who has shipped on OpenAI, Google Gemini, and Anthropic "
     "Claude. For each claimed capability gap, decide whether it survives scrutiny or is "
     "overstated. Be harsh. If a competitor has a near-equivalent, the claim is overstated. Think "
     "combinatorially: a single Claude feature can read as a real edge while the competitor can "
     "assemble an equivalent STACK of two or three of its own features on the same workload, so try "
-    "to build that competing combination before you let a claim survive. Reply with exactly one "
-    "line per claim, in the form: <KILLED|SURVIVES> - <key> - <one sentence why>."
-)
-
-OPENAI_SYSTEM = (
-    "You are a skeptical startup CTO who has shipped on OpenAI, Google Gemini, and Anthropic "
-    "Claude. For each claimed capability gap, decide whether it survives scrutiny or is "
-    "overstated. Be harsh. If a competitor has a near-equivalent, the claim is overstated. Think "
-    "combinatorially: a single Claude feature can read as a real edge while the competitor can "
-    "assemble an equivalent STACK of two or three of its own features on the same workload, so try "
-    "to build that competing combination before you let a claim survive.\n\n"
+    "to build that competing combination before you let a claim survive. KILL claims where the "
+    "difference is only native packaging, DX, a thinner integration path, a feature name, or a "
+    "mechanism with no measured founder-valued outcome. SURVIVES only when the evidence shows an "
+    "outcome a founder pays for: lower cost, higher speed, stronger reliability, better accuracy, "
+    "stronger security, or less glue code that a best competitor stack cannot recreate on the same "
+    "workload.\n\n"
     "Return only strict JSON, with no markdown, no code fence, no table, and no prose outside the "
     "JSON object. The schema is exactly: "
     '{"verdicts":[{"key":"<claim key>","verdict":"KILLED|SURVIVES","why":"<one sentence>"}]}. '
     "Return exactly one verdict for every expected key, and no extra keys."
 )
+
+# Back-compat alias for old imports/tests.
+SYSTEM = JUDGE_SYSTEM
+OPENAI_SYSTEM = JUDGE_SYSTEM
 
 
 def _claim_keys(body: str) -> list[str]:
@@ -90,6 +91,26 @@ def _parse_openai_verdicts(text: str, expected_keys: list[str]) -> dict[str, dic
     return found
 
 
+def _verdict_prompt(body: str, expected_keys: list[str]) -> str:
+    return (
+        f"{JUDGE_SYSTEM}\n\n"
+        f"Expected keys, in order: {json.dumps(expected_keys)}\n\n"
+        f"Claims:\n{body}"
+    )
+
+
+def _print_verdicts(label: str, expected_keys: list[str], verdicts: dict[str, dict[str, str]]) -> None:
+    print(f"\n  Skeptic pass ({label}):\n")
+    for key in expected_keys:
+        row = verdicts[key]
+        print(f"    {row['verdict']} - {key} - {row['why']}")
+    print()
+
+
+def _report_rows(expected_keys: list[str], verdicts: dict[str, dict[str, str]]) -> list[dict[str, str]]:
+    return [verdicts[key] for key in expected_keys]
+
+
 def _body() -> str:
     return "\n\n".join(
         f"key: {c['key']}\nclaim Claude is ahead: {c['claim']}\nwhy: {c['why']}"
@@ -121,24 +142,25 @@ def _message_text(msg) -> str:
 
 
 def _run_claude(body: str, budget: BudgetLedger) -> None:
-    messages = [{"role": "user", "content": body}]
+    expected_keys = _claim_keys(body)
+    messages = [{"role": "user", "content": _verdict_prompt(body, expected_keys)}]
     max_tokens = _verdict_max_tokens()
     effort = _claude_effort()
     reservation = budget.preflight("verify:claude-opus-skeptic", "opus",
-                                   messages=messages, max_tokens=max_tokens, system=SYSTEM)
+                                   messages=messages, max_tokens=max_tokens, system=JUDGE_SYSTEM)
     client = get_client()
     try:
         msg = _create_claude_message(
             client,
             max_tokens=max_tokens,
-            system=SYSTEM,
+            system=JUDGE_SYSTEM,
             messages=messages,
             **request_kwargs("opus", effort=effort, adaptive_thinking=True),
         )
     except Exception as e:
         budget.mark_failed(reservation, e)
         raise
-    budget.commit_usage(reservation, msg.usage)
+    actual = budget.commit_usage(reservation, msg.usage)
     text = _message_text(msg)
     if not text:
         kinds = ", ".join(getattr(b, "type", "?") for b in msg.content)
@@ -146,11 +168,16 @@ def _run_claude(body: str, budget: BudgetLedger) -> None:
             f"Claude verifier returned no visible verdict text after {max_tokens} max_tokens "
             f"(content blocks: {kinds or 'none'})."
         )
-    print(f"\n  Skeptic pass ({get('opus').label}, {effort} effort, adaptive thinking):\n")
-    for line in text.splitlines():
-        if line.strip():
-            print(f"    {line.strip()}")
-    print()
+    verdicts = _parse_openai_verdicts(text, expected_keys)
+    _print_verdicts(f"{get('opus').label}, {effort} effort, adaptive thinking", expected_keys, verdicts)
+    return {
+        "judge": "claude",
+        "model": get("opus").id,
+        "label": get("opus").label,
+        "effort": effort,
+        "cost_usd": round(actual, 6),
+        "verdicts": _report_rows(expected_keys, verdicts),
+    }
 
 
 def _run_openai(body: str, budget: BudgetLedger) -> None:
@@ -159,15 +186,10 @@ def _run_openai(body: str, budget: BudgetLedger) -> None:
         print("\n  OpenAI skeptic skipped: OPENAI_API_KEY is not set.\n")
         return
     expected_keys = _claim_keys(body)
-    prompt = (
-        f"{OPENAI_SYSTEM}\n\n"
-        f"Expected keys, in order: {json.dumps(expected_keys)}\n\n"
-        f"Claims:\n{body}"
-    )
-    messages = [{"role": "user", "content": prompt}]
+    messages = [{"role": "user", "content": _verdict_prompt(body, expected_keys)}]
     max_tokens = _verdict_max_tokens()
     reservation = budget.preflight("verify:openai-gpt-5.5-xhigh-skeptic", "gpt-top",
-                                   messages=messages, max_tokens=max_tokens, system=OPENAI_SYSTEM)
+                                   messages=messages, max_tokens=max_tokens, system=JUDGE_SYSTEM)
     try:
         result = runner_call(client, "gpt-top", messages, max_tokens=max_tokens, effort="xhigh")
     except Exception as e:
@@ -179,11 +201,15 @@ def _run_openai(body: str, budget: BudgetLedger) -> None:
         usage={"input_tokens": result.input_tokens, "output_tokens": result.output_tokens},
     )
     verdicts = _parse_openai_verdicts(result.text, expected_keys)
-    print(f"\n  Skeptic pass ({get('gpt-top').label}, xhigh reasoning):\n")
-    for key in expected_keys:
-        row = verdicts[key]
-        print(f"    {row['verdict']} - {key} - {row['why']}")
-    print()
+    _print_verdicts(f"{get('gpt-top').label}, xhigh reasoning", expected_keys, verdicts)
+    return {
+        "judge": "openai",
+        "model": get("gpt-top").id,
+        "label": get("gpt-top").label,
+        "effort": "xhigh",
+        "cost_usd": round(result.cost_usd, 6),
+        "verdicts": _report_rows(expected_keys, verdicts),
+    }
 
 
 def main(argv=None):
@@ -197,13 +223,19 @@ def main(argv=None):
     args = parser.parse_args(argv)
     budget = BudgetLedger.from_env(cap_usd=args.budget_usd, label=args.budget_label)
     body = _body()
+    reports = []
     for judge in [j.strip().lower() for j in args.judges.split(",") if j.strip()]:
         if judge == "claude":
-            _run_claude(body, budget)
+            report = _run_claude(body, budget)
         elif judge == "openai":
-            _run_openai(body, budget)
+            report = _run_openai(body, budget)
         else:
             raise SystemExit(f"unknown judge {judge!r}; expected claude or openai")
+        if report:
+            reports.append(report)
+    if reports:
+        path = write_report(reports)
+        print(f"  wrote adversarial value report to {path.relative_to(pathlib.Path.cwd())}\n")
 
 
 if __name__ == "__main__":

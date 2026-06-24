@@ -43,6 +43,7 @@ import json
 import pathlib
 
 from common.client import repo_root
+from engine import adversarial
 from engine import coverage as coverage_view
 from engine import gate, scan, sweep_edges
 from engine.demokinds import PRIVATE_ONLY_DEMOKINDS, demokind_for
@@ -85,9 +86,14 @@ def _private_only(edge: dict) -> bool:
 
 def _anchor_edge(ranked: list[dict], covered_keys: set[str]) -> dict | None:
     """The newest UNCOVERED lead edge: the top-ranked genuine lead whose key the stream has not already
-    drafted. Falls back to the top lead when every lead is covered (so a run always has an anchor when a
-    lead exists). Returns None when there is no genuine lead this run."""
-    leads = [e for e in ranked if e.get("lead_score", 0) > 0 and not _private_only(e)]
+    drafted and whose current adversarial report confirms value. Falls back to the top confirmed lead
+    when every confirmed lead is covered. Returns None when there is no adversarially-confirmed lead."""
+    root = repo_root()
+    leads = [e for e in ranked
+             if e.get("lead_score", 0) > 0
+             and not _private_only(e)
+             and adversarial.value_confirmed(e, root=root, require_receipt=False,
+                                             require_adversarial=True).ok]
     if not leads:
         return None
     for e in leads:

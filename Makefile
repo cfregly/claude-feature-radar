@@ -2,7 +2,7 @@
 DEEP_BUDGET_USD ?= 2.00
 DEEP_BUDGET_LABEL ?= grind-deep
 DEEP_EFFORT ?= xhigh
-VERIFY_JUDGES ?= claude
+VERIFY_JUDGES ?= claude,openai
 .PHONY: setup compare-deps mcp-deps mcp app app-check programmatic-tool-calling ptc-cache-context citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost security-posture security draft publish-brief publish-misses check-claims check-docs core-imports check-surface check-split check-receipts test ci deslop gif clean
 
 PY := .venv/bin/python

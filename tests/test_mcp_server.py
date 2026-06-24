@@ -17,6 +17,7 @@ import pytest
 
 from engine import gate
 from engine import mcp_tools as mt
+from engine.publish_brief import GateResult
 
 
 # A subprocess that explodes, wired in everywhere by default: no test may ever run a real benchmark.
@@ -93,14 +94,23 @@ def test_every_confirm_gated_action_is_caught_if_run_unattended():
 # --------------------------------------------------------------------------- publish_brief (ASK)
 
 
-def test_publish_brief_without_confirm_is_a_preview_that_writes_nothing():
-    """A clean-win edge previews under the gate but writes nothing and spends nothing until confirm."""
+def test_publish_brief_without_confirm_refuses_a_held_edge():
+    """PTC has a receipt, but the current adversarial report holds the broad framing."""
+    r = mt.publish_brief("programmatic-tool-calling", confirm=False)
+    assert r["gate_ok"] is False
+    assert r["published"] is False
+    assert r["refused"] is True
+    assert r["spent_usd"] == 0.0
+    assert r["pushed"] is False and r["sent"] is False
+
+
+def test_publish_brief_preview_writes_nothing_when_gate_is_clean(monkeypatch):
+    monkeypatch.setattr(mt, "verdict_gate", lambda edge: GateResult(
+        True, edge, "claude-ahead", "head-to-head", "synthetic", "ok"))
     r = mt.publish_brief("programmatic-tool-calling", confirm=False)
     assert r["gate_ok"] is True
     assert r["published"] is False
     assert r["requires_confirmation"] is True
-    assert r["spent_usd"] == 0.0
-    assert r["pushed"] is False and r["sent"] is False
 
 
 def test_publish_brief_refuses_a_regime_bounded_edge_even_with_confirm():
@@ -123,6 +133,8 @@ def test_publish_brief_with_confirm_routes_to_the_writer_only_on_a_clean_gate(mo
         (briefs_root / "programmatic_tool_calling" / "README.md").write_text("# brief\n")
         return 0
 
+    monkeypatch.setattr(mt, "verdict_gate", lambda edge: GateResult(
+        True, edge, "claude-ahead", "head-to-head", "synthetic", "ok"))
     monkeypatch.setattr(mt, "publish", fake_publish)
     monkeypatch.setattr(mt, "_briefs_root", lambda: tmp_path)
     r = mt.publish_brief("programmatic-tool-calling", confirm=True)
@@ -272,7 +284,9 @@ def temp_repo(tmp_path, monkeypatch):
         "edges": [
             {"key": "programmatic_tool_calling", "axis": "cost", "verdict": "claude-ahead",
              "lead_score": 2, "score": 6, "demoKind": "token_accounting",
-             "fair_comparison": {"repro": {"command": "make programmatic-tool-calling",
+             "fair_comparison": {"lead_basis": "head-to-head", "task_shape": "fan-out",
+                                 "score_gate": "tokens lower",
+                                 "repro": {"command": "make programmatic-tool-calling",
                                            "est_cost_usd": 0.08, "est_time_s": 90}}},
             {"key": "managed_agents", "axis": "reliability", "verdict": "parity", "lead_score": 0,
              "score": 0, "demoKind": "retention_resume", "fair_comparison": {}},
@@ -280,6 +294,12 @@ def temp_repo(tmp_path, monkeypatch):
         "capabilities": {}, "content_hashes": {}, "coverage": {},
     }
     (tmp_path / "landscape" / "landscape.json").write_text(json.dumps(landscape))
+    (tmp_path / "landscape" / "adversarial.json").write_text(json.dumps({
+        "reports": [{
+            "judge": "openai",
+            "verdicts": [{"key": "programmatic_tool_calling", "verdict": "SURVIVES", "why": "ok"}],
+        }]
+    }))
     monkeypatch.setattr(cadence, "repo_root", lambda: tmp_path)
     monkeypatch.setattr(scan, "_landscape_path", lambda: tmp_path / "landscape" / "landscape.json")
     return tmp_path

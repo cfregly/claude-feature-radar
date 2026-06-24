@@ -22,6 +22,7 @@ import re
 import pytest
 
 from engine import cadence
+from engine.adversarial import ValueGate
 
 
 # ----- the deterministic draft is deslop-clean and grounded -----
@@ -90,7 +91,8 @@ def test_deslop_outbox_exempts_fenced_code():
 
 # ----- the anchor: newest uncovered lead, never a parity edge -----
 
-def test_anchor_is_the_top_uncovered_lead():
+def test_anchor_is_the_top_uncovered_lead(monkeypatch):
+    monkeypatch.setattr(cadence.adversarial, "value_confirmed", lambda *a, **k: ValueGate(True, "ok"))
     ranked = [
         {"key": "programmatic_tool_calling", "lead_score": 2}, {"key": "citations", "lead_score": 2},
         {"key": "managed_agents", "lead_score": 0},   # parity, never anchored
@@ -99,12 +101,14 @@ def test_anchor_is_the_top_uncovered_lead():
     assert cadence._anchor_edge(ranked, covered_keys={"programmatic_tool_calling"})["key"] == "citations"
 
 
-def test_anchor_skips_parity_and_behind_edges():
+def test_anchor_skips_parity_and_behind_edges(monkeypatch):
+    monkeypatch.setattr(cadence.adversarial, "value_confirmed", lambda *a, **k: ValueGate(True, "ok"))
     ranked = [{"key": "managed_agents", "lead_score": 0}, {"key": "x", "lead_score": 0}]
     assert cadence._anchor_edge(ranked, covered_keys=set()) is None  # no genuine lead, no email
 
 
-def test_anchor_skips_private_only_security_posture():
+def test_anchor_skips_private_only_security_posture(monkeypatch):
+    monkeypatch.setattr(cadence.adversarial, "value_confirmed", lambda *a, **k: ValueGate(True, "ok"))
     ranked = [
         {"key": "cmek", "axis": "security", "lead_score": 2, "demoKind": "security_posture"},
         {"key": "programmatic_tool_calling", "axis": "cost", "lead_score": 2,
@@ -114,9 +118,16 @@ def test_anchor_skips_private_only_security_posture():
     assert cadence._anchor_edge(ranked[:1], covered_keys=set()) is None
 
 
-def test_anchor_falls_back_to_top_lead_when_all_covered():
+def test_anchor_falls_back_to_top_lead_when_all_covered(monkeypatch):
+    monkeypatch.setattr(cadence.adversarial, "value_confirmed", lambda *a, **k: ValueGate(True, "ok"))
     ranked = [{"key": "programmatic_tool_calling", "lead_score": 2}]
     assert cadence._anchor_edge(ranked, covered_keys={"programmatic_tool_calling"})["key"] == "programmatic_tool_calling"
+
+
+def test_anchor_skips_an_adversarially_killed_lead(monkeypatch):
+    monkeypatch.setattr(cadence.adversarial, "value_confirmed", lambda *a, **k: ValueGate(False, "killed"))
+    ranked = [{"key": "programmatic_tool_calling", "axis": "cost", "lead_score": 2, "demoKind": "token_accounting"}]
+    assert cadence._anchor_edge(ranked, covered_keys=set()) is None
 
 
 # ----- the full run: $0, audit empty, no send, no benchmark, against a temp repo root -----
@@ -133,13 +144,21 @@ def temp_repo(tmp_path, monkeypatch):
         "edges": [
             {"key": "programmatic_tool_calling", "axis": "cost", "verdict": "claude-ahead", "lead_score": 2, "score": 6,
              "demoKind": "token_accounting",
-             "fair_comparison": {"repro": {"command": "make programmatic-tool-calling", "est_cost_usd": 0.08, "est_time_s": 90}}},
+             "fair_comparison": {"lead_basis": "head-to-head", "task_shape": "fan-out",
+                                 "score_gate": "tokens lower",
+                                 "repro": {"command": "make programmatic-tool-calling", "est_cost_usd": 0.08, "est_time_s": 90}}},
             {"key": "managed_agents", "axis": "reliability", "verdict": "parity", "lead_score": 0,
              "score": 0, "demoKind": "retention_resume", "fair_comparison": {}},
         ],
         "capabilities": {}, "content_hashes": {}, "coverage": {},
     }
     (tmp_path / "landscape" / "landscape.json").write_text(json.dumps(landscape))
+    (tmp_path / "landscape" / "adversarial.json").write_text(json.dumps({
+        "reports": [{
+            "judge": "openai",
+            "verdicts": [{"key": "programmatic_tool_calling", "verdict": "SURVIVES", "why": "ok"}],
+        }]
+    }))
     monkeypatch.setattr(cadence, "repo_root", lambda: tmp_path)
     # scan.current_edges reads the same landscape path off ITS own repo-root resolution; point it here.
     import engine.scan as scan

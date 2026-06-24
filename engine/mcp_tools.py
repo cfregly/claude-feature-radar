@@ -43,6 +43,7 @@ from dataclasses import asdict, dataclass
 
 from common.client import load_env, repo_root
 from engine import coverage as coverage_view
+from engine import adversarial
 from engine import gate
 from engine.publish_brief import (
     PLANS,
@@ -147,6 +148,7 @@ def _edge_row(e: dict) -> dict:
     and score, the value score, the axis, and the reproduction command and estimate when present."""
     fc = e.get("fair_comparison") or {}
     repro = fc.get("repro") or {}
+    value_gate = adversarial.value_confirmed(e, require_receipt=False, require_adversarial=True)
     return {
         "key": e.get("key"),
         "vendor": e.get("vendor"),
@@ -156,6 +158,8 @@ def _edge_row(e: dict) -> dict:
         "value_score": e.get("value_score"),
         "score": e.get("score"),
         "lead_basis": fc.get("lead_basis"),
+        "adversarial_value_confirmed": value_gate.ok,
+        "adversarial_value_reason": value_gate.reason,
         "demoKind": e.get("demoKind"),
         "status": e.get("status"),
         "source_url": e.get("source_url"),
@@ -180,7 +184,7 @@ def list_edges(leads_only: bool = False, verdict: str = "", limit: int = 0) -> d
                 "valid_verdicts": list(VALID_VERDICTS)}
     rows = [_edge_row(e) for e in edges]
     if leads_only:
-        rows = [r for r in rows if (r.get("lead_score") or 0) > 0]
+        rows = [r for r in rows if (r.get("lead_score") or 0) > 0 and r.get("adversarial_value_confirmed")]
     if verdict:
         rows = [r for r in rows if r.get("verdict") == verdict]
     rows.sort(key=lambda r: (r.get("score") or 0), reverse=True)
@@ -196,7 +200,9 @@ def show_landscape() -> dict:
     by_verdict: dict[str, int] = {}
     for e in edges:
         by_verdict[e.get("verdict", "unknown")] = by_verdict.get(e.get("verdict", "unknown"), 0) + 1
-    leads = sorted((e for e in edges if (e.get("lead_score") or 0) > 0),
+    leads = sorted((e for e in edges if (e.get("lead_score") or 0) > 0
+                    and adversarial.value_confirmed(e, require_receipt=False,
+                                                    require_adversarial=True).ok),
                    key=lambda e: (e.get("score") or 0), reverse=True)
     land_path = repo_root() / "landscape" / "landscape.json"
     as_of = None

@@ -1,0 +1,41 @@
+{
+  "as_of_date": "2026-06-24",
+  "bar": "adversarially-confirmed to add value",
+  "rule": "Any KILLED verdict by a current adversarial judge holds the edge. SURVIVES means the judge could not construct a stronger competitor stack or reduce the value to DX, native packaging, or a mechanism with no measured founder outcome.",
+  "reports": [
+    {
+      "judge": "openai",
+      "model": "gpt-5.5",
+      "label": "GPT-5.5",
+      "effort": "xhigh",
+      "cost_usd": 0.2198,
+      "verdicts": [
+        {
+          "key": "programmatic_tool_calling",
+          "verdict": "KILLED",
+          "why": "OpenAI or Gemini can reproduce the same fan-out/token-shielding pattern with a single custom execute-script or batch tool that runs the loop in the developer sandbox and returns only a compact result, so Claude's native packaging is DX rather than a durable gap."
+        },
+        {
+          "key": "task_budgets",
+          "verdict": "KILLED",
+          "why": "A competitor agent runner can combine usage accounting, max output/reasoning/thinking caps, and tool-approval or preflight budget gates to prevent low-budget tool execution on the same workload, making Claude's provider-side countdown nicer but not unmatched."
+        },
+        {
+          "key": "cache_diagnostics",
+          "verdict": "KILLED",
+          "why": "Prompt-cache counters plus client-side canonical request hashing and section diffs give OpenAI or Gemini users the same practical root-cause diagnosis for model/system/tools/messages changes, so the typed Claude field is convenience observability."
+        },
+        {
+          "key": "citations",
+          "verdict": "KILLED",
+          "why": "Inline files or extracted page chunks plus structured outputs and a deterministic quote/source resolver give OpenAI or Gemini the no-store mixed-source citation path in practice, leaving Claude with native DX and token-accounting niceties rather than a hard capability gap."
+        },
+        {
+          "key": "search_results",
+          "verdict": "KILLED",
+          "why": "Passing RAG chunks inline with stable IDs and requiring structured chunk/span/quote output lets OpenAI or Gemini return the same zero-hosted-object pointers through a small resolver, so comparing only against hosted File Search overstates the gap."
+        }
+      ]
+    }
+  ]
+}

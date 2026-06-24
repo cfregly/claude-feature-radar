@@ -18,11 +18,17 @@ Each edge below is proven on a real task, with saved output committed in `edges/
 The distilled, founder-facing versions, the ones a founder clones and reproduces in a single
 command, live in the companion repo [`claude-feature-hits`](https://github.com/cfregly/claude-feature-hits).
 
-Every edge here is verified before it ships. The engine runs a skeptic pass on each comparison, best
-to best and latest to latest across vendors, and keeps only the differentiators that survive it, so a
-win on this page has already beaten its toughest reading.
+Every edge here is measured before it ships, and measurement is not enough. `make verify` writes
+`landscape/adversarial.json`, and publish, MCP lead lists, cadence drafts, and the paid founder-email
+drafter only expose edges that are adversarially-confirmed to add value. A `KILLED` row by any current
+judge holds the edge until the framing is narrowed and re-tested.
 
-## Lead edge: programmatic tool calling, about 28% fewer billed input tokens than the same Claude agent without the feature (`make programmatic-tool-calling`)
+## Measured but currently held: programmatic tool calling, about 28% fewer billed input tokens than the same Claude agent without the feature (`make programmatic-tool-calling`)
+
+Current adversarial status, 2026-06-24: held. The live GPT-5.5 xhigh skeptic killed the broad public
+framing because a competitor stack can run the fan-out loop inside a developer sandbox and return only
+a compact result. Keep this as a useful within-Claude receipt until a narrower claim survives the
+adversarial value gate.
 
 If your agent calls a tool many times over data it then crunches (usage rollups across cohorts,
 plan-limit checks across accounts, log or trace triage), every tool output flows into the model's
@@ -41,7 +47,9 @@ regions of 60 sales outputs each (240 outputs), find the highest-revenue region.
 | plain tool use | 9,451 | all 240 outputs flow through the model's context |
 | programmatic | 6,828 | the sandbox aggregates, only the answer (east) reaches the model |
 
-A 28% input-token cut against the same Claude agent without programmatic tool calling, and the sandbox returns the exact winner. This pays off when your agent calls a tool many times over data it then crunches (the fan-out shape). The full saved output is [`edges/programmatic-tool-calling/sample.txt`](edges/programmatic-tool-calling/sample.txt).
+A 28% input-token cut against the same Claude agent without programmatic tool calling, and the sandbox
+returns the exact winner. This proves the mechanism on a fan-out shape, but it is not currently a
+public feature hit. The full saved output is [`edges/programmatic-tool-calling/sample.txt`](edges/programmatic-tool-calling/sample.txt).
 
 ```bash
 make programmatic-tool-calling          # about $0.08 on Sonnet, needs ANTHROPIC_API_KEY
@@ -58,7 +66,7 @@ Feature references, fetched 2026-06-18:
 - The 24% fewer input tokens / 11% accuracy gain on agentic search: https://claude.com/blog/improved-web-search-with-dynamic-filtering
 - The PTC cookbook (runnable): https://platform.claude.com/cookbook/tool-use-programmatic-tool-calling-programmatic_tool_calling
 
-## Supporting edge: Citations, a verifiable per-character source pointer (`make citations`)
+## Measured but currently held: Citations, a verifiable per-character source pointer (`make citations`)
 
 For a product built over your users' own documents (contracts, clinical notes, financial filings,
 support docs), the accuracy layer is the click-through to the exact sentence a claim came from. Turn on
@@ -76,10 +84,12 @@ Measured over 8 questions on 3 plain-text documents, each citation graded agains
 | pointer granularity | per character, into the user's own document |
 
 Claude returns a per-character pointer into your user's own document, guaranteed to resolve, with the
-verbatim quote free of output tokens and no resolver code to maintain. The per-edge writeup is
-[`edges/citations/README.md`](edges/citations/README.md). The founder-facing brief is
-[`claude-feature-hits/citations`](https://github.com/cfregly/claude-feature-hits). The full saved output
-is [`edges/citations/sample.txt`](edges/citations/sample.txt).
+verbatim quote free of output tokens and no resolver code to maintain. Current adversarial status,
+2026-06-24: held. The live GPT-5.5 xhigh skeptic killed the broad no-store framing because a
+competitor stack can combine inline files or extracted chunks, structured output, and a deterministic
+quote resolver. Keep the measured receipts, but do not pitch this as a public feature hit until a
+narrower claim survives the adversarial value gate. The full saved output is
+[`edges/citations/sample.txt`](edges/citations/sample.txt).
 
 ```bash
 make citations    # about $0.01, needs ANTHROPIC_API_KEY
@@ -123,7 +133,7 @@ Feature references, fetched 2026-06-19:
 - Gemini document processing docs: https://ai.google.dev/gemini-api/docs/document-processing
 - Gemini file search docs: https://ai.google.dev/gemini-api/docs/file-search
 
-## Supporting edge: Search results, citations into your own RAG chunks (`make search-results`)
+## Measured but currently held: Search results, citations into your own RAG chunks (`make search-results`)
 
 If you run your own retriever (pgvector, a custom reranker, multi-tenant isolation), the accuracy layer
 is a deep link from each answer to the exact chunk it came from. Pass your retrieved passages as
@@ -143,8 +153,11 @@ holds the answer:
 
 All three cited the correct source. Claude did it inline, resolver-free, with a block-level pointer and
 zero persisted objects, where the others each stood up a hosted store of six objects and returned a
-coarser pointer. The full saved output is [`edges/search-results/sample.txt`](edges/search-results/sample.txt),
-with machine data in [`edges/search-results/receipt.json`](edges/search-results/receipt.json).
+coarser pointer. Current adversarial status, 2026-06-24: held. The live GPT-5.5 xhigh skeptic killed
+the broad framing because a competitor stack can pass stable chunk IDs inline and require structured
+chunk/span output through a small resolver. The full saved output is
+[`edges/search-results/sample.txt`](edges/search-results/sample.txt), with machine data in
+[`edges/search-results/receipt.json`](edges/search-results/receipt.json).
 
 ```bash
 make search-results # cents-scale, needs all three keys
@@ -310,7 +323,7 @@ Feature references, fetched 2026-06-19:
 - OpenAI compaction docs: https://developers.openai.com/api/docs/guides/compaction
 - Gemini long context docs: https://ai.google.dev/gemini-api/docs/long-context
 
-## Supporting edge: Cache diagnostics, root cause for silent cache misses (`make cache-diagnostics`)
+## Measured but currently held: Cache diagnostics, root cause for silent cache misses (`make cache-diagnostics`)
 
 Prompt caching saves money only when the cached prefix stays stable. A timestamp in the system prompt,
 a reordered tool schema, or a changed message history can silently turn a cache hit into a miss. The
@@ -327,7 +340,9 @@ cached-prefix requests across all four documented miss-reason variants.
 
 Claude identified 4/4 documented cache-miss reason variants and reduced the manual cache-miss suspect
 list from four prompt-prefix surfaces to one for each miss. The edge is observability: a typed,
-per-request reason for every silent cache miss. The full saved output is
+per-request reason for every silent cache miss. Current adversarial status, 2026-06-24: held. The live
+GPT-5.5 xhigh skeptic killed the broad framing because cache counters plus request hashing and section
+diffs can give a practical root-cause diagnosis. The full saved output is
 [`edges/cache-diagnostics/sample.txt`](edges/cache-diagnostics/sample.txt), with machine data in
 [`edges/cache-diagnostics/receipt.json`](edges/cache-diagnostics/receipt.json).
 
@@ -340,7 +355,7 @@ Feature references, fetched 2026-06-19:
 - OpenAI prompt caching docs: https://developers.openai.com/api/docs/guides/prompt-caching
 - Gemini context caching docs: https://ai.google.dev/gemini-api/docs/caching
 
-## Supporting edge: Task budgets, stop before a budget-exhausted tool loop (`make task-budget`)
+## Measured but currently held: Task budgets, stop before a budget-exhausted tool loop (`make task-budget`)
 
 Long-running agents need a clean handoff before they start work that cannot fit the remaining budget.
 Output caps and reasoning budgets can limit pieces of a call, but they do not give the model a
@@ -360,7 +375,10 @@ hand off before making that external tool call.
 
 Claude saw the low remaining `task_budget` and handed off before the first tool call. The high-budget
 Claude control, OpenAI closest controls, and Gemini closest controls all started the tool loop. The
-edge is budget-control reliability, not a universal cost claim. The full saved output is
+edge is budget-control reliability, not a universal cost claim. Current adversarial status, 2026-06-24:
+held. The live GPT-5.5 xhigh skeptic killed the broad framing because a competitor agent runner can
+combine usage accounting, output/reasoning caps, and preflight tool gates on the same workload. The
+full saved output is
 [`edges/task-budgets/sample.txt`](edges/task-budgets/sample.txt), with machine data in
 [`edges/task-budgets/receipt.json`](edges/task-budgets/receipt.json).
 
@@ -379,7 +397,7 @@ Feature references, fetched 2026-06-19:
 git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make setup                        # the venv and the one dependency (anthropic)
 cp .env.example .env              # paste your ANTHROPIC_API_KEY
-make programmatic-tool-calling                          # the lead edge, about $0.08 (needs ANTHROPIC_API_KEY)
+make programmatic-tool-calling                          # measured but held, about $0.08 (needs ANTHROPIC_API_KEY)
 make app-check                    # the forkable app on the shipped example, then edit app/my_tool.py
 ```
 
