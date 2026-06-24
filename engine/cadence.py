@@ -56,24 +56,10 @@ BANNED = {"—": "em-dash", "–": "en-dash", ";": "semicolon"}
 
 PUBLIC_COMMANDS = {
     "programmatic_tool_calling": "make programmatic_tool_calling",
-    "citations": "make citations",
-    "pdf_citations": "make pdf_citations",
-    "search_results": "make search_results",
-    "grounding_stack": "make grounding_stack",
-    "web_citations": "make web_citations",
-    "bulk_extended_output": "make bulk_output",
-    "exact_list_ledger": "make exact_ledger",
-    "code_execution_state": "make code_execution_state",
-    "cache_diagnostics": "make cache_diagnostics",
-    "task_budgets": "make task_budgets",
+    "ptc_cache_context": "make ptc_cache_context",
 }
 
-PUBLIC_CLAIMS = {
-    "search_results": "Claude can cite developer-supplied RAG chunks inline with typed source pointers and zero hosted objects.",
-    "cache_diagnostics": "Claude can name the cache-miss cause on a request where competitor usage objects expose counters but no typed root-cause field.",
-    "task_budgets": "Claude task budgets can make a near-exhausted agent hand off before starting a tool action it cannot finish.",
-    "code_execution_state": "Claude code execution can reuse the same sandbox across separate requests, so files written in one turn are readable later.",
-}
+PUBLIC_CLAIMS: dict[str, str] = {}
 
 
 # ----- draft-to-outbox (ALWAYS, $0, deterministic, no model call) --------------------------------

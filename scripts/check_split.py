@@ -8,6 +8,7 @@ see all three checkouts, so absent siblings produce an explicit SKIPPED note rat
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import subprocess
 import sys
@@ -19,6 +20,17 @@ sys.path.insert(0, str(ROOT))
 
 HITS_DIRNAME = "claude-feature-" + "hits"
 MISSES_DIRNAME = "claude-feature-" + "misses"
+COMBINATION_PUBLIC_ARTIFACTS = {
+    "combo-1": (
+        "ptc_cache_context",
+        (
+            "ptc_cache_context/README.md",
+            "ptc_cache_context/run.py",
+            "ptc_cache_context/sample.txt",
+            "ptc_cache_context/receipt.json",
+        ),
+    ),
+}
 
 
 def _run(cmd: list[str], cwd: Path) -> subprocess.CompletedProcess[str]:
@@ -35,6 +47,16 @@ def _git_files(root: Path) -> list[str]:
 def _read(root: Path, rel: str) -> str:
     p = root / rel
     return p.read_text(errors="ignore") if p.exists() else ""
+
+
+def _read_json(root: Path, rel: str) -> dict:
+    text = _read(root, rel)
+    if not text:
+        return {}
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"{rel} is not valid JSON: {exc}") from exc
 
 
 def _contains_any(root: Path, needles: list[str], files: list[str]) -> bool:
@@ -109,7 +131,8 @@ def _misses_has_note(misses: Path, misses_files: list[str], edge_key: str, slug:
     )
 
 
-def _check_publishable_plans(hits: Path, misses: Path, fail: list[str]) -> None:
+def _check_public_plans(hits: Path, misses: Path, fail: list[str]) -> None:
+    from engine import adversarial
     from engine.publish_brief import PLANS
 
     hits_files = set(_git_files(hits))
@@ -121,14 +144,50 @@ def _check_publishable_plans(hits: Path, misses: Path, fail: list[str]) -> None:
     for edge_key, plan in sorted(PLANS.items()):
         entrypoint = entrypoints.get(plan.slug, "run.py")
         required = [f"{plan.slug}/README.md", f"{plan.slug}/{entrypoint}", f"{plan.slug}/sample.txt"]
-        for rel in required:
-            if rel not in hits_files:
-                fail.append(f"public hits missing publishable {edge_key!r} artifact: {rel}")
+        value_gate = adversarial.adversarial_status(edge_key, root=ROOT)
+        if value_gate.ok:
+            for rel in required:
+                if rel not in hits_files:
+                    fail.append(f"public hits missing promoted {edge_key!r} artifact: {rel}")
+        else:
+            for rel in required:
+                if rel in hits_files:
+                    fail.append(f"public hits still tracks killed {edge_key!r} artifact: {rel}")
         if not _misses_has_note(misses, misses_files, edge_key, plan.slug):
-            fail.append(f"misses has no both-directions/product note for publishable edge {edge_key!r}")
+            fail.append(f"misses has no both-directions/product note for edge {edge_key!r}")
 
 
-def _check_provenance(radar: Path, misses: Path, warn: list[str], fail: list[str]) -> None:
+def _check_surviving_combinations(hits: Path, fail: list[str]) -> None:
+    combos = _read_json(ROOT, "landscape/combinations.json").get("combinations", [])
+    hits_files = set(_git_files(hits))
+    for combo in combos:
+        combo_id = str(combo.get("id", ""))
+        mapped = COMBINATION_PUBLIC_ARTIFACTS.get(combo_id)
+        verdict = combo.get("skeptic_verdict")
+        if verdict == "SURVIVES":
+            if not mapped:
+                fail.append(f"surviving combination {combo_id!r} has no public artifact mapping")
+                continue
+            _, required = mapped
+            for rel in required:
+                if rel not in hits_files:
+                    fail.append(f"public hits missing surviving combination {combo_id!r} artifact: {rel}")
+        elif mapped:
+            slug, required = mapped
+            for rel in required:
+                if rel in hits_files:
+                    fail.append(f"public hits still tracks killed combination {combo_id!r} artifact: {slug}/")
+                    break
+
+
+def _head(root: Path) -> str | None:
+    out = _run(["git", "rev-parse", "HEAD"], root)
+    if out.returncode != 0:
+        return None
+    return out.stdout.strip()
+
+
+def _check_provenance(radar: Path, hits: Path, misses: Path, warn: list[str], fail: list[str]) -> None:
     text = _read(misses, "PROVENANCE.md")
     if not text:
         fail.append("misses missing committed PROVENANCE.md")
@@ -138,13 +197,22 @@ def _check_provenance(radar: Path, misses: Path, warn: list[str], fail: list[str
         fail.append("misses PROVENANCE.md does not name a source commit")
         return
     stamped = m.group(1)
-    out = _run(["git", "rev-parse", "HEAD"], radar)
-    if out.returncode != 0:
+    head = _head(radar)
+    if not head:
         warn.append("could not read radar HEAD for provenance freshness")
+    elif not head.startswith(stamped):
+        fail.append(f"misses provenance source stamp {stamped} does not match radar HEAD {head[:12]}")
+
+    m = re.search(r"Public artifact commit checked with it:\*\*\s*`?([0-9a-f]{7,40})`?", text)
+    if not m:
+        fail.append("misses PROVENANCE.md does not name a public artifact commit")
         return
-    head = out.stdout.strip()
-    if not head.startswith(stamped):
-        warn.append(f"misses provenance is stamped {stamped}, radar HEAD is {head[:12]}")
+    stamped = m.group(1)
+    head = _head(hits)
+    if not head:
+        warn.append("could not read hits HEAD for provenance freshness")
+    elif not head.startswith(stamped):
+        fail.append(f"misses provenance public stamp {stamped} does not match hits HEAD {head[:12]}")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -162,8 +230,9 @@ def main(argv: list[str] | None = None) -> int:
 
     _check_surface_gate(fail)
     _check_internal_kinds(args.hits_root, args.misses_root, fail)
-    _check_publishable_plans(args.hits_root, args.misses_root, fail)
-    _check_provenance(ROOT, args.misses_root, warn, fail)
+    _check_public_plans(args.hits_root, args.misses_root, fail)
+    _check_surviving_combinations(args.hits_root, fail)
+    _check_provenance(ROOT, args.hits_root, args.misses_root, warn, fail)
 
     for w in warn:
         print(f"split gate: WARN {w}")

@@ -73,8 +73,8 @@ def test_draft_never_falls_back_to_scraped_evidence_quote():
             "fair_comparison": {"repro": {"command": "make search-results", "est_cost_usd": 0.06, "est_time_s": 120}}}
     text = cadence._draft_email(edge, None)
     assert "Search results - Claude API Docs" not in text
-    assert "developer-supplied RAG chunks" in text
-    assert "make search_results" in text
+    assert "Review the source and receipt before sending." in text
+    assert "make search-results" in text
     assert "Estimated check cost: $0.06" in text
     assert "about $" not in text
 
