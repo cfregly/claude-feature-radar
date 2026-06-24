@@ -104,11 +104,12 @@ MODELS: dict[str, Model] = {
         effort_levels=("low", "medium", "high"), thinking_mode="none",
     ),
     "gpt-top": Model(
+        # GPT-5.5 reasoning.effort xhigh support re-verified 2026-06-24 against the OpenAI model docs.
         key="gpt-top", id="gpt-5.5", label="GPT-5.5", tier="frontier", provider="openai",
         input_per_mtok=5.0, output_per_mtok=30.0,
         cache_write_5m_per_mtok=0.0, cache_write_1h_per_mtok=0.0, cache_read_per_mtok=0.50,
         context_window=1_050_000, min_cache_tokens=0,
-        effort_levels=("low", "medium", "high"), thinking_mode="none",
+        effort_levels=("none", "low", "medium", "high", "xhigh"), thinking_mode="none",
     ),
     "gem-lite": Model(
         key="gem-lite", id="gemini-3.1-flash-lite", label="Gemini 3.1 Flash-Lite", tier="fast",

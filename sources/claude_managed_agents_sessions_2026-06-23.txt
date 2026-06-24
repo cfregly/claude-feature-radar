@@ -1,0 +1,39 @@
+Source: https://platform.claude.com/docs/en/managed-agents/sessions
+Snapshot fetched 2026-06-23. Verbatim excerpts for citation grounding.
+
+Start a session - Claude API Docs Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K First steps Overview Quickstart Prototype in Console Define your agent Agent setup Tools MCP connector Permission policies Agent Skills Configure agent environment Cloud environment setup Cloud sandbox reference Self-hosted sandboxes  Delegate work to your agent Start a session Session operations Session event stream Subscribe to webhooks Define outcomes Authenticate with vaults Manage agent context Access GitHub Attach and download files Build persistent memory  Advanced orchestration Multiagent sessions Scheduled deployments Reference Managed Agents reference Working with files Files API PDF support Images and vision Skills Overview Best practices Skills for enterprise MCP Remote MCP servers MCP tunnels  Claude on cloud platforms Claude Platform on AWS  Log in  Managed Agents  Start a session Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Solutions AI agents Code modernization Coding Customer support Education Financial services Government Life sciences Partners Claude on AWS Google Cloud's Vertex AI Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Company Anthropic Careers Economic Futures Research News Responsible Scaling Policy Security and compliance Transparency Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Help and security Availability Status Support Discord Terms and policies Privacy policy Responsible disclosure policy Terms of service: Commercial Terms of service: Consumer Usage policy Managed Agents / Delegate work to your agent Start a session Copy page  Create a session to run your agent and begin executing tasks. Copy page  A session is an agent instance within an environment. Each session references an agent and an environment (both created separately), and maintains conversation history across multiple interactions. Sessions follow a two-step lifecycle: first create the session to provision its sandbox, then send a user event to start work.
+ All Managed Agents API requests require the managed-agents-2026-04-01 beta header. The SDK sets the beta header automatically.
+ Creating a session
+A session requires an agent ID and an environment ID. Agents are versioned resources; passing in the agent ID as a string starts the session with the latest agent version.
+cURL CLI Python TypeScript C# Go Java PHP Ruby  ant beta:sessions create \
+--agent " $AGENT_ID " \
+--environment-id " $ENVIRONMENT_ID "
+To pin a session to a specific agent version, pass an object. This lets you control exactly which version runs and stage rollouts of new versions independently.
+cURL CLI Python TypeScript C# Go Java PHP Ruby  ant beta:sessions create << YAML
+agent:
+type: agent
+id: $AGENT_ID
+version: 1
+environment_id: $ENVIRONMENT_ID
+YAML
+ The agent defines how Claude behaves within the session, including the model, system prompt, tools, and MCP servers. See Define your agent for details.
+ MCP authentication through vaults
+If your agent uses MCP tools that require authentication, pass vault_ids at session creation to reference a vault containing stored OAuth credentials. Anthropic manages token refresh on your behalf. See Authenticate with vaults for how to create vaults and register credentials.
+cURL CLI Python TypeScript C# Go Java PHP Ruby  ant beta:sessions create << YAML
+agent: $AGENT_ID
+environment_id: $ENVIRONMENT_ID
+vault_ids:
+- $VAULT_ID
+YAML
+ Starting the session
+Creating a session provisions the environment's sandbox but does not start any work. To delegate a task, send events to the session using a user event . The session acts as a state machine that tracks progress while events drive the actual execution.
+cURL CLI Python TypeScript C# Go Java PHP Ruby  ant beta:sessions:events send \
+--session-id " $SESSION_ID " << 'YAML'
+events:
+- type: user.message
+content:
+- type: text
+text: List the files in the working directory.
+YAML
+See Session event stream for how to stream the agent's responses and handle tool confirmations.
+See Session statuses for the statuses a session moves through, and Session operations for retrieving, listing, updating, archiving, and deleting sessions. Was this page helpful?   Creating a session MCP authentication through vaults Starting the session

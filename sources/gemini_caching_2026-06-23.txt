@@ -1,0 +1,200 @@
+Source: https://ai.google.dev/gemini-api/docs/caching
+Snapshot fetched 2026-06-23. Verbatim excerpts for citation grounding.
+
+Context caching  |  Gemini API  |  Google AI for Developers
+Skip to main content
+/
+English
+Deutsch
+Español – América Latina
+Français
+Indonesia
+Italiano
+Polski
+Português – Brasil
+Shqip
+Tiếng Việt
+Türkçe
+Русский
+עברית
+العربيّة
+فارسی
+हिंदी
+বাংলা
+ภาษาไทย
+中文 – 简体
+中文 – 繁體
+日本語
+한국어
+Get API key
+Cookbook
+Community
+Sign in
+Docs
+API reference
+Gemini API
+Docs
+API reference
+Get API key
+Cookbook
+Community
+Get started
+Overview
+Get Started
+API keys
+Libraries
+Pricing
+Interactions API
+Coding agent setup
+Models
+All models
+Current: Gemini 3.5
+Nano Banana
+Veo
+Lyria 3
+Lyria RealTime
+Imagen
+Text-to-speech
+Live
+Live Translate
+Embeddings
+Robotics
+Core capabilities
+Text
+Image
+Image generation 🍌 Image understanding
+Video
+Video generation Video understanding
+Documents
+Speech and audio
+Speech generation Audio understanding
+Thinking
+Thinking Thought signatures
+Structured outputs
+Function calling
+Long context
+Agents
+Overview
+Quickstart
+Antigravity Agent
+Building managed agents
+Environments
+Deep Research Agent
+Tools
+Overview
+Google Search
+Google Maps
+Code execution
+URL context
+Computer Use
+File Search
+Combine Tools and Function calling
+Live API
+Overview
+Get started
+Get started using the GenAI SDK Get started using raw WebSockets
+Capabilities
+Live Translation
+Tool use
+Session management
+Ephemeral tokens
+Best practices
+Optimization
+Overview
+Batch API
+Webhooks
+Flex inference
+Priority inference
+Context caching
+Guides
+Streaming
+File input
+Input methods Files API
+OpenAI compatibility
+Media resolution
+Token counting
+Prompt engineering
+Logs and datasets
+Get started with logs Data logging and sharing
+Safety
+Safety settings Safety guidance
+Frameworks
+LangChain & LangGraph CrewAI LlamaIndex Vercel AI SDK Temporal
+Resources
+Release notes
+Deprecations
+Migration
+Migrate to Gen AI SDK Migrate to Interactions API Interactions breaking changes (May 2026)
+Rate limits
+Billing info
+API troubleshooting
+Status
+Partner and library integrations
+Google AI Studio
+Quickstart Vibe code in Build mode Developing Full-Stack Apps Build Android Apps Deploying your app Agents in AI Studio Playground Try out LearnLM Troubleshooting Access for Workspace users
+Google Cloud Platform
+Gemini Enterprise Agent Platform Gemini API OAuth authentication
+Policies
+Terms of service
+Available regions
+Abuse monitoring
+Feedback information
+The Interactions API is now generally available. We recommend using this API for access to all the latest features and models.
+Home
+Gemini API
+Docs
+Send feedback
+Context caching
+In a typical AI workflow, you might pass the same input tokens over and over to
+a model. The Gemini API offers implicit caching to optimize performance and costs.
+Note: This version of the page covers the Interactions API , which only supports implicit caching. Explicit caching (manually creating and managing cache objects) is not supported in the Interactions API. You can use the toggle on this page to switch to the generateContent API version of this page .
+Implicit caching
+Implicit caching is enabled by default for all Gemini 2.5 and newer models. We automatically
+pass on cost savings if your request hits caches. There is nothing you need to do
+in order to enable this. The minimum input
+token count for context caching is listed in the following table for each model:
+Model
+Min token limit
+Gemini 3.5 Flash
+4096
+Gemini 3.1 Pro Preview
+4096
+Gemini 2.5 Flash
+2048
+Gemini 2.5 Pro
+2048
+To increase the chance of an implicit cache hit:
+Try putting large and common contents at the beginning of your prompt
+Try to send requests with similar prefix in a short amount of time
+You can see the number of tokens which were cache hits in the response object's
+usage_metadata (Python) or usageMetadata (JavaScript) field.
+Send feedback
+Except as otherwise noted, the content of this page is licensed under the Creative Commons Attribution 4.0 License , and code samples are licensed under the Apache 2.0 License . For details, see the Google Developers Site Policies . Java is a registered trademark of Oracle and/or its affiliates.
+Last updated 2026-06-22 UTC.
+Need to tell us more?
+[[["Easy to understand","easyToUnderstand","thumb-up"],["Solved my problem","solvedMyProblem","thumb-up"],["Other","otherUp","thumb-up"]],[["Missing the information I need","missingTheInformationINeed","thumb-down"],["Too complicated / too many steps","tooComplicatedTooManySteps","thumb-down"],["Out of date","outOfDate","thumb-down"],["Samples / code issue","samplesCodeIssue","thumb-down"],["Other","otherDown","thumb-down"]],["Last updated 2026-06-22 UTC."],[],[]]
+Terms
+Privacy
+Manage cookies
+English
+Deutsch
+Español – América Latina
+Français
+Indonesia
+Italiano
+Polski
+Português – Brasil
+Shqip
+Tiếng Việt
+Türkçe
+Русский
+עברית
+العربيّة
+فارسی
+हिंदी
+বাংলা
+ภาษาไทย
+中文 – 简体
+中文 – 繁體
+日本語
+한국어

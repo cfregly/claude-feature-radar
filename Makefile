@@ -1,4 +1,8 @@
 # The competitive-gap engine. Each target runs in one command.
+DEEP_BUDGET_USD ?= 2.00
+DEEP_BUDGET_LABEL ?= grind-deep
+DEEP_EFFORT ?= xhigh
+VERIFY_JUDGES ?= claude
 .PHONY: setup compare-deps mcp-deps mcp app app-check programmatic-tool-calling citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost security-posture security draft publish-brief publish-misses check-claims check-docs core-imports check-surface check-split check-receipts test ci deslop gif clean
 
 PY := .venv/bin/python
@@ -106,7 +110,9 @@ cadence: ## the unattended engine: sweep, rank, dispatch by demoKind, draft the 
 
 grind: cadence coverage ci ## LOOP (tier 1, $0, fire-and-forget): the recurring edge loop, coverage view, and full offline gate, and paid proofs stay explicit per-edge targets
 
-grind-deep: grind verify combine ## LOOP (tier 2, cents): the $0 loop, then the Opus skeptic and the combinatorial generator, the creative judgment layer, run on a slower cadence with a spend cap
+grind-deep: grind ## LOOP (tier 2, budgeted): the $0 loop, then the skeptic and combinatorial generator under DEEP_BUDGET_USD
+	$(MAKE) verify DEEP_BUDGET_USD=$(DEEP_BUDGET_USD) DEEP_BUDGET_LABEL=$(DEEP_BUDGET_LABEL) DEEP_EFFORT=$(DEEP_EFFORT) VERIFY_JUDGES=$(VERIFY_JUDGES)
+	$(MAKE) combine DEEP_BUDGET_USD=$(DEEP_BUDGET_USD) DEEP_BUDGET_LABEL=$(DEEP_BUDGET_LABEL) DEEP_EFFORT=$(DEEP_EFFORT)
 
 coverage: ## per-demoKind coverage: what is built vs adapt vs build, and the gaps the engine surfaces about itself (NO API call, $0)
 	$(PY) run.py coverage
@@ -132,14 +138,14 @@ fast-mode: ## live validation for fast mode access and same-model speedup (needs
 scan: ## print the candidate gaps, grounded in both sides' docs (no API call)
 	$(PY) run.py scan
 
-verify: ## the skeptic pass: ask Claude to break each candidate, keep what survives
-	$(PY) run.py verify
+verify: ## budgeted skeptic pass. Set VERIFY_JUDGES=claude,openai for GPT-5.5 xhigh as a second critic
+	RADAR_BUDGET_USD=$(DEEP_BUDGET_USD) RADAR_BUDGET_LABEL=$(DEEP_BUDGET_LABEL) RADAR_CLAUDE_EFFORT=$(DEEP_EFFORT) $(PY) run.py verify --judges "$(VERIFY_JUDGES)"
 
 verify-live: ## live-claim re-prover: re-check the model access, knobs, and prices against real calls (spends cents)
 	$(PY) scripts/verify_live.py
 
-combine: ## the combinatorial generator: Opus + adaptive thinking proposes feature stacks, a skeptic tries the competitor's best counter-stack, survivors persist to landscape/combinations.json (spends cents)
-	$(PY) run.py combine
+combine: ## the budgeted combinatorial generator: Opus + adaptive thinking proposes and skeptic-tests feature stacks
+	RADAR_BUDGET_USD=$(DEEP_BUDGET_USD) RADAR_BUDGET_LABEL=$(DEEP_BUDGET_LABEL) RADAR_CLAUDE_EFFORT=$(DEEP_EFFORT) $(PY) run.py combine
 
 eval: ## EDGE eval_quality: the cost x effort grid on a labeled slice, held-out test split, all providers (needs compare-deps + keys, about $3-4)
 	$(PY) engine/demonstrators/eval_quality.py

@@ -1,112 +1,112 @@
 {
   "generated_by": "Claude Opus 4.8 + adaptive thinking",
   "proposed": 7,
-  "survived": 4,
+  "survived": 1,
   "combinations": [
     {
       "features": [
+        "prompt caching",
         "programmatic tool calling",
-        "code execution",
-        "prompt caching"
+        "the 1M-token context window"
       ],
-      "workload": "A data-ops agent that runs a Python loop inside code execution and issues 200+ DB/API tool calls per task across thousands of tasks nightly; allowed_callers routes every tool result into the sandbox instead of the model.",
+      "workload": "A coding agent that runs a large monorepo review: the agent loads a ~700K-token snapshot of the repo (architecture docs, key modules, dependency graph) once, then iterates across hundreds of tool calls (grep, file reads, lint runs) over a long session reviewing a 40-file PR. Programmatic tool calling orchestrates the grep/read/test loop in code so the raw tool outputs (megabytes of file contents and test logs) never re-enter the model context.",
       "founder_axis": "cost",
-      "compounded_value": "Model context stays flat at the cached prefix size no matter how many tool calls fire, so caching keeps amortizing the schema/system prefix while PTC prevents the superlinear context growth that would otherwise blow past the cache and re-bill the whole transcript every turn. Flat-context + cheap-reuse is something neither feature gives alone.",
-      "competitor_best_stack": "OpenAI Code Interpreter + function calling + automatic prompt caching (or Gemini code execution + context caching): every tool result re-enters model context, so tokens grow superlinearly across the loop and caching cannot offset the re-billed transcript. No allowed_callers equivalent exists.",
+      "compounded_value": "The compound is a cost cliff, not a discount. The 1M window makes the huge repo snapshot loadable at all; prompt caching makes re-reading that 700K prefix on every one of the hundreds of turns cost ~10% instead of full-rate; programmatic tool calling keeps the fan-out of noisy tool outputs (which would otherwise bloat the cached-and-billed context and force cache invalidation) entirely out of the billed window. Cache + 1M alone still pays full rate on tool output growth; PTC alone has no giant stable prefix to amortize. Together you get a near-flat per-turn cost on a session that would otherwise grow superlinearly.",
+      "competitor_best_stack": "OpenAI can stack automatic prompt caching + a 1M-context model (GPT-4.1) + function calling, but function results return into context (no allowed_callers equivalent that keeps outputs out of the model's window), so tool-output growth re-bills and can evict the cached prefix. Gemini has explicit/implicit context caching + 1M/2M window + function calling but likewise no out-of-context tool-output orchestration. Both match two of three legs; neither matches the PTC leg, so the compounded cost flatness is a genuine Claude-only edge.",
       "conflict": "none",
       "id": "combo-1",
       "skeptic_verdict": "SURVIVES",
-      "skeptic_why": "OpenAI Code Interpreter/Gemini code execution + function calling have no allowed_callers, so every one of the 200+ tool results re-enters context and tokens grow superlinearly, defeating any caching discount and beating the named cost currency."
+      "skeptic_why": "OpenAI's GPT-4.1 1M + automatic caching + Code Interpreter/function-calling can keep raw outputs out of context but either re-bills the cached prefix per tool round-trip or can't run real monorepo lint/test infra in-sandbox, so it can't reproduce PTC's in-code external-tool fan-out at flat cost."
     },
     {
       "features": [
-        "memory tool",
+        "the memory tool",
         "context editing",
         "prompt caching"
       ],
-      "workload": "A multi-day autonomous repo-migration/coding agent running hundreds of turns over a large codebase, far exceeding any single window; clear_tool_uses drops stale tool results, the memory tool writes durable decisions/state to its file store, and caching keeps the trimmed stable prefix warm.",
-      "founder_axis": "reliability",
-      "compounded_value": "The agent runs effectively unbounded turns without overflow because context editing bounds the live window, the memory tool preserves facts across the clears, and caching keeps input cost low on the surviving prefix. Bounded-context + persistence + cheap reuse together is not achievable with any one of the three.",
-      "competitor_best_stack": "OpenAI Responses with hand-rolled summarization + external file store, or Gemini context caching + manual truncation. Both require custom glue and neither ships a native clear-tool-results-yet-persist-facts primitive, so reliability and effort are worse at the same turn count.",
-      "conflict": "none",
+      "workload": "A long-running customer-support / ops triage agent that runs continuous multi-hour sessions over a queue of hundreds of tickets, accumulating tool-call transcripts (API lookups, log pulls) that blow past the window. Context editing clears stale tool_uses mid-session; the memory tool persists the durable facts (account state, prior resolution, escalation notes) to a file store before the clear.",
+      "founder_axis": "cost",
+      "compounded_value": "Compound on cost AND reliability. Context editing's clear_tool_uses normally torpedoes the cache (clearing the prefix invalidates the cached segment); memory tool lets you evacuate the must-keep facts to disk first, so after the clear you re-prime a SMALL stable prefix that re-caches cheaply, while the cleared bulk never re-bills. Memory alone doesn't reduce in-context billing; context-editing alone destroys cache value and risks dropping facts the agent still needs. Stacked, you get unbounded session length at bounded per-turn cost with no fact loss.",
+      "competitor_best_stack": "OpenAI's Responses API has server-side state + automatic caching, but no first-class clear-tool-results primitive that preserves a re-cacheable prefix, and memory is via the (separate) Assistants/file-search store rather than a model-driven memory tool. Gemini has context caching but no model-initiated context-editing clear. Neither can reproduce the 'evacuate-then-clear-then-recache' loop as a coordinated stack; closest is OpenAI but it leaks cleared content back into billed state.",
+      "conflict": "context editing clear_tool_uses interacts badly with advisor blocks \u2014 safe here because no advisor tool is in this stack, but do NOT add advisor to this combination.",
       "id": "combo-2",
-      "skeptic_verdict": "SURVIVES",
-      "skeptic_why": "OpenAI Responses + external store or Gemini caching + manual truncation require hand-rolled glue with no native clear-tool-yet-persist primitive, so on long-horizon reliability/effort at the same turn count neither matches."
+      "skeptic_verdict": "KILLED",
+      "skeptic_why": "OpenAI Responses API with client-side context pruning of stale tool_uses + your own fact store + automatic prefix caching reproduces the evacuate-then-clear-then-recache loop, since you fully control the message array and the cache is keyed on the surviving stable prefix exactly like Claude's."
     },
     {
       "features": [
-        "1M-token context window",
+        "the Batch API",
         "prompt caching",
-        "Citations"
+        "native PDF input"
       ],
-      "workload": "Load an entire ~700k-token codebase or regulatory corpus once, cache it, then serve hundreds of grounded Q&A requests with inline character-level citation pointers — no vector DB or chunking pipeline.",
+      "workload": "Overnight ingestion of a 50,000-document contract/financial-filing corpus where every document is run against the SAME large extraction rubric + few-shot exemplar set (~30K-token instruction prefix). Each batch request = the shared cached rubric prefix + one native-PDF document, extracting structured fields.",
       "founder_axis": "cost",
-      "compounded_value": "The giant prefix is paid once at cache-write then read-discounted across N queries, and every answer still carries verifiable typed citation spans, giving cheap grounded retrieval-quality answers without building or paying for a retrieval stack.",
-      "competitor_best_stack": "Gemini 2M context + context caching matches the cost amortization on the huge prefix but exposes only coarse grounding metadata, not inline span-precise Citations; OpenAI has no 1M-class window at all so it must chunk and re-embed, losing the single-call grounding.",
+      "compounded_value": "Two multiplicative discounts on the same dollar: Batch API gives 50% off, and prompt caching gives ~90% off the shared 30K rubric prefix that repeats across all 50K requests. Native PDF input removes a whole OCR/preprocessing pipeline (and its cost/error surface) by letting the model read the PDF (text + layout + embedded images) directly. Batch alone discounts everything once; caching alone discounts the prefix at full per-request rate; together the dominant cost term (rubric \u00d7 50K) is cut by both factors and the document-handling cost goes to zero.",
+      "competitor_best_stack": "OpenAI Batch API (50% off) + automatic prompt caching + direct PDF in the Responses API is a near-complete match \u2014 this one is close. The remaining Claude edge is thinner: cache-hit economics and PDF fidelity (Claude reads layout/visual PDF structure natively in one call), but a founder could plausibly get parity on cost from OpenAI. Be honest: competitor largely matches this stack; the edge is marginal, mostly accuracy-of-extraction on layout-heavy PDFs rather than a clean cost cliff.",
       "conflict": "none",
       "id": "combo-3",
       "skeptic_verdict": "KILLED",
-      "skeptic_why": "Gemini 2M context + context caching matches the named cost axis dollar-for-dollar on the amortized prefix; span-precise Citations is an accuracy perk, not a cost one, so on the stated currency the combo dies."
+      "skeptic_why": "OpenAI Batch (50%) + automatic prompt caching + direct PDF in the Responses API hits the same two multiplicative discounts on the same rubric\u00d750K dominant term, and the residual is layout-extraction accuracy, not a cost cliff (the prompt itself concedes parity)."
     },
     {
       "features": [
-        "programmatic tool calling",
-        "MCP connector",
-        "context editing"
+        "the advisor tool",
+        "the effort knob",
+        "the model tiers (Haiku/Sonnet/Opus/Fable)"
       ],
-      "workload": "An ops agent wired to 10+ MCP servers (Jira, Salesforce, internal APIs) that each return verbose JSON; allowed_callers keeps MCP outputs out of model context and context editing clears anything that does leak, across long multi-hour sessions.",
+      "workload": "A high-volume routing layer in front of a product agent: every inbound request first hits a cheap Haiku call running the advisor tool (out-of-band guidance/policy reasoning) to decide difficulty and policy path, which then routes easy traffic to low-effort Haiku/Sonnet and hard/risky traffic to high-effort Opus. Think 1M requests/day support or moderation triage.",
       "founder_axis": "cost",
-      "compounded_value": "Fat third-party payloads never pollute or overflow the model context, so the agent stays both cheap (no re-billed JSON) and reliable (no derailment from noise) across long sessions — a stability-plus-cost effect neither MCP nor PTC delivers alone.",
-      "competitor_best_stack": "OpenAI and Gemini both support MCP now, but the connector returns full tool output into model context with no allowed_callers equivalent, so you pay for and risk derailment from every verbose payload; only manual post-hoc trimming approximates context editing.",
-      "conflict": "none",
+      "compounded_value": "Compound on cost-per-resolved-request. The effort knob lets the SAME model spend less compute on easy cases; tier selection sends most volume to Haiku; the advisor tool makes the cheap router smart enough to mis-route rarely (so few requests get wastefully escalated AND few hard ones slip through under-resourced). Each alone is a blunt instrument: effort knob without good routing still runs everything on one tier; tiers without an advisor router mis-classify; advisor without the knob/tiers can't act on its own judgment. Stacked, the blended cost per request drops while keeping hard-case accuracy.",
+      "competitor_best_stack": "OpenAI has reasoning_effort (on o-series/GPT-5 class) + a tier ladder (nano/mini/full) + function-calling-based routing, and Gemini has thinking budgets + Flash/Pro tiers \u2014 both can build a difficulty router. The advisor tool's out-of-context guidance shape is the only non-replicable leg, and a competitor can approximate it with a separate router call. Competitors can assemble a close-equivalent stack; the Claude edge is modest and rests on advisor's cleaner separation, not a hard moat.",
+      "conflict": "advisor blocks are not fully compatible with context editing clear_tool_uses \u2014 keep context editing out of this stack.",
       "id": "combo-4",
-      "skeptic_verdict": "SURVIVES",
-      "skeptic_why": "Both competitors' MCP connectors dump full verbose JSON into model context with no allowed_callers equivalent, so you re-bill every fat payload and can't match the flat-cost-across-long-sessions currency."
+      "skeptic_verdict": "KILLED",
+      "skeptic_why": "OpenAI reasoning_effort + nano/mini/full tier ladder + a cheap dedicated router call (or Gemini thinking-budgets + Flash/Pro + router) builds the same cost-per-resolved-request funnel, and a separate router call approximates the advisor tool's out-of-band guidance well enough."
     },
     {
       "features": [
-        "native PDF input",
-        "Citations",
-        "memory tool"
+        "forced tool use / structured outputs",
+        "code execution",
+        "prompt caching"
       ],
-      "workload": "Multi-session contract / due-diligence review over hundreds of PDFs: cite clauses inline per request and persist extracted obligations and redlines to the memory store so the knowledge base compounds across weeks of sessions.",
+      "workload": "A financial-analytics agent that turns natural-language questions into validated computations over uploaded datasets at scale: a large cached system prefix (schema + business rules + formula library), structured output forces the model to emit a typed computation plan, and code execution actually runs the numbers in a sandbox rather than letting the model hallucinate arithmetic. Hundreds of analyst queries against the same dataset/schema.",
       "founder_axis": "accuracy",
-      "compounded_value": "Each session grounds every assertion to an exact PDF span while the accumulating cross-document obligation set persists in memory, so a reviewer builds a verifiable, growing audit trail rather than re-deriving findings each session.",
-      "competitor_best_stack": "OpenAI file search + Assistants thread persistence approximates the memory layer but its citations are coarse and unreliable; Gemini PDF input + Search grounding lacks span-precise inline Citations. Neither matches verifiable-span + durable-cross-doc-state together.",
-      "conflict": "none",
+      "compounded_value": "Compound on accuracy with a cost kicker. Structured outputs guarantee the plan is machine-parseable (no parse failures \u2192 no silent wrong path); code execution guarantees the arithmetic/aggregation is actually correct (eliminates the model's numeric hallucination, the dominant error class in analytics agents); prompt caching makes the heavy schema/formula prefix nearly free across hundreds of queries so you can afford to include the full grounding context every time. Structured-only still hallucinates numbers; code-exec-only can emit malformed plans that crash the runner. Together: typed plan + verified math + cheap full context = a measurably lower wrong-answer rate per dollar.",
+      "competitor_best_stack": "OpenAI matches this most closely: Structured Outputs (strict JSON schema) + Code Interpreter + prompt caching is a real, assemblable stack. Gemini has controlled generation + code execution + context caching. This is largely matched \u2014 be honest. The residual Claude edge is reliability of the structured+tool interaction under load, not a unique capability. Treat this as parity-leaning.",
+      "conflict": "none \u2014 but note Citations and tool-returned search results both 400 with structured outputs, so this stack must NOT add either; it relies on code-execution grounding instead of citation grounding.",
       "id": "combo-5",
-      "skeptic_verdict": "SURVIVES",
-      "skeptic_why": "OpenAI file-search citations are coarse and Gemini Search grounding lacks span-precise inline pointers, so neither can deliver the verifiable-span + durable cross-doc audit trail that the accuracy currency demands."
+      "skeptic_verdict": "KILLED",
+      "skeptic_why": "OpenAI Structured Outputs (strict schema) + Code Interpreter + automatic caching is an assemblable typed-plan + verified-math + cheap-grounding stack that matches the wrong-answer-rate-per-dollar target, as the prompt itself admits parity."
     },
     {
       "features": [
-        "Batch API",
-        "prompt caching",
-        "Agent Skills"
+        "Agent Skills",
+        "the MCP connector",
+        "extended/adaptive thinking"
       ],
-      "workload": "Overnight extraction/classification over ~500k documents using an Agent Skill that encodes the standard operating procedure; the cached skill+schema prefix is amortized across the entire batch.",
-      "founder_axis": "cost",
-      "compounded_value": "Batch discount stacks on top of cache-read discount on a large shared prefix, while the Skill removes per-job prompt assembly glue — three reductions on one bulk job.",
-      "competitor_best_stack": "OpenAI Batch (50% off) + automatic prompt caching captures most of the dollar win and you can simply inline the SOP into the prompt; Agent Skills saves glue code, not tokens, so the competitor roughly matches on the pure cost axis here. Honestly close to parity.",
+      "workload": "A devops/incident-response agent: when paged, it pulls live telemetry and runbooks through MCP connectors (Grafana, PagerDuty, internal tools), loads a library of org-specific Agent Skills (deploy-rollback, db-failover, cache-flush procedures as reusable skill modules), and uses extended thinking to plan a multi-step remediation across the connected systems. Bursty, low-volume-but-high-stakes incidents.",
+      "founder_axis": "reliability",
+      "compounded_value": "Compound on reliability (mean-time-to-recovery and correctness of irreversible actions). MCP gives live, real-world state instead of stale assumptions; Agent Skills package the org's vetted procedures so the agent doesn't improvise dangerous steps; extended thinking lets it sequence the remediation and check preconditions before acting. MCP alone gives data but no procedure; Skills alone are static playbooks with no live state; thinking alone reasons over nothing real. Stacked: grounded state + vetted procedure + deliberate planning = far fewer wrong irreversible actions during incidents.",
+      "competitor_best_stack": "OpenAI now supports MCP (Responses API connectors) + extended reasoning, and can emulate 'skills' via tool/function definitions or a prompt library; Gemini supports MCP-style tool connection + thinking. Agent Skills as a first-class packaged-procedure primitive is the Claude-distinct leg, but competitors can approximate it with structured tool/prompt bundles. Competitor stack is close; the edge is operational ergonomics and reuse, not a hard capability gap.",
       "conflict": "none",
       "id": "combo-6",
       "skeptic_verdict": "KILLED",
-      "skeptic_why": "OpenAI Batch (50%) + automatic prompt caching captures the entire named cost win on the shared prefix and the SOP can be inlined, since Skills saves glue not tokens—author-admitted parity."
+      "skeptic_why": "OpenAI Responses MCP connectors + extended reasoning + a versioned tool/prompt bundle emulating Skills delivers grounded-state + vetted-procedure + deliberate-planning, and the only gap is packaging ergonomics, not an MTTR-affecting capability."
     },
     {
       "features": [
-        "advisor tool",
-        "extended/adaptive thinking",
-        "effort knob"
+        "Managed Agents (beta)",
+        "the Batch API",
+        "Agent Skills"
       ],
-      "workload": "A high-stakes triage agent (legal or clinical intake) that escalates only hard cases: the effort knob raises the thinking budget on demand and the advisor tool pulls a structured second-opinion subagent on low-confidence steps.",
-      "founder_axis": "accuracy",
-      "compounded_value": "Reasoning spend is allocated adaptively and a structured second opinion is fetched only on hard branches, lifting accuracy on the tail of difficult cases without paying maximum thinking tokens on every routine request.",
-      "competitor_best_stack": "OpenAI o-series reasoning_effort plus a hand-rolled critic/second-pass call, or Gemini thinking budget + self-critique, reproduces most of the pattern; neither has a native advisor primitive but the behavior is reproducible with extra glue, so the competitor partially matches.",
-      "conflict": "context editing clear_tool_uses is not fully compatible with advisor blocks, so this stack must avoid adding context editing",
+      "workload": "A back-office automation founder running thousands of independent long-horizon tasks overnight (e.g., reconcile 5,000 vendor invoices, each requiring a multi-step agent: fetch \u2192 match \u2192 flag exceptions \u2192 draft email). Each task is a Managed Agent instance executing a shared invoice-reconciliation Skill, dispatched in bulk via the Batch API.",
+      "founder_axis": "cost",
+      "compounded_value": "Compound on cost-at-scale for agentic (not single-shot) workloads. Batch API normally discounts single completions; pairing it with Managed Agents lets you get the 50% batch economics on entire multi-step agent runs, not just one call \u2014 the discount now covers the whole orchestration. Agent Skills make each agent instance consistent and cheap to spin up (no re-teaching the procedure per task). Batch alone can't run a multi-turn agent loop; Managed Agents alone run at full real-time rate; Skills alone don't change pricing. Stacked: discounted, consistent, hands-off overnight agentic throughput.",
+      "competitor_best_stack": "OpenAI and Gemini do not need to match batch-priced managed agent loops because Claude Managed Agents sessions are not batch-discountable either. The current Claude pricing docs state that the Batch API discount does not apply to Managed Agents sessions because sessions are stateful and interactive and there is no batch mode. The proposed cost compound therefore collapses on Claude before the competitor comparison.",
+      "conflict": "Batch API discount does not apply to Managed Agents sessions; current Claude pricing says sessions are stateful and interactive and there is no batch mode.",
       "id": "combo-7",
       "skeptic_verdict": "KILLED",
-      "skeptic_why": "OpenAI reasoning_effort + a hand-rolled critic pass (or Gemini thinking budget + self-critique) reproduces the adaptive-spend-plus-second-opinion behavior, matching the accuracy currency at the cost of a little glue."
+      "skeptic_why": "Claude Managed Agents sessions are not batch-eligible: the pricing docs say the Batch API discount does not apply to Managed Agents sessions because sessions are stateful and interactive and there is no batch mode."
     }
   ],
   "note": "Candidates only. A combination ships only after a demonstrator measures it at promotable_edge: true, the way engine/demonstrators/grounding_stack.py proves its stack. competitor_best_stack and the skeptic verdict are the internal both-directions read."

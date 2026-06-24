@@ -29,10 +29,13 @@ unattended $0 cadence. Run it with `make combine`.
 
 from __future__ import annotations
 
+import argparse
 import json
+import os
 
 from common.client import get_client, repo_root
 from common.models import get, request_kwargs
+from engine.budget import BudgetLedger
 from engine.scan import current_edges
 
 # The platform surface the generator stacks from. Grounded in the same enumeration CLAUDE.md and
@@ -124,14 +127,37 @@ _TOOL = {
 }
 
 
+def _claude_effort() -> str:
+    return os.environ.get("RADAR_CLAUDE_EFFORT", "xhigh")
+
+
+def _max_tokens(default: int, env_name: str) -> int:
+    raw = os.environ.get(env_name)
+    if raw:
+        return int(raw)
+    return default * 4 if _claude_effort() == "max" else default
+
+
+def _create_claude_message(client, **kwargs):
+    if _claude_effort() == "max" or kwargs.get("max_tokens", 0) > 16000:
+        with client.messages.stream(**kwargs) as stream:
+            stream.until_done()
+            return stream.get_final_message()
+    return client.messages.create(**kwargs)
+
+
+def _message_text(msg) -> str:
+    return "".join(getattr(b, "text", "") for b in msg.content if getattr(b, "type", None) == "text").strip()
+
+
 def _opus_kwargs():
     # The generator and the skeptic are creative-judgment seats: top tier with adaptive thinking and
-    # high effort. Tier tracks stakes x reasoning difficulty x volume (CLAUDE.md "Model tier tracks
+    # xhigh effort. Tier tracks stakes x reasoning difficulty x volume (CLAUDE.md "Model tier tracks
     # stakes"). These are two low-volume calls per run, so the top tier costs pennies.
-    return request_kwargs("opus", effort="high", adaptive_thinking=True)
+    return request_kwargs("opus", effort=_claude_effort(), adaptive_thinking=True)
 
 
-def generate(client, n: int = 7) -> list[dict]:
+def generate(client, budget: BudgetLedger, n: int = 7) -> list[dict]:
     """Opus + adaptive thinking proposes up to n combination candidates. The shape is pinned with a
     json_schema via output_config.format, NOT a forced tool: the live API rejects thinking when
     tool_choice forces a tool ("Thinking may not be enabled when tool_choice forces tool use"), while
@@ -147,24 +173,41 @@ def generate(client, n: int = 7) -> list[dict]:
         f"valuable when it compounds one of these into a stack a competitor cannot match.\n\n"
         f"Propose {n} genuinely new combination candidates, strongest first."
     )
-    base = dict(max_tokens=16000, system=GEN_SYSTEM,
+    base = dict(max_tokens=_max_tokens(16000, "RADAR_COMBINE_GENERATE_MAX_TOKENS"), system=GEN_SYSTEM,
                 messages=[{"role": "user", "content": prompt}])
+    reservation = budget.preflight("combine:opus-generate", "opus", messages=base["messages"],
+                                   max_tokens=base["max_tokens"], system=GEN_SYSTEM)
     try:
-        msg = client.messages.create(
+        msg = _create_claude_message(
+            client,
             **base,
             model=get("opus").id,
             thinking={"type": "adaptive"},
-            output_config={"effort": "high",
+            output_config={"effort": _claude_effort(),
                            "format": {"type": "json_schema", "schema": _TOOL["input_schema"]}},
         )
-        text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text")
+        budget.commit_usage(reservation, msg.usage)
+        text = _message_text(msg)
+        if not text:
+            kinds = ", ".join(getattr(b, "type", "?") for b in msg.content)
+            raise ValueError(f"generate returned no visible JSON text (content blocks: {kinds or 'none'})")
         combos = json.loads(text).get("combinations", [])
     except Exception as e:  # noqa: BLE001  resilience: if structured output is ever rejected, fall back
+        budget.mark_failed(reservation, e)
         # to a forced tool WITHOUT thinking (forced-tool + thinking is itself rejected). Logged, never silent.
         print(f"  (note: structured-output generate failed, falling back to forced tool without thinking: {e})")
-        msg = client.messages.create(
-            **base, tools=[_TOOL], tool_choice={"type": "tool", "name": "record_combinations"},
-            **request_kwargs("opus", effort="high"))
+        reservation = budget.preflight("combine:opus-generate-fallback", "opus",
+                                       messages=base["messages"], max_tokens=base["max_tokens"],
+                                       system=GEN_SYSTEM)
+        try:
+            msg = _create_claude_message(
+                client,
+                **base, tools=[_TOOL], tool_choice={"type": "tool", "name": "record_combinations"},
+                **request_kwargs("opus", effort=_claude_effort()))
+        except Exception as fallback_error:  # noqa: BLE001
+            budget.mark_failed(reservation, fallback_error)
+            raise
+        budget.commit_usage(reservation, msg.usage)
         block = next((b for b in msg.content if getattr(b, "type", None) == "tool_use"), None)
         combos = block.input.get("combinations", []) if block else []
     for i, c in enumerate(combos, 1):
@@ -172,7 +215,7 @@ def generate(client, n: int = 7) -> list[dict]:
     return combos
 
 
-def skeptic(client, combos: list[dict]) -> dict[str, tuple[str, str]]:
+def skeptic(client, combos: list[dict], budget: BudgetLedger) -> dict[str, tuple[str, str]]:
     """One batched Opus + adaptive thinking pass that tries to break each combination by assembling the
     competitor's best stack. Returns {id: (KILLED|SURVIVES, why)}. The writer is never the grader."""
     if not combos:
@@ -183,12 +226,28 @@ def skeptic(client, combos: list[dict]) -> dict[str, tuple[str, str]]:
         f"claimed competitor best: {c['competitor_best_stack']}"
         for c in combos
     )
-    msg = client.messages.create(
-        max_tokens=8000, system=SKEPTIC_SYSTEM,
-        messages=[{"role": "user", "content": body}],
-        **_opus_kwargs(),
-    )
-    text = "".join(b.text for b in msg.content if getattr(b, "type", None) == "text")
+    messages = [{"role": "user", "content": body}]
+    max_tokens = _max_tokens(8000, "RADAR_COMBINE_SKEPTIC_MAX_TOKENS")
+    reservation = budget.preflight("combine:opus-skeptic", "opus", messages=messages,
+                                   max_tokens=max_tokens, system=SKEPTIC_SYSTEM)
+    try:
+        msg = _create_claude_message(
+            client,
+            max_tokens=max_tokens, system=SKEPTIC_SYSTEM,
+            messages=messages,
+            **_opus_kwargs(),
+        )
+    except Exception as e:
+        budget.mark_failed(reservation, e)
+        raise
+    budget.commit_usage(reservation, msg.usage)
+    text = _message_text(msg)
+    if not text:
+        kinds = ", ".join(getattr(b, "type", "?") for b in msg.content)
+        raise SystemExit(
+            f"combine skeptic returned no visible verdict text after {max_tokens} max_tokens "
+            f"(content blocks: {kinds or 'none'})."
+        )
     verdicts: dict[str, tuple[str, str]] = {}
     for line in text.splitlines():
         s = line.strip()
@@ -202,18 +261,27 @@ def skeptic(client, combos: list[dict]) -> dict[str, tuple[str, str]]:
         why = parts[2] if len(parts) > 2 else ""
         if verdict in ("KILLED", "SURVIVES"):
             verdicts[cid] = (verdict, why)
+    if not verdicts:
+        raise SystemExit("combine skeptic returned no parseable KILLED/SURVIVES verdicts")
     return verdicts
 
 
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Generate feature-stack candidates under a budget cap.")
+    parser.add_argument("--budget-usd", type=float, default=None,
+                        help="Daily budget cap. Defaults to RADAR_BUDGET_USD or $2.")
+    parser.add_argument("--budget-label", default=None,
+                        help="Budget ledger label. Defaults to RADAR_BUDGET_LABEL or grind-deep.")
+    args = parser.parse_args(argv)
+    budget = BudgetLedger.from_env(cap_usd=args.budget_usd, label=args.budget_label)
     client = get_client()
-    print(f"\n  Combinatorial generation ({get('opus').label}, adaptive thinking): stacking the "
+    print(f"\n  Combinatorial generation ({get('opus').label}, {_claude_effort()} effort, adaptive thinking): stacking the "
           f"platform surface for compounding edges...\n")
-    combos = generate(client)
+    combos = generate(client, budget)
     if not combos:
         raise SystemExit("  the generator returned no combinations (check the API response)")
 
-    verdicts = skeptic(client, combos)
+    verdicts = skeptic(client, combos, budget)
     for c in combos:
         v, why = verdicts.get(c["id"], ("UNJUDGED", ""))
         c["skeptic_verdict"] = v

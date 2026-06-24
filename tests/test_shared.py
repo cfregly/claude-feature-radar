@@ -65,6 +65,7 @@ def test_supports_effort_helpers():
     assert M.supports_effort("haiku") is False
     assert M.supports_effort_level("sonnet", "max") is True
     assert M.supports_effort_level("sonnet", "xhigh") is False  # no xhigh on Sonnet 4.6
+    assert M.supports_effort_level("gpt-top", "xhigh") is True
 
 
 # ----- the provider-blind runner -----
