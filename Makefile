@@ -1,5 +1,6 @@
 # The competitive-gap engine. Each target runs in one command.
 DEEP_BUDGET_USD ?= 2.00
+DEEP_BUDGET_WARN_USD ?= 2.00
 DEEP_BUDGET_LABEL ?= grind-deep
 DEEP_EFFORT ?= xhigh
 VERIFY_JUDGES ?= claude,openai
@@ -114,8 +115,8 @@ cadence: ## the unattended engine: sweep, rank, dispatch by demoKind, draft the 
 grind: cadence coverage ci ## LOOP (tier 1, $0, fire-and-forget): the recurring edge loop, coverage view, and full offline gate, and paid proofs stay explicit per-edge targets
 
 grind-deep: grind ## LOOP (tier 2, budgeted): the $0 loop, then the skeptic and combinatorial generator under DEEP_BUDGET_USD
-	$(MAKE) verify DEEP_BUDGET_USD=$(DEEP_BUDGET_USD) DEEP_BUDGET_LABEL=$(DEEP_BUDGET_LABEL) DEEP_EFFORT=$(DEEP_EFFORT) VERIFY_JUDGES=$(VERIFY_JUDGES)
-	$(MAKE) combine DEEP_BUDGET_USD=$(DEEP_BUDGET_USD) DEEP_BUDGET_LABEL=$(DEEP_BUDGET_LABEL) DEEP_EFFORT=$(DEEP_EFFORT)
+	$(MAKE) verify DEEP_BUDGET_USD=$(DEEP_BUDGET_USD) DEEP_BUDGET_WARN_USD=$(DEEP_BUDGET_WARN_USD) DEEP_BUDGET_LABEL=$(DEEP_BUDGET_LABEL) DEEP_EFFORT=$(DEEP_EFFORT) VERIFY_JUDGES=$(VERIFY_JUDGES)
+	$(MAKE) combine DEEP_BUDGET_USD=$(DEEP_BUDGET_USD) DEEP_BUDGET_WARN_USD=$(DEEP_BUDGET_WARN_USD) DEEP_BUDGET_LABEL=$(DEEP_BUDGET_LABEL) DEEP_EFFORT=$(DEEP_EFFORT)
 
 coverage: ## per-demoKind coverage: what is built vs adapt vs build, and the gaps the engine surfaces about itself (NO API call, $0)
 	$(PY) run.py coverage
@@ -142,13 +143,13 @@ scan: ## print the candidate gaps, grounded in both sides' docs (no API call)
 	$(PY) run.py scan
 
 verify: ## budgeted skeptic pass. Set VERIFY_JUDGES=claude,openai for GPT-5.5 xhigh as a second critic
-	RADAR_BUDGET_USD=$(DEEP_BUDGET_USD) RADAR_BUDGET_LABEL=$(DEEP_BUDGET_LABEL) RADAR_CLAUDE_EFFORT=$(DEEP_EFFORT) $(PY) run.py verify --judges "$(VERIFY_JUDGES)"
+	RADAR_BUDGET_USD=$(DEEP_BUDGET_USD) RADAR_BUDGET_WARN_USD=$(DEEP_BUDGET_WARN_USD) RADAR_BUDGET_LABEL=$(DEEP_BUDGET_LABEL) RADAR_CLAUDE_EFFORT=$(DEEP_EFFORT) $(PY) run.py verify --judges "$(VERIFY_JUDGES)"
 
 verify-live: ## live-claim re-prover: re-check the model access, knobs, and prices against real calls (spends cents)
 	$(PY) scripts/verify_live.py
 
 combine: ## the budgeted combinatorial generator: Opus + adaptive thinking proposes and skeptic-tests feature stacks
-	RADAR_BUDGET_USD=$(DEEP_BUDGET_USD) RADAR_BUDGET_LABEL=$(DEEP_BUDGET_LABEL) RADAR_CLAUDE_EFFORT=$(DEEP_EFFORT) $(PY) run.py combine
+	RADAR_BUDGET_USD=$(DEEP_BUDGET_USD) RADAR_BUDGET_WARN_USD=$(DEEP_BUDGET_WARN_USD) RADAR_BUDGET_LABEL=$(DEEP_BUDGET_LABEL) RADAR_CLAUDE_EFFORT=$(DEEP_EFFORT) $(PY) run.py combine
 
 eval: ## EDGE eval_quality: the cost x effort grid on a labeled slice, held-out test split, all providers (needs compare-deps + keys, about $3-4)
 	$(PY) engine/demonstrators/eval_quality.py

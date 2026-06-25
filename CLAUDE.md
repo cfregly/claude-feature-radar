@@ -395,11 +395,15 @@ The loop has two tiers, matched to the gate. Tier 1 is `make grind`: the $0 fire
 forever because nothing in it spends, sends, or pushes. Tier 2 is `make grind-deep`: tier 1 plus the
 two creative judgment seats that DO spend, the Opus skeptic (`make verify`) and the combinatorial
 generator (`make combine`, which proposes new feature stacks and skeptic-tests them against the
-competitor's best counter-stack). Run tier 2 on a slower cadence under a spend cap. The split is the
-gate: the cheap recurring discovery stays unattended, the paid reasoning is an explicit, budgeted pass.
+competitor's best counter-stack). Tier 2 must always run under the budget ledger. The normal daily
+baseline is `$2`. A scheduler may use `DEEP_BUDGET_USD=10.00 DEEP_BUDGET_WARN_USD=2.00` as a burst
+lane for finding new edges and combos, but the ledger must warn loudly when it crosses `$2` and must
+block before `$10`. The split is the gate: cheap recurring discovery stays unattended, and paid
+reasoning is explicit, budgeted, and auditable.
 
-To make it truly fire-and-forget, a scheduler invokes `make grind` (tier 1) often and `make grind-deep`
-(tier 2) on a slower cadence. The scheduler is operator-side and is NOT committed here (a host cron
+To make it truly fire-and-forget, a scheduler invokes `make grind` (tier 1) often and may invoke
+`make grind-deep DEEP_BUDGET_USD=10.00 DEEP_BUDGET_WARN_USD=2.00` daily when the operator wants an
+aggressive edge-and-combo search. The scheduler is operator-side and is NOT committed here (a host cron
 entry, a Claude Code routine, or a Managed Agents scheduled deployment that fires the cadence on a cron
 and is itself a paid ASK-tier runtime). The repo's job is to expose one clean entrypoint per tier and to
 make the gate hold no matter how often the scheduler fires, so an unattended run can never cross the

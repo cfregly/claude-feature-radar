@@ -46,6 +46,17 @@ def test_preflight_reserves_and_commit_replaces_estimate_with_actual(tmp_path):
     assert data["spent_or_reserved_usd"] == round(actual, 6)
 
 
+def test_preflight_warns_when_estimate_crosses_warning_threshold(tmp_path, capsys):
+    budget = BudgetLedger(10.0, label="test", root=tmp_path, warn_usd=0.01)
+    budget.preflight("verify", "opus", messages=[{"role": "user", "content": "x"}],
+                     max_tokens=8000, system="sys")
+    out = capsys.readouterr().out
+    assert "LOUD BUDGET WARNING" in out
+    data = json.loads(budget.path.read_text())
+    assert data["cap_usd"] == 10.0
+    assert data["warn_usd"] == 0.01
+
+
 def test_openai_xhigh_estimate_uses_gpt_top_price():
     tokens = estimate_tokens("short prompt")
     assert estimate_cost_usd("gpt-top", input_tokens=tokens, max_output_tokens=1000) > 0

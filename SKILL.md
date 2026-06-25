@@ -246,15 +246,17 @@ For the recurring loop, use:
 
 ```
 make grind        # tier 1, $0: doc sweep, rank, coverage, full offline CI
-make grind-deep   # tier 2, cents: the $0 loop, then the Opus skeptic and the combinatorial generator
+make grind-deep   # tier 2, budgeted: the $0 loop, then the Opus skeptic and combinatorial generator
 ```
 
 `make grind` is the default no-credit loop: live doc sweep, rank, dispatch estimates, inert outbox
 draft, coverage view, and the full offline CI gate. It never runs a paid proof. `make grind-deep` adds
-the Opus skeptic pass and the combinatorial edge generator on top, the creative judgment layer, run on
-a slower cadence with a spend cap. When the loop surfaces a candidate, run the specific live target
-named in the estimate, promote only when the receipt says `promotable_edge: true`, then run `make grind`
-again so the landscape, coverage, and gates catch up.
+the Opus skeptic pass and the combinatorial edge generator on top. A daily scheduler may use
+`make grind-deep DEEP_BUDGET_USD=10.00 DEEP_BUDGET_WARN_USD=2.00`: `$2` is the normal daily baseline,
+`$10` is the hard burst ceiling, and the budget ledger must warn loudly before crossing the baseline.
+When the loop surfaces a candidate, run the specific live target named in the estimate, promote only
+when the receipt says `promotable_edge: true`, then run `make grind` again so the landscape, coverage,
+and gates catch up.
 
 ### 3. Synthesize the honest picture
 Combine the audit and the benchmark. State plainly where Claude wins, where it ties, and where it

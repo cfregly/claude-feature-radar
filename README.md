@@ -433,6 +433,12 @@ Cost expectations: every benchmark reads its numbers off a real API call. `make 
 bounded live measured run, and `make ledger` estimated $5 on the shipped full task. There is no hidden spend,
 and each target prints its saved output before it commits anything.
 
+Daily deep discovery is budgeted separately from individual proofs. `make grind-deep` defaults to a
+$2 hard cap for the skeptic plus combination generator. A scheduler may run
+`make grind-deep DEEP_BUDGET_USD=10.00 DEEP_BUDGET_WARN_USD=2.00` when the goal is to find new edges
+and combos more aggressively: `$2` stays the normal daily baseline, `$10` is the hard burst ceiling,
+and the budget ledger prints `LOUD BUDGET WARNING` when a preflight crosses the baseline.
+
 The citations edge runs on the Anthropic key alone and proves Claude's structured source-pointer
 saved output. Cross-vendor grounding comparisons live in the sibling edges, each with its own stated task
 shape and optional SDK/key requirements.

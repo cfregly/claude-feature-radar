@@ -56,9 +56,7 @@ NEGATIVES = [
 ]
 
 SECURITY_TERMS = [
-    # Security posture details belong in private source-backed reviews, not public founder copy,
-    # except for the public security brief (SIBLING_SECURITY_DIR), whose own runner verifies sources
-    # and caveats.
+    # Security posture details belong in private source-backed reviews, not public founder copy.
     "zdr", "zero data retention", "hipaa", "baa", "business associate agreement",
     "cmek", "customer-managed encryption", "access transparency",
     "compliance api", "admin api", "blanket coverage",
@@ -78,22 +76,8 @@ BRIEF_ASSET_GLOBS = [
     "brief_assets/*/sample.txt", "brief_assets/*/compare_sample.txt",
 ]
 SIBLING_BRIEFS = ROOT.parent / "claude-feature-hits"
-# Public security artifacts allowed to carry source-backed security terms. Each has a no-key runner
-# that the surface gate invokes when the sibling repo is present. The folder names live here so a
-# rename cannot silently disarm both the whitelist and the runner gate at once.
-SIBLING_SECURITY_DIR = "security_claims_guard"
-SIBLING_SECURITY_POLICY_DIR = "mcp_authorization_security"
-SIBLING_SECURITY_AUDIT_DIR = "audit_evidence_security"
-SIBLING_SECURITY_TERM_DIRS = (
-    SIBLING_SECURITY_DIR,
-    SIBLING_SECURITY_POLICY_DIR,
-    SIBLING_SECURITY_AUDIT_DIR,
-)
-SIBLING_SECURITY_RUNNERS = (
-    SIBLING_SECURITY_DIR,
-    SIBLING_SECURITY_POLICY_DIR,
-    SIBLING_SECURITY_AUDIT_DIR,
-)
+SIBLING_SECURITY_TERM_DIRS = ()
+SIBLING_SECURITY_RUNNERS = ()
 SIBLING_BRIEF_GLOBS = [
     "README.md", "*/README.md", "*/run.py", "*/run_tokens.py", "*/cite.py", "*/my_tool.py",
     "*/sample.txt", "*/compare_sample.txt", "*/controls.json",
@@ -185,11 +169,7 @@ def _is_security_brief(p):
 
 
 def _check_security_brief(bad):
-    # When the public repo is not checked out beside the engine (isolated CI), there is nothing to
-    # verify, so skip. But when the sibling IS present and a public security artifact is gone, that is
-    # a silent-disarm risk, so fail loudly instead of returning quietly.
-    if not SIBLING_BRIEFS.exists():
-        return
+    # Security artifacts are no longer part of the public feature-hits surface.
     for name in SIBLING_SECURITY_RUNNERS:
         brief_dir = SIBLING_BRIEFS / name
         if not brief_dir.exists():

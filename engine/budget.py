@@ -21,7 +21,9 @@ from common.models import get
 from common.pricing import cost_breakdown, cost_from_buckets
 
 DEFAULT_BUDGET_USD = 2.0
+DEFAULT_WARN_USD = 2.0
 ENV_BUDGET = "RADAR_BUDGET_USD"
+ENV_WARN = "RADAR_BUDGET_WARN_USD"
 ENV_LABEL = "RADAR_BUDGET_LABEL"
 
 
@@ -63,8 +65,10 @@ class Reservation:
 class BudgetLedger:
     """One per-day, per-label budget ledger stored under gitignored data/."""
 
-    def __init__(self, cap_usd: float | None, *, label: str = "grind-deep", root=None):
+    def __init__(self, cap_usd: float | None, *, label: str = "grind-deep", root=None,
+                 warn_usd: float | None = None):
         self.cap_usd = cap_usd
+        self.warn_usd = warn_usd
         self.label = label
         self.root = root or repo_root()
         today = _dt.date.today().isoformat()
@@ -72,13 +76,20 @@ class BudgetLedger:
         self.path = self.root / "data" / "budget" / f"{today}-{safe_label}.json"
 
     @classmethod
-    def from_env(cls, *, cap_usd: float | None = None, label: str | None = None, root=None):
+    def from_env(cls, *, cap_usd: float | None = None, label: str | None = None, root=None,
+                 warn_usd: float | None = None):
         if cap_usd is None:
             raw = os.environ.get(ENV_BUDGET)
             cap_usd = float(raw) if raw not in (None, "") else DEFAULT_BUDGET_USD
+        if warn_usd is None:
+            raw_warn = os.environ.get(ENV_WARN)
+            warn_usd = float(raw_warn) if raw_warn not in (None, "") else DEFAULT_WARN_USD
         if cap_usd <= 0:
             raise SystemExit(f"{ENV_BUDGET} must be positive, got {cap_usd!r}")
-        return cls(cap_usd, label=label or os.environ.get(ENV_LABEL, "grind-deep"), root=root)
+        if warn_usd is not None and warn_usd <= 0:
+            raise SystemExit(f"{ENV_WARN} must be positive, got {warn_usd!r}")
+        return cls(cap_usd, label=label or os.environ.get(ENV_LABEL, "grind-deep"), root=root,
+                   warn_usd=warn_usd)
 
     def _load(self) -> dict:
         if not self.path.exists():
@@ -86,12 +97,14 @@ class BudgetLedger:
         data = json.loads(self.path.read_text())
         data.setdefault("records", [])
         data["cap_usd"] = self.cap_usd
+        data["warn_usd"] = self.warn_usd
         data["label"] = self.label
         return data
 
     def _save(self, data: dict) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         data["cap_usd"] = self.cap_usd
+        data["warn_usd"] = self.warn_usd
         data["label"] = self.label
         data["spent_or_reserved_usd"] = round(self.spent_or_reserved(data), 6)
         self.path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
@@ -120,6 +133,12 @@ class BudgetLedger:
                 f"Budget preflight blocked {label}: estimated ${estimated:.4f}, "
                 f"already spent/reserved ${used:.4f}, cap ${cap:.2f}. "
                 f"Raise {ENV_BUDGET} only after approval."
+            )
+        warn = float(self.warn_usd or 0.0)
+        if warn and used <= warn < used + estimated:
+            print(
+                f"  LOUD BUDGET WARNING: {label} will cross the ${warn:.2f} daily baseline "
+                f"(estimated/reserved ${used + estimated:.4f}) but remains under the hard cap ${cap:.2f}."
             )
         rid = str(uuid.uuid4())
         row = {
