@@ -79,16 +79,22 @@ def _check_internal_kinds(hits: Path, misses: Path, fail: list[str]) -> None:
     from engine.coverage import _INTERNAL_KINDS
 
     expected = {
-        "cost": ["misses/cost-model/BRIEF.md", "misses/cost-model/sample.txt", "misses/cost-model/PRODUCT_NOTE.md"],
-        "eval_quality": ["misses/eval-quality/BRIEF.md", "misses/eval-quality/sample.txt", "misses/eval-quality/PRODUCT_NOTE.md"],
+        "cost": ["misses/cost-model/FINDING.md", "misses/cost-model/sample.txt", "misses/cost-model/PRODUCT_NOTE.md"],
+        "eval_quality": [
+            "misses/eval-quality/FINDING.md",
+            "misses/eval-quality/sample.txt",
+            "misses/eval-quality/PRODUCT_NOTE.md",
+        ],
         "retention_resume": [
-            "misses/retention-resume/BRIEF.md",
+            "misses/retention-resume/FINDING.md",
             "misses/retention-resume/sample.txt",
             "misses/retention-resume/PRODUCT_NOTE.md",
         ],
-        "security_posture": ["misses/security-posture/BRIEF.md", "misses/security-posture/FINDING.md"],
-        "other": ["misses/parity-gated/BRIEF.md", "misses/parity-gated/sample.txt", "misses/parity-gated/PRODUCT_NOTE.md"],
-        "advisor_routing": ["misses/advisor-tool/BRIEF.md", "misses/advisor-tool/FINDING.md"],
+        # Security posture remains private radar/source-ledger machinery, not an exported public or
+        # misses artifact, until a specific security claim clears the same adversarial value bar.
+        "security_posture": [],
+        "other": ["misses/parity-gated/FINDING.md", "misses/parity-gated/sample.txt", "misses/parity-gated/PRODUCT_NOTE.md"],
+        "advisor_routing": ["misses/advisor-tool/FINDING.md", "misses/advisor-tool/INTAKE.md"],
     }
     forbidden_public_markers = {
         "cost": ["cost-model", "cost_model"],
