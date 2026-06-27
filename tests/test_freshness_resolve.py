@@ -221,7 +221,7 @@ def test_resolve_report_carries_review_only_control_plane(tmp_path):
         "auto_send": False,
     }
     md = md_path.read_text()
-    assert "review PR only" in md
+    assert "PR-only control plane" in md
     assert "no auto-merge" in md
     assert "no auto-publish" in md
 

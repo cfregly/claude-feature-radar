@@ -190,7 +190,7 @@ def markdown_report(report: dict) -> str:
         "",
         report["guardrail"],
         "",
-        "Control plane: report-only, review PR only, no auto-merge, no auto-publish, no auto-send.",
+        "Control plane: PR-only control plane, no auto-merge, no auto-publish, no auto-send.",
         "",
         "This report is inert. It does not update public claims, send mail, post publicly, or push a branch.",
         "",

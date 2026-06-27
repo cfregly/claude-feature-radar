@@ -604,7 +604,7 @@ def markdown_report(payload: dict) -> str:
         "",
         payload["guardrail"],
         "",
-        "Control plane: report-only unless `--apply`; review PR only when `--open-pr` is explicit; no auto-merge, no auto-publish, no auto-send.",
+        "Control plane: PR-only control plane. Dry-run by default; `--apply` edits local files; `--open-pr` opens a review PR; no auto-merge, no auto-publish, no auto-send.",
         "",
         "| Job | Decision | Reason | Command | Receipt |",
         "| --- | --- | --- | --- | --- |",

@@ -115,7 +115,7 @@ def test_report_schema_and_guardrail(monkeypatch, tmp_path):
     assert saved["stale"][0]["decision"] == ""
     md = md_path.read_text()
     assert "Search broad, prove narrow, republish only with receipts." in md
-    assert "Control plane: report-only, review PR only" in md
+    assert "Control plane: PR-only control plane" in md
     assert "promote / hold / miss" in md
 
 
