@@ -581,6 +581,7 @@ def write_report(jobs: list[Job], *, date: str, root: Path | None = None) -> tup
         "schema_version": 1,
         "date": date,
         "guardrail": freshness.GUARDRAIL,
+        "control_plane": freshness.CONTROL_PLANE,
         "summary": {decision: sum(1 for job in jobs if job.decision == decision) for decision in sorted(DECISIONS)},
         "jobs": [job_to_dict(job) for job in jobs],
     }
@@ -602,6 +603,8 @@ def markdown_report(payload: dict) -> str:
         f"# Feature Radar Freshness Resolve, {payload['date']}",
         "",
         payload["guardrail"],
+        "",
+        "Control plane: report-only unless `--apply`; review PR only when `--open-pr` is explicit; no auto-merge, no auto-publish, no auto-send.",
         "",
         "| Job | Decision | Reason | Command | Receipt |",
         "| --- | --- | --- | --- | --- |",
@@ -646,6 +649,7 @@ def maybe_open_prs(jobs: list[Job], *, hits_dir: Path, misses_dir: Path, date: s
     body = markdown_report({
         "date": date,
         "guardrail": freshness.GUARDRAIL,
+        "control_plane": freshness.CONTROL_PLANE,
         "jobs": [job_to_dict(job) for job in jobs],
     })
     branch = f"freshness-resolve/{date}"

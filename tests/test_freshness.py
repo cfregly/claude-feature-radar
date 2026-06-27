@@ -103,11 +103,19 @@ def test_report_schema_and_guardrail(monkeypatch, tmp_path):
     saved = json.loads(json_path.read_text())
     assert saved["schema_version"] == 1
     assert saved["guardrail"] == "A release does not update the claim. A rerun updates the claim."
+    assert saved["control_plane"] == {
+        "mode": "report_only",
+        "review_pr_only": True,
+        "auto_merge": False,
+        "auto_publish": False,
+        "auto_send": False,
+    }
     assert saved["stale"][0]["decision_options"] == ["promote", "hold", "miss"]
     assert saved["stale"][0]["result"] == ""
     assert saved["stale"][0]["decision"] == ""
     md = md_path.read_text()
     assert "Search broad, prove narrow, republish only with receipts." in md
+    assert "Control plane: report-only, review PR only" in md
     assert "promote / hold / miss" in md
 
 

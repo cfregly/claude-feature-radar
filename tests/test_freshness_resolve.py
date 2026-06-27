@@ -201,6 +201,31 @@ def test_run_dry_path_does_not_write_sibling_repos(monkeypatch, tmp_path):
     assert list(misses.iterdir()) == []
 
 
+def test_resolve_report_carries_review_only_control_plane(tmp_path):
+    job = resolve.Job(
+        artifact=resolve.REGISTRY["search_results"],
+        rows=[_row("search_results")],
+        command="make search-results",
+        decision="hold",
+        reason="missing required environment: OPENAI_API_KEY",
+    )
+
+    json_path, md_path = resolve.write_report([job], date="2026-06-27", root=tmp_path)
+
+    payload = json.loads(json_path.read_text())
+    assert payload["control_plane"] == {
+        "mode": "report_only",
+        "review_pr_only": True,
+        "auto_merge": False,
+        "auto_publish": False,
+        "auto_send": False,
+    }
+    md = md_path.read_text()
+    assert "review PR only" in md
+    assert "no auto-merge" in md
+    assert "no auto-publish" in md
+
+
 def test_unmapped_hold_apply_stays_report_only(tmp_path):
     hits = tmp_path / "hits"
     misses = tmp_path / "misses"

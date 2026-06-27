@@ -20,6 +20,14 @@ from engine.sources_registry import Source, sources
 
 GUARDRAIL = "A release does not update the claim. A rerun updates the claim."
 
+CONTROL_PLANE = {
+    "mode": "report_only",
+    "review_pr_only": True,
+    "auto_merge": False,
+    "auto_publish": False,
+    "auto_send": False,
+}
+
 STALE_STATUSES = {"changed", "missing_baseline", "unknown"}
 
 RERUN_COMMANDS = {
@@ -143,6 +151,7 @@ def evaluate(*, watched_sources: list[Source] | None = None, date: str | None = 
         "as_of_date": run_date,
         "landscape_as_of_date": landscape.get("as_of_date"),
         "guardrail": GUARDRAIL,
+        "control_plane": CONTROL_PLANE,
         "summary": {
             "total_sources": len(rows),
             "fresh_sources": by_status.get("fresh", 0),
@@ -180,6 +189,8 @@ def markdown_report(report: dict) -> str:
         f"# Feature Radar Freshness Report, {report['as_of_date']}",
         "",
         report["guardrail"],
+        "",
+        "Control plane: report-only, review PR only, no auto-merge, no auto-publish, no auto-send.",
         "",
         "This report is inert. It does not update public claims, send mail, post publicly, or push a branch.",
         "",
