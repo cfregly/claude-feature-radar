@@ -1588,8 +1588,8 @@ def _citations_sample_source() -> str:
 
 def _sample_source(plan: BriefPlan, receipt: dict | None) -> str:
     """The committed receipt snapshot that the demo gif replays (cat by demo.tape). Wins-only, honest,
-    deterministic. The token_accounting brief shows the billed-input table token-only (no answer-correctness
-    claim, since plain tool use can miss on 240 rows); grounding_resolution shows the per-pointer table."""
+    deterministic. The token_accounting brief shows the billed-input table and same-answer check;
+    grounding_resolution shows the per-pointer table."""
     if plan.from_assets:
         return _read_asset(plan, "sample.txt")
     if plan.slug == "code_execution_state":
@@ -1601,8 +1601,8 @@ def _sample_source(plan: BriefPlan, receipt: dict | None) -> str:
         a_in = receipt.get("mode_a", {}).get("billed_input")
         b_in = receipt.get("mode_b", {}).get("billed_input")
         pct = receipt.get("pct_input_reduction")
-    a_str = f"{a_in:,}" if a_in else "9,451"
-    b_str = f"{b_in:,}" if b_in else "6,828"
+    a_str = f"{a_in:,}" if a_in else "9,494"
+    b_str = f"{b_in:,}" if b_in else "6,910"
     pct_str = f"{pct:.0f}" if isinstance(pct, (int, float)) else "28"
     return (
         "\n  Programmatic tool calling: the same fan-out task, Claude with PTC vs without it.\n\n"
@@ -1615,6 +1615,7 @@ def _sample_source(plan: BriefPlan, receipt: dict | None) -> str:
         "  --------------------------------------------------------------------------\n\n"
         f"  -> {pct_str}% fewer billed input tokens, because the 240 results went to the\n"
         "     sandbox, not the model context. The saving compounds across every fan-out.\n\n"
+        "  Same answer gate: both arms must return the expected answer before this counts as a win.\n\n"
         "  Estimated token/API run cost: $0.08.\n"
         "  Code execution runtime can bill separately after the monthly free allowance.\n\n"
         "  The change is two lines: add the code_execution tool, then put\n"

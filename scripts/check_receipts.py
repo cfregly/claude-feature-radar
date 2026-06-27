@@ -83,7 +83,7 @@ def check_programmatic_tool_calling(fail, warn):
 
 def check_programmatic_tool_calling_drift(fail, warn):
     """Any PTC-token-shaped number (9,4xx / 6,8xx) on a PTC founder surface must equal the receipt, so a
-    stray hand-typed 6,819 cannot drift away from the 6,828 the run actually billed. Scoped to files that
+    stray hand-typed 6,819 cannot drift away from the 6,910 the run actually billed. Scoped to files that
     are actually about PTC: with many briefs now, an unrelated edge can legitimately print a 6,8xx number
     (cache diagnostics measured 6,827 missed tokens), and that is its own receipt, not PTC drift."""
     s = _read("edges/programmatic-tool-calling/sample.txt")

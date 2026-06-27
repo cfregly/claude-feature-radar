@@ -16,6 +16,7 @@ price and token-window arithmetic over dated registry facts.
 from __future__ import annotations
 
 import argparse
+from decimal import Decimal, ROUND_HALF_UP
 import json
 import pathlib
 import re
@@ -45,6 +46,10 @@ def _mtok_cost(tokens: int, usd_per_mtok: float) -> float:
     return tokens * usd_per_mtok / 1e6
 
 
+def _money(value: float) -> float:
+    return float(Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+
+
 def _cache_write_cost(model_key: str, tokens: int, ttl: str) -> float:
     model = get(model_key)
     if ttl == "5m":
@@ -66,7 +71,7 @@ def _cached_run_cost(model_key: str, *, prefix_tokens: int, turns: int, fresh_pe
         "cache_read_usd": round(read, 6),
         "fresh_input_usd": round(fresh, 6),
         "output_usd": round(output, 6),
-        "total_usd": round(write + read + fresh + output, 6),
+        "total_usd": _money(write + read + fresh + output),
     }
 
 
@@ -81,7 +86,7 @@ def _automatic_cache_run_cost(model_key: str, *, prefix_tokens: int, turns: int,
         "cache_read_usd": round(read, 6),
         "fresh_input_usd": round(fresh, 6),
         "output_usd": round(output, 6),
-        "total_usd": round(read + fresh + output, 6),
+        "total_usd": _money(read + fresh + output),
     }
 
 
@@ -95,7 +100,7 @@ def _uncached_run_cost(model_key: str, *, prefix_tokens: int, turns: int, fresh_
         "cache_read_usd": 0.0,
         "fresh_input_usd": round(fresh, 6),
         "output_usd": round(output, 6),
-        "total_usd": round(fresh + output, 6),
+        "total_usd": _money(fresh + output),
     }
 
 
@@ -117,8 +122,8 @@ def ptc_receipt(path: pathlib.Path | None = None) -> dict:
     }
 
 
-def compute_proof(workload: dict | None = None, *, claude_model_key: str = "opus",
-                  competitor_model_key: str = "gpt-top") -> dict:
+def compute_proof(workload: dict | None = None, *, claude_model_key: str = "sonnet",
+                  openai_model_key: str = "gpt-top", gemini_model_key: str = "gem-flash") -> dict:
     workload = dict(workload or DEFAULT_WORKLOAD)
     prefix = int(workload["stable_prefix_tokens"])
     turns = int(workload["turns"])
@@ -128,7 +133,8 @@ def compute_proof(workload: dict | None = None, *, claude_model_key: str = "opus
     ttl = str(workload["cache_ttl"])
 
     claude = get(claude_model_key)
-    competitor = get(competitor_model_key)
+    openai = get(openai_model_key)
+    gemini = get(gemini_model_key)
     no_cache = _uncached_run_cost(
         claude_model_key,
         prefix_tokens=prefix,
@@ -152,8 +158,15 @@ def compute_proof(workload: dict | None = None, *, claude_model_key: str = "opus
         output_per_turn=output,
         ttl=ttl,
     )
-    competitor_cache_no_ptc = _automatic_cache_run_cost(
-        competitor_model_key,
+    openai_cache_no_ptc = _automatic_cache_run_cost(
+        openai_model_key,
+        prefix_tokens=prefix,
+        turns=turns,
+        fresh_per_turn=raw_tool,
+        output_per_turn=output,
+    )
+    gemini_cache_no_ptc = _automatic_cache_run_cost(
+        gemini_model_key,
         prefix_tokens=prefix,
         turns=turns,
         fresh_per_turn=raw_tool,
@@ -166,20 +179,35 @@ def compute_proof(workload: dict | None = None, *, claude_model_key: str = "opus
     reduction_vs_uncached = (
         100 * (no_cache["total_usd"] - cache_ptc["total_usd"]) / no_cache["total_usd"]
     )
-    reduction_vs_competitor_best = (
-        100 * (competitor_cache_no_ptc["total_usd"] - cache_ptc["total_usd"])
-        / competitor_cache_no_ptc["total_usd"]
+    reduction_vs_openai_best = (
+        100 * (openai_cache_no_ptc["total_usd"] - cache_ptc["total_usd"])
+        / openai_cache_no_ptc["total_usd"]
+    )
+    reduction_vs_gemini_best = (
+        100 * (gemini_cache_no_ptc["total_usd"] - cache_ptc["total_usd"])
+        / gemini_cache_no_ptc["total_usd"]
     )
     return {
         "basis": {
             "ptc_live_receipt": ptc_receipt(),
             "claude_model": {"key": claude.key, "label": claude.label, "context_window": claude.context_window},
-            "competitor_best_stack": {
-                "key": competitor.key,
-                "label": competitor.label,
-                "context_window": competitor.context_window,
-                "assumption": "best-case automatic cache hits on every post-first turn, but no PTC equivalent",
-            },
+            "competitor_best_stacks": [
+                {
+                    "key": openai.key,
+                    "label": openai.label,
+                    "context_window": openai.context_window,
+                    "assumption": "best-case automatic cache hits on every post-first turn, but no PTC equivalent",
+                },
+                {
+                    "key": gemini.key,
+                    "label": gemini.label,
+                    "context_window": gemini.context_window,
+                    "assumption": (
+                        "context caching plus function calling or code execution for a high-tool-call "
+                        "agent executor, but no PTC equivalent"
+                    ),
+                },
+            ],
         },
         "workload": workload,
         "context_fit": {
@@ -193,17 +221,22 @@ def compute_proof(workload: dict | None = None, *, claude_model_key: str = "opus
         "scenarios": {
             "claude_no_cache_no_ptc": no_cache,
             "claude_cache_no_ptc": cache_no_ptc,
-            "openai_best_cache_1m_no_ptc": competitor_cache_no_ptc,
+            "openai_best_cache_1m_no_ptc": openai_cache_no_ptc,
+            "gemini_best_cache_1m_no_ptc": gemini_cache_no_ptc,
             "claude_cache_ptc": cache_ptc,
         },
         "cliff": {
-            "savings_vs_claude_cache_no_ptc_usd": round(cache_no_ptc["total_usd"] - cache_ptc["total_usd"], 6),
-            "savings_vs_openai_best_cache_no_ptc_usd": round(
-                competitor_cache_no_ptc["total_usd"] - cache_ptc["total_usd"], 6
+            "savings_vs_claude_cache_no_ptc_usd": _money(cache_no_ptc["total_usd"] - cache_ptc["total_usd"]),
+            "savings_vs_openai_best_cache_no_ptc_usd": _money(
+                openai_cache_no_ptc["total_usd"] - cache_ptc["total_usd"]
+            ),
+            "savings_vs_gemini_best_cache_no_ptc_usd": _money(
+                gemini_cache_no_ptc["total_usd"] - cache_ptc["total_usd"]
             ),
             "reduction_vs_claude_cache_no_ptc_pct": round(reduction_vs_claude_cache, 1),
             "reduction_vs_uncached_no_ptc_pct": round(reduction_vs_uncached, 1),
-            "reduction_vs_openai_best_cache_no_ptc_pct": round(reduction_vs_competitor_best, 1),
+            "reduction_vs_openai_best_cache_no_ptc_pct": round(reduction_vs_openai_best, 1),
+            "reduction_vs_gemini_best_cache_no_ptc_pct": round(reduction_vs_gemini_best, 1),
         },
         "honest_reading": (
             "PTC is the unique leg: cache and 1M context are not enough if raw custom-tool output keeps "
@@ -219,6 +252,9 @@ def _print_receipt(receipt: dict) -> None:
     scenarios = receipt["scenarios"]
     cliff = receipt["cliff"]
     fit = receipt["context_fit"]
+    competitors = {stack["key"]: stack for stack in receipt["basis"]["competitor_best_stacks"]}
+    openai_stack = competitors["gpt-top"]
+    gemini_stack = competitors["gem-flash"]
     print("\n  PTC + cache + 1M-context cost cliff (deterministic, $0):\n")
     print(
         f"    live PTC receipt: {ptc['plain_tool_use_billed_input_tokens']:,} -> "
@@ -241,8 +277,13 @@ def _print_receipt(receipt: dict) -> None:
     )
     print(
         f"    - Claude cache+PTC saves ${cliff['savings_vs_openai_best_cache_no_ptc_usd']:,.2f} "
-        f"vs best-case GPT-5.5 1M+cache without PTC "
+        f"vs {openai_stack['label']} 1M+cache without PTC "
         f"({cliff['reduction_vs_openai_best_cache_no_ptc_pct']}% lower)"
+    )
+    print(
+        f"    - Claude cache+PTC saves ${cliff['savings_vs_gemini_best_cache_no_ptc_usd']:,.2f} "
+        f"vs {gemini_stack['label']} 1M+cache without PTC "
+        f"({cliff['reduction_vs_gemini_best_cache_no_ptc_pct']}% lower)"
     )
     print(
         f"    - 700k prefix fits a 1M window: {fit['fits_claude_1m_with_ptc_summary']}; "

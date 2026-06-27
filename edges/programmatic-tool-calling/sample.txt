@@ -1,31 +1,31 @@
 
-  Programmatic tool calling: the input-token receipt on a real fan-out task.
+  Programmatic tool calling: the input-token proof on a real fan-out task.
   Task: across 4 regions, each returning ~60 sales rows, find the
   region with the highest total revenue. True winner (computed locally): east.
   Same task and same model (Claude Sonnet 4.6) both ways, the final answer must match or we fail.
 
   running Mode A (plain tool use, every row through context) ...
-      [A] turn 1: stop=tool_use tool_use=4 code=0 billed=745 3s
-      [A] turn 2: stop=end_turn tool_use=0 code=0 billed=9,451 9s
-    Mode A done: 2 round-trips, 9,451 billed input tokens, answer None.
+      [A] turn 1: stop=tool_use tool_use=4 code=0 billed=761 6s
+      [A] turn 2: stop=end_turn tool_use=0 code=0 billed=9,494 41s
+    Mode A done: 2 round-trips, 9,494 billed input tokens, answer east.
   running Mode B (programmatic, rows filtered in the sandbox) ...
-      [B] turn 1: stop=tool_use tool_use=1 code=1 billed=3,294 6s
-      [B] turn 2: stop=tool_use tool_use=1 code=0 billed=3,294 8s
-      [B] turn 3: stop=tool_use tool_use=1 code=0 billed=3,294 9s
-      [B] turn 4: stop=tool_use tool_use=1 code=0 billed=3,294 10s
-      [B] turn 5: stop=end_turn tool_use=0 code=0 billed=6,828 14s
-    Mode B done: 5 round-trips, 6,828 billed input tokens, answer east.
+      [B] turn 1: stop=tool_use tool_use=1 code=1 billed=3,310 6s
+      [B] turn 2: stop=tool_use tool_use=1 code=0 billed=3,310 7s
+      [B] turn 3: stop=tool_use tool_use=1 code=0 billed=3,310 9s
+      [B] turn 4: stop=tool_use tool_use=1 code=0 billed=3,310 10s
+      [B] turn 5: stop=end_turn tool_use=0 code=0 billed=6,910 14s
+    Mode B done: 5 round-trips, 6,910 billed input tokens, answer east.
 
   mode                                      billed input tok  round-trips    answer  token/API
   --------------------------------------------------------------------------------------------
-  Mode A: plain tool use                               9,451            2      None    $0.06
-  Mode B: programmatic (allowed_callers)               6,828            5      east    $0.02
+  Mode A: plain tool use                               9,494            2      east    $0.06
+  Mode B: programmatic (allowed_callers)               6,910            5      east    $0.02
 
   Honest reading:
-  - THE EDGE, measured: Mode B billed 6,828 input tokens vs Mode A's 9,451, a 28% reduction, because the 240 rows the tool returned went to the sandbox, not the model context.
-  - Bonus, correctness: Mode B (the sandbox code does the arithmetic) answered east (correct). Mode A (the model sums 240 rows in its head) answered None (WRONG). Exact math in code beats in-context summation over many rows.
-  - Honest cost of the approach: Mode B made 5 model round-trips to Mode A's 2 because the model called the tool serially from code, so on an INSTANT mock tool it runs slower. The token saving is the win, the latency depends on your real tool's per-call time (PTC saves the per-call model round-trip a real slow tool would cost).
+  - THE EDGE, measured: Mode B billed 6,910 input tokens vs Mode A's 9,494, a 27% reduction, because the 240 rows the tool returned went to the sandbox, not the model context.
+  - Correctness: both modes answered east on this saved run, and the reducer eval pins the exact local winner.
+  - Honest cost of the approach: Mode B made 5 model round-trips to Mode A's 2 because the model called the tool serially from code, so on an instant mock tool it runs slower. The token saving is the win, and the latency story depends on your real tool's per-call time.
   - Cost scope: the dollar column is token/API cost from usage objects. Code execution runtime can bill separately after the monthly free allowance, so production COGS must add it.
   - Fan-out-shaped: the doc notes a sequential single-call task (tau2-bench) is flat to about 8% more expensive. No competitor keeps your custom-tool outputs out of context.
 
-  wrote receipts to data/last_programmatic_tool_calling.json
+  wrote outputs to data/last_programmatic_tool_calling.json

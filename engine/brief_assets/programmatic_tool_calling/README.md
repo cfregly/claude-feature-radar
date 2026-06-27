@@ -2,7 +2,7 @@
 
 ![demo](https://raw.githubusercontent.com/cfregly/claude-feature-hits/main/programmatic_tool_calling/demo.gif)
 
-[![Claude proof: 28% fewer input tokens](https://img.shields.io/badge/Claude%20proof-28%25%20fewer%20input%20tokens-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/programmatic_tool_calling/sample.txt)
+[![Claude proof: 27% fewer input tokens](https://img.shields.io/badge/Claude%20proof-27%25%20fewer%20input%20tokens-2F855A)](https://github.com/cfregly/claude-feature-hits/blob/main/programmatic_tool_calling/sample.txt)
 
 When your agent meters usage per cohort or runs analytics across regions, it calls one of your own tools many times, then crunches what comes back. Every one of those calls dumps its outputs into the model's context, and you pay input tokens for all of them, even the outputs the agent never uses. Programmatic tool calling runs your tool inside a code sandbox (a server-side scratchpad that crunches the outputs for you), keeps only what matters, and passes just the answer to the model. The tool outputs stay in the sandbox, so they never reach the context.
 
@@ -26,10 +26,10 @@ The measured run, same task and same model (Sonnet 4.6), the only change is the 
 
 | your run | input tokens billed | what it means |
 |---|---:|---|
-| without programmatic tool calling | 9,451 | every tool output lands in the model's context |
-| **with programmatic tool calling** | **6,828** | only the answer reaches the model |
+| without programmatic tool calling | 9,494 | every tool output lands in the model's context |
+| **with programmatic tool calling** | **6,910** | only the answer reaches the model |
 
-That is **28% fewer input tokens**, with the exact winner returned from the sandbox. Every cell is read live off the API's own `usage` object, so re-running shifts the count a little. The saving grows with the size of the fan-out.
+That is **27% fewer input tokens**, with the exact winner returned from the sandbox. Every cell is read live off the API's own `usage` object, so re-running shifts the count a little. The saving grows with the size of the fan-out.
 
 ## Why I built this on Claude
 

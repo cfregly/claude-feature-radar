@@ -2,21 +2,29 @@
   "basis": {
     "ptc_live_receipt": {
       "source": "edges/programmatic-tool-calling/sample.txt",
-      "plain_tool_use_billed_input_tokens": 9451,
-      "programmatic_tool_calling_billed_input_tokens": 6828,
-      "input_reduction_pct": 27.8
+      "plain_tool_use_billed_input_tokens": 9494,
+      "programmatic_tool_calling_billed_input_tokens": 6910,
+      "input_reduction_pct": 27.2
     },
     "claude_model": {
-      "key": "opus",
-      "label": "Claude Opus 4.8",
+      "key": "sonnet",
+      "label": "Claude Sonnet 4.6",
       "context_window": 1000000
     },
-    "competitor_best_stack": {
-      "key": "gpt-top",
-      "label": "GPT-5.5",
-      "context_window": 1050000,
-      "assumption": "best-case automatic cache hits on every post-first turn, but no PTC equivalent"
-    }
+    "competitor_best_stacks": [
+      {
+        "key": "gpt-top",
+        "label": "GPT-5.5",
+        "context_window": 1050000,
+        "assumption": "best-case automatic cache hits on every post-first turn, but no PTC equivalent"
+      },
+      {
+        "key": "gem-flash",
+        "label": "Gemini 3.5 Flash",
+        "context_window": 1000000,
+        "assumption": "context caching plus function calling or code execution for a high-tool-call agent executor, but no PTC equivalent"
+      }
+    ]
   },
   "workload": {
     "stable_prefix_tokens": 700000,
@@ -38,16 +46,16 @@
     "claude_no_cache_no_ptc": {
       "cache_write_usd": 0.0,
       "cache_read_usd": 0.0,
-      "fresh_input_usd": 450.0,
-      "output_usd": 0.75,
-      "total_usd": 450.75
+      "fresh_input_usd": 270.0,
+      "output_usd": 0.45,
+      "total_usd": 270.45
     },
     "claude_cache_no_ptc": {
-      "cache_write_usd": 7.0,
-      "cache_read_usd": 34.65,
-      "fresh_input_usd": 100.0,
-      "output_usd": 0.75,
-      "total_usd": 142.4
+      "cache_write_usd": 4.2,
+      "cache_read_usd": 20.79,
+      "fresh_input_usd": 60.0,
+      "output_usd": 0.45,
+      "total_usd": 85.44
     },
     "openai_best_cache_1m_no_ptc": {
       "cache_write_usd": 0.0,
@@ -56,20 +64,29 @@
       "output_usd": 0.9,
       "total_usd": 135.55
     },
+    "gemini_best_cache_1m_no_ptc": {
+      "cache_write_usd": 0.0,
+      "cache_read_usd": 10.395,
+      "fresh_input_usd": 30.0,
+      "output_usd": 0.27,
+      "total_usd": 40.67
+    },
     "claude_cache_ptc": {
-      "cache_write_usd": 7.0,
-      "cache_read_usd": 34.65,
-      "fresh_input_usd": 1.0,
-      "output_usd": 0.75,
-      "total_usd": 43.4
+      "cache_write_usd": 4.2,
+      "cache_read_usd": 20.79,
+      "fresh_input_usd": 0.6,
+      "output_usd": 0.45,
+      "total_usd": 26.04
     }
   },
   "cliff": {
-    "savings_vs_claude_cache_no_ptc_usd": 99.0,
-    "savings_vs_openai_best_cache_no_ptc_usd": 92.15,
+    "savings_vs_claude_cache_no_ptc_usd": 59.4,
+    "savings_vs_openai_best_cache_no_ptc_usd": 109.51,
+    "savings_vs_gemini_best_cache_no_ptc_usd": 14.63,
     "reduction_vs_claude_cache_no_ptc_pct": 69.5,
     "reduction_vs_uncached_no_ptc_pct": 90.4,
-    "reduction_vs_openai_best_cache_no_ptc_pct": 68.0
+    "reduction_vs_openai_best_cache_no_ptc_pct": 80.8,
+    "reduction_vs_gemini_best_cache_no_ptc_pct": 36.0
   },
   "honest_reading": "PTC is the unique leg: cache and 1M context are not enough if raw custom-tool output keeps returning to the model as fresh input. The proof is deterministic cost arithmetic over verified prices, grounded by the committed live PTC receipt."
 }

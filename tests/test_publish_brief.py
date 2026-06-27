@@ -150,8 +150,8 @@ def test_agreeing_receipt_passes(monkeypatch, tmp_path):
     _synthetic_edge(monkeypatch, verdict="claude-ahead", lead_score=5, lead_basis="absence-of-evidence")
     _pass_adversarial_gate(monkeypatch)
     good = tmp_path / "last_programmatic_tool_calling.json"
-    good.write_text(json.dumps({"mode_b_correct": True, "pct_input_reduction": 28.0,
-                                "mode_a": {"billed_input": 9451}, "mode_b": {"billed_input": 6828}}))
+    good.write_text(json.dumps({"mode_b_correct": True, "pct_input_reduction": 27.2,
+                                "mode_a": {"billed_input": 9494}, "mode_b": {"billed_input": 6910}}))
     monkeypatch.setattr(pb, "_receipt_path", lambda k: good)
     assert pb.verdict_gate("programmatic-tool-calling").ok
 
@@ -163,13 +163,13 @@ def test_agreeing_receipt_passes(monkeypatch, tmp_path):
 def test_committed_receipt_matches_the_gated_sample():
     """_committed_receipt parses edges/<folder>/sample.txt, the SAME committed file scripts/check_receipts.py
     checks, so a published brief quotes the receipt-of-record. The numbers and the honest correctness flags
-    come straight off it: Mode A answered None (wrong), Mode B answered the true winner."""
+    come straight off it: both modes answered east, while the deterministic reducer eval pins the true winner."""
     r = pb._committed_receipt(pb.PLANS["programmatic-tool-calling"])
     assert r is not None, "the committed edges/programmatic-tool-calling/sample.txt must parse"
-    assert r["mode_a"]["billed_input"] == 9451
-    assert r["mode_b"]["billed_input"] == 6828
-    assert round(r["pct_input_reduction"]) == 28
-    assert r["mode_a_correct"] is False, "the public table must never claim Mode A was correct"
+    assert r["mode_a"]["billed_input"] == 9494
+    assert r["mode_b"]["billed_input"] == 6910
+    assert round(r["pct_input_reduction"]) == 27
+    assert r["mode_a_correct"] is True
     assert r["mode_b_correct"] is True
 
 
@@ -180,10 +180,11 @@ def test_committed_receipt_ignores_the_transient_json(monkeypatch):
         raise AssertionError("_committed_receipt must not read the transient receipt path")
     monkeypatch.setattr(pb, "_receipt_path", boom)
     r = pb._committed_receipt(pb.PLANS["programmatic-tool-calling"])
-    assert r["mode_a"]["billed_input"] == 9451 and r["mode_b"]["billed_input"] == 6828
+    assert r["mode_a"]["billed_input"] == 9494 and r["mode_b"]["billed_input"] == 6910
     # and the generated receipt snapshot the gif replays carries those committed numbers, not a scratch run
     sample = pb._sample_source(pb.PLANS["programmatic-tool-calling"], r)
-    assert "9,451" in sample and "6,828" in sample and "correct" not in sample
+    assert "9,494" in sample and "6,910" in sample
+    assert "same answer" in sample.lower()
 
 
 def test_gate_measurement_uses_committed_receipt_when_transient_has_no_positive_verdict():

@@ -29,8 +29,8 @@ response = client.messages.create(
 )
 ```
 
-Using my API key, the same fan-out task over 240 returned results went from 9,451 to 6,828 billed input tokens,
-with the exact winner returned from the sandbox. That is 28% fewer billed input tokens than the same
+Using my API key, the same fan-out task over 240 returned results went from 9,494 to 6,910 billed input tokens,
+with the exact winner returned from the sandbox. That is 27% fewer billed input tokens than the same
 Claude agent without programmatic tool calling.
 
 Cost caveat for production: that is token/API cost. Code execution runtime can bill separately after

@@ -38,9 +38,9 @@ DIFFERENTIATORS = [
                "of context (allowed_callers). OpenAI ships a code interpreter and tool search but not "
                "this, an absence-of-evidence lead. This receipt path uses no beta header. Programmatic "
                "tool calling requires code_execution_20260120 or later (checked 2026-06-22). Measured (make "
-               "programmatic-tool-calling): on a 240-row fan-out task billed input fell from 9,451 to 6,828 tokens, about "
-               "28% (Anthropic's own doc reports about 24%), and the sandbox code answered correctly "
-               "where the in-context model failed. Fan-out-shaped (sequential tasks flat to +8%), it "
+               "programmatic-tool-calling): on a 240-row fan-out task billed input fell from 9,494 to 6,910 tokens, about "
+               "27% (Anthropic's own doc reports about 24%) on a same-answer run. Fan-out-shaped "
+               "(sequential tasks flat to +8%), it "
                "adds round-trips, and it is not on Bedrock or Vertex and not ZDR-eligible.",
         "fair_comparison": {
             "task_shape": "fan-out, 4 regions x ~60 rows",
@@ -227,9 +227,9 @@ GAPS = [
 CHOSEN = (
     "The sharpest edge is programmatic tool calling: add allowed_callers to a tool and Claude writes "
     "one sandbox script that calls it in a loop and keeps the bulky outputs out of the model context. "
-    "GA, no named competitor equivalent. Measured (make programmatic-tool-calling): billed input fell about 28% on a 240-row "
-    "fan-out task (Anthropic's doc reports about 24%), and the code answered correctly where the "
-    "in-context model failed. Fan-out-shaped, it adds round-trips. The cleanest near-binary edge is "
+    "GA, no named competitor equivalent. Measured (make programmatic-tool-calling): billed input fell about 27% on a 240-row "
+    "fan-out task (Anthropic's doc reports about 24%) on a same-answer run. Fan-out-shaped, it adds "
+    "round-trips. The cleanest near-binary edge is "
     "Citations: the only GA API with a per-character source "
     "pointer into the user's own document, the verbatim quote extracted and free of output tokens "
     "(Gemini File Search is page-level and still preview, OpenAI cites its own output). The third is "

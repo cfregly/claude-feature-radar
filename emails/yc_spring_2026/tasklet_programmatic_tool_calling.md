@@ -23,8 +23,8 @@ tools=[
 ]
 ```
 
-Using my API key, the measured fan-out run went from 9,451 to 6,828 billed input tokens, with the
-exact winner returned from the sandbox. That is 28% fewer billed input tokens than the same Claude
+Using my API key, the measured fan-out run went from 9,494 to 6,910 billed input tokens, with the
+exact winner returned from the sandbox. That is 27% fewer billed input tokens than the same Claude
 agent without programmatic tool calling. That is the shape: many tool calls, bulky results, one final
 answer.
 

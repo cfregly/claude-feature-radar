@@ -10,7 +10,7 @@ The repo is here: https://github.com/cfregly/claude-feature-hits
 
 Pick the production blocker you have this week:
 
-- Cost from agents that fan out over logs, usage events, accounts, or app APIs: run `make programmatic_tool_calling`. The measured fan-out run used 28% fewer billed input tokens than the same Claude agent without programmatic tool calling.
+- Cost from agents that fan out over logs, usage events, accounts, or app APIs: run `make programmatic_tool_calling`. The measured fan-out run used 27% fewer billed input tokens than the same Claude agent without programmatic tool calling.
 - Speed for large outputs or long-stream work: run `make bulk_output` or `make exact_ledger`.
 - Reliability for multi-step code, data, or build agents: run `make code_execution_state` or `make task_budgets`.
 - Accuracy for answers over PDFs, docs, filings, or retrieved chunks: run `make pdf_citations` or `make citations`.
@@ -26,7 +26,7 @@ tools=[
 ]
 ```
 
-For that path, Claude writes one sandbox script, calls your tool in a loop, crunches the bulky intermediate results there, and sends only the answer back to the model. On my run, the same usage-style workload went from 9,451 to 6,828 billed input tokens. That is 28% fewer billed input tokens than the same Claude agent without programmatic tool calling. It costs $0.08 to reproduce.
+For that path, Claude writes one sandbox script, calls your tool in a loop, crunches the bulky intermediate results there, and sends only the answer back to the model. On my run, the same usage-style workload went from 9,494 to 6,910 billed input tokens. That is 27% fewer billed input tokens than the same Claude agent without programmatic tool calling. It costs $0.08 to reproduce.
 
 One important scope line: `allowed_callers` guides Claude to invoke the tool from code execution. It is not a security boundary. Keep authorization, policy checks, and dangerous-action handling in your client or tool layer.
 
@@ -89,7 +89,7 @@ tools=[
 ]
 ```
 
-Using my API key, the same fan-out task over 240 returned results went from 9,451 to 6,828 billed input tokens, with the exact winner returned from the sandbox. That is 28% fewer billed input tokens than the same Claude agent without programmatic tool calling.
+Using my API key, the same fan-out task over 240 returned results went from 9,494 to 6,910 billed input tokens, with the exact winner returned from the sandbox. That is 27% fewer billed input tokens than the same Claude agent without programmatic tool calling.
 
 Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
 
@@ -129,7 +129,7 @@ tools=[
 ]
 ```
 
-Using my API key, the measured fan-out run went from 9,451 to 6,828 billed input tokens, with the exact winner returned from the sandbox. That is 28% fewer billed input tokens than the same Claude agent without programmatic tool calling.
+Using my API key, the measured fan-out run went from 9,494 to 6,910 billed input tokens, with the exact winner returned from the sandbox. That is 27% fewer billed input tokens than the same Claude agent without programmatic tool calling.
 
 Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
 

@@ -19,13 +19,13 @@ regions of 60 sales rows each (240 rows), find the highest-revenue region.
 
 | mode | billed input tokens | answer | round-trips | token/API cost |
 |---|--:|:--:|:--:|--:|
-| Mode A: plain tool use (every row through context) | 9,451 | None (failed) | 2 | $0.06 |
-| **Mode B: programmatic (`allowed_callers`)** | **6,828** | **east (correct)** | 5 | $0.02 |
+| Mode A: plain tool use (every row through context) | 9,494 | east | 2 | $0.06 |
+| **Mode B: programmatic (`allowed_callers`)** | **6,910** | **east (correct)** | 5 | $0.02 |
 
-**The honest read.** Mode B billed about **28% fewer input tokens** because the 240 rows went to the
+**The honest read.** Mode B billed about **27% fewer input tokens** because the 240 rows went to the
 sandbox, not the model context (Anthropic's own docs report about 24% on agentic-search benchmarks, so
-ours is in line). Bonus: the sandbox code did the exact arithmetic that the in-context model fumbled
-(Mode A failed to produce a clean answer over 240 rows). Full receipt in [`sample.txt`](sample.txt).
+ours is in line). Both modes answered `east` on this saved run. The deterministic reducer eval pins the
+exact local winner. Full saved output in [`sample.txt`](sample.txt).
 
 ## The honest scope
 

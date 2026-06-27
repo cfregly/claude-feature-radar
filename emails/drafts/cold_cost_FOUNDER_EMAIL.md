@@ -30,10 +30,10 @@ I measured it on the same fan-out twice, same model (Sonnet 4.6), same answer re
 
 | mode | billed input tokens |
 |---|--:|
-| plain tool use | 9,451 |
-| programmatic | 6,828 |
+| plain tool use | 9,494 |
+| programmatic | 6,910 |
 
-That is about 28% fewer billed input tokens than the same Claude agent without programmatic tool
+That is about 27% fewer billed input tokens than the same Claude agent without programmatic tool
 calling, and the sandbox returned the exact winner. It pays off on the fan-out shape, many calls over
 data the model then crunches.
 
