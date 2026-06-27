@@ -30,6 +30,10 @@ docs): Fable 5, Mythos 5, Opus 4.5 to 4.8, Sonnet 4.5 to 4.6 (not Haiku). The ru
 Sonnet and Opus. Source, re-fetched 2026-06-22:
 https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 
+Cost scope. This module measures input tokens and token/API dollars from the Messages API usage
+object. Code execution runtime can bill separately after the monthly free allowance, so production
+COGS must add that line item before claiming all-in savings.
+
 The win is workload-shaped. It needs a FAN-OUT task: the model has to call the tool many times for the
 bulky outputs to pile up, so keeping them in the sandbox is what saves the input tokens. The demo and
 the app both run the genuine fan-out example, and the app says so plainly, so the claim stays scoped to

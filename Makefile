@@ -4,7 +4,10 @@ DEEP_BUDGET_WARN_USD ?= 2.00
 DEEP_BUDGET_LABEL ?= grind-deep
 DEEP_EFFORT ?= xhigh
 VERIFY_JUDGES ?= claude,openai
-.PHONY: setup compare-deps mcp-deps mcp app app-check programmatic-tool-calling ptc-cache-context citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost security-posture security draft publish-brief publish-misses check-claims check-docs core-imports check-surface check-split check-receipts test ci deslop gif clean
+HITS_DIR ?= ../claude-feature-hits
+MISSES_KIND ?= misses
+MISSES_DIR ?= ../claude-feature-$(MISSES_KIND)
+.PHONY: setup compare-deps mcp-deps mcp app app-check programmatic-tool-calling ptc-cache-context citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges check-freshness freshness-report resolve-freshness resolve-freshness-apply cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost security-posture security draft publish-brief publish-misses check-claims check-docs core-imports check-surface check-split check-receipts test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -108,6 +111,18 @@ sweep: ## trust-the-result variant sweep (caching on/off x managed/baseline, vs 
 
 edges: ## the cheap discovery loop: sweep the live docs, diff against the last run, rank, write the landscape + changelog + brief (NO API call, NO benchmark spend, $0)
 	$(PY) run.py edges
+
+check-freshness: ## source freshness gate: fail when watched source hashes drift from landscape/landscape.json (NO API call, NO benchmark spend, $0)
+	$(PY) run.py check-freshness
+
+freshness-report: ## write an inert receipt-update report for stale source hashes under state/outbox/freshness/ (NO API call, NO benchmark spend, $0)
+	$(PY) run.py freshness-report
+
+resolve-freshness: ## rerun mapped stale workloads and classify promote/hold/miss without editing sibling repos
+	$(PY) run.py resolve-freshness --write-report --dry-run
+
+resolve-freshness-apply: ## apply local hits/misses/radar edits for resolved freshness decisions, without opening PRs
+	$(PY) run.py resolve-freshness --write-report --apply --hits-dir $(HITS_DIR) --misses-dir $(MISSES_DIR)
 
 cadence: ## the unattended engine: sweep, rank, dispatch by demoKind, draft the newest uncovered lead to the inert outbox, update coverage, write the run manifest, audit the boundary (NO benchmark spend, NO send, $0)
 	$(PY) run.py cadence --dry-run

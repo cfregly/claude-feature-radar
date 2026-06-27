@@ -12,13 +12,13 @@ Quick builder note. If this workload looks like yours, the repo below lets you c
 
 The model writes one sandbox script that calls the developer's own tools, then pays for the shorter tool result loop instead of feeding the whole tool surface back into every step.
 
-Here is the receipt path: Estimated check cost: $0.08 using your own API key (estimated 1.5 minutes). Clone the repo and run one command:
+Here is the receipt path: estimated token/API check cost is $0.08 using your own API key (estimated 1.5 minutes). Code execution runtime can bill separately after the monthly free allowance. Clone the repo and run one command:
 
 ```
 make programmatic_tool_calling
 ```
 
-The run prints its own receipt: the workload, the exact models on each side, the dollar cost off the real usage object, and the assumptions your own task would change. If your numbers move the result, that is the point, the repo is built for you to swap in your own workload. The gap can move as the platforms ship, so the repo re-runs the whole search instead of caching a winner.
+The run prints its own receipt: the workload, the exact models on each side, the token/API cost off the real usage object, and the assumptions your own task would change. If your numbers move the result, that is the point, the repo is built for you to swap in your own workload. The gap can move as the platforms ship, so the repo re-runs the whole search instead of caching a winner.
 
 Link: {repo_link}
 
@@ -31,5 +31,5 @@ Provenance (not part of the email body):
 - edge key: programmatic_tool_calling
 - axis: cost
 - verdict: claude-ahead
-- reproduce: make programmatic_tool_calling (estimated $0.08)
+- reproduce: make programmatic_tool_calling (estimated $0.08 token/API cost, excluding separate code-execution runtime)
 - This draft is inert. The cadence never sends. A human reviews, runs the deslop and outbound-scrutiny panel, and decides.

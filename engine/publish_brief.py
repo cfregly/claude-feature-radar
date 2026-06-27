@@ -740,10 +740,9 @@ my_tool.py, on the same model, and prints YOUR own numbers:
           a loop and filters the records there. The irrelevant records stay in the sandbox, not the
           model, so you are not billed input tokens for data the model never reads.
 
-It prints the billed-input table for both modes, the input-token reduction, the dollar delta at the
-model's published input price, and an upfront cost-and-time line BEFORE it spends anything. This receipt
-path uses no beta header. Programmatic tool calling requires `code_execution_20260120` or later. Source,
-re-fetched 2026-06-22:
+It prints the billed-input table for both modes, the input-token reduction, the token/API dollar delta,
+and an upfront cost-and-time line BEFORE it spends anything. This receipt path uses no beta header.
+Programmatic tool calling requires `code_execution_20260120` or later. Source, re-fetched 2026-06-22:
 https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 
   python -m {slug}.run_tokens            run the example (or your tool) and print the before-and-after table
@@ -751,9 +750,9 @@ https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-
                                    (Mode B bills fewer input tokens AND answers correctly)
   python -m {slug}.run_tokens --model opus    use Opus 4.8 instead of the default Sonnet 4.6
 
-This costs estimated $0.08 on the shipped example on Sonnet 4.6. The model arms are the only spend, the code
-runs server-side in Anthropic's sandbox. anthropic is imported lazily, inside main(), so importing this
-module needs no SDK.
+This prints an estimated $0.08 token/API cost on the shipped example on Sonnet 4.6. Code execution
+runtime can bill separately after the monthly free allowance, so production COGS must add that line
+item. anthropic is imported lazily, inside main(), so importing this module needs no SDK.
 """
 
 from __future__ import annotations
@@ -810,7 +809,7 @@ def run_token_compare(client, model_key: str) -> dict:
 
 def print_table(result: dict) -> None:
     a, b = result["mode_a"], result["mode_b"]
-    print(f"\\n  {{'mode':<44}}{{'billed input tok':>18}}{{'round-trips':>13}}{{'answer':>10}}{{'cost':>11}}")
+    print(f"\\n  {{'mode':<44}}{{'billed input tok':>18}}{{'round-trips':>13}}{{'answer':>10}}{{'token/API':>11}}")
     print("  " + "-" * 96)
     for name, r in [("Mode A: plain tool use", a),
                     ("Mode B: programmatic (allowed_callers)", b)]:
@@ -821,7 +820,8 @@ def print_table(result: dict) -> None:
           f"{{a['billed_input']:,}},")
     print(f"  a {{result['pct_input_reduction']:.0f}}% reduction worth {{fmt_usd(result['saved_input_usd'])}} "
           f"on THIS run at {{get(result['model_key']).label}}'s input price, because the records went")
-    print(f"  to the sandbox, not the model context. The saving scales with how often you run the task.\\n")
+    print(f"  to the sandbox, not the model context. The saving scales with how often you run the task.")
+    print("  Cost scope: code execution runtime can bill separately after the monthly free allowance.\\n")
 
 
 def cmd_run(model_key: str) -> int:
@@ -832,8 +832,9 @@ def cmd_run(model_key: str) -> int:
     print(f"\\n  Token bill: the same fan-out task two ways over your tool ({{tool.TOOL_SPEC['name']}}),")
     print(f"  on {{label}}. Mode A calls the tool directly, Mode B (programmatic tool calling) runs it")
     print(f"  from a sandbox so the records stay out of the model's context.")
-    print(f"  Upfront: this run makes 2 task runs over {{n}} inputs and costs estimated ${{est_usd(model_key):.2f}} and roughly")
-    print(f"  90 seconds using your API key. The model arms are the only spend, the sandbox is server-side.\\n")
+    print(f"  Upfront: this run makes 2 task runs over {{n}} inputs and costs estimated ${{est_usd(model_key):.2f}} token/API")
+    print("  cost and roughly 90 seconds using your API key.")
+    print("  Cost scope: code execution runtime can bill separately after the monthly free allowance.\\n")
     client = get_client()
     result = run_token_compare(client, model_key)
     print_table(result)
@@ -848,7 +849,8 @@ def cmd_check(model_key: str) -> int:
 
     expected = getattr(tool, "EXPECTED_ANSWER", None)
     print(f"\\n  --check: running the shipped example on {{get(model_key).label}} and asserting the PTC")
-    print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). Estimated ${{est_usd(model_key):.2f}}.\\n")
+    print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). Estimated ${{est_usd(model_key):.2f}}")
+    print("  token/API cost, excluding any separate code-execution runtime charge after the free allowance.\\n")
     client = get_client()
     result = run_token_compare(client, model_key)
     print_table(result)
@@ -1613,7 +1615,8 @@ def _sample_source(plan: BriefPlan, receipt: dict | None) -> str:
         "  --------------------------------------------------------------------------\n\n"
         f"  -> {pct_str}% fewer billed input tokens, because the 240 results went to the\n"
         "     sandbox, not the model context. The saving compounds across every fan-out.\n\n"
-        "  Estimated total run cost: $0.08.\n\n"
+        "  Estimated token/API run cost: $0.08.\n"
+        "  Code execution runtime can bill separately after the monthly free allowance.\n\n"
         "  The change is two lines: add the code_execution tool, then put\n"
         '  allowed_callers: ["code_execution_20260120"] on your own tool.\n\n'
         "  Runnable code and the full brief: programmatic_tool_calling/README.md\n"

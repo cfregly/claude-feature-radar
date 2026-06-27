@@ -1,7 +1,8 @@
-"""Turn a real ``usage`` object into real dollars, using only verified prices.
+"""Turn a real ``usage`` object into token/API dollars, using only verified prices.
 
 Nothing here estimates. It reads the token counts the API actually returned and multiplies by
-the rates in models.py. That is what makes every dollar figure in this repo a receipt.
+the rates in models.py. Code execution runtime billing is tracked separately from token usage, so
+this module does not claim an all-in production COGS number for PTC or code-execution workloads.
 """
 
 from __future__ import annotations
@@ -64,7 +65,7 @@ def cost_breakdown(model: str, usage) -> CostBreakdown:
 
 
 def cost_usd(model: str, usage) -> float:
-    """Total dollar cost of one response."""
+    """Token/API dollar cost of one response, excluding code-execution runtime billing."""
     return cost_breakdown(model, usage).total
 
 

@@ -1,0 +1,782 @@
+Source: https://github.com/anthropics/claude-code/releases
+Snapshot fetched 2026-06-25. Verbatim excerpts for citation grounding.
+
+Releases · anthropics/claude-code · GitHub
+Skip to content
+Navigation Menu
+Toggle navigation
+Sign in
+Appearance settings
+Platform AI CODE CREATION GitHub Copilot Write better code with AI GitHub Copilot app Direct agents from issue to merge MCP Registry New Integrate external tools DEVELOPER WORKFLOWS Actions Automate any workflow Codespaces Instant dev environments Issues Plan and track work Code Review Manage code changes APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities Code security Secure your code as you build Secret protection Stop leaks before they start EXPLORE Why GitHub Documentation Blog Changelog Marketplace View all features Solutions BY COMPANY SIZE Enterprises Small and medium teams Startups Nonprofits BY USE CASE App Modernization DevSecOps DevOps CI/CD View all use cases BY INDUSTRY Healthcare Financial services Manufacturing Government View all industries View all solutions Resources EXPLORE BY TOPIC AI Software Development DevOps Security View all topics EXPLORE BY TYPE Customer stories Events & webinars Ebooks & reports Business insights GitHub Skills SUPPORT & SERVICES Documentation Customer support Community forum Trust center Partners View all resources Open Source COMMUNITY GitHub Sponsors Fund open source developers PROGRAMS Security Lab Maintainer Community Accelerator GitHub Stars Archive Program REPOSITORIES Topics Trending Collections Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features Copilot for Business Enterprise-grade AI features Premium Support Enterprise-grade 24/7 support Pricing
+Search or jump to...
+Search code, repositories, users, issues, pull requests...
+-->
+Search
+Clear
+Search syntax tips
+Provide feedback
+-->
+We read every piece of feedback, and take your input very seriously.
+Include my email address so I can be contacted
+Cancel
+Submit feedback
+Saved searches
+Use saved searches to filter your results more quickly
+-->
+Name
+Query
+To see all available qualifiers, see our documentation .
+Cancel
+Create saved search
+Sign in
+Sign up
+Appearance settings
+Resetting focus
+You signed in with another tab or window. Reload to refresh your session.
+You signed out in another tab or window. Reload to refresh your session.
+You switched accounts on another tab or window. Reload to refresh your session.
+Dismiss alert
+{{ message }}
+Uh oh!
+There was an error while loading. Please reload this page .
+anthropics
+/
+claude-code
+Public
+Notifications
+You must be signed in to change notification settings
+Fork
+21.7k
+Star
+134k
+Code
+Issues
+5k+
+Pull requests
+635
+Actions
+Security and quality
+30
+Insights
+Additional navigation options
+Code
+Issues
+Pull requests
+Actions
+Security and quality
+Insights
+Releases: anthropics/claude-code
+Releases
+Tags
+-->
+Releases · anthropics/claude-code
+v2.1.191
+24 Jun 21:58
+ashwin-ant
+v2.1.191
+0bd9543
+Compare
+Choose a tag to compare
+Sorry, something went wrong.
+Filter
+Loading
+Sorry, something went wrong.
+Uh oh!
+There was an error while loading. Please reload this page .
+No results found
+View all tags
+v2.1.191
+Latest
+Latest
+What's changed
+Added /rewind support for resuming a conversation from before /clear was run
+Fixed scroll position jumping to the bottom while reading earlier output during a streaming response
+Fixed background agents resurrecting after being stopped — stopping an agent from the tasks panel is now permanent
+Fixed /voice showing a generic "not available" message when disabled by an organization's policy — it now explains the restriction
+Fixed /login URL opening truncated in Windows Terminal when it wraps across lines
+Fixed Cmd+click on links in fullscreen mode for Ghostty over ssh/tmux
+Fixed claude agents sending builtin slash commands like /usage to background sessions as prompt text instead of showing a hint
+Fixed claude agents job rows showing full filesystem paths for pasted images instead of the [Image #N] placeholder
+Fixed hooks with comma-separated matchers (e.g. "Bash,PowerShell" ) silently never firing
+Fixed /permissions Recently-denied tab: approving a denial now persists on close instead of being silently discarded
+Fixed the agent panel jumping by one row when scrolling the roster past the overflow cap
+Fixed the welcome splash art overflowing the default 80×24 macOS Terminal window
+Fixed managed settings: forceRemoteSettingsRefresh now takes effect when set via MDM or file policy, and the fetch sends Cache-Control: no-cache to prevent proxies from serving stale responses
+Improved sandbox network permission dialog: hosts you allow with "Yes" are now remembered for the rest of the session instead of re-prompting on every connection
+Improved MCP server reliability: capability discovery ( tools/list , prompts/list , resources/list ) now retries transient network errors with short backoff
+Improved MCP OAuth: discovery and token requests now retry once after transient network errors, and headless environments skip the browser popup and go straight to the paste-the-URL prompt
+Improved MCP error messages: HTTP 404 errors now show the URL and point to your MCP config
+Improved vim mode prompt-history search (NORMAL / ) to hint how to reach slash commands
+Reduced CPU usage during streaming responses by ~37% by coalescing text updates to 100ms
+Reduced long-session memory growth from terminal output cache
+Assets
+12
+Loading
+Uh oh!
+There was an error while loading. Please reload this page .
+-->
+👍
+4
+mike1858, ytsssun, saita08, and loradmyself reacted with thumbs up emoji
+😄
+3
+mike1858, saita08, and loradmyself reacted with laugh emoji
+🎉
+5
+mike1858, saita08, tanakornrawee-dev, JRAVILES, and simono reacted with hooray emoji
+❤️
+5
+mike1858, saita08, JRAVILES, loradmyself, and meng-hhh reacted with heart emoji
+🚀
+3
+mike1858, saita08, and JRAVILES reacted with rocket emoji
+👀
+2
+mike1858 and saita08 reacted with eyes emoji
+All reactions
+👍
+4 reactions
+😄
+3 reactions
+🎉
+5 reactions
+❤️
+5 reactions
+🚀
+3 reactions
+👀
+2 reactions
+8 people reacted
+v2.1.190
+24 Jun 15:53
+ashwin-ant
+v2.1.190
+5c1517a
+Compare
+Choose a tag to compare
+Sorry, something went wrong.
+Filter
+Loading
+Sorry, something went wrong.
+Uh oh!
+There was an error while loading. Please reload this page .
+No results found
+View all tags
+v2.1.190
+What's changed
+Bug fixes and reliability improvements
+Assets
+12
+Loading
+Uh oh!
+There was an error while loading. Please reload this page .
+-->
+😄
+4
+Turbo87, heliocosta-dev, liqlvnvn, and saita08 reacted with laugh emoji
+❤️
+3
+JRAVILES, saita08, and heliocosta-dev reacted with heart emoji
+All reactions
+😄
+4 reactions
+❤️
+3 reactions
+5 people reacted
+v2.1.187
+23 Jun 21:03
+ashwin-ant
+v2.1.187
+2aa6ef3
+Compare
+Choose a tag to compare
+Sorry, something went wrong.
+Filter
+Loading
+Sorry, something went wrong.
+Uh oh!
+There was an error while loading. Please reload this page .
+No results found
+View all tags
+v2.1.187
+What's changed
+Added sandbox.credentials setting to block sandboxed commands from reading credential files and secret environment variables
+Added org-configured model restrictions to the model picker, --model , /model , and ANTHROPIC_MODEL , with a "restricted by your organization's settings" message when a restricted model is selected
+Added mouse click support to select menus (permission prompts, /model , /config , etc.) in fullscreen mode
+Fixed --resume failing with "No conversation found" when the original -p run produced no model turns
+Fixed --json-schema and workflow agent({schema}) structured output: the model can no longer re-call StructuredOutput indefinitely after a successful call, and follow-up turns now reliably return structured output
+Fixed remote MCP tool calls that hang with no response for 5 minutes — they now abort with an error instead of blocking indefinitely (override with CLAUDE_CODE_MCP_TOOL_IDLE_TIMEOUT )
+Fixed Claude Code Remote sessions taking ~2.7s longer to start after the agent proxy CA system-trust install was added
+Fixed pasted Korean/CJK text turning into mojibake in terminals that deliver paste as per-byte extended-key events
+Fixed /update over Remote Control hanging when a startup trust dialog would have shown
+Fixed background jobs in the agents view getting stuck in "working" indefinitely when the agent ended a turn without producing structured output
+Fixed channel connections dropping after navigating to the agents view and back, and after /bg , /tui , or /update
+Fixed agent stop notifications not correctly attributing who stopped the agent, and improved wording ("finished"/"stopped" instead of "came to rest")
+Fixed subagent depth tracking: resumed subagents now restore their original spawn depth, and forked subagents now count toward the depth cap
+Fixed leaked agent worktree registrations: locked .git/worktrees/ entries from killed agents are now cleaned up automatically
+Fixed Cmd+click not opening URLs in fullscreen mode in Ghostty on macOS
+Fixed claude --help not listing the --bg / --background flag
+Fixed Esc, Ctrl-C, and Ctrl-D not working while /share is uploading
+Improved /install-github-app : GitHub Actions workflow setup is now optional — you can install just the GitHub App and skip the workflow/secret steps
+Improved /btw with ←/→ arrow navigation to step through earlier answers
+Improved /plugin to surface plugins you haven't used recently so you can clean them up
+[VSCode] Fixed extension becoming unresponsive when resuming a large session
+Assets
+12
+Loading
+Uh oh!
+There was an error while loading. Please reload this page .
+-->
+👍
+6
+mike1858, hanchunjun, saita08, Maaattqc, Kovic-Odhiambo, and coconutLatte reacted with thumbs up emoji
+😄
+2
+mike1858 and saita08 reacted with laugh emoji
+🎉
+3
+mike1858, JRAVILES, and saita08 reacted with hooray emoji
+❤️
+4
+mike1858, JRAVILES, saita08, and jsaristi reacted with heart emoji
+🚀
+3
+mike1858, JRAVILES, and saita08 reacted with rocket emoji
+👀
+2
+mike1858 and saita08 reacted with eyes emoji
+All reactions
+👍
+6 reactions
+😄
+2 reactions
+🎉
+3 reactions
+❤️
+4 reactions
+🚀
+3 reactions
+👀
+2 reactions
+8 people reacted
+v2.1.186
+22 Jun 20:37
+ashwin-ant
+v2.1.186
+1228199
+Compare
+Choose a tag to compare
+Sorry, something went wrong.
+Filter
+Loading
+Sorry, something went wrong.
+Uh oh!
+There was an error while loading. Please reload this page .
+No results found
+View all tags
+v2.1.186
+What's changed
+Added claude mcp login <name> and claude mcp logout <name> to authenticate MCP servers from the CLI without opening the interactive /mcp menu, with --no-browser stdin redirect support for completing over SSH
+Added status filtering (press f ) to the /workflows agent detail view
+Added a "Skills" section to the /plugin Installed tab
+Added teammateMode: "iterm2" setting with a warning when auto mode cannot find the it2 CLI
+Added "Claude Platform on AWS - refresh credentials" option to /login when awsAuthRefresh is configured
+! bash commands now trigger Claude to respond to the output automatically; set "respondToBashCommands": false in settings.json to keep the previous context-only behavior
+Fixed streaming requests failing with "Content block not found" or JSON parse errors after the machine wakes from sleep
+Fixed subagent transcript scroll position bleeding into the main transcript on exit
+Fixed background task previews flashing raw tool names before the agent's plan loaded
+Fixed Chrome tab-group isolation not applying when the in-product permissions gate is off for concurrent CLI sessions
+Fixed background session recaps being duplicated; the agent's own end-of-turn summary now shows as the recap line
+Fixed opening a background session from claude agents leaving the previous screen painted behind it
+Fixed Agent(type) deny rules and Agent(x,y) allowed-types restrictions not being enforced for named subagent spawns
+Fixed Esc and Ctrl+C not responding while background agents are still running after the main turn ends
+Fixed misaligned option numbers in permission prompts when the option text overflows
+Fixed pressing x on a finished subagent in the agent panel not dismissing it
+Fixed a misleading "MCP server disconnected" notice for intentionally retired tools when resuming older sessions
+Fixed /plugin Installed showing a "more above" indicator when already scrolled to the top
+Fixed ~~strikethrough~~ showing literal tildes in assistant messages instead of rendering as strikethrough
+Fixed --tools allowing feature-gated tools to slip through before flags loaded on a cold first launch
+Fixed background job status in claude agents showing a stale "needs input" message after replying
+Fixed a dark-theme flash when opening a background session from claude agents on a light terminal
+Fixed mouse-selected text staying highlighted after deleting it in claude agents
+Fixed session cost not showing for usage-based Enterprise and Team subscribers
+Fixed agent teams: teammates spawned via tmux/pane backends now inherit the leader's --effort level
+Fixed Workflow agent({schema}) subagents looping forever on repeated schema validation failures instead of aborting after 5 attempts
+Improved claude mcp get and claude mcp remove to suggest the closest configured server name on a typo and truncate long server lists
+Improved memory: the agent is now reminded to compact its MEMORY.md index when nearing the size limit
+Improved skill frontmatter: display-name , default-enabled , fallback , and metadata.* keys now accept kebab-case, snake_case, and camelCase
+Improved malformed SKILL.md YAML frontmatter handling: loads the skill body with empty metadata instead of failing silently
+Changed CLAUDE_CODE_MAX_RETRIES to cap at 15; for unattended sessions, use CLAUDE_CODE_RETRY_WATCHDOG instead
+Changed background subagents to surface permission prompts in the main session instead of auto-denying; the dialog shows which agent is asking, and Esc denies just that tool
+Changed /review <pr> to use the same review engine as /code-review medium
+Assets
+12
+Loading
+Uh oh!
+There was an error while loading. Please reload this page .
+-->
+👍
+3
+saita08, Maaattqc, and mike1858 reacted with thumbs up emoji
+😄
+2
+saita08 and mike1858 reacted with laugh emoji
+🎉
+2
+saita08 and mike1858 reacted with hooray emoji
+❤️
+2
+saita08 and mike1858 reacted with heart emoji
+🚀
+2
+saita08 and mike1858 reacted with rocket emoji
+👀
+2
+saita08 and mike1858 reacted with eyes emoji
+All reactions
+👍
+3 reactions
+😄
+2 reactions
+🎉
+2 reactions
+❤️
+2 reactions
+🚀
+2 reactions
+👀
+2 reactions
+3 people reacted
+v2.1.185
+20 Jun 20:59
+ashwin-ant
+v2.1.185
+b407389
+Compare
+Choose a tag to compare
+Sorry, something went wrong.
+Filter
+Loading
+Sorry, something went wrong.
+Uh oh!
+There was an error while loading. Please reload this page .
+No results found
+View all tags
+v2.1.185
+What's changed
+The stream-stall hint now reads "Waiting for API response · will retry in …" instead of "No response from API · Retrying in …", and triggers after 20s of silence instead of 10s
+Assets
+12
+Loading
+Uh oh!
+There was an error while loading. Please reload this page .
+-->
+👍
+3
+mike1858, janghuesu, and saita08 reacted with thumbs up emoji
+😄
+4
+mike1858, bmmmm, ihatemodels, and saita08 reacted with laugh emoji
+🎉
+3
+mike1858, pdecat, and saita08 reacted with hooray emoji
+❤️
+2
+mike1858 and saita08 reacted with heart emoji
+🚀
+2
+mike1858 and saita08 reacted with rocket emoji
+👀
+3
+mike1858, liqlvnvn, and saita08 reacted with eyes emoji
+All reactions
+👍
+3 reactions
+😄
+4 reactions
+🎉
+3 reactions
+❤️
+2 reactions
+🚀
+2 reactions
+👀
+3 reactions
+7 people reacted
+v2.1.183
+19 Jun 01:20
+ashwin-ant
+v2.1.183
+c487902
+Compare
+Choose a tag to compare
+Sorry, something went wrong.
+Filter
+Loading
+Sorry, something went wrong.
+Uh oh!
+There was an error while loading. Please reload this page .
+No results found
+View all tags
+v2.1.183
+What's changed
+Improved auto mode safety: destructive git commands ( git reset --hard , git checkout -- . , git clean -fd , git stash drop ) are now blocked when you didn't ask to discard local work, git commit --amend is blocked when the commit wasn't made by the agent this session, and terraform destroy / pulumi destroy / cdk destroy are blocked unless you asked for the specific stack
+Added a warning when the requested model is deprecated or automatically updated to a newer model, shown on stderr in print mode ( -p ) and now also covering models set in agent frontmatter
+Added attribution.sessionUrl setting to omit the claude.ai session link from commits and PRs in web and Remote Control sessions
+Added /config --help to list all available shorthand keys for /config key=value
+Changed /config toggle behavior: Enter and Space both change the selected setting, and Esc now saves and closes instead of reverting
+Removed the startup "setup issues" line under the logo — run /doctor to see configuration issues or use --debug
+Fixed thinking.disabled.display: Extra inputs are not permitted 400 errors on subagent spawns and session-title generation for affected configurations
+Fixed WebSearch returning empty results in subagents
+Fixed the terminal cursor being stranded above the prompt after navigating history in vim mode with the native cursor enabled
+Fixed fullscreen TUI corruption (statusline mid-screen, duplicated spinner rows, merged text) in Windows Terminal under heavy nested-subagent load
+Fixed turns silently completing with no visible output when the model returned only a thinking block; Claude now re-prompts once
+Fixed user-level skills appearing multiple times in slash-command autocomplete when multiple plugins are enabled
+Fixed MCP servers requiring authentication exposing auth-stub tools to the model in headless/SDK mode
+Fixed tmux teammate panes failing to launch when the shell has slow rc-file initialization, and keystrokes typed during agent spawn leaking into the new tmux pane instead of the leader prompt
+Fixed background tasks started by a teammate being killed when the teammate finishes a turn
+Fixed scheduled task and webhook trigger deliveries being treated as keyboard input; they now classify as task notifications and can no longer approve a pending action or set the session title in auto mode
+Fixed focus mode showing "Ran N PostToolUse hooks" timing lines under each response
+Assets
+12
+Loading
+Uh oh!
+There was an error while loading. Please reload this page .
+-->
+👍
+2
+mike1858 and saita08 reacted with thumbs up emoji
+😄
+2
+mike1858 and saita08 reacted with laugh emoji
+🎉
+4
+mike1858, tanakornrawee-dev, JRAVILES, and saita08 reacted with hooray emoji
+❤️
+4
+mike1858, JRAVILES, saita08, and ruvater reacted with heart emoji
+🚀
+2
+mike1858 and saita08 reacted with rocket emoji
+👀
+2
+mike1858 and saita08 reacted with eyes emoji
+All reactions
+👍
+2 reactions
+😄
+2 reactions
+🎉
+4 reactions
+❤️
+4 reactions
+🚀
+2 reactions
+👀
+2 reactions
+5 people reacted
+v2.1.181
+17 Jun 22:07
+ashwin-ant
+v2.1.181
+0047022
+Compare
+Choose a tag to compare
+Sorry, something went wrong.
+Filter
+Loading
+Sorry, something went wrong.
+Uh oh!
+There was an error while loading. Please reload this page .
+No results found
+View all tags
+v2.1.181
+What's changed
+Added /config key=value syntax to set any setting from the prompt (e.g. /config thinking=false ) — works in interactive, -p , and Remote Control
+Added sandbox.allowAppleEvents opt-in setting that lets sandboxed commands send Apple Events on macOS
+Added CLAUDE_CLIENT_PRESENCE_FILE environment variable: point it at a marker file to suppress mobile push notifications while you're at the machine
+Upgraded the bundled Bun runtime to 1.4
+Improved streaming of long paragraphs: text now appears line-by-line instead of waiting for the first line break
+Improved auto-retry: API connection drops mid-thinking now automatically retry instead of showing "Connection closed while thinking"
+Improved the subagent panel: idle subagents auto-hide after 30s, the list caps at 5 rows with scroll hints, and keyboard hints now show in the footer
+Improved the MCP OAuth browser page to match Claude Code's visual style and auto-close on success
+Changed fullscreen mode URL opening to require Cmd+click (macOS) / Ctrl+click, matching native terminal behavior
+Changed the Improved N memories line to no longer list individual files outside verbose mode
+Fixed prompt caching not reading on custom ANTHROPIC_BASE_URL and on Foundry due to a per-request attestation token changing every turn
+Fixed Write/Edit producing 0-byte or truncated files on network drives and cloud-synced folders
+Fixed open , osascript , and browser-based auth flows failing with error -600 on macOS by adding the Apple Events entitlement
+Fixed a startup regression (~120ms per launch in fresh environments, introduced in 2.1.169): the first prompt no longer waits for the managed-settings fetch when no MCP servers are configured
+Fixed startup blocking with a blank terminal for up to 15 seconds when the account settings fetch is slow on a degraded network
+Fixed startup crash ( TypeError: Cannot read properties of null ) when .claude.json contains corrupted null project entries
+Fixed macOS TUI freezing at session start (Ctrl+C unresponsive) when Spotlight is busy reindexing
+Fixed long-running idle sessions losing their history when another Claude Code process ran the 30-day transcript cleanup
+Fixed foreground subagents spawning unbounded nested chains; they now respect the same 5-level depth limit as background subagents
+Fixed /recap and conversation forks using the previous model immediately after a model switch
+Fixed subagent "Thinking" duration showing the parent agent's elapsed time instead of the subagent's own
+Fixed subagents blocked on a nested agent showing a ticking elapsed time instead of "waiting" in the agent panel
+Fixed the API retry indicator ("Retrying in 0s · attempt N/10") staying on screen after the retry succeeded
+Fixed AWS awsCredentialExport credentials with a short remaining lifetime causing credential refreshes every minute, and now accepts the JSON shape from aws configure export-credentials
+Fixed claude mcp get / list showing ✓ Connected when tools/list fails; they now show ! Connected · tools fetch failed with the error detail
+Fixed /remote-control leaving a stale "connecting…" line; it now confirms in the transcript once connected
+Fixed ExitWorktree refusing to remove a clean worktree with "Could not verify worktree state" when bare git cannot be resolved on Windows
+Fixed settings changes (such as /effort or /model ) failing with ENOENT when ~/.claude/settings.json is a relative symlink under a symlinked ~/.claude
+Fixed IDE selection line numbers in context reminders being off by one (IntelliJ and VS Code)
+Fixed Ctrl+C in fullscreen after a native terminal selection (modifier+drag) overwriting the clipboard with the app's prior selection
+Fixed Ctrl+V showing "No image found in clipboard" instead of pasting when the clipboard contains text
+Fixed agent creation failing with "EEXIST: file already exists" when the agents directory already exists (Windows/OneDrive)
+Fixed AskUserQuestion preview content being cut off at the dialog edge instead of word-wrapping
+Fixed AskUserQuestion multi-select questions silently dropping a typed "Other" free-text answer when submitting
+Fixed /stats "Most active day" and daily token chart dates showing one day early in UTC-negative timezones
+Fixed /copy and copy-on-select on Linux not detecting a clipboard utility installed after Claude Code started
+Fixed tab-indented code rendering with incorrect indentation in the Write (create-file) preview
+Fixed user prompts queued mid-turn not showing a full-width background highlight in the transcript
+Fixed the activity spinner's pulse dwelling on the wrong glyph size in Ghostty
+Assets
+12
+Loading
+Uh oh!
+There was an error while loading. Please reload this page .
+-->
+👍
+45
+mike1858, htnabe, JRAVILES, saita08, luckboy66, wanxian-Yu, raky291, dungwfu, yerlasumanth16, maximilianharr, and 35 more reacted with thumbs up emoji
+😄
+10
+mike1858, saita08, bugcysg, STEINS-gate11, Seanmwill246810-dotcom, GatienBoquet, matthewseat449, miluo-star, cuongdevv, and Daytona39264 reacted with laugh emoji
+🎉
+9
+mike1858, JRAVILES, saita08, STEINS-gate11, uorhsohk, thinh9e, Mateo728, cuongdevv, and leesdonson reacted with hooray emoji
+❤️
+11
+mike1858, JRAVILES, saita08, STEINS-gate11, sankarsarkar261, AsledinU, navdeepghai, uorhsohk, mehdeh, Mateo728, and cuongdevv reacted with heart emoji
+🚀
+12
+mike1858, maxvelop, saita08, STEINS-gate11, mrverdant13, rsecss, uorhsohk, M0bileDev, egoan82, Mateo728, and 2 more reacted with rocket emoji
+👀
+8
+mike1858, saita08, STEINS-gate11, kamisimokagura, atlas61, Mateo728, sihan-github, and cuongdevv reacted with eyes emoji
+All reactions
+👍
+45 reactions
+😄
+10 reactions
+🎉
+9 reactions
+❤️
+11 reactions
+🚀
+12 reactions
+👀
+8 reactions
+63 people reacted
+v2.1.179
+16 Jun 20:22
+ashwin-ant
+v2.1.179
+1b73808
+Compare
+Choose a tag to compare
+Sorry, something went wrong.
+Filter
+Loading
+Sorry, something went wrong.
+Uh oh!
+There was an error while loading. Please reload this page .
+No results found
+View all tags
+v2.1.179
+What's changed
+Fixed mid-stream connection drops: partial responses are now preserved instead of showing a raw error, and the spinner no longer gets stuck at "running tool"
+Fixed mouse-wheel scrolling in WSL2 under Windows Terminal and VS Code (regression in 2.1.172)
+Fixed a sandbox denyRead / allowRead glob over a large directory tree making the Bash tool description enormous and the session unusable on Linux
+Fixed the feedback survey capturing a single-digit reply as a session rating immediately after a turn completes
+Fixed the welcome screen stacking multiple promotional banners — at most one promo now shows per session
+Fixed Ctrl+O not showing the subagent's transcript when viewing a subagent
+Fixed clicking the prompt input not returning focus from the subagent/footer panel
+Fixed remote session background tasks appearing stuck as "still running" between turns
+Improved plugin loading performance in remote sessions
+Assets
+12
+Loading
+Uh oh!
+There was an error while loading. Please reload this page .
+-->
+👍
+16
+mike1858, 1977-eu, raky291, fullstackdegen, saita08, x98613727-G, deafenken, egoan82, STEINS-gate11, avoylenko, and 6 more reacted with thumbs up emoji
+😄
+6
+mike1858, fullstackdegen, saita08, Drakaniia, bugcysg, and STEINS-gate11 reacted with laugh emoji
+🎉
+6
+mike1858, fullstackdegen, tanakornrawee-dev, Anima-Machina, saita08, and STEINS-gate11 reacted with hooray emoji
+❤️
+7
+mike1858, fullstackdegen, saita08, emilrittmeyer-DK, STEINS-gate11, aabrahymhkymy-prog, and mehdeh reacted with heart emoji
+🚀
+7
+mike1858, fullstackdegen, saita08, egoan82, STEINS-gate11, maxvelop, and mrverdant13 reacted with rocket emoji
+👀
+6
+mike1858, fullstackdegen, saita08, javierjah, STEINS-gate11, and miquann-working reacted with eyes emoji
+All reactions
+👍
+16 reactions
+😄
+6 reactions
+🎉
+6 reactions
+❤️
+7 reactions
+🚀
+7 reactions
+👀
+6 reactions
+27 people reacted
+v2.1.178
+15 Jun 21:35
+ashwin-ant
+v2.1.178
+64ceb97
+Compare
+Choose a tag to compare
+Sorry, something went wrong.
+Filter
+Loading
+Sorry, something went wrong.
+Uh oh!
+There was an error while loading. Please reload this page .
+No results found
+View all tags
+v2.1.178
+What's changed
+Added Tool(param:value) syntax for permission rules to match a tool's input parameters (with * wildcard), e.g. Agent(model:opus) to block Opus subagents
+Skills in nested .claude/skills directories now load when working on files there; on a name clash, the nested skill appears as <dir>:<name> so both stay available
+Nested .claude/ directories: the agent, workflow, and output-style closest to the working directory now wins when names collide; project-scope workflow saves now target the closest existing .claude/workflows/
+Improved auto mode: subagent spawns are now evaluated by the classifier before launch, closing a gap where a subagent could request a blocked action without review
+Improved /doctor with consistent flat tree layout across all sections, clearer section status icons, and highlighted command names
+Improved the skill listing truncation warning to show how many skill descriptions are affected
+Changed the workflow prompt keyword to use a purple shimmer highlight and trigger only on explicit phrases like "run a workflow" or "workflow:", not on any mention of the word
+Improved Remote Control error messages: connection failures now show a persistent red "/rc failed" indicator in the footer, and the "not yet enabled" error now explains whether it's a gate, a check failure, stale entitlement, or org policy
+/bug now requires a description before submitting, and no longer uses model-refusal text as the GitHub issue title
+Fixed a crash (out-of-memory) when the CLI inherits a stale websocket/OAuth file-descriptor environment variable from a parent process
+Fixed Claude in Chrome silently failing to connect when the OAuth token belongs to a different account than the Claude Code login
+Fixed nested .claude/skills skills with directory-qualified names being blocked by permission prompts in non-interactive runs
+Fixed several subagent issues: viewing a subagent's transcript now shows tool results and live progress, messages sent while it finishes its turn are no longer dropped, and backgrounding a running subagent (ctrl+b) no longer restarts it from scratch
+Fixed claude agents workers failing with 401 Invalid bearer token when the daemon was started from a shell with a custom API gateway via ANTHROPIC_BASE_URL and ANTHROPIC_AUTH_TOKEN
+Fixed compaction not honoring --fallback-model : compaction now falls back to the configured fallback model chain on overload or model-availability errors
+Fixed model requests continuing to fail with auth errors after credentials were refreshed outside the session, due to a stale cached request configuration
+Fixed background sessions created with /bg or ←← after a turn finished showing "Working" forever in the agents list
+Fixed CLAUDE_CODE_PLUGIN_KEEP_MARKETPLACE_ON_FAILURE=1 preventing fresh marketplace installs from cloning
+Fixed MCP server-level specs ( mcp__server , mcp__server__* , mcp__* ) in subagent disallowedTools being silently ignored
+Fixed vim mode undo: u now steps through NORMAL/VISUAL-mode commands one at a time instead of merging commands in quick succession into a single undo step
+Fixed statusline links with custom URI schemes (e.g. vscode:// ) not opening when clicked in claude agents
+[VSCode] Fixed pressing Esc to dismiss a CJK IME candidate window canceling the running Claude task
+Assets
+12
+Loading
+Uh oh!
+There was an error while loading. Please reload this page .
+-->
+👍
+16
+intech, egoan82, saita08, petrichor-hl, STEINS-gate11, JoshuaFontiveros, Mateo728, lesismore-lily, maciejcieslar, Miner2026, and 6 more reacted with thumbs up emoji
+😄
+2
+saita08 and bugcysg reacted with laugh emoji
+🎉
+3
+brandaltux, saita08, and leesdonson reacted with hooray emoji
+❤️
+2
+saita08 and mehdeh reacted with heart emoji
+🚀
+6
+mrverdant13, raky291, egoan82, saita08, lesismore-lily, and M0bileDev reacted with rocket emoji
+👀
+1
+saita08 reacted with eyes emoji
+All reactions
+👍
+16 reactions
+😄
+2 reactions
+🎉
+3 reactions
+❤️
+2 reactions
+🚀
+6 reactions
+👀
+1 reaction
+23 people reacted
+v2.1.177
+13 Jun 01:25
+ashwin-ant
+v2.1.177
+ca9f604
+Compare
+Choose a tag to compare
+Sorry, something went wrong.
+Filter
+Loading
+Sorry, something went wrong.
+Uh oh!
+There was an error while loading. Please reload this page .
+No results found
+View all tags
+v2.1.177
+chore: Update CHANGELOG.md and feed.xml
+Assets
+12
+Loading
+Uh oh!
+There was an error while loading. Please reload this page .
+-->
+👍
+25
+mike1858, Minatozaki-A, LegendaryGaoZheng, egoan82, JoshuaFontiveros, brandaltux, hyeonjinyoon, liuyijiang1994, geraldfehringer, mbt7000, and 15 more reacted with thumbs up emoji
+😄
+12
+mike1858, Minatozaki-A, devacc00, aa-dragosmocrii, JRAVILES, linkedlist771, bugcysg, arieshsieh0402, liqlvnvn, jdmsharpe, and 2 more reacted with laugh emoji
+🎉
+9
+mike1858, Minatozaki-A, aiwonderland, wellkilo, ysknsid25, Mateo728, STEINS-gate11, sjvr87, and leesdonson reacted with hooray emoji
+❤️
+8
+mike1858, Minatozaki-A, JRAVILES, hyeonjinyoon, RiskanAhamed, Mateo728, STEINS-gate11, and mehdeh reacted with heart emoji
+🚀
+5
+mike1858, Minatozaki-A, egoan82, xiyanghu, and STEINS-gate11 reacted with rocket emoji
+👀
+16
+mike1858, philwo, NellInc, Minatozaki-A, viniciusdsandrade, konamilano, lzm0107, kasnol, jlacours, raky291, and 6 more reacted with eyes emoji
+All reactions
+👍
+25 reactions
+😄
+12 reactions
+🎉
+9 reactions
+❤️
+8 reactions
+🚀
+5 reactions
+👀
+16 reactions
+55 people reacted
+Previous 1 2 3 4 5 … 15 16 Next
+Previous Next
+Footer
+© 2026 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Community
+Docs
+Contact
+Manage cookies
+Do not share my personal information
+You can’t perform that action at this time.

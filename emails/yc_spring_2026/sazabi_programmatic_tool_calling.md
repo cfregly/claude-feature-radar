@@ -33,9 +33,13 @@ Using my API key, the same fan-out task over 240 returned results went from 9,45
 with the exact winner returned from the sandbox. That is 28% fewer billed input tokens than the same
 Claude agent without programmatic tool calling.
 
+Cost caveat for production: that is token/API cost. Code execution runtime can bill separately after
+the monthly free allowance, so I would track token cost, runtime charge, correctness, latency, and
+failures before calling it an all-in COGS win.
+
 Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
 
-Run it in about two minutes for $0.08:
+Run it in about two minutes for $0.08 token/API cost:
 
 ```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits

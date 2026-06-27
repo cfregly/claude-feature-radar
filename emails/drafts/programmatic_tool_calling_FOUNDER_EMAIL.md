@@ -31,9 +31,11 @@ Same task, same model (Sonnet 4.6), the only change is the feature on or off:
 
 That is 28% fewer input tokens than the same Claude agent without programmatic tool calling, with the exact winner returned from the sandbox. The saving grows with the size of the fan-out (an agent calling one tool many times over data it then crunches).
 
+Cost caveat I would factor into production: the dollar figure is token/API cost. Because this uses code execution, runtime can bill separately after the monthly free allowance, so track token cost plus runtime charge, correctness, latency, and failures before calling it an all-in COGS win.
+
 Why I am sending this for your workload: `allowed_callers` lets Claude call your own tool from the code sandbox and return only the computed answer to the model. For metering across many cohorts, that is the difference between paying for every tool output and paying for the answer.
 
-I ran it using my own API key for $0.08, takes around two minutes. To see it yourself, one clone and one command:
+I ran it using my own API key for $0.08 token/API cost, and it takes around two minutes. To see it yourself, one clone and one command:
 
 ```
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits

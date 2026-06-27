@@ -44,7 +44,9 @@ next_response = client.beta.messages.create(..., container=container_id)
 For the many-tool-call path, Claude writes one sandbox script that loops over your tool, crunches the
 bulky intermediate results there, and sends only the answer back to the model. On my run, the same usage-style
 workload went from 9,451 to 6,828 billed input tokens, 28% fewer than the same Claude agent without
-programmatic tool calling. It costs $0.08 to reproduce.
+programmatic tool calling. It costs $0.08 in token/API usage to reproduce. Code execution
+runtime can bill separately after the monthly free allowance, so production COGS should track that
+runtime line item too.
 
 Run it:
 
@@ -52,13 +54,13 @@ Run it:
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
 # Get an API key: https://console.anthropic.com/
 export ANTHROPIC_API_KEY=your-api-key
-make programmatic_tool_calling   # cost for fan-out agents
+make programmatic_tool_calling   # token cost for fan-out agents
 make citations                   # accuracy for text-doc answers
 make code_execution_state        # reliability for multi-step agents
 make security                    # security preflight, audit evidence, MCP auth, and source-backed claims
 ```
 
-Each brief has the code, sample output, the exact cost, and a named edit surface for your own
+Each brief has the code, sample output, the exact token/API cost, and a named edit surface for your own
 workload, such as `programmatic_tool_calling/my_tool.py`, `citations/cite.py`,
 `tool_boundary_security/policy.json`, `audit_evidence_security/audit_log.jsonl`,
 `mcp_authorization_security/policy.json`, `security_claims_guard/controls.json`, or the brief

@@ -23,11 +23,13 @@ final-answer assertion so the comparison cannot be gamed:
                             the sandbox, not the model.
 
 The receipt: total billed input tokens A vs B (input + cache_read + cache_write, every input bucket),
-the model round-trip count, and the dollar delta, all read off the real usage object. The win is
-workload-shaped: the live doc itself notes a sequential single-call benchmark (tau2-bench) was flat
-to about 8% MORE expensive, so this task is a genuine fan-out or the result does not hold. Anthropic's
-own doc reports about 24% fewer input tokens on agentic-search benchmarks; we quote that as theirs and
-the number below as ours, measured on our key. PTC is not ZDR-eligible and is not on Bedrock or Vertex.
+the model round-trip count, and the token/API dollar delta, all read off the real usage object. Code
+execution runtime can bill separately after the monthly free allowance, so this is not an all-in COGS
+claim. The win is workload-shaped: the live doc itself notes a sequential single-call benchmark
+(tau2-bench) was flat to about 8% MORE expensive, so this task is a genuine fan-out or the result does
+not hold. Anthropic's own doc reports about 24% fewer input tokens on agentic-search benchmarks; we
+quote that as theirs and the number below as ours, measured on our key. PTC is not ZDR-eligible and is
+not on Bedrock or Vertex.
 """
 
 from __future__ import annotations
@@ -94,7 +96,7 @@ class PTCDemonstrator(BaseDemonstrator):
     def estimate(self, edge, spec):
         model = (self.fair_comparison(edge).get("claude_config") or {}).get("model", "sonnet")
         return CostEstimate(usd=0.08, wall_clock_s=90.0, command="make programmatic-tool-calling",
-                            note=f"two fan-out runs on {model}, the only spend is the model arms")
+                            note=f"token/API estimate for two fan-out runs on {model}; excludes code-exec runtime")
 
     def run_claude_arm(self, edge, spec):
         client = spec.get("client") or get_client()
@@ -187,7 +189,7 @@ def main():
           f"answer {b_run['answer']}.\n", flush=True)
 
     rows = [("Mode A: plain tool use", a_run), ("Mode B: programmatic (allowed_callers)", b_run)]
-    print(f"  {'mode':<40}{'billed input tok':>18}{'round-trips':>13}{'answer':>10}{'cost':>11}")
+    print(f"  {'mode':<40}{'billed input tok':>18}{'round-trips':>13}{'answer':>10}{'token/API':>11}")
     print("  " + "-" * 92)
     for name, r in rows:
         print(f"  {name:<40}{r['billed_input']:>18,}{r['turns']:>13}{str(r['answer']):>10}{fmt_usd(r['cost']):>11}")
@@ -210,6 +212,8 @@ def main():
           f"{a_run['turns']} because the model called the tool serially from code, so on an INSTANT mock "
           f"tool it runs slower. The token saving is the win, the latency depends on your real tool's "
           f"per-call time (PTC saves the per-call model round-trip a real slow tool would cost).")
+    print("  - Cost scope: the dollar column is token/API cost from usage objects. Code execution runtime "
+          "can bill separately after the monthly free allowance, so production COGS must add it.")
     print(f"  - Fan-out-shaped: the doc notes a sequential single-call task (tau2-bench) is flat to about "
           f"8% more expensive. No competitor keeps your custom-tool outputs out of context.\n")
 

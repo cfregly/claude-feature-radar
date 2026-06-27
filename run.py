@@ -4,6 +4,9 @@
     python run.py demo [--quick|--full]   the runnable proof for the current gap
     python run.py ledger                  the exact-list long-stream edge
     python run.py edges                    sweep the live docs, diff, rank, persist (no API call, $0)
+    python run.py check-freshness          fail if source hashes changed from the pinned landscape
+    python run.py freshness-report         write a PR-ready freshness report into state/outbox
+    python run.py resolve-freshness        rerun mapped stale workloads and classify promote/hold/miss
     python run.py cadence [--dry-run]      the unattended engine: sweep, dispatch, draft to outbox ($0)
     python run.py coverage                 per-demoKind, what is built vs adapt vs build (no API call)
     python run.py managed [--apply]        the Tier-2 monthly resumable runtime (wired, $0 without --apply)
@@ -41,6 +44,12 @@ def main():
         from engine.sweep import main as m; m()
     elif cmd == "edges":
         from engine.sweep_edges import main as m; m()
+    elif cmd == "check-freshness":
+        from engine.freshness import main as m; raise SystemExit(m())
+    elif cmd == "freshness-report":
+        from engine.freshness import main as m; raise SystemExit(m(["--write-report", "--no-fail"]))
+    elif cmd == "resolve-freshness":
+        from engine.freshness_resolve import main as m; raise SystemExit(m())
     elif cmd == "cadence":
         from engine.cadence import main as m; raise SystemExit(m())
     elif cmd == "coverage":

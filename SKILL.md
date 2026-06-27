@@ -247,6 +247,8 @@ For the recurring loop, use:
 ```
 make grind        # tier 1, $0: doc sweep, rank, coverage, full offline CI
 make grind-deep   # tier 2, budgeted: the $0 loop, then the Opus skeptic and combinatorial generator
+make check-freshness  # fail when watched source hashes drift from the pinned landscape
+make freshness-report # write the inert receipt-update report for a human PR
 ```
 
 `make grind` is the default no-credit loop: live doc sweep, rank, dispatch estimates, inert outbox
@@ -257,6 +259,11 @@ the Opus skeptic pass and the combinatorial edge generator on top. A daily sched
 When the loop surfaces a candidate, run the specific live target named in the estimate, promote only
 when the receipt says `promotable_edge: true`, then run `make grind` again so the landscape, coverage,
 and gates catch up.
+
+Freshness is a gate, not a publisher. `make check-freshness` compares live source hashes against
+`landscape/landscape.json`. `make freshness-report` writes stale sources, rerun commands, blank
+results, and blank promote, hold, or miss decisions under `state/outbox/freshness/`. A release does
+not update the claim. A rerun updates the claim.
 
 ### 3. Synthesize the honest picture
 Combine the audit and the benchmark. State plainly where Claude wins, where it ties, and where it

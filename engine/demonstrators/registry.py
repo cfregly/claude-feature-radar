@@ -23,6 +23,7 @@ from engine.demonstrators.base import CostEstimate, Demonstrator
 
 # demo_kind -> a Demonstrator instance. Populated by register() at demonstrator import time.
 REGISTRY: dict[str, Demonstrator] = {}
+_REGISTERED_ALL = False
 
 # The built demonstrators register from these modules. Imported once by register_all(), each in its
 # own try/except so one demo's missing optional SDK never blanks the registry.
@@ -76,11 +77,15 @@ def register_all() -> dict[str, Demonstrator]:
     import is guarded: a demo that needs an optional SDK at import time must not blank the registry for
     the offline core, so an ImportError is swallowed and that one kind stays unmapped (it then files an
     ASK stub on dispatch, which is the honest state)."""
+    global _REGISTERED_ALL
+    if _REGISTERED_ALL:
+        return REGISTRY
     for mod in _DEMO_MODULES:
         try:
             importlib.import_module(mod)
         except Exception:  # noqa: BLE001  a demo's optional dep or import error never breaks dispatch
             continue
+    _REGISTERED_ALL = True
     return REGISTRY
 
 
@@ -110,7 +115,7 @@ def dispatch(edge: dict, spec: dict | None = None) -> DispatchResult:
     than crashing. The gate is "always" only for a surfaced $0 estimate, "ask" for any spend or a
     stub, so the ASK gate and audit() can read the decision off the result."""
     spec = spec or {}
-    if not REGISTRY:
+    if not _REGISTERED_ALL:
         register_all()
     kind = edge.get("demoKind") or edge.get("demo_kind") or demokind_for(edge.get("key", ""), edge.get("axis"))
     # Stamp the resolved kind onto the edge so applicable() (which reads edge["demoKind"]) sees it even

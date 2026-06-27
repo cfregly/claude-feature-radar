@@ -46,7 +46,7 @@
         "usd": 0.08,
         "wall_clock_s": 90.0,
         "command": "make programmatic-tool-calling",
-        "note": "two fan-out runs on sonnet, the only spend is the model arms"
+        "note": "token/API estimate for two fan-out runs on sonnet; excludes code-execution runtime"
       },
       "edge_dir": "edges/programmatic-tool-calling"
     },

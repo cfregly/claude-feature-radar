@@ -37,8 +37,12 @@ That is about 28% fewer billed input tokens than the same Claude agent without p
 calling, and the sandbox returned the exact winner. It pays off on the fan-out shape, many calls over
 data the model then crunches.
 
+Cost caveat: that is token/API cost. Code execution runtime can bill separately after the monthly free
+allowance, so production COGS should add runtime charge, correctness, latency, and failures before
+calling it an all-in savings claim.
+
 Run it on your own tool: edit one file, programmatic_tool_calling/my_tool.py, paste your tool dict and
-the Python that runs it, then `make programmatic_tool_calling` ($0.08 using your API key).
+the Python that runs it, then `make programmatic_tool_calling` ($0.08 token/API cost using your API key).
 
 Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
 

@@ -17,7 +17,7 @@ the model never reads. No beta header required (verified 2026-06-18). Supported 
 The same fan-out task two ways on the same model (Sonnet 4.6), with an identical-answer check: across 4
 regions of 60 sales rows each (240 rows), find the highest-revenue region.
 
-| mode | billed input tokens | answer | round-trips | cost |
+| mode | billed input tokens | answer | round-trips | token/API cost |
 |---|--:|:--:|:--:|--:|
 | Mode A: plain tool use (every row through context) | 9,451 | None (failed) | 2 | $0.06 |
 | **Mode B: programmatic (`allowed_callers`)** | **6,828** | **east (correct)** | 5 | $0.02 |
@@ -34,6 +34,9 @@ ours is in line). Bonus: the sandbox code did the exact arithmetic that the in-c
 - **It adds round-trips.** Here Mode B made more model round-trips than Mode A because the model called
   the tool serially from code, so on an instant mock tool it ran slower. The token saving is the win.
   On a real slow tool you also save the per-call model round-trip.
+- **The dollar column is not all-in COGS.** PTC uses code execution. Code execution runtime can bill
+  separately after the monthly free allowance, so production savings need token/API cost plus runtime
+  charge, correctness, latency, fallback rate, and container failures.
 - **No named competitor equivalent.** OpenAI ships a code interpreter and tool search but neither keeps
   your own custom-tool outputs out of context. This is absence-of-evidence, not a head-to-head loss.
 - **Not everywhere.** Not on Amazon Bedrock or Vertex AI, and not ZDR-eligible.
@@ -47,6 +50,6 @@ re-fetched 2026-06-18.
 git clone https://github.com/cfregly/claude-feature-radar && cd claude-feature-radar
 make setup
 cp .env.example .env   # paste your Anthropic key
-make programmatic-tool-calling               # this edge, using your own API key, $0.08 on Sonnet 4.6
+make programmatic-tool-calling               # this edge, about $0.08 token/API cost on Sonnet 4.6
 # or directly: python edges/programmatic-tool-calling/demo.py
 ```

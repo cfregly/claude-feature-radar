@@ -421,6 +421,27 @@ send, push, or spend boundary even if it is triggered every hour.
   past the cap. The boundary is the absence of the capability in the unattended path, not a flag that
   could be flipped. The outbox holds inert files and no send transport is wired into the cadence.
 
+## Source freshness fails before claims move
+
+The freshness gate is separate from the discovery sweep. `make check-freshness` fetches the watched
+Claude, Anthropic, OpenAI, and Gemini sources, compares the live content hashes to
+`landscape/landscape.json`, and fails when a source changed, has no pinned baseline, or cannot be
+fetched. A failed fetch is `unknown`, never proof that a competitor lacks a feature.
+
+`make freshness-report` writes the same read into `state/outbox/freshness/YYYY-MM-DD.{json,md}` as an
+inert receipt-update queue: old claim, old hash, new hash, rerun command, blank result, and blank
+promote, hold, or miss decision. The report is evidence for a follow-up review. It does not send
+mail, post publicly, push a branch, or update `claude-feature-hits`.
+
+`make resolve-freshness` is the follow-up classifier. It reruns only mapped workload receipts, then
+classifies each mapped item as promote, hold, or miss. `make resolve-freshness-apply` may update the
+local public-wins and private-misses sibling checkouts. The scheduled form may open review PRs, but
+it never merges those PRs, sends mail, or directly publishes a claim. Missing keys, quota, timeouts,
+unknown fetches, unmapped sources, and generic discovery commands stay held.
+
+A release does not update the claim. A rerun updates the claim. Promotion still requires the measured
+workload, baseline, eval, receipt, and skeptic gate.
+
 A blocked or failed doc fetch is recorded as status `unknown`, never as competitor-absence, so the
 engine can never manufacture a false Claude lead. The losing and parity cells stay in the ranking.
 The offline gate test in `tests/test_gate.py` asserts `audit()` flags any outward or non-always action

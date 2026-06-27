@@ -31,7 +31,7 @@
         "usd": 0.08,
         "wall_clock_s": 90.0,
         "command": "make programmatic-tool-calling",
-        "note": "two fan-out runs on sonnet, the only spend is the model arms"
+        "note": "token/API estimate for two fan-out runs on sonnet; excludes code-execution runtime"
       },
       "edge_dir": "edges/programmatic-tool-calling"
     },
@@ -181,7 +181,7 @@
         "usd": 0.08,
         "wall_clock_s": 90.0,
         "command": "make programmatic-tool-calling",
-        "note": "two fan-out runs on claude-haiku-4-5-20251001, the only spend is the model arms"
+        "note": "token/API estimate for two fan-out runs on claude-haiku-4-5-20251001; excludes code-execution runtime"
       },
       "edge_dir": null
     }

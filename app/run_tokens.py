@@ -10,9 +10,9 @@ same model, and prints YOUR own numbers:
           tool in a loop and filters the results there. The outputs go to the sandbox, not the model,
           so you are not billed input tokens for data the model never reads.
 
-It prints the billed-input table for both modes, the input-token reduction, the dollar delta at the
-model's published input price, and an upfront "this run costs about $X and Y seconds using your API key" line
-BEFORE it spends anything. Source, re-fetched 2026-06-18:
+It prints the billed-input table for both modes, the input-token reduction, the token/API dollar delta,
+and an upfront "this run costs about $X and Y seconds using your API key" line BEFORE it spends
+anything. Source, re-fetched 2026-06-18:
 https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 
 The honest scope, stated as part of the result. The win is FAN-OUT shaped: it shows up when the model
@@ -27,9 +27,10 @@ fan-out. When you swap in your own tool, keep the task fan-out shaped or the num
                                    trust it on your own tool
   python -m app.run_tokens --model opus    use Opus 4.8 instead of the default Sonnet 4.6
 
-This costs about $0.08 on the shipped example on Sonnet 4.6. The model arms are the only spend. The
-code runs server-side in Anthropic's sandbox, so there is no Docker and nothing to install for the
-sandbox itself. anthropic is imported lazily, inside main(), so importing this module needs no SDK.
+This prints about $0.08 token/API cost on the shipped example on Sonnet 4.6. Code execution runtime can
+bill separately after the monthly free allowance, so production COGS must add that line item. There is
+no Docker and nothing to install for the sandbox itself. anthropic is imported lazily, inside main(), so
+importing this module needs no SDK.
 """
 
 from __future__ import annotations
@@ -91,7 +92,7 @@ def run_token_compare(client, model_key: str, *, progress: bool = True) -> dict:
 
 def print_table(result: dict) -> None:
     a, b = result["mode_a"], result["mode_b"]
-    print(f"\n  {'mode':<44}{'billed input tok':>18}{'round-trips':>13}{'answer':>10}{'cost':>11}")
+    print(f"\n  {'mode':<44}{'billed input tok':>18}{'round-trips':>13}{'answer':>10}{'token/API':>11}")
     print("  " + "-" * 96)
     for name, r in [("Mode A: plain tool use", a),
                     ("Mode B: programmatic (allowed_callers)", b)]:
@@ -103,6 +104,7 @@ def print_table(result: dict) -> None:
     print(f"  a {result['pct_input_reduction']:.0f}% reduction worth {fmt_usd(result['saved_input_usd'])} "
           f"on THIS run at {get(result['model_key']).label}'s input price, because the tool outputs went")
     print(f"  to the sandbox, not the model context. The saving scales with how often you run the task.")
+    print("  Cost scope: code execution runtime can bill separately after the monthly free allowance.")
     print(f"  Fan-out shaped: the win needs the model to call your tool many times. On a sequential")
     print(f"  single-call task the doc reports it is flat to about 8% more expensive.\n")
 
@@ -116,8 +118,9 @@ def cmd_run(model_key: str) -> int:
     print(f"\n  Token bill: the same fan-out task two ways over your tool ({tool.TOOL_SPEC['name']}),")
     print(f"  on {label}. Mode A calls the tool directly, Mode B (programmatic tool calling) runs it")
     print(f"  from a sandbox so the outputs stay out of the model's context.")
-    print(f"  Upfront: this run makes 2 task runs over {n} inputs and costs about ${est_usd(model_key):.2f} and roughly")
-    print(f"  90 seconds using your API key. The model arms are the only spend, the sandbox is server-side.\n")
+    print(f"  Upfront: this run makes 2 task runs over {n} inputs and costs about ${est_usd(model_key):.2f} token/API")
+    print("  cost and roughly 90 seconds using your API key.")
+    print("  Cost scope: code execution runtime can bill separately after the monthly free allowance.\n")
     client = get_client()
     result = run_token_compare(client, model_key)
     print_table(result)
@@ -135,7 +138,8 @@ def cmd_check(model_key: str) -> int:
 
     expected = getattr(tool, "EXPECTED_ANSWER", None)
     print(f"\n  --check: running the shipped example on {get(model_key).label} and asserting the PTC")
-    print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). About ${est_usd(model_key):.2f}.\n")
+    print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). About ${est_usd(model_key):.2f}")
+    print("  token/API cost, excluding any separate code-execution runtime charge after the free allowance.\n")
     client = get_client()
     result = run_token_compare(client, model_key)
     print_table(result)

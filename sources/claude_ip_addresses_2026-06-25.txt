@@ -1,0 +1,21 @@
+Source: https://platform.claude.com/docs/en/api/ip-addresses
+Snapshot fetched 2026-06-25. Verbatim excerpts for citation grounding.
+
+Messages Managed Agents Admin Resources   API reference English   Console Log in    Search... ⌘K  Log in  API reference  IP addresses Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Loading... Solutions AI agents Code modernization Coding Customer support Education Financial services Government Life sciences Partners Claude on AWS Google Cloud's Vertex AI Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Company Anthropic Careers Economic Futures Research News Responsible Scaling Policy Security and compliance Transparency Learn Blog Courses Use cases Connectors Customer stories Engineering at Anthropic Events Powered by Claude Service partners Startups program Help and security Availability Status Support Discord Terms and policies Privacy policy Responsible disclosure policy Terms of service: Commercial Terms of service: Consumer Usage policy IP addresses - Claude API Docs API reference / Support & configuration IP addresses Copy page  Anthropic services use fixed IP addresses for both inbound and outbound connections. You can use these addresses to configure your firewall rules for secure access to the Claude API and Console. These addresses will not change without notice. Copy page  Was this page helpful?   Inbound IP addresses IPv4 IPv6 Outbound IP addresses IPv4 Phased out IP addresses  Claude Platform on AWS : The inbound endpoint ( aws-external-anthropic.{region}.api.aws ) resolves to AWS IP ranges. Outbound tool calls (MCP connector, web search, and web fetch) originate from the Anthropic ranges listed on this page. See the AWS IP address ranges for inbound allowlisting.
+ Inbound IP addresses
+These are the IP addresses where Anthropic services receive incoming connections.
+ IPv4
+160.79.104.0/23
+ IPv6
+2607:6bc0::/48
+ Outbound IP addresses
+These are the stable IP addresses that Anthropic uses for outbound requests (for example, when making MCP tool calls to external servers).
+ IPv4
+160.79.104.0/21
+ Phased out IP addresses
+The following IP addresses are no longer in use by Anthropic. If you have previously allowlisted these addresses, you should remove them from your firewall rules.
+34.162.46.92/32
+34.162.102.82/32
+34.162.136.91/32
+34.162.142.92/32
+34.162.183.95/32 

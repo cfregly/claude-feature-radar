@@ -1,0 +1,65 @@
+name: source freshness resolve
+
+# Scheduled freshness resolve reruns mapped workloads and opens review PRs.
+# It never merges, sends mail, or directly publishes claims.
+
+on:
+  schedule:
+    - cron: "17 14 * * 1"
+  workflow_dispatch:
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: check out radar
+        uses: actions/checkout@v4
+        with:
+          path: claude-feature-radar
+          token: ${{ secrets.FEATURE_RADAR_BOT_TOKEN }}
+      - name: check out hits
+        uses: actions/checkout@v4
+        with:
+          repository: cfregly/claude-feature-hits
+          path: claude-feature-hits
+          token: ${{ secrets.FEATURE_RADAR_BOT_TOKEN }}
+      - name: check out misses
+        uses: actions/checkout@v4
+        with:
+          repository: cfregly/claude-feature-misses
+          path: claude-feature-misses
+          token: ${{ secrets.FEATURE_RADAR_BOT_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: build the venv
+        working-directory: claude-feature-radar
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install --quiet --upgrade pip
+          .venv/bin/pip install --quiet anthropic openai google-genai pytest
+      - name: configure git
+        run: |
+          git config --global user.name "feature-radar-bot"
+          git config --global user.email "feature-radar-bot@users.noreply.github.com"
+      - name: resolve source freshness and open PRs
+        working-directory: claude-feature-radar
+        env:
+          GH_TOKEN: ${{ secrets.FEATURE_RADAR_BOT_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          FRESHNESS_MAX_SPEND_USD: ${{ secrets.FRESHNESS_MAX_SPEND_USD || '5.00' }}
+        run: |
+          .venv/bin/python run.py resolve-freshness --write-report --apply --open-pr --hits-dir ../claude-feature-hits --misses-dir ../claude-feature-misses
+      - name: upload freshness resolve report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-freshness-resolve-report
+          path: |
+            claude-feature-radar/state/outbox/freshness/
+            claude-feature-radar/state/outbox/freshness-resolve/
