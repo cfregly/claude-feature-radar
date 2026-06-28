@@ -1,0 +1,18 @@
+name: ci
+
+# Offline gates only, the same `make ci` that runs locally: deslop, the secret scan, a compile pass,
+# and the one-dependency import check. Nothing here calls the Claude API or runs live proof targets,
+# so CI never needs a key and never spends.
+
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: the offline gate chain (identical to local `make ci`)
+        run: make ci

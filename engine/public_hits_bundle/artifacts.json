@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "artifacts": {
+    "programmatic_tool_calling": {
+      "status": "active",
+      "make_target": "programmatic_tool_calling",
+      "run_module": "programmatic_tool_calling.compare_direct_vs_programmatic",
+      "check_args": ["--check"],
+      "cost_usd": "0.08"
+    },
+    "programmatic_tool_calling_cache_context": {
+      "status": "active",
+      "make_target": "programmatic_tool_calling_cache_context",
+      "run_module": "programmatic_tool_calling_cache_context.compare_cache_context_programmatic",
+      "check_args": ["--check"],
+      "cost_usd": "0.00"
+    },
+    "pdf_citations": {"status": "removed"},
+    "grounding_stack": {"status": "removed"},
+    "search_results": {"status": "removed"},
+    "task_budgets": {"status": "removed"},
+    "bulk_output": {"status": "removed"},
+    "cache_diagnostics": {"status": "removed"},
+    "citations": {"status": "removed"},
+    "code_execution_state": {"status": "removed"},
+    "exact_ledger": {"status": "removed"},
+    "web_citations": {"status": "removed"}
+  }
+}

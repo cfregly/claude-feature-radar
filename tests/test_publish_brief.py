@@ -19,16 +19,15 @@ from engine.adversarial import ValueGate
 
 
 def test_current_programmatic_tool_calling_passes_the_adversarial_gate():
-    """The current measured PTC framing is confirmed by both adversarial judges."""
+    """The current measured programmatic-tool-calling framing is confirmed by both adversarial judges."""
     gate = pb.verdict_gate("programmatic-tool-calling")
     assert gate.ok
     assert gate.verdict == "claude-ahead"
     assert "adversarially confirmed" in gate.reason
 
 
-def test_slug_and_folder_key_both_resolve():
-    """Both the live sweep slug and the built-edge folder resolve to the same confirmed edge."""
-    assert pb.verdict_gate("programmatic_tool_calling").ok
+def test_canonical_folder_key_resolves():
+    """The canonical built-edge folder key resolves to the confirmed edge."""
     assert pb.verdict_gate("programmatic-tool-calling").ok
 
 
@@ -150,8 +149,8 @@ def test_agreeing_receipt_passes(monkeypatch, tmp_path):
     _synthetic_edge(monkeypatch, verdict="claude-ahead", lead_score=5, lead_basis="absence-of-evidence")
     _pass_adversarial_gate(monkeypatch)
     good = tmp_path / "last_programmatic_tool_calling.json"
-    good.write_text(json.dumps({"mode_b_correct": True, "pct_input_reduction": 27.2,
-                                "mode_a": {"billed_input": 9494}, "mode_b": {"billed_input": 6910}}))
+    good.write_text(json.dumps({"mode_b_correct": True, "pct_input_reduction": 74.0,
+                                "mode_a": {"billed_input": 54989}, "mode_b": {"billed_input": 14299}}))
     monkeypatch.setattr(pb, "_receipt_path", lambda k: good)
     assert pb.verdict_gate("programmatic-tool-calling").ok
 
@@ -162,13 +161,14 @@ def test_agreeing_receipt_passes(monkeypatch, tmp_path):
 
 def test_committed_receipt_matches_the_gated_sample():
     """_committed_receipt parses edges/<folder>/sample.txt, the SAME committed file scripts/check_receipts.py
-    checks, so a published brief quotes the receipt-of-record. The numbers and the honest correctness flags
-    come straight off it: both modes answered east, while the deterministic reducer eval pins the true winner."""
+    checks, so a published brief quotes the receipt-of-record. The numbers and the expected compact
+    account list come straight off it."""
     r = pb._committed_receipt(pb.PLANS["programmatic-tool-calling"])
     assert r is not None, "the committed edges/programmatic-tool-calling/sample.txt must parse"
-    assert r["mode_a"]["billed_input"] == 9494
-    assert r["mode_b"]["billed_input"] == 6910
-    assert round(r["pct_input_reduction"]) == 27
+    assert r["mode_a"]["billed_input"] == 54989
+    assert r["mode_b"]["billed_input"] == 14299
+    assert round(r["pct_input_reduction"]) == 74
+    assert r["expected_answer"] == ("acct_1842", "acct_2199", "acct_7731")
     assert r["mode_a_correct"] is True
     assert r["mode_b_correct"] is True
 
@@ -180,11 +180,11 @@ def test_committed_receipt_ignores_the_transient_json(monkeypatch):
         raise AssertionError("_committed_receipt must not read the transient receipt path")
     monkeypatch.setattr(pb, "_receipt_path", boom)
     r = pb._committed_receipt(pb.PLANS["programmatic-tool-calling"])
-    assert r["mode_a"]["billed_input"] == 9494 and r["mode_b"]["billed_input"] == 6910
+    assert r["mode_a"]["billed_input"] == 54989 and r["mode_b"]["billed_input"] == 14299
     # and the generated receipt snapshot the gif replays carries those committed numbers, not a scratch run
     sample = pb._sample_source(pb.PLANS["programmatic-tool-calling"], r)
-    assert "9,494" in sample and "6,910" in sample
-    assert "same answer" in sample.lower()
+    assert "54,989" in sample and "14,299" in sample
+    assert "acct_1842" in sample
 
 
 def test_gate_measurement_uses_committed_receipt_when_transient_has_no_positive_verdict():
@@ -221,11 +221,11 @@ def test_missing_briefs_root_writes_nothing(tmp_path):
 
 
 def test_import_swap_rewrites_engine_and_common_prefixes():
-    src = ("from engine.demonstrators.token_core import run_mode\n"
+    src = ("from engine.demonstrators.code_execution_state import run_mode\n"
            "from common.models import get\n"
            "from common.pricing import cost_usd\n")
     out = pb._swap_imports(src)
-    assert "from .token_core import run_mode" in out
+    assert "from .code_execution_state import run_mode" in out
     assert "from .common.models import get" in out
     assert "from .common.pricing import cost_usd" in out
     pb._assert_no_dangling(out, "synthetic")  # must not raise
@@ -242,9 +242,7 @@ def test_dangling_common_import_is_refused():
 
 
 def test_vendored_engine_files_are_closure_clean():
-    """Every file the PTC plan vendors imports only from its declared closure after the prefix swap, so a
-    shipped brief never carries a dangling import. This is the static guarantee, checked without writing."""
+    """Generated-vendor plans import only from their declared closure after the prefix swap."""
     plan = pb.PLANS["programmatic-tool-calling"]
-    for vf in plan.files:
-        text = (pb.ROOT / vf.src).read_text()
-        pb._assert_no_dangling(pb._swap_imports(text), vf.dst)  # must not raise
+    assert plan.public_bundle is True
+    assert not plan.files

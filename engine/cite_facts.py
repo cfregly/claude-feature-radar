@@ -51,7 +51,7 @@ FACTS = [
     {"claim": "OpenAI compaction carries forward key prior state and reasoning rather than traditional summarization.",
      "source": "sources/openai_compaction_2026-06-18.txt"},
     # Our own measured receipts (cited to the committed sample.txt)
-    {"claim": "Programmatic tool calling billed 6,910 input tokens versus 9,494 for plain tool use.",
+    {"claim": "Programmatic tool calling billed 14,299 input tokens versus 54,989 for plain tool use.",
      "source": "edges/programmatic-tool-calling/sample.txt"},
     {"claim": "Claude Citations resolved 8 of 8 pointers to the exact source text.",
      "source": "edges/citations/sample.txt"},

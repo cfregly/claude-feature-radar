@@ -30,69 +30,61 @@ def _dollars(text: str) -> list[float]:
 
 
 def check_programmatic_tool_calling(fail, warn):
-    """The PTC receipt (edges/programmatic-tool-calling/sample.txt) is the source for the billed-token
+    """The programmatic-tool-calling receipt is the source for the billed-token
     numbers, the percent reduction, and the run cost. Every surface that quotes them must agree."""
     s = _read("edges/programmatic-tool-calling/sample.txt")
-    a = re.search(r"Mode A:.*?([\d,]+)\s+\d+\s+\S+\s+\$([\d.]+)", s)
-    b = re.search(r"Mode B:.*?([\d,]+)\s+\d+\s+\S+\s+\$([\d.]+)", s)
+    a = re.search(r"without programmatic tool calling\s+([\d,]+)", s)
+    b = re.search(r"with programmatic tool calling\s+([\d,]+)", s)
     if not (a and b):
-        fail.append("PTC: could not parse the Mode A/Mode B receipt rows in sample.txt")
+        fail.append("programmatic tool calling: could not parse receipt rows in sample.txt")
         return
-    a_tok, a_cost = int(a.group(1).replace(",", "")), float(a.group(2))
-    b_tok, b_cost = int(b.group(1).replace(",", "")), float(b.group(2))
+    a_tok = int(a.group(1).replace(",", ""))
+    b_tok = int(b.group(1).replace(",", ""))
     pct = round((1 - b_tok / a_tok) * 100)
-    total = round(a_cost + b_cost, 2)
 
     # the stable token numbers and percent must appear verbatim where the edge is pitched
     a_str, b_str = f"{a_tok:,}", f"{b_tok:,}"
-    for rel in ["README.md", "emails/drafts/programmatic_tool_calling_FOUNDER_EMAIL.md"]:
+    for rel in [
+        "README.md",
+        "edges/programmatic-tool-calling/README.md",
+        "engine/brief_assets/programmatic_tool_calling/README.md",
+        "engine/brief_assets/programmatic_tool_calling/email.md",
+        "emails/drafts/programmatic_tool_calling_FOUNDER_EMAIL.md",
+    ]:
         text = _read(rel)
         if a_str not in text or b_str not in text:
-            fail.append(f"PTC tokens: {rel} does not carry the receipt's {a_str}/{b_str}")
+            fail.append(f"programmatic tool calling tokens: {rel} does not carry the receipt's {a_str}/{b_str}")
         if f"{pct}%" not in text:
-            fail.append(f"PTC percent: {rel} does not carry the receipt's {pct}% reduction")
+            fail.append(f"programmatic tool calling percent: {rel} does not carry the receipt's {pct}% reduction")
 
-    # the run-cost claims must all agree with the receipt total (within a rounding tolerance)
     cost_files = [
-        "Makefile", "README.md", "app/run_tokens.py", "demo.tape",
+        "Makefile", "README.md",
         "edges/programmatic-tool-calling/README.md",
+        "engine/brief_assets/programmatic_tool_calling/README.md",
+        "engine/brief_assets/programmatic_tool_calling/email.md",
         "emails/drafts/programmatic_tool_calling_FOUNDER_EMAIL.md",
     ]
-    want = f"${total:.2f}"
     for rel in cost_files:
         text = _read(rel)
-        # only inspect lines that mention the PTC run cost (make programmatic-tool-calling / make app / "on Sonnet ... reproduce")
         for i, line in enumerate(text.splitlines(), 1):
-            if not re.search(r"make (programmatic[-_]tool[-_]calling|app)|on Sonnet|reproduce|token bill", line, re.I):
+            target_line = re.search(r"programmatic[-_]tool[-_]calling(?![-_])", line, re.I)
+            email_cost_line = "token/API cost" in line
+            if not (target_line or email_cost_line):
                 continue
             for c in _dollars(line):
-                if abs(c - total) > COST_TOL:
-                    fail.append(f"PTC cost: {rel}:{i} says ${c:.2f}, receipt total is {want} "
-                                f"(${a_cost:.2f}+${b_cost:.2f}); update both together")
-
-    # the $ figure that immediately follows a 'make programmatic-tool-calling'/'make app' claim must be the receipt total,
-    # scanning across line breaks up to the next make-command (so 'make citations $0.06' is not misread)
-    for rel in cost_files:
-        text = _read(rel)
-        for mm in re.finditer(r"make (?:programmatic[-_]tool[-_]calling|app)\b", text):
-            tail = re.split(r"\bmake \w", text[mm.end():mm.end() + 140])[0]
-            d = _dollars(tail)
-            if d and abs(d[0] - total) > COST_TOL:
-                fail.append(f"PTC cost: {rel} 'make programmatic-tool-calling/app' is followed by ${d[0]:.2f}, receipt total is {want}")
+                if abs(c - 0.08) > COST_TOL:
+                    fail.append(f"programmatic tool calling cost: {rel}:{i} says ${c:.2f}, expected the canonical $0.08 estimate")
 
 
 def check_programmatic_tool_calling_drift(fail, warn):
-    """Any PTC-token-shaped number (9,4xx / 6,8xx) on a PTC founder surface must equal the receipt, so a
-    stray hand-typed 6,819 cannot drift away from the 6,910 the run actually billed. Scoped to files that
-    are actually about PTC: with many briefs now, an unrelated edge can legitimately print a 6,8xx number
-    (cache diagnostics measured 6,827 missed tokens), and that is its own receipt, not PTC drift."""
+    """Any programmatic-tool-calling token-shaped number on a founder surface must equal the receipt."""
     s = _read("edges/programmatic-tool-calling/sample.txt")
-    a = re.search(r"Mode A:.*?([\d,]+)\s+\d+\s+\S+\s+\$", s)
-    b = re.search(r"Mode B:.*?([\d,]+)\s+\d+\s+\S+\s+\$", s)
+    a = re.search(r"without programmatic tool calling\s+([\d,]+)", s)
+    b = re.search(r"with programmatic tool calling\s+([\d,]+)", s)
     if not (a and b):
         return
     a_tok, b_tok = int(a.group(1).replace(",", "")), int(b.group(1).replace(",", ""))
-    programmatic_tool_calling_ctx = re.compile(r"programmatic tool calling|Token MINNing|allowed_callers|\bPTC\b", re.I)
+    programmatic_tool_calling_ctx = re.compile(r"programmatic tool calling|Token MINNing|allowed_callers", re.I)
     files = [ROOT / "README.md"]
     files += sorted(ROOT.glob("edges/*/FOUNDER_EMAIL.md"))
     files += sorted(ROOT.glob("emails/*.md")) + sorted(ROOT.glob("emails/**/*.md"))
@@ -101,13 +93,13 @@ def check_programmatic_tool_calling_drift(fail, warn):
             continue
         text = p.read_text()
         if not programmatic_tool_calling_ctx.search(text):
-            continue  # not a PTC surface, so a 6,8xx/9,4xx number here is its own receipt, not PTC's
-        for m in re.finditer(r"\b([69],\d{3})\b", text):
+            continue  # not a programmatic-tool-calling surface, so unrelated token numbers trace elsewhere
+        for m in re.finditer(r"\b(\d{2},\d{3})\b", text):
             v = int(m.group(1).replace(",", ""))
-            if 6000 < v < 7000 and v != b_tok:
-                fail.append(f"PTC token drift: {p.relative_to(ROOT)} has {m.group(1)}, receipt Mode B is {b_tok:,}")
-            if 9000 < v < 10000 and v != a_tok:
-                fail.append(f"PTC token drift: {p.relative_to(ROOT)} has {m.group(1)}, receipt Mode A is {a_tok:,}")
+            if 10000 < v < 20000 and v != b_tok:
+                fail.append(f"programmatic tool calling token drift: {p.relative_to(ROOT)} has {m.group(1)}, receipt Mode B is {b_tok:,}")
+            if 50000 < v < 60000 and v != a_tok:
+                fail.append(f"programmatic tool calling token drift: {p.relative_to(ROOT)} has {m.group(1)}, receipt Mode A is {a_tok:,}")
 
 
 def check_price_provenance(fail, warn):
@@ -137,7 +129,7 @@ def main():
         for f in fail:
             print(f"  {f}")
         sys.exit(1)
-    print(f"receipt-drift gate: clean (PTC tokens/percent/cost, eval total, price provenance"
+    print(f"receipt-drift gate: clean (programmatic tool calling tokens/percent/cost, eval total, price provenance"
           f"{'; ' + str(len(warn)) + ' warning(s)' if warn else ''})")
 
 

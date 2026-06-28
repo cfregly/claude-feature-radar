@@ -1,21 +1,20 @@
-Subject: Congrats on YC! A cost pattern for log-triage agents
+Subject: Congrats on YC! A sandbox pattern for customer-evidence agents
 
-Hey Sherwood,
+Hey {first_name},
 
-Congrats on YC.
+Congrats on the batch, that is a real milestone. Quick builder tip in case it helps.
 
-I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I help teams turn promising
-agent demos into production systems where cost, speed, reliability, accuracy, and security are all
-designed in early.
+If your agent decides which customers are at risk, it often has to fan out across support tickets,
+product logs, usage metering, CRM notes, and compliance docs. Direct tool use sends every raw row
+back through the model context. You pay for the rows, even when the final answer only needs a compact
+decision packet.
 
-I saw Sazabi is building AI-native observability around logs, Slack, and agent-driven
-investigations. The Claude pattern that maps to that workload is log-triage fan-out without dragging
-every intermediate result into the model context.
+[Programmatic tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling)
+moves that reduction into Claude's code sandbox. Claude writes Python that calls your own tool,
+rejects malformed rows, joins evidence by account, sums risk points, preserves evidence IDs and
+caveats, and returns only the top accounts to the model.
 
-That workload can get expensive fast. Every log slice or trace payload your tool returns
-becomes model context unless you move the crunching somewhere else. Claude programmatic tool calling
-lets the model write one sandbox script that calls your own tool in a loop, filters and aggregates
-there, and returns only the fix-relevant answer.
+You add the code execution tool, then one field to the tool you already pass:
 
 ```python
 response = client.messages.create(
@@ -23,38 +22,38 @@ response = client.messages.create(
     messages=[...],
     tools=[
         {"type": "code_execution_20260120", "name": "code_execution"},
-        {"name": "query_logs", "input_schema": {...},
-         "allowed_callers": ["code_execution_20260120"]},
+        { "name": "query_customer_evidence", "input_schema": {...},
+          "allowed_callers": ["code_execution_20260120"] },
     ],
 )
 ```
 
-Using my API key, the same fan-out task over 240 returned results went from 9,494 to 6,910 billed input tokens,
-with the exact winner returned from the sandbox. That is 27% fewer billed input tokens than the same
-Claude agent without programmatic tool calling.
+Same task, same model, the only change is the feature on or off:
 
-Cost caveat for production: that is token/API cost. Code execution runtime can bill separately after
-the monthly free allowance, so I would track token cost, runtime charge, correctness, latency, and
-failures before calling it an all-in COGS win.
+| run | billed input tokens | what it means |
+|---|---:|---|
+| without programmatic tool calling | 54,989 | every raw evidence row lands in the model context |
+| with programmatic tool calling | 14,299 | only the compact decision packet reaches the model |
 
-Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
+That is 74% fewer billed input tokens on my run, with the same three accounts returned:
+`acct_1842`, `acct_2199`, and `acct_7731`.
 
-Run it in about two minutes for $0.08 token/API cost:
+I ran it using my own API key for estimated $0.08 token/API cost. To see it yourself:
 
-```bash
+```
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-# Get an API key: https://console.anthropic.com/
 export ANTHROPIC_API_KEY=your-api-key
 make programmatic_tool_calling
 ```
 
-To try it on your own workload, edit `programmatic_tool_calling/my_tool.py` with your log query tool
-and re-run the same command.
+Full artifact, demo GIF, code, and sample output:
+https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
 
-If Sazabi's heavier blocker is accuracy over incident context or security around tool access,
-send me the rough workflow and I can point you to the closest Claude pattern.
+Docs: https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
+
+To run it on your own data, open `programmatic_tool_calling/founder_workload.py`, drop in your tool and
+fan-out task, and run `make programmatic_tool_calling` again.
 
 Happy building,
-
---Chris Fregly
-Applied AI, Startups, Anthropic
+{your_name}
+Building with Claude

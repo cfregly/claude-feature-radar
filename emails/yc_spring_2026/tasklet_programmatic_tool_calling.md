@@ -1,55 +1,59 @@
-Subject: Congrats on YC! A sandbox pattern for work-app agents
+Subject: Congrats on YC! A sandbox pattern for customer-evidence agents
 
-Hey Jonny,
+Hey {first_name},
 
-Congrats on getting Tasklet into YC.
+Congrats on the batch, that is a real milestone. Quick builder tip in case it helps.
 
-I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I spend my time on the
-mechanics that make agents cheaper, faster, safer, and easier to ship.
+If your agent decides which customers are at risk, it often has to fan out across support tickets,
+product logs, usage metering, CRM notes, and compliance docs. Direct tool use sends every raw row
+back through the model context. You pay for the rows, even when the final answer only needs a compact
+decision packet.
 
-I saw Tasklet is building agents that call work-app APIs to get tasks done. The Claude pattern that
-maps to that workload is app-API fan-out where the agent makes many calls, inspects bulky
-intermediate results, and returns one action.
+[Programmatic tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling)
+moves that reduction into Claude's code sandbox. Claude writes Python that calls your own tool,
+rejects malformed rows, joins evidence by account, sums risk points, preserves evidence IDs and
+caveats, and returns only the top accounts to the model.
 
-Without a filter point, every API result flows into the model context. Claude programmatic tool
-calling gives you that filter point. Mark your tool as callable from code execution, then Claude can
-write a sandbox script that loops over the tool and returns only the answer the model needs.
+You add the code execution tool, then one field to the tool you already pass:
 
 ```python
-tools=[
-    {"type": "code_execution_20260120", "name": "code_execution"},
-    {"name": "fetch_workspace_task", "input_schema": {...},
-     "allowed_callers": ["code_execution_20260120"]},
-]
+response = client.messages.create(
+    model="claude-sonnet-4-6",
+    messages=[...],
+    tools=[
+        {"type": "code_execution_20260120", "name": "code_execution"},
+        { "name": "query_customer_evidence", "input_schema": {...},
+          "allowed_callers": ["code_execution_20260120"] },
+    ],
+)
 ```
 
-Using my API key, the measured fan-out run went from 9,494 to 6,910 billed input tokens, with the
-exact winner returned from the sandbox. That is 27% fewer billed input tokens than the same Claude
-agent without programmatic tool calling. That is the shape: many tool calls, bulky results, one final
-answer.
+Same task, same model, the only change is the feature on or off:
 
-Cost caveat for production: that is token/API cost. Code execution runtime can bill separately after
-the monthly free allowance, so I would track token cost, runtime charge, correctness, latency, and
-failures before calling it an all-in COGS win.
+| run | billed input tokens | what it means |
+|---|---:|---|
+| without programmatic tool calling | 54,989 | every raw evidence row lands in the model context |
+| with programmatic tool calling | 14,299 | only the compact decision packet reaches the model |
 
-Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
+That is 74% fewer billed input tokens on my run, with the same three accounts returned:
+`acct_1842`, `acct_2199`, and `acct_7731`.
 
-Run it in about two minutes for $0.08 token/API cost:
+I ran it using my own API key for estimated $0.08 token/API cost. To see it yourself:
 
-```bash
+```
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-# Get an API key: https://console.anthropic.com/
 export ANTHROPIC_API_KEY=your-api-key
 make programmatic_tool_calling
 ```
 
-To try it on Tasklet's shape, edit `programmatic_tool_calling/my_tool.py` with one of your work-app
-tools and the inputs it fans out over.
+Full artifact, demo GIF, code, and sample output:
+https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
 
-If a different app-agent loop is the sharper blocker, reply with the flow and I can point you to the
-closest Claude pattern, including the tool-boundary path for app-agent risk.
+Docs: https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
+
+To run it on your own data, open `programmatic_tool_calling/founder_workload.py`, drop in your tool and
+fan-out task, and run `make programmatic_tool_calling` again.
 
 Happy building,
-
---Chris Fregly
-Applied AI, Startups, Anthropic
+{your_name}
+Building with Claude

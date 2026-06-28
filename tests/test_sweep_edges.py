@@ -352,8 +352,8 @@ def test_route_dispatches_a_built_edge_to_its_demonstrator():
     ranked = [{"key": "programmatic_tool_calling", "lead_score": 2, "axis": "cost"}]
     out = se.route(ranked, covered={"programmatic-tool-calling"})
     assert out[0]["covered"] is True
-    assert out[0]["demonstrator"] == "PTCDemonstrator"
-    assert out[0]["gate"] == "ask"               # PTC spends a credit, so it waits for approval
+    assert out[0]["demonstrator"] == "ProgrammaticToolCallingDemonstrator"
+    assert out[0]["gate"] == "ask"               # programmatic tool calling spends a credit, so it waits for approval
     assert out[0]["estimate_surfaced"] is True   # the estimate is shown before any spend
     assert out[0]["estimate"]["command"] == "make programmatic-tool-calling"
 

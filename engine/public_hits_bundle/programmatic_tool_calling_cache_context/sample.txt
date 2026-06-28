@@ -1,0 +1,38 @@
+
+  programmatic_tool_calling_cache_context: programmatic tool calling + prompt caching + 1M context cost cliff.
+  This command is deterministic: it reads the committed programmatic-tool-calling receipt and receipt.json.
+  It does not call any model or require an API key.
+
+  committed programmatic tool calling basis
+    without programmatic tool calling: 54,989 billed input tokens
+    with programmatic tool calling:    14,299 billed input tokens
+    reduction:                         74%
+
+  declared larger workload
+    stable prefix tokens:              700,000
+    turns:                             100
+    raw tool-output tokens per turn:   200,000
+    programmatic summary tokens/turn:  2,000
+    Claude context window:             1,000,000
+    GPT-5.5 context window:            1,050,000
+    Gemini 3.5 Flash context window:   1,000,000
+
+  scenario                                                   estimated model-token cost
+  -----------------------------------------------------------------------------------
+  Claude, no cache, no programmatic tool calling                $270.45
+  Claude cache, no programmatic tool calling                    $85.44
+  GPT-5.5 best cache+1M, no programmatic tool calling           $135.55
+  Gemini 3.5 Flash cache+1M, no programmatic tool calling       $40.67
+  Claude cache + programmatic tool calling                      $26.04
+  -----------------------------------------------------------------------------------
+  Claude cache + programmatic tool calling saves $59.40 vs Claude cache-only.
+  Claude cache + programmatic tool calling saves $109.51 vs GPT-5.5 best cache+1M without programmatic tool calling.
+  Claude cache + programmatic tool calling is 80.8% lower than GPT-5.5 best cache+1M without programmatic tool calling.
+  Claude cache + programmatic tool calling saves $14.63 vs Gemini 3.5 Flash cache+1M without programmatic tool calling.
+  Claude cache + programmatic tool calling is 36.0% lower than Gemini 3.5 Flash cache+1M without programmatic tool calling.
+
+  Cost scope: model-token arithmetic only. Add any separate code-execution runtime charge,
+  including the current $0.0042 floor exposure per new billed code-execution container,
+  plus backend cost, latency, failures, and correctness before claiming production COGS.
+
+  CHECK PASSED: committed 74% basis and declared cost ladder are internally consistent.

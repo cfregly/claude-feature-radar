@@ -1,10 +1,10 @@
 {
   "basis": {
-    "ptc_live_receipt": {
+    "programmatic_tool_calling_receipt": {
       "source": "edges/programmatic-tool-calling/sample.txt",
-      "plain_tool_use_billed_input_tokens": 9494,
-      "programmatic_tool_calling_billed_input_tokens": 6910,
-      "input_reduction_pct": 27.2
+      "plain_tool_use_billed_input_tokens": 54989,
+      "programmatic_tool_calling_billed_input_tokens": 14299,
+      "input_reduction_pct": 74.0
     },
     "claude_model": {
       "key": "sonnet",
@@ -16,13 +16,13 @@
         "key": "gpt-top",
         "label": "GPT-5.5",
         "context_window": 1050000,
-        "assumption": "best-case automatic cache hits on every post-first turn, but no PTC equivalent"
+        "assumption": "best-case automatic cache hits on every post-first turn, but no programmatic tool calling equivalent"
       },
       {
         "key": "gem-flash",
         "label": "Gemini 3.5 Flash",
         "context_window": 1000000,
-        "assumption": "context caching plus function calling or code execution for a high-tool-call agent executor, but no PTC equivalent"
+        "assumption": "context caching plus function calling or code execution for a high-tool-call agent executor, but no programmatic tool calling equivalent"
       }
     ]
   },
@@ -30,48 +30,48 @@
     "stable_prefix_tokens": 700000,
     "turns": 100,
     "raw_tool_output_tokens_per_turn": 200000,
-    "ptc_summary_tokens_per_turn": 2000,
+    "programmatic_summary_tokens_per_turn": 2000,
     "answer_output_tokens_per_turn": 300,
     "cache_ttl": "1h"
   },
   "context_fit": {
     "prefix_tokens": 700000,
     "prefix_plus_raw_tool_tokens": 900000,
-    "prefix_plus_ptc_summary_tokens": 702000,
+    "prefix_plus_programmatic_summary_tokens": 702000,
     "fits_claude_1m_with_raw_tool_output": true,
-    "fits_claude_1m_with_ptc_summary": true,
+    "fits_claude_1m_with_programmatic_summary": true,
     "fits_400k_context_with_prefix": false
   },
   "scenarios": {
-    "claude_no_cache_no_ptc": {
+    "claude_no_cache_no_programmatic": {
       "cache_write_usd": 0.0,
       "cache_read_usd": 0.0,
       "fresh_input_usd": 270.0,
       "output_usd": 0.45,
       "total_usd": 270.45
     },
-    "claude_cache_no_ptc": {
+    "claude_cache_no_programmatic": {
       "cache_write_usd": 4.2,
       "cache_read_usd": 20.79,
       "fresh_input_usd": 60.0,
       "output_usd": 0.45,
       "total_usd": 85.44
     },
-    "openai_best_cache_1m_no_ptc": {
+    "openai_best_cache_1m_no_programmatic": {
       "cache_write_usd": 0.0,
       "cache_read_usd": 34.65,
       "fresh_input_usd": 100.0,
       "output_usd": 0.9,
       "total_usd": 135.55
     },
-    "gemini_best_cache_1m_no_ptc": {
+    "gemini_best_cache_1m_no_programmatic": {
       "cache_write_usd": 0.0,
       "cache_read_usd": 10.395,
       "fresh_input_usd": 30.0,
       "output_usd": 0.27,
       "total_usd": 40.67
     },
-    "claude_cache_ptc": {
+    "claude_cache_programmatic": {
       "cache_write_usd": 4.2,
       "cache_read_usd": 20.79,
       "fresh_input_usd": 0.6,
@@ -80,13 +80,13 @@
     }
   },
   "cliff": {
-    "savings_vs_claude_cache_no_ptc_usd": 59.4,
-    "savings_vs_openai_best_cache_no_ptc_usd": 109.51,
-    "savings_vs_gemini_best_cache_no_ptc_usd": 14.63,
-    "reduction_vs_claude_cache_no_ptc_pct": 69.5,
-    "reduction_vs_uncached_no_ptc_pct": 90.4,
-    "reduction_vs_openai_best_cache_no_ptc_pct": 80.8,
-    "reduction_vs_gemini_best_cache_no_ptc_pct": 36.0
+    "savings_vs_claude_cache_no_programmatic_usd": 59.4,
+    "savings_vs_openai_best_cache_no_programmatic_usd": 109.51,
+    "savings_vs_gemini_best_cache_no_programmatic_usd": 14.63,
+    "reduction_vs_claude_cache_no_programmatic_pct": 69.5,
+    "reduction_vs_uncached_no_programmatic_pct": 90.4,
+    "reduction_vs_openai_best_cache_no_programmatic_pct": 80.8,
+    "reduction_vs_gemini_best_cache_no_programmatic_pct": 36.0
   },
-  "honest_reading": "PTC is the unique leg: cache and 1M context are not enough if raw custom-tool output keeps returning to the model as fresh input. The proof is deterministic cost arithmetic over verified prices, grounded by the committed live PTC receipt."
+  "honest_reading": "programmatic tool calling is the unique leg: cache and 1M context are not enough if raw custom-tool output keeps returning to the model as fresh input. The proof is deterministic cost arithmetic over verified prices, grounded by the committed programmatic tool calling receipt."
 }

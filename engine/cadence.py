@@ -56,7 +56,7 @@ BANNED = {"—": "em-dash", "–": "en-dash", ";": "semicolon"}
 
 PUBLIC_COMMANDS = {
     "programmatic_tool_calling": "make programmatic_tool_calling",
-    "ptc_cache_context": "make ptc_cache_context",
+    "programmatic_tool_calling_cache_context": "make programmatic_tool_calling_cache_context",
 }
 
 PUBLIC_CLAIMS: dict[str, str] = {}

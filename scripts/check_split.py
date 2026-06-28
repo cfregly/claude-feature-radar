@@ -22,12 +22,12 @@ HITS_DIRNAME = "claude-feature-" + "hits"
 MISSES_DIRNAME = "claude-feature-" + "misses"
 COMBINATION_PUBLIC_ARTIFACTS = {
     "combo-1": (
-        "ptc_cache_context",
+        "programmatic_tool_calling_cache_context",
         (
-            "ptc_cache_context/README.md",
-            "ptc_cache_context/run.py",
-            "ptc_cache_context/sample.txt",
-            "ptc_cache_context/receipt.json",
+            "programmatic_tool_calling_cache_context/README.md",
+            "programmatic_tool_calling_cache_context/compare_cache_context_programmatic.py",
+            "programmatic_tool_calling_cache_context/sample.txt",
+            "programmatic_tool_calling_cache_context/receipt.json",
         ),
     ),
 }
@@ -144,7 +144,7 @@ def _check_public_plans(hits: Path, misses: Path, fail: list[str]) -> None:
     hits_files = set(_git_files(hits))
     misses_files = _git_files(misses)
     entrypoints = {
-        "programmatic_tool_calling": "run_tokens.py",
+        "programmatic_tool_calling": "compare_direct_vs_programmatic.py",
         "citations": "cite.py",
     }
     for edge_key, plan in sorted(PLANS.items()):

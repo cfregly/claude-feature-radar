@@ -1,196 +1,59 @@
-# Congrats on YC! 5 production blockers to test this week
+Subject: Congrats on YC! A sandbox pattern for customer-evidence agents
 
-Subject: Congrats on YC! 5 production blockers to test this week
+Hey {first_name},
 
-Hey YC founders,
+Congrats on the batch, that is a real milestone. Quick builder tip in case it helps.
 
-Congrats on the batch! I'm Chris Fregly on Anthropic's Applied AI team, focused on startups. I made a small public repo of Claude patterns you can run in one command with your own API key.
+If your agent decides which customers are at risk, it often has to fan out across support tickets,
+product logs, usage metering, CRM notes, and compliance docs. Direct tool use sends every raw row
+back through the model context. You pay for the rows, even when the final answer only needs a compact
+decision packet.
 
-The repo is here: https://github.com/cfregly/claude-feature-hits
+[Programmatic tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling)
+moves that reduction into Claude's code sandbox. Claude writes Python that calls your own tool,
+rejects malformed rows, joins evidence by account, sums risk points, preserves evidence IDs and
+caveats, and returns only the top accounts to the model.
 
-Pick the production blocker you have this week:
-
-- Cost from agents that fan out over logs, usage events, accounts, or app APIs: run `make programmatic_tool_calling`. The measured fan-out run used 27% fewer billed input tokens than the same Claude agent without programmatic tool calling.
-- Speed for large outputs or long-stream work: run `make bulk_output` or `make exact_ledger`.
-- Reliability for multi-step code, data, or build agents: run `make code_execution_state` or `make task_budgets`.
-- Accuracy for answers over PDFs, docs, filings, or retrieved chunks: run `make pdf_citations` or `make citations`.
-- Security for regulated data, MCP connectors, prompt injection, or agent attack surface: run `make security`.
-
-The cost pattern is the one I would test first when an agent makes many tool calls and only needs one final answer:
+You add the code execution tool, then one field to the tool you already pass:
 
 ```python
-tools=[
-    {"type": "code_execution_20260120", "name": "code_execution"},
-    {"name": "query_usage", "input_schema": {...},
-     "allowed_callers": ["code_execution_20260120"]},
-]
+response = client.messages.create(
+    model="claude-sonnet-4-6",
+    messages=[...],
+    tools=[
+        {"type": "code_execution_20260120", "name": "code_execution"},
+        { "name": "query_customer_evidence", "input_schema": {...},
+          "allowed_callers": ["code_execution_20260120"] },
+    ],
+)
 ```
 
-For that path, Claude writes one sandbox script, calls your tool in a loop, crunches the bulky intermediate results there, and sends only the answer back to the model. On my run, the same usage-style workload went from 9,494 to 6,910 billed input tokens. That is 27% fewer billed input tokens than the same Claude agent without programmatic tool calling. It costs $0.08 to reproduce.
+Same task, same model, the only change is the feature on or off:
 
-One important scope line: `allowed_callers` guides Claude to invoke the tool from code execution. It is not a security boundary. Keep authorization, policy checks, and dangerous-action handling in your client or tool layer.
+| run | billed input tokens | what it means |
+|---|---:|---|
+| without programmatic tool calling | 54,989 | every raw evidence row lands in the model context |
+| with programmatic tool calling | 14,299 | only the compact decision packet reaches the model |
 
-Run it:
+That is 74% fewer billed input tokens on my run, with the same three accounts returned:
+`acct_1842`, `acct_2199`, and `acct_7731`.
 
-```shell
-git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-# Get an API key: https://console.anthropic.com/
-export ANTHROPIC_API_KEY=your-api-key
-make programmatic_tool_calling
+I ran it using my own API key for estimated $0.08 token/API cost. To see it yourself:
+
 ```
-
-Each brief has the code, sample output, exact cost, and a named edit surface for your own workload. For the cost path, edit `programmatic_tool_calling/my_tool.py` with your real tool and inputs, then run the same command.
-
-If you reply with the production blocker you are working through this week, I can point you to the closest Claude pattern.
-
-Happy building,
-
---Chris Fregly
-
-Applied AI, Startups, Anthropic
-
-## Appendix: Routing Snapshot
-
-This routing snapshot explains why the batch email points to a menu instead of one generic demo. Each company maps to one production blocker and one public brief. The three routed drafts below are representative examples, not extra required deliverables.
-
-Source list: [TechCrunch, "The 11 standout startups from YC's Demo Day, according to VCs," published 2026-06-18](https://techcrunch.com/2026/06/18/the-11-standout-startups-from-ycs-demo-day-according-to-vcs/).
-
-Company pages and founder greetings were last reviewed from public YC pages on 2026-06-22.
-
-| Company | Workload | Primary blocker | Public pattern |
-| --- | --- | --- | --- |
-| Sazabi | Observability over logs, Slack, and agent investigations | Cost | Programmatic tool calling |
-| Tasklet | Work agents calling APIs, MCP servers, browsers, and code sandboxes | Cost + security follow-up | Programmatic tool calling |
-| Complir | Compliance agents over regulations, product data, and documentation | Accuracy + security follow-up | PDF citations |
-| Arga Labs | Real-world sandboxes to test agents and agent-facing software | Reliability + security-testing follow-up | Code execution state |
-| Superset | IDE for running hundreds of coding agents in parallel | Reliability | Task budgets |
-| Lightsprint | Collaborative product development with cloud agents | Reliability | Code execution state |
-| Silmaril | Prompt-injection defense for AI-native applications and agents | Security | Tool-boundary security + audit, MCP auth, and claims guards |
-
-## Representative Routed Drafts
-
-### Sazabi: cost pattern for log-triage agents
-
-Subject: Congrats on YC! A cost pattern for log-triage agents
-
-Hey Sherwood,
-
-Congrats on YC.
-
-I saw Sazabi is building AI-native observability around logs, Slack, and agent-driven investigations. The Claude pattern that maps to that workload is log-triage fan-out without dragging every intermediate result into the model context.
-
-That workload gets expensive fast. Every log slice or trace payload your tool returns becomes model context unless you move the crunching somewhere else. Claude programmatic tool calling lets the model write one sandbox script, call your tool in a loop, filter and aggregate there, and return only the fix-relevant answer.
-
-```python
-tools=[
-    {"type": "code_execution_20260120", "name": "code_execution"},
-    {"name": "query_logs", "input_schema": {...},
-     "allowed_callers": ["code_execution_20260120"]},
-]
-```
-
-Using my API key, the same fan-out task over 240 returned results went from 9,494 to 6,910 billed input tokens, with the exact winner returned from the sandbox. That is 27% fewer billed input tokens than the same Claude agent without programmatic tool calling.
-
-Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
-
-Run it in about two minutes for $0.08:
-
-```bash
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
 export ANTHROPIC_API_KEY=your-api-key
 make programmatic_tool_calling
 ```
 
-To try it on your own workload, edit `programmatic_tool_calling/my_tool.py` with your log query tool and re-run the same command.
+Full artifact, demo GIF, code, and sample output:
+https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
+
+Docs: https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
+
+To run it on your own data, open `programmatic_tool_calling/founder_workload.py`, drop in your tool and
+fan-out task, and run `make programmatic_tool_calling` again.
 
 Happy building,
-
---Chris Fregly
-
-Applied AI, Startups, Anthropic
-
-### Tasklet: a sandbox pattern for work-app agents
-
-Subject: Congrats on YC! A sandbox pattern for work-app agents
-
-Hey Jonny,
-
-Congrats on getting Tasklet into YC.
-
-I saw Tasklet is building agents that call work-app APIs to get tasks done. The Claude pattern that maps to that workload is app-API fan-out where the agent makes many calls, inspects bulky intermediate results, and returns one action.
-
-Without a filter point, every API result flows into the model context. Claude programmatic tool calling gives you that filter point. Mark your tool as callable from code execution, then Claude can write a sandbox script that loops over the tool and returns only the answer the model needs.
-
-```python
-tools=[
-    {"type": "code_execution_20260120", "name": "code_execution"},
-    {"name": "fetch_workspace_task", "input_schema": {...},
-     "allowed_callers": ["code_execution_20260120"]},
-]
-```
-
-Using my API key, the measured fan-out run went from 9,494 to 6,910 billed input tokens, with the exact winner returned from the sandbox. That is 27% fewer billed input tokens than the same Claude agent without programmatic tool calling.
-
-Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
-
-Run it in about two minutes for $0.08:
-
-```bash
-git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
-export ANTHROPIC_API_KEY=your-api-key
-make programmatic_tool_calling
-```
-
-To try it on Tasklet's shape, edit `programmatic_tool_calling/my_tool.py` with one work-app tool and the inputs it fans out over.
-
-Happy building,
-
---Chris Fregly
-
-Applied AI, Startups, Anthropic
-
-### Silmaril: security route for prompt-injection defense
-
-Subject: Congrats on YC! A security route for prompt-injection defense
-
-Hey Aum,
-
-Congrats on YC.
-
-I saw Silmaril is building prompt-injection defense that self-improves for AI-native applications and agents. I made four small public security artifacts for this boundary question: which tool action is high risk, which injected instructions should block or ask, what evidence gets logged, how MCP authorization is scoped, and which official source supports each security-control line.
-
-The security surface I would map first is the exact boundary your product defends: model input, retrieved content, tool call, action policy, operator review, and buyer evidence.
-
-The prompt-injection preflight is here:
-
-https://github.com/cfregly/claude-feature-hits/tree/main/tool_boundary_security
-
-The audit-evidence check is here:
-
-https://github.com/cfregly/claude-feature-hits/tree/main/audit_evidence_security
-
-The MCP authorization check is here:
-
-https://github.com/cfregly/claude-feature-hits/tree/main/mcp_authorization_security
-
-The source-backed claims guard is here:
-
-https://github.com/cfregly/claude-feature-hits/tree/main/security_claims_guard
-
-Run all four with `make security`. The audit, MCP auth, and source-backed claim guards are $0.00 and need no API key or network. The prompt-injection preflight makes twelve live Claude calls for $0.04 and passes 12/12 model decisions, with 0 unsafe tool executions.
-
-The test I would build with you is not generic:
-
-```text
-attacker input -> model/tool boundary -> allowed action?
-expected: block, ask, or continue
-evidence: tool call, refusal, source, and audit event
-```
-
-If useful, reply with one prompt-injection workflow you use in demos. I can point you to the closest Claude security pattern, the eval shape, and the source line I would map it to.
-
-Happy building,
-
---Chris Fregly
-
-Applied AI, Startups, Anthropic
+{your_name}
+Building with Claude

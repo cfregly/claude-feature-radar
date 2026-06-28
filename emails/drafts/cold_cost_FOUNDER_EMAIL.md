@@ -1,56 +1,59 @@
-Subject: A Claude tool-calling pattern for fan-out agents
+Subject: Congrats on YC! A sandbox pattern for customer-evidence agents
 
 Hey {first_name},
 
-Congrats on the batch. Quick builder note if you are running an agent that calls a tool many times
-over data it then crunches: usage summaries across a cohort, plan-limit checks across accounts, log or
-trace triage.
+Congrats on the batch, that is a real milestone. Quick builder tip in case it helps.
 
-The problem is the bill. Every tool output flows into the model's context, so you pay input tokens for
-all of it, even the outputs the model only sums and throws away.
+If your agent decides which customers are at risk, it often has to fan out across support tickets,
+product logs, usage metering, CRM notes, and compliance docs. Direct tool use sends every raw row
+back through the model context. You pay for the rows, even when the final answer only needs a compact
+decision packet.
 
-Claude has one change for this, no beta header. Mark your tool so the model can call it from a sandbox
-script, and add the code execution tool. The model writes one script that loops your tool, aggregates
-in the sandbox, and returns only the answer. The bulky outputs stay in the sandbox.
+[Programmatic tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling)
+moves that reduction into Claude's code sandbox. Claude writes Python that calls your own tool,
+rejects malformed rows, joins evidence by account, sums risk points, preserves evidence IDs and
+caveats, and returns only the top accounts to the model.
+
+You add the code execution tool, then one field to the tool you already pass:
 
 ```python
-tools = [
-    {"type": "code_execution_20260120", "name": "code_execution"},   # add this
-    {
-        "name": "get_usage",
-        "description": "Return the usage entries for one account.",
-        "input_schema": {...},
-        "allowed_callers": ["code_execution_20260120"],              # and this
-    },
-]
+response = client.messages.create(
+    model="claude-sonnet-4-6",
+    messages=[...],
+    tools=[
+        {"type": "code_execution_20260120", "name": "code_execution"},
+        { "name": "query_customer_evidence", "input_schema": {...},
+          "allowed_callers": ["code_execution_20260120"] },
+    ],
+)
 ```
 
-I measured it on the same fan-out twice, same model (Sonnet 4.6), same answer required (240 outputs across
-4 cohorts, find the top one):
+Same task, same model, the only change is the feature on or off:
 
-| mode | billed input tokens |
-|---|--:|
-| plain tool use | 9,494 |
-| programmatic | 6,910 |
+| run | billed input tokens | what it means |
+|---|---:|---|
+| without programmatic tool calling | 54,989 | every raw evidence row lands in the model context |
+| with programmatic tool calling | 14,299 | only the compact decision packet reaches the model |
 
-That is about 27% fewer billed input tokens than the same Claude agent without programmatic tool
-calling, and the sandbox returned the exact winner. It pays off on the fan-out shape, many calls over
-data the model then crunches.
+That is 74% fewer billed input tokens on my run, with the same three accounts returned:
+`acct_1842`, `acct_2199`, and `acct_7731`.
 
-Cost caveat: that is token/API cost. Code execution runtime can bill separately after the monthly free
-allowance, so production COGS should add runtime charge, correctness, latency, and failures before
-calling it an all-in savings claim.
+I ran it using my own API key for estimated $0.08 token/API cost. To see it yourself:
 
-Run it on your own tool: edit one file, programmatic_tool_calling/my_tool.py, paste your tool dict and
-the Python that runs it, then `make programmatic_tool_calling` ($0.08 token/API cost using your API key).
+```
+git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
+export ANTHROPIC_API_KEY=your-api-key
+make programmatic_tool_calling
+```
 
-Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
+Full artifact, demo GIF, code, and sample output:
+https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
 
 Docs: https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 
-If you reply with the bottleneck you are working through, I can point you to the closest Claude pattern.
+To run it on your own data, open `programmatic_tool_calling/founder_workload.py`, drop in your tool and
+fan-out task, and run `make programmatic_tool_calling` again.
 
 Happy building,
-
---Chris Fregly
+{your_name}
 Building with Claude

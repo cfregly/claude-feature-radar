@@ -30,14 +30,14 @@ def _row(key="search_results", status="changed", command="make search-results"):
 
 def test_stale_rows_dedupe_into_workload_jobs():
     report = {"stale": [
-        _row("prompt_caching", command="make ptc-cache-context"),
-        _row("context_windows", command="make ptc-cache-context"),
+        _row("prompt_caching", command="make programmatic-tool-calling-cache-context"),
+        _row("context_windows", command="make programmatic-tool-calling-cache-context"),
     ]}
 
     jobs = resolve.build_jobs(report)
 
     assert len(jobs) == 1
-    assert jobs[0].key == "ptc_cache_context"
+    assert jobs[0].key == "programmatic_tool_calling_cache_context"
     assert len(jobs[0].rows) == 2
 
 

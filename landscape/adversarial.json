@@ -13,7 +13,7 @@
         {
           "key": "programmatic_tool_calling",
           "verdict": "SURVIVES",
-          "why": "Keeping custom-tool outputs out of context while the model drives the loop yields a measured ~27% token cut on a same-answer run, and recreating it on OpenAI/Gemini requires building a whole sandbox-plus-tool-dispatch runtime that no native feature provides, not trivial glue."
+          "why": "Keeping custom-tool outputs out of context while the model drives the loop yields a measured 74% billed-input-token cut on a same-answer run, and recreating it on OpenAI/Gemini requires building a whole sandbox-plus-tool-dispatch runtime that no native feature provides, not trivial glue."
         },
         {
           "key": "task_budgets",

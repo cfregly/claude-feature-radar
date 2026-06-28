@@ -151,7 +151,7 @@ def write_snapshot(src, text: str, date: str) -> str:
     page is immediately citable. Returns the repo-relative path.
 
     A few snapshots are hand-curated verbatim excerpts that engine/cite_facts.py grounds specific
-    facts against (the PTC 24%, the Citations free-quote line, the pricing rows). The automatic
+    facts against (the programmatic tool calling claim, the Citations free-quote line, the pricing rows). The automatic
     full-page fetch carries chrome and collapsed whitespace and does not reliably contain every
     curated sentence, so it must NEVER clobber a curated snapshot. When the canonical dated path
     already holds a curated snapshot, the auto-fetched page is written to a `.raw.txt` sibling
@@ -276,7 +276,7 @@ def _lead_score(claude_cap: dict, competitor_caps: list[dict], all_fetched_ok: b
     """value times GENUINE lead, the CLAUDE.md rule. Returns (lead_score, verdict).
 
     lead_score 2: no competitor capability with a matching key AND every competitor source fetched
-                  this run (a real absence-of-evidence lead, the PTC case). If any competitor source
+                  this run (a real absence-of-evidence lead, the programmatic-tool-calling case). If any competitor source
                   did NOT fetch, the absence is unknown, not a lead: score 0, verdict never-evaluated.
     lead_score 1: a competitor has the key but Claude's status is ahead (beta-vs-none, ga-vs-preview).
     lead_score 0: parity or behind. Sorted aside, never pitched. Honesty posture: lead with losses.

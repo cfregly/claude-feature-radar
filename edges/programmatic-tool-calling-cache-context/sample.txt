@@ -1,0 +1,22 @@
+
+  programmatic tool calling + cache + 1M-context cost cliff (deterministic, $0):
+
+    committed programmatic tool calling receipt: 54,989 -> 14,299 billed input tokens (74.0% lower)
+    modeled workload: 700,000-token stable prefix, 100 turns, 200,000 raw tool-output tokens/turn vs 2,000 programmatic summary tokens/turn
+
+    scenario                                      total cost
+    --------------------------------------------------------
+    claude_no_cache_no_programmatic            $   270.45
+    claude_cache_no_programmatic               $    85.44
+    openai_best_cache_1m_no_programmatic       $   135.55
+    gemini_best_cache_1m_no_programmatic       $    40.67
+    claude_cache_programmatic                  $    26.04
+
+    cliff:
+    - Claude cache+programmatic tool calling saves $59.40 vs Claude cache without programmatic tool calling (69.5% lower)
+    - Claude cache+programmatic tool calling saves $109.51 vs GPT-5.5 1M+cache without programmatic tool calling (80.8% lower)
+    - Claude cache+programmatic tool calling saves $14.63 vs Gemini 3.5 Flash 1M+cache without programmatic tool calling (36.0% lower)
+    - 700k prefix fits a 1M window: True; fits a 400k window: False
+
+  wrote receipts to data/last_programmatic_tool_calling_cache_context.json and edges/programmatic-tool-calling-cache-context/receipt.json
+

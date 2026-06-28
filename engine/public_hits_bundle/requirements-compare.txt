@@ -1,0 +1,3 @@
+# Optional. Only needed for `make <artifact> COMPARE=1`.
+openai>=2.0
+google-genai>=2.0

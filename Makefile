@@ -7,7 +7,7 @@ VERIFY_JUDGES ?= claude,openai
 HITS_DIR ?= ../claude-feature-hits
 MISSES_KIND ?= misses
 MISSES_DIR ?= ../claude-feature-$(MISSES_KIND)
-.PHONY: setup compare-deps mcp-deps mcp app app-check programmatic-tool-calling ptc-cache-context citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges check-freshness freshness-report resolve-freshness resolve-freshness-apply cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost security-posture security draft publish-brief publish-misses check-claims check-docs core-imports check-surface check-split check-receipts test ci deslop gif clean
+.PHONY: setup compare-deps mcp-deps mcp programmatic-tool-calling programmatic-tool-calling-cache-context citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges check-freshness freshness-report resolve-freshness resolve-freshness-apply cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost security-posture security draft publish-hits publish-brief publish-misses check-claims check-docs core-imports check-surface check-split check-receipts check-stale-programmatic-tool-calling test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -28,17 +28,11 @@ mcp-deps: ## install the optional MCP Python SDK into the SAME venv, for the cha
 mcp: ## MCP SERVER (stdio): drive the engine from a chat window. Read tools + the $0 discovery loop run free; publish and benchmark are ASK and refuse without confirm. Needs make mcp-deps once.
 	$(PY) -m engine.mcp_server
 
-app: ## FORKABLE APP: run the fan-out task over your own tool (app/my_tool.py), print your before-and-after token bill (needs ANTHROPIC_API_KEY, about $0.08)
-	$(PY) -m app.run_tokens
-
-app-check: ## the app self-test: run the shipped example and assert the PTC invariant (Mode B bills fewer input tokens AND answers correctly) before you trust it on your own tool (about $0.08)
-	$(PY) -m app.run_tokens --check
-
 programmatic-tool-calling: ## EDGE: programmatic tool calling, the input-token receipt on a fan-out task (needs ANTHROPIC_API_KEY, about $0.08)
 	$(PY) edges/programmatic-tool-calling/demo.py
 
-ptc-cache-context: ## EDGE MODEL: PTC + cache + 1M-context cost cliff over verified prices (NO API call, $0)
-	$(PY) run.py ptc-cache-context
+programmatic-tool-calling-cache-context: ## EDGE MODEL: programmatic tool calling + cache + 1M-context cost cliff over the committed receipt (NO API call, $0)
+	$(PY) run.py programmatic-tool-calling-cache-context
 
 citations: ## EDGE: Claude Citations, a verifiable per-character source pointer into your user's own documents, one Claude arm (needs ANTHROPIC_API_KEY, $0.01)
 	$(PY) edges/citations/demo.py
@@ -195,6 +189,9 @@ draft: ## draft the founder email from the measured receipt
 publish-brief: ## generate a self-contained public brief for a VERIFIED Claude-win edge into ../claude-feature-hits (the comparison gate defaults OFF, offline, $0, writes files only, never pushes/sends)
 	$(PY) -m engine.publish_brief --edge=$(EDGE)
 
+publish-hits: ## regenerate the canonical public claude-feature-hits code bundle from engine/public_hits_bundle
+	$(PY) -m engine.publish_hits --hits-root $(HITS_DIR)
+
 publish-misses: ## republish the 7 head-to-head briefs into MISSES_ROOT with the comparison gate defaulted ON (the always-full both-directions mirror). Set MISSES_ROOT to the private both-directions checkout, offline, $0
 	@test -n "$(MISSES_ROOT)" || { echo "set MISSES_ROOT=<path to the private both-directions head_to_head dir>"; exit 1; }
 	@for e in pdf-citations search-results grounding-stack web-citations bulk-extended-output exact-list-ledger code-execution-state; do \
@@ -220,13 +217,16 @@ check-split: ## split gate: public wins stay in hits, private misses stay in the
 check-receipts: ## receipt-drift gate: every measured number in the prose traces to a committed receipt (offline, $0)
 	$(PY) scripts/check_receipts.py
 
+check-stale-programmatic-tool-calling: ## stale programmatic-tool-calling guard: old region-sales fixture cannot re-enter live generated surfaces
+	$(PY) scripts/check_stale_programmatic_tool_calling.py
+
 test: ## the offline test suite (the gate boundary, the dispatch seam, the shared infra, no key, no network)
 	$(PY) -m pytest -q
 
 deslop: check-claims ## prose gate (em-dashes, en-dashes, semicolons) plus the citations cost-claim gate
 	$(PY) scripts/deslop_check.py
 
-ci: deslop check-docs core-imports check-surface check-split check-receipts test ## the full offline gate chain, the same one CI runs ($0)
+ci: deslop check-docs core-imports check-surface check-split check-receipts check-stale-programmatic-tool-calling test ## the full offline gate chain, the same one CI runs ($0)
 	@echo "ci: all offline gates passed."
 
 gif: ## regenerate docs/demo.gif from demo.tape (needs vhs, ffmpeg, ttyd)

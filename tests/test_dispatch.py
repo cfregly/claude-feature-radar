@@ -93,7 +93,7 @@ def test_dispatch_routes_a_built_edge_with_a_surfaced_estimate():
     r = dispatch(edge)
     assert r.covered is True
     assert r.demo_kind == "token_accounting"
-    assert r.estimate is not None and r.estimate.usd > 0  # PTC spends a credit
+    assert r.estimate is not None and r.estimate.usd > 0  # programmatic tool calling spends a credit
     assert r.gate == "ask"                                  # so it waits for approval
     assert r.estimate.command == "make programmatic-tool-calling"
 
@@ -184,7 +184,7 @@ def test_claude_ahead_holds_when_a_competitor_arm_did_not_run():
 
 def test_claude_ahead_stands_on_an_all_fetched_absence_of_evidence():
     # When the lead rests on a documented absence and every source fetched, the verdict stands even
-    # with no competitor arm to run (the PTC case: no named equivalent exists to run an arm against).
+    # with no competitor arm to run (programmatic tool calling has no named equivalent to run against).
     verdict, note = reconcile_verdict("claude-ahead", _claude_arm(), [], "absence-of-evidence")
     assert verdict == "claude-ahead"
 
@@ -222,7 +222,7 @@ def test_build_receipt_applies_the_contract():
 
 def test_audit_flags_a_spend_proposed_without_a_surfaced_estimate():
     from engine import gate
-    routing = [{"key": "programmatic_tool_calling", "gate": gate.ASK, "demonstrator": "PTCDemonstrator",
+    routing = [{"key": "programmatic_tool_calling", "gate": gate.ASK, "demonstrator": "ProgrammaticToolCallingDemonstrator",
                 "estimate_surfaced": False}]
     violations = gate.audit([], routing)
     assert violations and any("surfaced estimate" in v for v in violations)
@@ -230,7 +230,7 @@ def test_audit_flags_a_spend_proposed_without_a_surfaced_estimate():
 
 def test_audit_passes_a_spend_with_a_surfaced_estimate():
     from engine import gate
-    routing = [{"key": "programmatic_tool_calling", "gate": gate.ASK, "demonstrator": "PTCDemonstrator",
+    routing = [{"key": "programmatic_tool_calling", "gate": gate.ASK, "demonstrator": "ProgrammaticToolCallingDemonstrator",
                 "estimate_surfaced": True}]
     assert gate.audit([], routing) == []
 
@@ -272,4 +272,4 @@ def test_grounding_correction_leaves_other_edges_untouched():
     edge = {"key": "programmatic_tool_calling", "axis": "cost", "verdict": "claude-ahead", "lead_score": 2, "score": 6,
             "fair_comparison": {"lead_basis": "absence-of-evidence"}}
     out = scan.apply_grounding_correction(edge)
-    assert out["verdict"] == "claude-ahead" and out["lead_score"] == 2  # PTC is a genuine lead, untouched
+    assert out["verdict"] == "claude-ahead" and out["lead_score"] == 2  # programmatic tool calling is a genuine lead

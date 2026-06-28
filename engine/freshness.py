@@ -32,8 +32,8 @@ STALE_STATUSES = {"changed", "missing_baseline", "unknown"}
 
 RERUN_COMMANDS = {
     "programmatic_tool_calling": "make programmatic-tool-calling",
-    "prompt_caching": "make ptc-cache-context",
-    "context_windows": "make ptc-cache-context",
+    "prompt_caching": "make programmatic-tool-calling-cache-context",
+    "context_windows": "make programmatic-tool-calling-cache-context",
     "code_execution": "make programmatic-tool-calling",
     "citations": "make citations-paraphrase",
     "pdf_support": "make pdf-citations",

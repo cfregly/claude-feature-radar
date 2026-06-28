@@ -48,7 +48,7 @@ ALWAYS_ACTIONS = [
 
 # What waits for you. Anything that changes your repo or spends credits.
 ASK_ACTIONS = [
-    Action("run_benchmark", ASK, True, "Run a credit-spending benchmark (the PTC grid, compare, longhorizon, citations).",
+    Action("run_benchmark", ASK, True, "Run a credit-spending benchmark (programmatic tool calling, compare, longhorizon, citations).",
            "A benchmark spends real credits, so it runs only on your explicit token."),
     Action("scaffold_edge", ASK, True, "Scaffold or refresh an edges/<key>/ bundle in the committed tree.",
            "Writing a new published bundle into the repo is your call, not a loop step."),

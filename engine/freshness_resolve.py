@@ -20,6 +20,7 @@ from pathlib import Path
 
 from common.client import repo_root
 from engine import adversarial, freshness, scan
+from engine.public_hits import PublicHitsPublishError, active_artifacts, copy_artifact
 
 DECISIONS = {"promote", "hold", "miss"}
 INFRA_MARKERS = (
@@ -49,6 +50,8 @@ class Artifact:
     edge_dir: str = ""
     active_public: bool = False
     public_adapter: bool = False
+    run_module: str = ""
+    check_args: tuple[str, ...] = ("--check",)
     estimate_usd: float = 0.10
     required_env: tuple[str, ...] = ("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "GEMINI_API_KEY")
 
@@ -88,19 +91,21 @@ REGISTRY: dict[str, Artifact] = {
         edge_dir="edges/programmatic-tool-calling",
         active_public=True,
         public_adapter=True,
+        run_module="programmatic_tool_calling.compare_direct_vs_programmatic",
         estimate_usd=0.08,
         required_env=("ANTHROPIC_API_KEY",),
     ),
-    "ptc_cache_context": Artifact(
-        key="ptc_cache_context",
-        hits_slug="ptc_cache_context",
+    "programmatic_tool_calling_cache_context": Artifact(
+        key="programmatic_tool_calling_cache_context",
+        hits_slug="programmatic_tool_calling_cache_context",
         misses_slug="programmatic-tool-calling",
-        rerun_command="make ptc-cache-context",
+        rerun_command="make programmatic-tool-calling-cache-context",
         source_keys=("prompt_caching", "context_windows", "programmatic_tool_calling"),
-        receipt_paths=("data/last_ptc_cache_context.json", "edges/programmatic-tool-calling/ptc-cache-context.json"),
+        receipt_paths=("data/last_programmatic_tool_calling_cache_context.json", "edges/programmatic-tool-calling-cache-context/receipt.json"),
         edge_dir="edges/programmatic-tool-calling",
         active_public=True,
         public_adapter=True,
+        run_module="programmatic_tool_calling_cache_context.compare_cache_context_programmatic",
         estimate_usd=0.08,
         required_env=("ANTHROPIC_API_KEY",),
     ),
@@ -407,6 +412,11 @@ def _write_hits_manifest(hits_dir: Path, manifest: dict) -> None:
 
 
 def _copy_public_artifact(artifact: Artifact, hits_dir: Path) -> list[str]:
+    if artifact.hits_slug in active_artifacts():
+        try:
+            return list(copy_artifact(artifact.hits_slug, hits_dir / artifact.hits_slug))
+        except PublicHitsPublishError as exc:
+            raise RuntimeError(str(exc)) from exc
     src_dir = repo_root() / artifact.edge_dir
     dst_dir = hits_dir / artifact.hits_slug
     copied: list[str] = []
@@ -459,8 +469,8 @@ def apply_hits(job: Job, hits_dir: Path, date: str) -> None:
         row.update({
             "status": "active",
             "make_target": artifact.hits_slug,
-            "run_module": f"{artifact.hits_slug}.run",
-            "check_args": ["--check"],
+            "run_module": artifact.run_module or f"{artifact.hits_slug}.run",
+            "check_args": list(artifact.check_args),
             "cost_usd": f"{artifact.estimate_usd:.2f}",
         })
         job.applied.append(f"hits manifest active {artifact.hits_slug}")

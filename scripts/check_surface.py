@@ -79,7 +79,7 @@ SIBLING_BRIEFS = ROOT.parent / "claude-feature-hits"
 SIBLING_SECURITY_TERM_DIRS = ()
 SIBLING_SECURITY_RUNNERS = ()
 SIBLING_BRIEF_GLOBS = [
-    "README.md", "*/README.md", "*/run.py", "*/run_tokens.py", "*/cite.py", "*/my_tool.py",
+    "README.md", "*/README.md", "*/run.py", "*/compare_*.py", "*/cite.py", "*/founder_workload.py",
     "*/sample.txt", "*/compare_sample.txt", "*/controls.json",
 ]
 

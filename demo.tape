@@ -13,12 +13,12 @@ Set Height 640
 Set Padding 14
 Set TypingSpeed 0.004
 
-Type "# programmatic tool calling: about 28% fewer billed input tokens on a fan-out task"
+Type "# programmatic tool calling: 74% fewer billed input tokens on a customer-evidence fan-out task"
 Enter
 Sleep 700ms
 Type "make programmatic-tool-calling   # about $0.08 on a real run; below is the committed receipt, replayed for $0"
 Enter
 Sleep 700ms
-Type `printf '\n  Task: across 4 regions (240 sales rows total), find the highest-revenue region.\n  Same task, same model (Sonnet 4.6), both ways.\n\n  mode                                      billed input tok    what happens to the 240 rows\n  --------------------------------------------------------------------------------------------\n  plain tool use                                       9,451    all 240 rows flow through the model context\n  programmatic (allowed_callers)                       6,828    the sandbox aggregates, only the answer (east) reaches the model\n  --------------------------------------------------------------------------------------------\n  -> 28%% fewer billed input tokens, and the sandbox returns the exact winner (east).\n\n  full receipt: edges/programmatic-tool-calling/sample.txt\n\n'`
+Type `printf '\n  Task: from support tickets, product logs, usage, CRM notes, and compliance docs,\n  find the three customer accounts most likely to churn or block expansion.\n\n  mode                                      billed input tok    what happens to the evidence rows\n  --------------------------------------------------------------------------------------------\n  plain tool use                                      54,989    all rows flow through the model context\n  programmatic (allowed_callers)                      14,299    sandbox reduces, only the compact packet returns\n  --------------------------------------------------------------------------------------------\n  -> 74%% fewer billed input tokens, with acct_1842, acct_2199, and acct_7731 returned.\n\n  full receipt: edges/programmatic-tool-calling/sample.txt\n\n'`
 Enter
 Sleep 2200ms

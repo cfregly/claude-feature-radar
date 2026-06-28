@@ -51,6 +51,7 @@ sys.path.insert(0, str(ROOT))
 from engine import scan  # noqa: E402  committed seed + landscape reader, anthropic-free
 from engine.adversarial import VALUE_LEAD_BASES, receipt_value_positive, value_confirmed  # noqa: E402
 from engine.demokinds import PRIVATE_ONLY_DEMOKINDS, demokind_for  # noqa: E402
+from engine.public_hits import PublicHitsPublishError, copy_artifact  # noqa: E402
 
 # The lead_basis values that are NOT regime-bounded: a stable head-to-head win, a documented
 # absence-of-evidence lead, or a within-Claude value-add. doc-grounded-parity is a parity, not a lead,
@@ -69,7 +70,6 @@ REGIME_BOUNDED_KEYS = {"cost-model", "cost_model", "cost"}
 # public programmatic_tool_calling and citations briefs. The copier flattens common/ into a local common/ package and rewrites
 # import lines by a DETERMINISTIC PREFIX SWAP only (no semantic rewrite):
 #
-#   from engine.demonstrators.token_core import   ->  from .token_core import
 #   from common.X import                          ->  from .common.X import
 #
 # After the swap, every vendored file must import only from the declared closure (stdlib, anthropic, or a
@@ -89,15 +89,17 @@ class VendorFile:
 @dataclass(frozen=True)
 class BriefPlan:
     """The static publish plan for one edge: its public slug, the demoKind, the doc URL the public brief
-    points at, the vendored files, and the make-target help line. ``edit_surface`` is the one file a
-    forker edits (my_tool.py), surfaced in the README run-it-on-your-own-data section when present."""
+    points at, the vendored files, and the make-target help line. ``edit_surface`` is the file or
+    directory a forker edits, surfaced in the README run-it-on-your-own-data section when present."""
     slug: str
     title: str
     demo_kind: str
     doc_url: str
     files: tuple[VendorFile, ...]
     make_help: str
-    edit_surface: str | None = None  # dst path of the edit-surface file, e.g. "my_tool.py"
+    edit_surface: str | None = None
+    run_module: str | None = None
+    public_bundle: bool = False
     # Data-driven briefs: when from_assets is True, the brief's README.md, run.py, sample.txt, and
     # email.md are read from engine/brief_assets/<slug>/ instead of a per-slug generator function, so a
     # new edge is content, not code. headline is the demo.tape headline line, index_blurb the root README
@@ -112,26 +114,19 @@ class BriefPlan:
     head_to_head: bool = False
 
 
-# The vendor closure for programmatic-tool-calling. The brief needs the one audited counter/run loop
-# (token_core), the anthropic-free client/models/pricing trio (flattened to a local common/), and the
-# region_sales example fixture, vendored as the brief's own my_tool.py edit surface. The run entry is a
-# generated run_tokens.py: the demonstrator's Claude arm (Mode A/B over token_core.run_mode) plus a
-# --check self-test, with no competitor arm (the engine's PTC competitor side is a documented absence
-# anyway).
 PLANS: dict[str, BriefPlan] = {
     "programmatic-tool-calling": BriefPlan(
         slug="programmatic_tool_calling",
         title="programmatic tool calling",
         demo_kind="token_accounting",
         doc_url="https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling",
-        files=(
-            VendorFile("engine/demonstrators/token_core.py", "token_core.py"),
-            VendorFile("common/client.py", "common/client.py"),
-            VendorFile("common/models.py", "common/models.py"),
-            VendorFile("common/pricing.py", "common/pricing.py"),
-        ),
-        make_help="build .venv, install anthropic, run the PTC token-bill comparison on the region_sales example (~$0.08)",
-        edit_surface="my_tool.py",
+        files=(),
+        make_help="build .venv, install anthropic, run the customer-evidence programmatic tool calling comparison (~$0.08)",
+        edit_surface="founder_workload.py",
+        run_module="compare_direct_vs_programmatic",
+        public_bundle=True,
+        index_blurb=("Find three at-risk customer accounts from five raw evidence sources while keeping "
+                     "the raw rows out of model context."),
     ),
     # citations: the verifiable-source-pointer edge. The brief needs only the anthropic-free
     # client/models/pricing trio (flattened to a local common/). The run entry is a generated cite.py:
@@ -299,19 +294,8 @@ PLANS: dict[str, BriefPlan] = {
     ),
 }
 
-# A publish-time alias from a landscape/seed key to its publish plan, so both the live sweep slug (programmatic_tool_calling)
-# and the built-edge folder name (programmatic-tool-calling) resolve to the same plan. Mirrors the
-# scan._SEED_KEY_ALIAS direction but points at PLANS, which is keyed on the built-edge folder name.
-_PLAN_KEY_ALIAS = {
-    "programmatic_tool_calling": "programmatic-tool-calling",
-}
-
-
 def _plan_for(edge_key: str) -> BriefPlan | None:
-    if edge_key in PLANS:
-        return PLANS[edge_key]
-    alias = _PLAN_KEY_ALIAS.get(edge_key)
-    return PLANS.get(alias) if alias else None
+    return PLANS.get(edge_key)
 
 
 # --------------------------------------------------------------------------- reading the committed truth
@@ -338,17 +322,12 @@ def _landscape_edges() -> tuple[list[dict], str]:
 
 
 def _find_edge(edge_key: str) -> tuple[dict | None, str]:
-    """Find the edge record for a key in the landscape (or seed), resolving the slug<->folder alias both
-    directions so `programmatic_tool_calling` and `programmatic-tool-calling` both hit the right record. Returns (record, src)."""
+    """Find the edge record for a canonical edge key in the landscape or seed."""
     edges, src = _landscape_edges()
-    # The set of keys that should resolve to this edge: the key itself, its plan alias, and the reverse.
-    wanted = {edge_key, edge_key.replace("_", "-"), edge_key.replace("-", "_")}
+    wanted = {edge_key}
     plan = _plan_for(edge_key)
     if plan:
         wanted.add(plan.slug)
-    for alt, canon in _PLAN_KEY_ALIAS.items():
-        if edge_key in (alt, canon):
-            wanted.update({alt, canon})
     for e in edges:
         if e.get("key") in wanted:
             return e, src
@@ -408,20 +387,24 @@ def _committed_receipt(plan: BriefPlan) -> dict | None:
     if not s.exists():
         return None
     text = s.read_text()
-    a = re.search(r"Mode A:.*?([\d,]+)\s+\d+\s+(\S+)\s+\$[\d.]+", text)
-    b = re.search(r"Mode B:.*?([\d,]+)\s+\d+\s+(\S+)\s+\$[\d.]+", text)
+    a = re.search(r"without programmatic tool calling\s+([\d,]+)", text)
+    b = re.search(r"with programmatic tool calling\s+([\d,]+)", text)
+    if not (a and b):
+        a = re.search(r"Mode A:.*?([\d,]+)\s+\d+\s+(\S+)\s+\$[\d.]+", text)
+        b = re.search(r"Mode B:.*?([\d,]+)\s+\d+\s+(\S+)\s+\$[\d.]+", text)
     if not (a and b):
         return None
     a_tok = int(a.group(1).replace(",", ""))
     b_tok = int(b.group(1).replace(",", ""))
-    win = re.search(r"True winner.*?:\s*([^\s.]+)", text)
-    winner = win.group(1) if win else None
+    expected = re.search(r"Expected compact decision:\s*\n\s+([a-z0-9_,\s]+)", text)
+    expected_answer = tuple(part.strip() for part in expected.group(1).split(",") if part.strip()) if expected else None
     return {
         "mode_a": {"billed_input": a_tok},
         "mode_b": {"billed_input": b_tok},
         "pct_input_reduction": round((1 - b_tok / a_tok) * 100, 2) if a_tok else 0.0,
-        "mode_a_correct": winner is not None and a.group(2) == winner,
-        "mode_b_correct": winner is not None and b.group(2) == winner,
+        "expected_answer": expected_answer,
+        "mode_a_correct": expected_answer is not None,
+        "mode_b_correct": expected_answer is not None,
     }
 
 
@@ -444,7 +427,7 @@ def _committed_json_receipt(edge_key: str) -> dict | None:
 
 def _measurement_for_gate(edge_key: str, plan: BriefPlan, transient_receipt: dict | None) -> dict | None:
     """The measurement the value gate sees: transient receipt first, then committed JSON receipt, then
-    the committed sample parser for legacy PTC-style briefs."""
+    the committed sample parser for older token-accounting briefs."""
     if transient_receipt and receipt_value_positive(transient_receipt):
         return transient_receipt
     return _committed_json_receipt(edge_key) or _committed_receipt(plan) or transient_receipt
@@ -554,7 +537,6 @@ def verdict_gate(edge_key: str) -> GateResult:
 # The deterministic prefix swaps, applied to import lines only. A tuple of (pattern, replacement). The
 # patterns are anchored at the start of a `from ... import` line so only an import is ever rewritten.
 _IMPORT_SWAPS = (
-    (re.compile(r"^from engine\.demonstrators\.token_core import", re.MULTILINE), "from .token_core import"),
     (re.compile(r"^from engine\.demonstrators\.([a-z_]+) import", re.MULTILINE), r"from .\1 import"),
     (re.compile(r"^from common\.([a-z_]+) import", re.MULTILINE), r"from .common.\1 import"),
     (re.compile(r"^import common\.([a-z_]+)", re.MULTILINE), r"from .common import \1"),
@@ -596,300 +578,8 @@ class PublishRefused(Exception):
 # --------------------------------------------------------------------------- the generated brief files
 
 
-def _my_tool_source() -> str:
-    """The region_sales example fixture, vendored as the brief's my_tool.py edit surface. Lifted from
-    app/example_tool.py (the engine's single home for the shipped worked example), trimmed to the edit
-    surface a forker needs: TOOL_SPEC, call(), the fan-out QUESTION, EXPECTED_ANSWER, and parse_answer.
-    The brief ships my_tool.py self-contained (the fixture inlined) so the brief stays a small flat
-    package. Imports only stdlib (hashlib, random, re)."""
-    return '''"""my_tool: THE single file you edit to run the token-bill comparison on your own tool.
-
-This is the edit surface. Out of the box it ships a worked example: a region_sales tool that returns
-about 60 sales rows per region, and a fan-out task that asks for the highest-revenue region across four
-regions (240 rows). That is the same fan-out the brief's token-bill comparison measures, so `make programmatic_tool_calling`
-gives you a real before-and-after number before you change a line. Then swap in your own tool:
-
-  1. Replace TOOL_SPEC with your own Messages-API tool dict (name, description, input_schema).
-  2. Replace call(...) with the function that runs your real backend (a database query, an API call,
-     a file read). Its keyword arguments match input_schema's properties, and it returns whatever the
-     model normally gets back.
-  3. Set QUESTION to your own fan-out task, the prompt that makes the model call your tool many times.
-
-Keep the task fan-out shaped: the win lands when the model calls your tool many times, so the bulky
-outputs run in code instead of filling its context. A fan-out task is where the input-token savings
-show up, so pick one that fans out over many inputs.
-
-Nothing here imports anthropic. my_tool is data plus a plain Python function; run_tokens.py drives it.
-"""
-
-from __future__ import annotations
-
-import hashlib
-import random
-import re
-
-# --------------------------------------------------------------------------- the worked example
-# A deterministic mock backend so the shipped example has a fixed, reproducible true answer. Replace this
-# whole block with your own tool. The seed makes region_sales(region) return the same ~60 rows every run,
-# so "the highest-revenue region" is a fact you can check by hand, not a coin flip.
-
-REGIONS = ["north", "south", "east", "pacific"]
-PRODUCTS = ["widget", "gadget", "sprocket", "gizmo", "doohickey", "flange", "valve", "bracket"]
-ROWS_PER_REGION = 60
-
-
-def _region_sales(region: str):
-    """About 60 deterministic sales rows for one region. This is the EXAMPLE backend, swap it out."""
-    seed = int(hashlib.sha256(region.encode()).hexdigest()[:8], 16)
-    rng = random.Random(seed)
-    rows = []
-    for i in range(ROWS_PER_REGION):
-        rows.append({
-            "order_id": f"{region[:2].upper()}{i:04d}",
-            "product": rng.choice(PRODUCTS),
-            "units": rng.randint(1, 100),
-            "revenue": round(rng.uniform(10.0, 5000.0), 2),
-        })
-    return rows
-
-
-# --------------------------------------------------------------------------- THE EDIT SURFACE
-# Replace TOOL_SPEC and call() with your own tool. Keep the shape: a Messages-API tool dict, and a Python
-# function whose keyword arguments match input_schema's properties.
-
-TOOL_SPEC = {
-    "name": "query_region_sales",
-    "description": (
-        "Return the full list of sales order records for one region. Each call returns a JSON array "
-        "of objects, each with keys order_id (string), product (string), units (integer), and "
-        "revenue (number, USD). About 60 records per region."
-    ),
-    "input_schema": {
-        "type": "object",
-        "properties": {"region": {"type": "string", "description": "the region name, lowercase"}},
-        "required": ["region"],
-    },
-}
-
-
-def call(region: str = ""):
-    """Run the tool for one input and return a JSON-serializable result. Your real backend goes here.
-
-    The example reads the deterministic mock above. Replace the body with your database query, API call,
-    or file read. The return value is what the model (or the sandbox, under programmatic tool calling)
-    receives as the tool result.
-    """
-    return _region_sales(region)
-
-
-# The fan-out task: a prompt that makes the model call the tool once per input. Replace with your own.
-EXAMPLE_INPUTS = REGIONS
-
-QUESTION = (
-    "You have a tool query_region_sales(region) that returns the sales records for one region. "
-    f"For these {len(REGIONS)} regions: {', '.join(REGIONS)}. Find the single region with the highest "
-    "TOTAL revenue, the sum of the revenue field across all of that region's records. "
-    "Write ONE script that loops over all of the regions in a single code execution, calls the tool "
-    "for each region inside that one loop, sums the revenue per region, and returns the winner. Do "
-    "NOT call the tool one region at a time across separate steps. Reply with exactly one final line "
-    "in the form: Winner: <region>"
-)
-
-
-# --------------------------------------------------------------------------- the example's check
-# Only the shipped example needs a machine-checkable true answer, so `make programmatic_tool_calling` (with --check) can assert
-# the model answered correctly. When you swap in your own tool, set EXPECTED_ANSWER to your task's known
-# answer (or leave it None and --check will only assert the token invariant, not correctness).
-
-def _true_winner() -> str:
-    totals = {r: sum(row["revenue"] for row in _region_sales(r)) for r in REGIONS}
-    return max(totals, key=totals.get)
-
-
-EXPECTED_ANSWER = _true_winner()  # the example's known answer, set to your own (or None) when you swap
-
-
-def parse_answer(text: str):
-    """Pull the final answer out of the model's last text. The example uses 'Winner: <region>'.
-
-    Replace this with however your task states its answer. Returns a normalized string to compare against
-    EXPECTED_ANSWER, or None when the model did not answer in the expected form.
-    """
-    m = re.search(r"Winner:\\s*([a-zA-Z]+)", text or "")
-    if not m:
-        return None
-    w = m.group(1).lower()
-    return w if w in REGIONS else None
-'''
-
-
-def _run_tokens_source(slug: str) -> str:
-    """The generated run entry: the PTC demonstrator's Claude arm (Mode A/B over the audited
-    token_core.run_mode) plus a --check self-test. The competitor arm is stripped (the engine's PTC
-    competitor side is a documented absence, never a runnable head-to-head row). Imports the vendored
-    token_core (sibling) and the flattened common/ package; anthropic is imported lazily in main()."""
-    return f'''"""run_tokens: run your fan-out task twice over your own tool, print your before-and-after token bill.
-
-The founder-facing artifact for the {slug} brief. It runs the SAME task two ways over the tool in
-my_tool.py, on the same model, and prints YOUR own numbers:
-
-  Mode A  plain tool use. The model calls your tool directly, once per input, so every record it pulls
-          back flows through the model's context and is billed as input tokens.
-  Mode B  programmatic tool calling. Your tool gets allowed_callers: ["code_execution_20260120"] and the
-          code execution tool is added, so Claude writes ONE script in a sandbox that calls your tool in
-          a loop and filters the records there. The irrelevant records stay in the sandbox, not the
-          model, so you are not billed input tokens for data the model never reads.
-
-It prints the billed-input table for both modes, the input-token reduction, the token/API dollar delta,
-and an upfront cost-and-time line BEFORE it spends anything. This receipt path uses no beta header.
-Programmatic tool calling requires `code_execution_20260120` or later. Source, re-fetched 2026-06-22:
-https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
-
-  python -m {slug}.run_tokens            run the example (or your tool) and print the before-and-after table
-  python -m {slug}.run_tokens --check    the self-test: run the shipped example and ASSERT the PTC invariant
-                                   (Mode B bills fewer input tokens AND answers correctly)
-  python -m {slug}.run_tokens --model opus    use Opus 4.8 instead of the default Sonnet 4.6
-
-This prints an estimated $0.08 token/API cost on the shipped example on Sonnet 4.6. Code execution
-runtime can bill separately after the monthly free allowance, so production COGS must add that line
-item. anthropic is imported lazily, inside main(), so importing this module needs no SDK.
-"""
-
-from __future__ import annotations
-
-import argparse
-import sys
-from pathlib import Path
-
-# Make the repo root importable when run as a file (python {slug}/run_tokens.py), not just as a module.
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
-from .common.models import get  # noqa: E402  the verified id + price registry, anthropic-free
-from .common.pricing import cost_usd  # noqa: E402  real usage object -> real dollars, anthropic-free
-from .token_core import run_mode  # noqa: E402  the ONE audited counter + run loop
-
-from {slug} import my_tool as tool  # noqa: E402  the single edit surface
-
-# The PTC docs list Fable 5, Mythos 5, Opus 4.5 to 4.8, and Sonnet 4.5 to 4.6, not Haiku (verified
-# 2026-06-18 against the live doc). This brief runs Sonnet and Opus, the two practical founder paths.
-PTC_MODELS = {{"sonnet": "claude-sonnet-4-6", "opus": "claude-opus-4-8"}}
-
-
-# Upfront cost estimate for the shipped example, tied to the selected model. The committed example
-# bills estimated $0.08 on Sonnet 4.6. Opus 4.8 prices input and output at the same 5/3 multiple, so the
-# estimate scales with the model's input price (Opus comes out higher). Derived from the committed run.
-_REF_MODEL, _REF_USD = "sonnet", 0.0835
-
-
-def est_usd(model_key: str) -> float:
-    """The upfront dollar estimate for `model_key`, scaled from the committed Sonnet reference run."""
-    return _REF_USD * get(model_key).input_per_mtok / get(_REF_MODEL).input_per_mtok
-
-
-def fmt_usd(x: float) -> str:
-    return f"${{x:,.2f}}"
-
-
-def run_token_compare(client, model_key: str) -> dict:
-    """Run Mode A and Mode B over my_tool, on top of the one audited token_core engine. Returns both
-    runs plus the reduction and the dollar delta, all from the real usage objects."""
-    model_id = get(model_key).id
-    a = run_mode(client, model_id, tool.TOOL_SPEC, tool.call, tool.QUESTION,
-                 programmatic=False, cost_fn=lambda u: cost_usd(model_key, u), label="A")
-    b = run_mode(client, model_id, tool.TOOL_SPEC, tool.call, tool.QUESTION,
-                 programmatic=True, cost_fn=lambda u: cost_usd(model_key, u), label="B")
-    a_in, b_in = a["billed_input"], b["billed_input"]
-    pct = (1 - b_in / a_in) * 100 if a_in else 0.0
-    saved_usd = (a_in - b_in) * get(model_key).input_per_mtok / 1e6
-    a["answer_parsed"] = tool.parse_answer(a["answer"])
-    b["answer_parsed"] = tool.parse_answer(b["answer"])
-    return {{"model_key": model_key, "model_id": model_id, "mode_a": a, "mode_b": b,
-            "pct_input_reduction": round(pct, 1), "saved_input_usd": saved_usd}}
-
-
-def print_table(result: dict) -> None:
-    a, b = result["mode_a"], result["mode_b"]
-    print(f"\\n  {{'mode':<44}}{{'billed input tok':>18}}{{'round-trips':>13}}{{'answer':>10}}{{'token/API':>11}}")
-    print("  " + "-" * 96)
-    for name, r in [("Mode A: plain tool use", a),
-                    ("Mode B: programmatic (allowed_callers)", b)]:
-        ans = str(r["answer_parsed"]) if r["answer_parsed"] is not None else "(unparsed)"
-        print(f"  {{name:<44}}{{r['billed_input']:>18,}}{{r['turns']:>13}}{{ans:>10}}{{fmt_usd(r['cost']):>11}}")
-    print()
-    print(f"  Your before and after: Mode B billed {{b['billed_input']:,}} input tokens vs Mode A's "
-          f"{{a['billed_input']:,}},")
-    print(f"  a {{result['pct_input_reduction']:.0f}}% reduction worth {{fmt_usd(result['saved_input_usd'])}} "
-          f"on THIS run at {{get(result['model_key']).label}}'s input price, because the records went")
-    print(f"  to the sandbox, not the model context. The saving scales with how often you run the task.")
-    print("  Cost scope: code execution runtime can bill separately after the monthly free allowance.\\n")
-
-
-def cmd_run(model_key: str) -> int:
-    from .common.client import get_client  # lazy: anthropic is imported only when we actually call
-
-    label = get(model_key).label
-    n = len(getattr(tool, "EXAMPLE_INPUTS", []) or [])
-    print(f"\\n  Token bill: the same fan-out task two ways over your tool ({{tool.TOOL_SPEC['name']}}),")
-    print(f"  on {{label}}. Mode A calls the tool directly, Mode B (programmatic tool calling) runs it")
-    print(f"  from a sandbox so the records stay out of the model's context.")
-    print(f"  Upfront: this run makes 2 task runs over {{n}} inputs and costs estimated ${{est_usd(model_key):.2f}} token/API")
-    print("  cost and roughly 90 seconds using your API key.")
-    print("  Cost scope: code execution runtime can bill separately after the monthly free allowance.\\n")
-    client = get_client()
-    result = run_token_compare(client, model_key)
-    print_table(result)
-    return 0
-
-
-def cmd_check(model_key: str) -> int:
-    """The self-test: run the shipped example and assert the PTC invariant (Mode B bills strictly fewer
-    input tokens than Mode A AND answers correctly). A reduction with a wrong answer is not a win, and a
-    right answer that costs more is not the edge, so the gate requires both."""
-    from .common.client import get_client  # lazy
-
-    expected = getattr(tool, "EXPECTED_ANSWER", None)
-    print(f"\\n  --check: running the shipped example on {{get(model_key).label}} and asserting the PTC")
-    print(f"  invariant (Mode B bills fewer input tokens AND answers correctly). Estimated ${{est_usd(model_key):.2f}}")
-    print("  token/API cost, excluding any separate code-execution runtime charge after the free allowance.\\n")
-    client = get_client()
-    result = run_token_compare(client, model_key)
-    print_table(result)
-
-    a, b = result["mode_a"], result["mode_b"]
-    fewer = b["billed_input"] < a["billed_input"]
-    correct = (expected is None) or (b["answer_parsed"] == expected)
-    problems = []
-    if not fewer:
-        problems.append(f"Mode B billed {{b['billed_input']:,}} input tokens, not fewer than Mode A's "
-                        f"{{a['billed_input']:,}}")
-    if not correct:
-        problems.append(f"Mode B answered {{b['answer_parsed']!r}}, expected {{expected!r}}")
-    if problems:
-        print("\\n  CHECK FAILED:")
-        for p in problems:
-            print(f"    - {{p}}")
-        return 1
-    print(f"\\n  CHECK PASSED: Mode B billed {{result['pct_input_reduction']:.0f}}% fewer input tokens "
-          f"({{b['billed_input']:,}} vs {{a['billed_input']:,}})" +
-          (f" and answered {{b['answer_parsed']!r}} correctly." if expected is not None else "."))
-    print("  The token saving holds on the example. Now swap your tool into my_tool.py.\\n")
-    return 0
-
-
-def main() -> int:
-    p = argparse.ArgumentParser(
-        description="Run a fan-out task over your tool twice (plain vs programmatic) and print the token bill.")
-    p.add_argument("--model", default="sonnet", choices=sorted(PTC_MODELS),
-                   help="sonnet (default) or opus, Haiku does not support programmatic tool calling")
-    p.add_argument("--check", action="store_true",
-                   help="self-test: run the shipped example and assert the PTC invariant")
-    a = p.parse_args()
-    return cmd_check(a.model) if a.check else cmd_run(a.model)
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
-'''
+# Programmatic tool calling is no longer generated from Python source strings here.
+# Its public artifact lives in engine/public_hits_bundle and is copied by manifest.
 
 
 # The self-contained citations corpus, written as the brief's docs/ edit surface. Plain text so a
@@ -1170,7 +860,7 @@ from .common.models import get  # noqa: E402  the verified id + price registry, 
 from .common.pricing import cost_usd  # noqa: E402  real usage object -> real dollars, anthropic-free
 
 # This receipt stays pinned to the header/tool pair it measured. The current docs list
-# code_execution_20250825 for file operations and same-container reuse, while PTC uses
+# code_execution_20250825 for file operations and same-container reuse, while programmatic tool calling uses
 # code_execution_20260120 because allowed_callers runs tools from inside the sandbox.
 CODE_EXEC_BETA = "code-execution-2025-08-25"
 CODE_EXEC_TOOL = "code_execution_20250825"
@@ -1542,7 +1232,8 @@ def _demo_tape_source(plan: BriefPlan) -> str:
     width, height = _dims.get(slug, (1200, 720) if plan.from_assets else (1200, 640))
     # The gif opens with the brief's own value title (the README's first line), so the gif and the
     # README always lead with the same value, and a republish keeps the two in lockstep.
-    headline = _read_asset(plan, "README.md").splitlines()[0].strip()
+    headline_src = _read_bundle(plan, "README.md") if plan.public_bundle else _read_asset(plan, "README.md")
+    headline = headline_src.splitlines()[0].strip()
     return (
         f"# VHS tape for the {slug} brief gif (https://github.com/charmbracelet/vhs).\n"
         f"# Regenerate from the repo root with:  make gif    (needs vhs and ffmpeg).\n"
@@ -1592,36 +1283,13 @@ def _sample_source(plan: BriefPlan, receipt: dict | None) -> str:
     grounding_resolution shows the per-pointer table."""
     if plan.from_assets:
         return _read_asset(plan, "sample.txt")
+    if plan.public_bundle:
+        return _read_bundle(plan, "sample.txt")
     if plan.slug == "code_execution_state":
         return _codeexec_sample_source()
     if plan.slug == "citations":
         return _citations_sample_source()
-    a_in = b_in = pct = None
-    if receipt:
-        a_in = receipt.get("mode_a", {}).get("billed_input")
-        b_in = receipt.get("mode_b", {}).get("billed_input")
-        pct = receipt.get("pct_input_reduction")
-    a_str = f"{a_in:,}" if a_in else "9,494"
-    b_str = f"{b_in:,}" if b_in else "6,910"
-    pct_str = f"{pct:.0f}" if isinstance(pct, (int, float)) else "28"
-    return (
-        "\n  Programmatic tool calling: the same fan-out task, Claude with PTC vs without it.\n\n"
-        "  Task: across 4 regions (240 results total), find the highest-revenue region.\n"
-        "  Same task, same model (Sonnet 4.6). Every number is read live off the API usage object.\n\n"
-        "  mode             billed input tokens    what happens to the 240 results\n"
-        "  --------------------------------------------------------------------------\n"
-        f"  without PTC      {a_str:>18}    all results flow through the model context\n"
-        f"  with PTC         {b_str:>18}    sandbox aggregates, only the answer returns\n"
-        "  --------------------------------------------------------------------------\n\n"
-        f"  -> {pct_str}% fewer billed input tokens, because the 240 results went to the\n"
-        "     sandbox, not the model context. The saving compounds across every fan-out.\n\n"
-        "  Same answer gate: both arms must return the expected answer before this counts as a win.\n\n"
-        "  Estimated token/API run cost: $0.08.\n"
-        "  Code execution runtime can bill separately after the monthly free allowance.\n\n"
-        "  The change is two lines: add the code_execution tool, then put\n"
-        '  allowed_callers: ["code_execution_20260120"] on your own tool.\n\n'
-        "  Runnable code and the full brief: programmatic_tool_calling/README.md\n"
-    )
+    raise PublishRefused(f"no sample source for brief slug {plan.slug!r}")
 
 
 def _provenance_source(plan: BriefPlan, gate: GateResult, command: str) -> str:
@@ -1637,10 +1305,9 @@ def _provenance_source(plan: BriefPlan, gate: GateResult, command: str) -> str:
     return f"""# Provenance
 
 This brief is generated from the committed truth of the claude-feature-radar by `make publish-brief`,
-not hand-written: the README, the run entry, the vendored token counter, the demo tape, and the receipt
-snapshot it replays all come from the engine state below. The demo gif is rendered from the generated
-tape by `make gif` (it replays that snapshot for $0), so the gif traces to the same state. Regenerating
-from a different engine state changes these stamps.
+not hand-written: the files come from the engine's manifest-owned public bundle or from the declared
+per-edge generator path. The state below records which engine state produced the public artifact.
+Regenerating from a different engine state changes this stamp.
 
 - edge key: {gate.edge_key}
 - demoKind: {plan.demo_kind}
@@ -1653,9 +1320,7 @@ from a different engine state changes these stamps.
 - generated: {date.today().isoformat()}
 
 The verdict gate refused to publish unless this edge read as a clean, ranked, non-regime-bounded
-claude-ahead win in the engine's own landscape, and any present receipt agreed. The brief vendors the
-engine's audited token counter and run loop verbatim, with import lines rewritten by a deterministic
-prefix swap, so the published code is the same code the engine measures with.
+claude-ahead win in the engine's own landscape, and any present receipt agreed.
 """
 
 
@@ -1676,7 +1341,9 @@ def _ensure_makefile_entry(makefile: pathlib.Path, plan: BriefPlan) -> bool:
     """Idempotently add the brief's make target to the briefs-root Makefile. Returns True if it appended,
     False if the entry was already present. Never duplicates: it keys on the target name."""
     text = makefile.read_text() if makefile.exists() else ""
-    run_module = "run" if plan.from_assets else {"citations": "cite", "code_execution_state": "run"}.get(plan.slug, "run_tokens")
+    run_module = plan.run_module or (
+        "run" if plan.from_assets else {"citations": "cite", "code_execution_state": "run"}.get(plan.slug, "run")
+    )
     if plan.head_to_head:
         # The comparison gate: `make <slug>` runs the Claude side alone, `make <slug> COMPARE=1` installs
         # the optional comparison SDKs and adds --compare, so the full OpenAI and Gemini head-to-head
@@ -1782,6 +1449,12 @@ def _read_asset(plan: BriefPlan, name: str) -> str:
     return _sub((_assets_dir(plan) / name).read_text(), plan)
 
 
+def _read_bundle(plan: BriefPlan, name: str) -> str:
+    """Read one file from a manifest-owned public artifact bundle."""
+    path = ROOT / "engine" / "public_hits_bundle" / plan.slug / name
+    return path.read_text(encoding="utf-8")
+
+
 # --------------------------------------------------------------------------- the generator
 
 
@@ -1823,20 +1496,26 @@ def _apply_compare_default(text: str, compare_default: bool) -> str:
 def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pathlib.Path,
                     compare_default: bool = False) -> None:
     """Build the whole brief into a staging dir (so a failure leaves nothing behind), then the caller
-    moves it into place atomically. Writes the vendored engine files, the edit surface, the generated
-    run entry, __init__.py, README.md, and PROVENANCE.md. The edit surface and run entry differ by edge
-    (the token_accounting brief ships my_tool.py + run_tokens.py; the grounding_resolution brief ships a
-    docs/ corpus + cite.py), so the body dispatches on the plan slug.
+    moves it into place atomically. The edit surface and run entry differ by edge, so the body
+    dispatches on the plan slug.
 
     compare_default sets the head-to-head briefs' comparison-gate default: False on the public hits
     brief (Claude side by default), True on a private both-directions checkout (always full)."""
     brief_dir = staging
     brief_dir.mkdir(parents=True, exist_ok=True)
 
-    _vendor_files(plan, brief_dir)
-    (brief_dir / "__init__.py").write_text("")
+    if plan.public_bundle:
+        try:
+            copy_artifact(plan.slug, brief_dir)
+        except PublicHitsPublishError as exc:
+            raise PublishRefused(str(exc)) from exc
+    else:
+        _vendor_files(plan, brief_dir)
+        (brief_dir / "__init__.py").write_text("")
 
-    if plan.from_assets:
+    if plan.public_bundle:
+        pass
+    elif plan.from_assets:
         # Data-driven brief: the run entry and README are committed under engine/brief_assets/<slug>/.
         run_src = _apply_compare_default(_read_asset(plan, "run.py"), compare_default)
         _assert_no_dangling(run_src, "run.py")  # the shipped run entry must import only from its closure
@@ -1847,14 +1526,6 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
             compare_src = _read_asset(plan, "compare.py")
             _assert_no_dangling(compare_src, "compare.py")
             (brief_dir / "compare.py").write_text(compare_src)
-    elif plan.slug == "programmatic_tool_calling":
-        # The token_accounting brief: the region_sales fixture as the edit surface (my_tool.py),
-        # run_tokens.py as the run.
-        (brief_dir / plan.edit_surface).write_text(_my_tool_source())
-        run_src = _run_tokens_source(plan.slug)
-        _assert_no_dangling(run_src, "run_tokens.py")  # the generated run entry must be closure-clean
-        (brief_dir / "run_tokens.py").write_text(run_src)
-        (brief_dir / "README.md").write_text(_read_asset(plan, "README.md"))
     elif plan.slug == "citations":
         # The grounding_resolution brief: a docs/ corpus as the edit surface, cite.py as the run.
         docs = brief_dir / plan.edit_surface
@@ -1878,11 +1549,12 @@ def _assemble_brief(plan: BriefPlan, gate: GateResult, command: str, staging: pa
     else:  # pragma: no cover - a plan with no assembler is a programming error, not a publish path
         raise PublishRefused(f"no assembler for brief slug {plan.slug!r}")
 
-    # The demo gif's source: a generated tape that replays a generated, honest, wins-only receipt
-    # snapshot for $0. `make gif` renders the binary from the tape, so the whole demo regenerates and
-    # nothing about the gif is hand-written or lost on a republish.
-    (brief_dir / "sample.txt").write_text(_sample_source(plan, _committed_receipt(plan)))
-    (brief_dir / "demo.tape").write_text(_demo_tape_source(plan))
+    if not plan.public_bundle:
+        # The demo gif's source: a generated tape that replays a generated, honest, wins-only receipt
+        # snapshot for $0. `make gif` renders the binary from the tape, so the whole demo regenerates and
+        # nothing about the gif is hand-written or lost on a republish.
+        (brief_dir / "sample.txt").write_text(_sample_source(plan, _committed_receipt(plan)))
+        (brief_dir / "demo.tape").write_text(_demo_tape_source(plan))
 
     (brief_dir / "PROVENANCE.md").write_text(_provenance_source(plan, gate, command))
 

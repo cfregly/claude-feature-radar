@@ -1,41 +1,44 @@
-Subject: Congrats on YC! A sandbox pattern for usage-metering agents
+Subject: Congrats on YC! A sandbox pattern for customer-evidence agents
 
 Hey {first_name},
 
 Congrats on the batch, that is a real milestone. Quick builder tip in case it helps.
 
-If you meter usage per cohort or run analytics across regions, your agent calls one of your own tools many times, then crunches what comes back. Every one of those calls dumps its outputs into the model's context, and you pay input tokens for all of them, even the outputs the agent never uses to answer.
+If your agent decides which customers are at risk, it often has to fan out across support tickets,
+product logs, usage metering, CRM notes, and compliance docs. Direct tool use sends every raw row
+back through the model context. You pay for the rows, even when the final answer only needs a compact
+decision packet.
 
-[Programmatic tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling) moves that work off the model. Claude writes one script that loops over your tool inside a code sandbox (a server-side scratchpad that runs the outputs), keeps only what matters, and passes just the answer back. The tool outputs stay in the sandbox, so they never hit the context.
+[Programmatic tool calling](https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling)
+moves that reduction into Claude's code sandbox. Claude writes Python that calls your own tool,
+rejects malformed rows, joins evidence by account, sums risk points, preserves evidence IDs and
+caveats, and returns only the top accounts to the model.
 
-You add the code execution tool, then one line to the tool you already pass. `allowed_callers` is the one that does the work: it tells Claude your tool can be called from the sandbox instead of through the model.
+You add the code execution tool, then one field to the tool you already pass:
 
 ```python
 response = client.messages.create(
     model="claude-sonnet-4-6",
     messages=[...],
     tools=[
-        {"type": "code_execution_20260120", "name": "code_execution"},   # add this
-        { "name": "query_region_sales", "input_schema": {...},   # your tool, unchanged
-          "allowed_callers": ["code_execution_20260120"] },        # add this line: tool outputs stay in the sandbox, not the model context
+        {"type": "code_execution_20260120", "name": "code_execution"},
+        { "name": "query_customer_evidence", "input_schema": {...},
+          "allowed_callers": ["code_execution_20260120"] },
     ],
 )
 ```
 
-Same task, same model (Sonnet 4.6), the only change is the feature on or off:
+Same task, same model, the only change is the feature on or off:
 
-| your run | input tokens billed | what it means |
+| run | billed input tokens | what it means |
 |---|---:|---|
-| without programmatic tool calling | 9,494 | every tool output lands in the model's context |
-| with programmatic tool calling | 6,910 | only the answer reaches the model |
+| without programmatic tool calling | 54,989 | every raw evidence row lands in the model context |
+| with programmatic tool calling | 14,299 | only the compact decision packet reaches the model |
 
-27% fewer input tokens on my run, with the exact winner returned from the sandbox. The saving grows with the size of the fan-out (an agent calling one tool many times over data it then crunches).
+That is 74% fewer billed input tokens on my run, with the same three accounts returned:
+`acct_1842`, `acct_2199`, and `acct_7731`.
 
-Cost caveat I would factor into production: the dollar figure is token/API cost. Because this uses code execution, runtime can bill separately after the monthly free allowance, so track token cost plus runtime charge, correctness, latency, and failures before calling it an all-in COGS win.
-
-Why I am sending this for your workload: `allowed_callers` lets Claude call your own tool from the code sandbox and return only the computed answer to the model. For metering across many cohorts, that is the difference between paying for every tool output and paying for the answer.
-
-I ran it using my own API key for about $0.08 token/API cost, takes around two minutes. To see it yourself, one clone and one command:
+I ran it using my own API key for estimated $0.08 token/API cost. To see it yourself:
 
 ```
 git clone https://github.com/cfregly/claude-feature-hits && cd claude-feature-hits
@@ -43,11 +46,13 @@ export ANTHROPIC_API_KEY=your-api-key
 make programmatic_tool_calling
 ```
 
-Full brief, demo GIF, code, and sample output: https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
+Full artifact, demo GIF, code, and sample output:
+https://github.com/cfregly/claude-feature-hits/tree/main/programmatic_tool_calling
 
 Docs: https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling
 
-To run it on your own data, open `programmatic_tool_calling/my_tool.py`, drop in your tool, and run `make programmatic_tool_calling` again.
+To run it on your own data, open `programmatic_tool_calling/founder_workload.py`, drop in your tool and
+fan-out task, and run `make programmatic_tool_calling` again.
 
 Happy building,
 {your_name}
