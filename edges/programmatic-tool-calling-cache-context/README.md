@@ -63,10 +63,10 @@ production COGS line item alongside token/API cost, backend cost, latency, failu
 ## Run it in radar ($0)
 
 ```
-make programmatic-tool-calling-cache-context
+make programmatic_tool_calling_cache_context
 ```
 
-`make programmatic-tool-calling-cache-context` is deterministic in radar. It parses `edges/programmatic-tool-calling/sample.txt`, recalculates the larger cache plus 1M-context table, and writes `edges/programmatic-tool-calling-cache-context/receipt.json` plus `data/last_programmatic_tool_calling_cache_context.json`. The public bundle under `engine/public_hits_bundle/programmatic_tool_calling_cache_context` is deterministic too and validates the same committed basis.
+`make programmatic_tool_calling_cache_context` is deterministic in radar. It parses `edges/programmatic-tool-calling/sample.txt`, recalculates the larger cache plus 1M-context table, and writes `edges/programmatic-tool-calling-cache-context/receipt.json` plus `data/last_programmatic_tool_calling_cache_context.json`. The public bundle under `engine/public_hits_bundle/programmatic_tool_calling_cache_context` is deterministic too and validates the same committed basis.
 
 ## Why this is separate from plain programmatic tool calling
 

@@ -212,6 +212,15 @@ PARITY = [
              "compaction in one product, beta header managed-agents-2026-04-01) and the time axis "
              "(no 30-day TTL, no 2-hour cap). State must stay server-side, so it is not ZDR- or "
              "HIPAA-BAA-eligible. NEVER pitched as a Claude-only capability."},
+    {"note": "Managed Agents operations runtime: held candidate. The radar-owned ops-triage "
+             "comparison runs Claude Managed Agents, a self-managed Claude Messages tool loop, "
+             "OpenAI Agents SDK, and Google ADK with Gemini on the same deterministic incident "
+             "workload. The latest local run was mechanically vetted but not ahead: all four arms "
+             "returned the expected report. The formal scorecard measures orchestration lines, "
+             "state and cleanup components, repeated failed-run teardown, interruption resume, time "
+             "to first correct agent, and token/API cost from session usage when exposed. It promotes "
+             "only on same correctness, materially less glue code or fewer failure modes, and no "
+             "worse token/API cost. Canonical command: make managed-agents-ops."},
     {"note": "Prompt caching, Batch, Files API, Structured Outputs, Skills, MCP: all matched."},
     {"note": "1M-token window: matched or exceeded by Gemini on raw size."},
     {"note": "Computer use, extended thinking, PDF and vision: all beta or matched."},

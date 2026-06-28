@@ -53,10 +53,14 @@ cannot be omitted.
   state surfaces, retry paths, debug loops, cache risk, or test burden that survive the strongest
   app-owned and cross-provider baselines.
 
-Managed Agents also belongs in Operations, but it is not promoted in this repo yet. It stays in
-[`claude-managed-agents`](https://github.com/cfregly/claude-managed-agents) as a candidate until a
-receipt compares the hosted Claude agent loop against the strongest self-managed Claude loop,
-OpenAI agent stack, and Gemini agent stack for the same workload.
+Managed Agents also belongs in Operations, but it is not promoted in this repo yet. The canonical
+comparison lives in `feature-radar` as `make managed-agents-ops`. The standalone
+[`claude-managed-agents`](https://github.com/cfregly/claude-managed-agents) repo remains a product
+surface deep dive and smoke test. The latest radar comparison is mechanically vetted on the
+ops-triage workload, but not ahead. The radar receipt now uses a formal Operations scorecard:
+orchestration lines removed, state or cleanup components avoided, repeated failed-run teardown,
+interruption resume behavior, time to first correct agent, and token/API cost from session usage when
+the API exposes it.
 
 **Security**:
 

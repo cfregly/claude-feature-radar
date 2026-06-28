@@ -23,7 +23,7 @@ sys.path.insert(0, str(ROOT))
 # The optional comparison and MCP SDKs. Block them so any core module that imports one at load fails
 # loudly. mcp is the optional server SDK (requirements-mcp.txt): the MCP logic layer engine.mcp_tools
 # must import without it, so the server's gate boundary stays testable with anthropic alone.
-BLOCKED = ("openai", "google", "google.genai", "mcp")
+BLOCKED = ("openai", "agents", "google", "google.genai", "mcp")
 
 
 class _Blocker:
@@ -40,13 +40,15 @@ def main() -> int:
 
     core = [
         "common.client", "common.models", "common.pricing", "common.runner", "common.compare_clients",
-        "engine.demokinds", "engine.gate", "engine.scan", "engine.sweep_edges",
+        "engine.demokinds", "engine.gate", "engine.outcome_routing", "engine.operations_scorecard",
+        "engine.scan", "engine.sweep_edges",
         "engine.cite_facts", "engine.draft_email", "engine.product_alert", "engine.verify",
         "engine.publish_brief", "engine.mcp_tools",
         "engine.sources_registry", "engine.cadence", "engine.coverage", "engine.managed",
         "engine.demonstrators", "engine.demonstrators.base", "engine.demonstrators.registry",
         "engine.demonstrators.shared.sandbox", "engine.demonstrators.shared.platform",
         "engine.demonstrators.eval_quality", "engine.demonstrators.retention_resume",
+        "engine.demonstrators.managed_agents_operations",
         "engine.demonstrators.cost_model", "engine.demonstrators.security_posture",
         "engine.demonstrators.other_parity_gated",
         "engine.providers.openai_provider", "engine.providers.gemini_provider",
@@ -63,7 +65,8 @@ def main() -> int:
         from engine.demonstrators.registry import register_all
         reg = register_all()
         for kind in ("token_accounting", "grounding_resolution", "long_horizon_survival",
-                     "eval_quality", "retention_resume", "cost", "security_posture", "other"):
+                     "eval_quality", "retention_resume", "agent_runtime_operations", "cost",
+                     "security_posture", "other"):
             if kind not in reg:
                 failed.append(f"built demonstrator for '{kind}' did not register with SDKs blocked")
     except Exception as e:  # noqa: BLE001

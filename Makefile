@@ -7,7 +7,7 @@ VERIFY_JUDGES ?= claude,openai
 HITS_DIR ?= ../claude-feature-hits
 MISSES_KIND ?= misses
 MISSES_DIR ?= ../claude-feature-$(MISSES_KIND)
-.PHONY: setup compare-deps mcp-deps mcp programmatic-tool-calling programmatic-tool-calling-cache-context citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges check-freshness freshness-report resolve-freshness resolve-freshness-apply cadence grind grind-deep combine coverage managed parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost security-posture security draft publish-hits publish-brief publish-misses check-claims check-docs core-imports check-surface check-split check-receipts check-stale-programmatic-tool-calling test ci deslop gif clean
+.PHONY: setup compare-deps mcp-deps mcp programmatic-tool-calling programmatic-tool-calling-cache-context programmatic_tool_calling_cache_context citations citations-quick citations-paraphrase cite demo demo-quick demo-full longhorizon longhorizon-smoke longhorizon-compare ledger ledger-smoke compare alert edges check-freshness freshness-report resolve-freshness resolve-freshness-apply blockers check-blockers cadence grind grind-deep combine coverage managed managed-agents-ops parity-gated dynamic-web task-budget cache-diagnostics fast-mode pdf-citations search-results grounding-stack web-citations bulk-output advisor code-execution-state code-execution-state-verify scan verify verify-live eval eval-smoke eval-judge retention retention-live cost security-posture security draft publish-hits publish-brief publish-misses check-claims check-docs core-imports check-surface check-split check-receipts check-stale-programmatic-tool-calling test ci deslop gif clean
 
 PY := .venv/bin/python
 
@@ -31,8 +31,10 @@ mcp: ## MCP SERVER (stdio): drive the engine from a chat window. Read tools + th
 programmatic-tool-calling: ## EDGE: programmatic tool calling, the input-token receipt on a fan-out task (needs ANTHROPIC_API_KEY, about $0.08)
 	$(PY) edges/programmatic-tool-calling/demo.py
 
-programmatic-tool-calling-cache-context: ## EDGE MODEL: programmatic tool calling + cache + 1M-context cost cliff over the committed receipt (NO API call, $0)
-	$(PY) run.py programmatic-tool-calling-cache-context
+programmatic_tool_calling_cache_context: ## EDGE MODEL: programmatic tool calling + cache + 1M-context cost cliff over the committed receipt (NO API call, $0)
+	$(PY) run.py programmatic_tool_calling_cache_context
+
+programmatic-tool-calling-cache-context: programmatic_tool_calling_cache_context
 
 citations: ## EDGE: Claude Citations, a verifiable per-character source pointer into your user's own documents, one Claude arm (needs ANTHROPIC_API_KEY, $0.01)
 	$(PY) edges/citations/demo.py
@@ -118,6 +120,12 @@ resolve-freshness: ## rerun mapped stale workloads and classify promote/hold/mis
 resolve-freshness-apply: ## apply local hits/misses/radar edits for resolved freshness decisions, without opening PRs
 	$(PY) run.py resolve-freshness --write-report --apply --hits-dir $(HITS_DIR) --misses-dir $(MISSES_DIR)
 
+blockers: ## render production blocker GAP_PACKET.md files into the product-owner misses checkout
+	$(PY) run.py blockers --misses-root $(MISSES_DIR)
+
+check-blockers: ## verify committed production blocker packets match radar blocker intake
+	$(PY) run.py blockers --check --misses-root $(MISSES_DIR)
+
 cadence: ## the unattended engine: sweep, rank, dispatch by demoKind, draft the newest uncovered lead to the inert outbox, update coverage, write the run manifest, audit the boundary (NO benchmark spend, NO send, $0)
 	$(PY) run.py cadence --dry-run
 
@@ -132,6 +140,9 @@ coverage: ## per-demoKind coverage: what is built vs adapt vs build, and the gap
 
 managed: ## the Tier-2 monthly resumable Managed Agents runtime, wired but not run (prints the boundary, $0, and --apply runs a live session and spends a small bounded amount)
 	$(PY) run.py managed
+
+managed-agents-ops: ## OPERATIONS CANDIDATE: Managed Agents vs self-managed Claude, OpenAI Agents SDK, and Google ADK on ops triage (needs compare-deps + 3 keys)
+	$(PY) run.py managed-agents-ops --check
 
 parity-gated: ## the long-tail parity-gated candidates, each HELD until its parity check survives (NO API call, $0)
 	$(PY) run.py other
@@ -211,7 +222,7 @@ core-imports: ## one-dependency gate: the core imports with anthropic alone, the
 check-surface: ## surface gate: no internal/private-repo leakage in source, no Claude negative on a founder email (offline, $0)
 	$(PY) scripts/check_surface.py
 
-check-split: ## split gate: public wins stay in hits, private misses stay in the private sibling checkout (offline, $0)
+check-split: ## split gate: public wins stay in hits, misses stay in the product-owner sibling checkout (offline, $0)
 	$(PY) scripts/check_split.py
 
 check-receipts: ## receipt-drift gate: every measured number in the prose traces to a committed receipt (offline, $0)
@@ -226,7 +237,7 @@ test: ## the offline test suite (the gate boundary, the dispatch seam, the share
 deslop: check-claims ## prose gate (em-dashes, en-dashes, semicolons) plus the citations cost-claim gate
 	$(PY) scripts/deslop_check.py
 
-ci: deslop check-docs core-imports check-surface check-split check-receipts check-stale-programmatic-tool-calling test ## the full offline gate chain, the same one CI runs ($0)
+ci: deslop check-docs core-imports check-surface check-split check-blockers check-receipts check-stale-programmatic-tool-calling test ## the full offline gate chain, the same one CI runs ($0)
 	@echo "ci: all offline gates passed."
 
 gif: ## regenerate docs/demo.gif from demo.tape (needs vhs, ffmpeg, ttyd)

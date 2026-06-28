@@ -19,7 +19,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from common.client import repo_root
-from engine import adversarial, freshness, scan
+from engine import adversarial, blockers, freshness, scan
 from engine.public_hits import PublicHitsPublishError, active_artifacts, copy_artifact
 
 DECISIONS = {"promote", "hold", "miss"}
@@ -99,7 +99,7 @@ REGISTRY: dict[str, Artifact] = {
         key="programmatic_tool_calling_cache_context",
         hits_slug="programmatic_tool_calling_cache_context",
         misses_slug="programmatic-tool-calling",
-        rerun_command="make programmatic-tool-calling-cache-context",
+        rerun_command="make programmatic_tool_calling_cache_context",
         source_keys=("prompt_caching", "context_windows", "programmatic_tool_calling"),
         receipt_paths=("data/last_programmatic_tool_calling_cache_context.json", "edges/programmatic-tool-calling-cache-context/receipt.json"),
         edge_dir="edges/programmatic-tool-calling",
@@ -540,12 +540,23 @@ def apply_misses(job: Job, misses_dir: Path, date: str) -> None:
     finding = target / "FINDING.md"
     _upsert_section(finding, "freshness-auto-resolve", _miss_finding(job, date))
     job.applied.append(f"misses updated {finding.relative_to(misses_dir)}")
+    blocker_records = blockers.records_for_miss(slug)
+    if blocker_records:
+        _upsert_section(finding, "blocker-context", blockers.render_freshness_context(blocker_records))
+        job.applied.append(f"misses linked blocker context {slug}")
+        for packet in blockers.write_packets(misses_root=misses_dir, only_slugs={slug}):
+            verb = "refreshed" if packet.changed else "checked"
+            job.applied.append(f"misses {verb} {packet.path.relative_to(misses_dir)}")
     index = misses_dir / "misses" / "README.md"
     if index.exists():
         text = index.read_text(encoding="utf-8")
         link = f"[`{slug}`]({slug}/FINDING.md)"
         if link not in text:
-            row = f"| {link} | Freshness | Medium | Review `{job.decision}` decision from auto resolve. | `{job.command}` |\n"
+            row = (
+                f"| {link} | Freshness | Medium | {job.decision} | Product surface owner | "
+                f"Freshness drift needs review before a claim moves. | Review `{job.decision}` decision from auto resolve. | "
+                f"`{job.command}` | none |\n"
+            )
             text = text.rstrip() + "\n" + row
             index.write_text(text)
             job.applied.append("misses index updated")

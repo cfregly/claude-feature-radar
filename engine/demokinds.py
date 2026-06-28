@@ -30,6 +30,7 @@ from __future__ import annotations
 #   long_horizon_survival a long, tool-heavy load FINISHES and stays correct where the other errors.
 #   retention_resume    a stateful feature survives a kill and re-attach, with a negative control.
 #   code_execution_state a code sandbox keeps files across requests and a long idle.
+#   agent_runtime_operations a hosted agent runtime beats or ties self-managed and cross-provider agent stacks.
 #   eval_quality        one (model, effort, prompt) cell wins on the believable held-out test number.
 #   cost                a workload-shaped pure-pricing-model edge, no model call, both regimes shown.
 #   security_posture    first-party security/admin docs are checked as a dated source ledger.
@@ -47,6 +48,7 @@ DEMO_KINDS = [
     "long_horizon_survival",
     "retention_resume",
     "code_execution_state",
+    "agent_runtime_operations",
     "eval_quality",
     "cost",
     "security_posture",
@@ -99,6 +101,8 @@ KEY_TO_DEMOKIND = {
     # bundle and time-axis win, never a Claude-only capability (see engine/scan.py).
     "memory_tool": "retention_resume",
     "managed_agents": "retention_resume",
+    "managed_agents_operations": "agent_runtime_operations",
+    "managed-agents-operations": "agent_runtime_operations",
     "code_execution_state": "code_execution_state",
     "code-execution-state": "code_execution_state",
     # eval_quality: a (model, effort, prompt) cell wins on the held-out test number.
@@ -205,6 +209,7 @@ AXIS_TO_DEMOKIND = {
     "cost": "cost",
     "speed": "token_accounting",
     "reliability": "long_horizon_survival",
+    "operations": "agent_runtime_operations",
     "accuracy": "eval_quality",
     "security": "security_posture",
     "throughput": "token_accounting",

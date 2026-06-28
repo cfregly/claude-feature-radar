@@ -33,6 +33,7 @@ _DEMO_MODULES = (
     "edges.context-editing.demo",
     "engine.demonstrators.eval_quality",
     "engine.demonstrators.retention_resume",
+    "engine.demonstrators.managed_agents_operations",
     "engine.demonstrators.code_execution_state",
     "engine.demonstrators.cost_model",
     "engine.demonstrators.security_posture",

@@ -61,9 +61,12 @@ as evidence against a public claim.
 - No Speed artifact is promoted in this pass. Speed needs a same-workload wall-clock, p50/p95,
   throughput, or streaming completion receipt.
 - No reliability artifact is promoted in this pass.
-- Managed Agents is an Operations candidate, not a promoted feature hit. It needs a same-workload
-  comparison against a self-managed Claude loop, OpenAI's agent stack, and Gemini's agent stack before
-  it can move into the promoted list.
+- Managed Agents is an Operations candidate, not a promoted feature hit. The canonical radar
+  comparison is `make managed-agents-ops`. The latest ops-triage receipt is mechanically vetted, but
+  not ahead, so it stays out of the promoted list. The receipt now records a formal Operations
+  scorecard covering orchestration lines, avoided state or cleanup components, teardown under forced
+  failure, interruption resume, time to first correct agent, and token/API cost from session usage
+  when the API exposes it.
 - No Security artifact is promoted in this pass.
 
 ## Pinning Rule

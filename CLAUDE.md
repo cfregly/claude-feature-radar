@@ -95,8 +95,8 @@ or less glue code.
 - Try to disprove the claim before promoting it. Look for parity, a stronger competitor stack, a
   stale source, a hidden beta caveat, an unfair model tier, a toy workload, a confounder, and a
   mechanism with no so-what.
-- If the adversarial read breaks the claim or finds no measured value, route it to the private misses
-  ledger, keep it as a private source-ledger item, or label it within-Claude only.
+- If the adversarial read breaks the claim or finds no measured value, route it to the product-owner
+  misses ledger, keep it as an internal source-ledger item, or label it within-Claude only.
   It does not become founder copy.
 - Promotion requires a closure record: exact source, receipt, run command, model ids, cost, time, and
   what the skeptic tried that did not break the value.
@@ -104,6 +104,19 @@ or less glue code.
   Publishing, MCP lead lists, cadence drafts, and the paid founder-email drafter must call
   `value_confirmed`. A `KILLED` verdict from any current adversarial judge holds the edge until the
   framing is narrowed and re-tested.
+
+## Route outcomes deliberately
+
+The split is a product surface, not a file layout preference. `feature-hits` gets only
+`claude-ahead` results with public founder value. Mirror a caveat into `feature-misses` when a
+product owner can act on it. Measured or claim-relevant `parity`, any `claude-behind`, stale claims,
+and useful held public framings live in misses. `never-evaluated` stays radar-only unless it blocks an
+existing public claim or has a product-owner ask. Held candidates stay radar-only unless the hold is
+itself roadmap signal.
+
+The executable rule lives in `engine/outcome_routing.py`. The Operations promotion bar lives in
+`engine/operations_scorecard.py`: same correctness, material operations reduction, and no worse
+token/API cost than the self-managed baseline.
 
 ## Compare best to best, latest to latest
 Every comparison uses each platform's LATEST API and ALL of its best features, including alpha and
@@ -435,7 +448,7 @@ mail, post publicly, push a branch, or update `claude-feature-hits`.
 
 `make resolve-freshness` is the follow-up classifier. It reruns only mapped workload receipts, then
 classifies each mapped item as promote, hold, or miss. `make resolve-freshness-apply` may update the
-local public-wins and private-misses sibling checkouts. The scheduled form may open review PRs, but
+local public-wins and product-owner-misses sibling checkouts. The scheduled form may open review PRs, but
 it never merges those PRs, sends mail, or directly publishes a claim. Missing keys, quota, timeouts,
 unknown fetches, unmapped sources, and generic discovery commands stay held.
 
@@ -519,18 +532,18 @@ dated evidence, never a swipe, and it stays wins-only: show only the axis where 
 Claude negative and never a tie stated as a concession. When the edge is a capability gap or a
 within-Claude result with no head-to-head number, state the honest capability line and show no
 competitor table, never a fabricated competitor number. The both-directions losses stay in the
-private analysis and the product-team note, never on the founder surface.
+operator analysis and the product-team note, never on the founder surface.
 
 ## Keep it forkable
 Cloned and edited by a stranger. No secrets in git (`.env` is ignored), no machine-specific
 paths, no references to anything outside this repo. Assume a public reader has only this repo, the
-generated public brief, and public URLs. They do not have this private parent workspace, private
-receipts, private plans, or any internal repository. Any instruction, claim, source, or reproduction
-path needed to understand the edge must ship inside the public repo or link to a public source.
+generated public brief, and public URLs. They do not have the parent workspace, local receipts,
+local plans, or any unlinked repository. Any instruction, claim, source, or reproduction path needed
+to understand the edge must ship inside the public repo or link to a public source.
 
 ## The public surface shows only wins, the internal analysis stays honest both ways
 
-The both-directions honesty in this file (surface where Claude ties or loses, write the product-team alert) governs the internal analysis and the reviewer, not the founder-facing surface. Public assets, meaning the founder emails, the briefs, and the landing README a founder clones, show only verified Claude wins and never expose a Claude negative. No "Claude got it wrong" baseline, no "where Claude loses on price or speed". Reframe any benefit that has an unflattering flip side as the positive, so programmatic tool calling gives exact totals because the math runs in code, never "the model got it wrong without it". The losing and parity cells stay in the internal brief and the product alert, never in the founder's inbox.
+The both-directions honesty in this file (surface where Claude ties or loses, write the product-team alert) governs the internal analysis and the reviewer, not the founder-facing surface. Public assets, meaning the founder emails, the briefs, and the landing README a founder clones, show only verified Claude wins and never expose a Claude negative. No "Claude got it wrong" baseline, no "where Claude loses on price or speed". Reframe any benefit that has an unflattering flip side as the positive, so programmatic tool calling gives exact totals because the math runs in code, never "the model got it wrong without it". The losing and parity cells stay in the operator brief and the product alert, never in the founder's inbox.
 
 Speak the founder's language on every founder-facing word. Explain every term a founder would not parse on a glance (fan out, tool use, rollups, allowed_callers, rows to code). Lead with the value a founder prices, which is cost, speed, reliability, accuracy, or security. Write cost as a concrete dollar figure like $0.06. Label every table column in plain terms with the key number where a quick scan expects it, and keep it warm. The founder emails are saved as .md, here in the engine repo under emails/, and are never committed to the public hits repo.
 

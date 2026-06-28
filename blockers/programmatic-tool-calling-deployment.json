@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "blocker_id": "blk-2026-06-28-ptc-deployment",
+  "date": "2026-06-28",
+  "segment": "anonymized founder team using cloud marketplace deployment",
+  "category": "deployment",
+  "severity": "high",
+  "affected_workload": "A tool-heavy agent reduces customer evidence from support, product, usage, CRM, and compliance sources before the model writes the final risk packet.",
+  "consequence": "Teams on Bedrock or Vertex cannot use the programmatic tool calling path that keeps bulky custom-tool output out of model context, so the cost-saving pattern is blocked for marketplace deployments.",
+  "current_workaround": "Use the direct Messages API where available, or keep tool-result reduction in app-owned code and pass only the compact packet back to Claude.",
+  "privacy_level": "anonymized",
+  "linked_feature_key": "programmatic_tool_calling",
+  "misses_slug": "programmatic-tool-calling",
+  "owner": "Claude platform deployment surfaces",
+  "value_pillar": "cost",
+  "recurrence_count": 2,
+  "decision_state": "workaround",
+  "next_action": "Close the availability gap, or document the fallback architecture for Bedrock and Vertex deployments.",
+  "learning_update": {
+    "target": "quickstart, cookbook, and partner session",
+    "change": "Add the deployment caveat and app-owned reducer fallback anywhere programmatic tool calling is taught."
+  },
+  "founder_follow_up": {
+    "state": "pending",
+    "note": "Follow up after the fallback or availability answer is decided. Keep private notes outside public artifacts."
+  },
+  "source_evidence": [
+    {
+      "type": "radar receipt",
+      "path": "edges/programmatic-tool-calling/sample.txt",
+      "note": "Shows the direct API token-saving receipt that makes the gap matter."
+    },
+    {
+      "type": "product-owner note",
+      "path": "misses/programmatic-tool-calling/PRODUCT_NOTE.md",
+      "note": "Records the Bedrock and Vertex availability qualifier."
+    }
+  ],
+  "replay": {
+    "command": "make programmatic-tool-calling",
+    "fixture": "edges/programmatic-tool-calling/sample.txt",
+    "receipt": "data/last_programmatic_tool_calling.json",
+    "expected": "The direct API path keeps raw custom-tool outputs out of model context and proves the cost lever.",
+    "actual": "The same pattern is not available to Bedrock or Vertex customers, so deployment path blocks production use."
+  }
+}

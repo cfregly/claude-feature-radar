@@ -30,8 +30,8 @@ def _row(key="search_results", status="changed", command="make search-results"):
 
 def test_stale_rows_dedupe_into_workload_jobs():
     report = {"stale": [
-        _row("prompt_caching", command="make programmatic-tool-calling-cache-context"),
-        _row("context_windows", command="make programmatic-tool-calling-cache-context"),
+        _row("prompt_caching", command="make programmatic_tool_calling_cache_context"),
+        _row("context_windows", command="make programmatic_tool_calling_cache_context"),
     ]}
 
     jobs = resolve.build_jobs(report)
@@ -243,3 +243,25 @@ def test_unmapped_hold_apply_stays_report_only(tmp_path):
     resolve.apply_decisions([job], hits_dir=hits, misses_dir=misses, date="2026-06-27")
 
     assert sorted(p.name for p in (misses / "misses").iterdir()) == ["README.md"]
+
+
+def test_apply_misses_refreshes_linked_blocker_packet(tmp_path):
+    misses = tmp_path / "misses"
+    (misses / "misses").mkdir(parents=True)
+    (misses / "misses" / "README.md").write_text("| Miss | Area | Severity | Product ask | Reproduce |\n")
+    artifact = resolve.REGISTRY["programmatic_tool_calling"]
+    job = resolve.Job(
+        artifact=artifact,
+        rows=[_row("programmatic_tool_calling", command=artifact.rerun_command)],
+        command=artifact.rerun_command,
+        decision="hold",
+        reason="source changed, keeping blocker context attached",
+    )
+
+    resolve.apply_misses(job, misses, "2026-06-28")
+
+    finding = misses / "misses" / "programmatic-tool-calling" / "FINDING.md"
+    packet = misses / "misses" / "programmatic-tool-calling" / "GAP_PACKET.md"
+    assert "Blocker Context" in finding.read_text()
+    assert "blk-2026-06-28-ptc-deployment" in packet.read_text()
+    assert "| none |" in (misses / "misses" / "README.md").read_text()

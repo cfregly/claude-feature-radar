@@ -7,9 +7,11 @@
     python run.py check-freshness          fail if source hashes changed from the pinned landscape
     python run.py freshness-report         write a PR-ready freshness report into state/outbox
     python run.py resolve-freshness        rerun mapped stale workloads and classify promote/hold/miss
+    python run.py blockers                 render or check product-owner production blocker packets
     python run.py cadence [--dry-run]      the unattended engine: sweep, dispatch, draft to outbox ($0)
     python run.py coverage                 per-demoKind, what is built vs adapt vs build (no API call)
     python run.py managed [--apply]        the Tier-2 monthly resumable runtime (wired, $0 without --apply)
+    python run.py managed-agents-ops       the canonical Managed Agents operations comparison
     python run.py security                 the private security/admin source-ledger receipt ($0)
     python run.py scan                     the candidate gaps, grounded in both sides' docs
     python run.py verify                   the skeptic pass: keep only what survives
@@ -50,12 +52,16 @@ def main():
         from engine.freshness import main as m; raise SystemExit(m(["--write-report", "--no-fail"]))
     elif cmd == "resolve-freshness":
         from engine.freshness_resolve import main as m; raise SystemExit(m())
+    elif cmd in ("blockers", "blocker-packets"):
+        from engine.blockers import main as m; raise SystemExit(m())
     elif cmd == "cadence":
         from engine.cadence import main as m; raise SystemExit(m())
     elif cmd == "coverage":
         from engine.coverage import main as m; raise SystemExit(m())
     elif cmd == "managed":
         from engine.managed import main as m; raise SystemExit(m())
+    elif cmd in ("managed-agents-ops", "managed_agents_operations"):
+        from engine.demonstrators.managed_agents_operations import main as m; raise SystemExit(m())
     elif cmd in ("other", "parity-gated"):
         from engine.demonstrators.other_parity_gated import main as m; raise SystemExit(m())
     elif cmd in ("dynamic-web", "dynamic-web-filtering"):
@@ -82,7 +88,7 @@ def main():
         from engine.demonstrators.advisor_routing import main as m; raise SystemExit(m())
     elif cmd in ("code-execution-state", "code_execution_state"):
         from engine.demonstrators.code_execution_state import main as m; raise SystemExit(m())
-    elif cmd == "programmatic-tool-calling-cache-context":
+    elif cmd in ("programmatic_tool_calling_cache_context", "programmatic-tool-calling-cache-context"):
         from engine.demonstrators.programmatic_tool_calling_cache_context import main as m; raise SystemExit(m())
     elif cmd in ("security", "security-posture", "security_posture"):
         from engine.demonstrators.security_posture import main as m; raise SystemExit(m())

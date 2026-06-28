@@ -6,3 +6,5 @@
 # Install with: make compare-deps  (installs these into the same .venv that make compare runs in).
 openai>=2.0
 google-genai>=2.0
+openai-agents==0.17.7
+google-adk==2.3.0

@@ -1,7 +1,7 @@
-"""Cross-repo split gate: public wins stay public, misses stay private.
+"""Cross-repo split gate: public wins stay public, misses stay product-owner.
 
-This is an operator-side check. It runs from the private engine checkout and inspects the sibling
-public hits repo and private misses repo when they are present locally. CI for a single repo cannot
+This is an operator-side check. It runs from the engine checkout and inspects the sibling public hits
+repo and product-owner misses repo when they are present locally. CI for a single repo cannot
 see all three checkouts, so absent siblings produce an explicit SKIPPED note rather than a false pass.
 """
 
@@ -90,6 +90,9 @@ def _check_internal_kinds(hits: Path, misses: Path, fail: list[str]) -> None:
             "misses/retention-resume/sample.txt",
             "misses/retention-resume/PRODUCT_NOTE.md",
         ],
+        # The operations-runtime comparator is measured parity. It stays out of public hits until it
+        # measures a founder-valued operations advantage, and the parity finding lives in misses.
+        "agent_runtime_operations": ["misses/managed-agents-operations/FINDING.md"],
         # Security posture remains private radar/source-ledger machinery, not an exported public or
         # misses artifact, until a specific security claim clears the same adversarial value bar.
         "security_posture": [],
@@ -100,6 +103,7 @@ def _check_internal_kinds(hits: Path, misses: Path, fail: list[str]) -> None:
         "cost": ["cost-model", "cost_model"],
         "eval_quality": ["eval-quality", "eval_quality"],
         "retention_resume": ["retention-resume", "retention_resume"],
+        "agent_runtime_operations": ["managed-agents-operations", "managed_agents_operations", "agent-runtime-operations"],
         "security_posture": ["security-posture", "security_posture"],
         "other": ["parity-gated", "parity_gated"],
         "advisor_routing": ["advisor-tool", "advisor_tool", "advisor-routing", "advisor_routing"],
@@ -124,7 +128,7 @@ def _misses_has_note(misses: Path, misses_files: list[str], edge_key: str, slug:
         f"head_to_head/{slug}/README.md",
         f"misses/{edge_key}/PRODUCT_NOTE.md",
         f"misses/{edge_key}/FINDING.md",
-        f"misses/{edge_key}/BRIEF.md",
+        f"misses/{edge_key}/GAP_PACKET.md",
         "misses/parity-gated/PRODUCT_NOTE.md",
         "archive/briefs/2026-06-19-edge-vetting.md",
     ]
@@ -186,6 +190,23 @@ def _check_surviving_combinations(hits: Path, fail: list[str]) -> None:
                     break
 
 
+def _check_blocker_packets(hits: Path, misses: Path, fail: list[str]) -> None:
+    from engine import blockers
+
+    hits_files = _git_files(hits)
+    for record in blockers.load_records(ROOT):
+        packet = blockers.packet_path(record, misses)
+        expected = blockers.render_packet(record)
+        if not packet.exists():
+            fail.append(f"misses missing blocker packet for {record['blocker_id']}: {packet.relative_to(misses)}")
+            continue
+        actual = packet.read_text(encoding="utf-8", errors="ignore")
+        if actual != expected:
+            fail.append(f"misses blocker packet is stale for {record['blocker_id']}: {packet.relative_to(misses)}")
+        if _contains_any(hits, [record["blocker_id"], "GAP_PACKET.md"], hits_files):
+            fail.append(f"public hits contains product-owner blocker marker for {record['blocker_id']}")
+
+
 def _head(root: Path) -> str | None:
     out = _run(["git", "rev-parse", "HEAD"], root)
     if out.returncode != 0:
@@ -222,7 +243,7 @@ def _check_provenance(radar: Path, hits: Path, misses: Path, warn: list[str], fa
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(description="Check the local public-wins/private-misses split.")
+    p = argparse.ArgumentParser(description="Check the local public-wins/product-owner-misses split.")
     p.add_argument("--hits-root", type=Path, default=ROOT.parent / HITS_DIRNAME)
     p.add_argument("--misses-root", type=Path, default=ROOT.parent / MISSES_DIRNAME)
     args = p.parse_args(argv)
@@ -238,6 +259,7 @@ def main(argv: list[str] | None = None) -> int:
     _check_internal_kinds(args.hits_root, args.misses_root, fail)
     _check_public_plans(args.hits_root, args.misses_root, fail)
     _check_surviving_combinations(args.hits_root, fail)
+    _check_blocker_packets(args.hits_root, args.misses_root, fail)
     _check_provenance(ROOT, args.hits_root, args.misses_root, warn, fail)
 
     for w in warn:
@@ -247,7 +269,7 @@ def main(argv: list[str] | None = None) -> int:
         for item in fail:
             print(f"  - {item}")
         return 1
-    print("split gate: clean (public wins, private misses, provenance checked)")
+    print("split gate: clean (public wins, product-owner misses, provenance checked)")
     return 0
 
 

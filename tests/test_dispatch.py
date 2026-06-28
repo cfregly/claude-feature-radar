@@ -25,6 +25,8 @@ def test_seed_table_maps_the_built_edges():
     assert demokinds.demokind_for("citations") == "grounding_resolution"
     assert demokinds.demokind_for("context_editing") == "long_horizon_survival"
     assert demokinds.demokind_for("managed_agents") == "retention_resume"
+    assert demokinds.demokind_for("managed_agents_operations") == "agent_runtime_operations"
+    assert demokinds.demokind_for("managed-agents-operations") == "agent_runtime_operations"
     assert demokinds.demokind_for("code_execution_state") == "code_execution_state"
     assert demokinds.demokind_for("cache_diagnostics") == "other"
     assert demokinds.demokind_for("task_budgets") == "other"
@@ -75,6 +77,7 @@ def test_built_demonstrators_register():
     assert REGISTRY.get("token_accounting") is not None
     assert REGISTRY.get("grounding_resolution") is not None
     assert REGISTRY.get("long_horizon_survival") is not None
+    assert REGISTRY.get("agent_runtime_operations") is not None
     assert REGISTRY.get("code_execution_state") is not None
     assert REGISTRY.get("security_posture") is not None
 
@@ -117,6 +120,15 @@ def test_dispatch_routes_security_posture_as_zero_spend_private_ledger():
     assert r.gate == "always"
     assert r.estimate.usd == 0
     assert r.estimate.command == "make security-posture"
+
+
+def test_dispatch_routes_managed_agents_operations_as_a_distinct_live_compare():
+    register_all()
+    r = dispatch({"key": "managed_agents_operations", "axis": "operations"})
+    assert r.covered is True
+    assert r.demo_kind == "agent_runtime_operations"
+    assert r.gate == "ask"
+    assert r.estimate.command == "make managed-agents-ops"
 
 
 def test_stale_noncanonical_demokind_is_normalized():

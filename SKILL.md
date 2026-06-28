@@ -25,7 +25,7 @@ produces three things:
 The platforms ship monthly, so a hard-coded claim rots fast. This re-verifies and tells the truth
 in both directions, including when Claude loses.
 
-The promotion bar is adversarially-confirmed to add value. A candidate stays private or held until
+The promotion bar is adversarially-confirmed to add value. A candidate stays internal or held until
 the skeptic pass, exact sources, and receipts prove a founder-valued outcome survived.
 
 ## The rules, non-negotiable
@@ -174,7 +174,7 @@ These are why the output is trusted. Break one and the trust is gone.
 
 14. **Public readers have only public context.** Any generated public brief, README, founder email, or
     forkable bundle must stand alone with files that ship in that repo and public URLs. Do not rely on
-    this private parent workspace, private receipts, private plans, or any internal repository. If a
+    the parent workspace, local receipts, local plans, or any unlinked repository. If a
     claim, instruction, source, or reproduction step is needed to understand the edge, include it in
     the public artifact or link to a public source.
 

@@ -40,6 +40,7 @@ PORT_STATUS = {
     "extended_output": "build",
     "long_horizon_survival": "exists",
     "code_execution_state": "build",
+    "agent_runtime_operations": "adapt",
     "discovery_loop": "exists",
     "eval_quality": "adapt",
     "retention_resume": "adapt",
@@ -80,6 +81,7 @@ SPEND_LANE = {
     "extended_output": "ASK (a credit-spending benchmark, a few dollars, the Claude batch is slow)",
     "long_horizon_survival": "ASK (a credit-spending benchmark)",
     "code_execution_state": "ASK (a two-phase credit-spending benchmark)",
+    "agent_runtime_operations": "ASK (live hosted-loop comparison, held until the operations value reproduces)",
     "eval_quality": "ASK (a credit-spending grid, the larger slice)",
     "retention_resume": "$0 ALWAYS default (doc-grounded parity); the live kill-resume is opt-in ASK",
     "cost": "$0 ALWAYS (pure pricing model, no API call)",
@@ -138,7 +140,15 @@ _INTRINSIC_KINDS = {"discovery_loop"}
 # not reproduce on the built slice yet, so it ships no public bundle until the value is measured.
 # extended_output was promoted on 2026-06-19 (Claude emitted 230,607 output tokens in one batch turn,
 # above every competitor's documented single-request cap), so it now carries a public edges/ bundle.
-_INTERNAL_KINDS = {"cost", "eval_quality", "retention_resume", "security_posture", "other", "advisor_routing"}
+_INTERNAL_KINDS = {
+    "cost",
+    "eval_quality",
+    "retention_resume",
+    "agent_runtime_operations",
+    "security_posture",
+    "other",
+    "advisor_routing",
+}
 
 
 def gaps(rows: list[dict] | None = None) -> list[str]:
