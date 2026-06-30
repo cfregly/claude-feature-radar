@@ -25,7 +25,7 @@
       "action": "ask-run-demonstrator",
       "gate": "ask",
       "covered": true,
-      "demonstrator": "PTCDemonstrator",
+      "demonstrator": "ProgrammaticToolCallingDemonstrator",
       "estimate_surfaced": true,
       "estimate": {
         "usd": 0.08,
@@ -175,7 +175,7 @@
       "action": "ask-run-demonstrator",
       "gate": "ask",
       "covered": true,
-      "demonstrator": "PTCDemonstrator",
+      "demonstrator": "ProgrammaticToolCallingDemonstrator",
       "estimate_surfaced": true,
       "estimate": {
         "usd": 0.08,
@@ -219,7 +219,7 @@
       {
         "demo_kind": "token_accounting",
         "registered": true,
-        "demonstrator": "PTCDemonstrator",
+        "demonstrator": "ProgrammaticToolCallingDemonstrator",
         "bundle": "programmatic-tool-calling",
         "has_bundle": true,
         "port_status": "exists",

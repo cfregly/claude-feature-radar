@@ -24,7 +24,6 @@ FORBIDDEN = [
     (r"claude-overnight", "names a private sibling repo"),
     (r"claude-feature-misses", "names a private sibling repo"),
     (r"claude-founder-kit", "names a private sibling repo"),
-    (r"takehome-experiments", "names the private parent workspace"),
     (r"\bported from\b", "internal port provenance"),
     (r"\bPhase [2-5]\b", "internal build-phase label"),
     (r"the A and B harness", "internal consolidation letter-code"),

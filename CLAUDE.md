@@ -426,7 +426,7 @@ send, push, or spend boundary even if it is triggered every hour.
   brief and the CHANGELOG, update the coverage ledger. All reversible, all internal, nothing leaves
   the repo and nothing spends credits. The sweep is stdlib HTTP fetches, so the discovery loop needs
   no key and costs nothing.
-- **ASK, waits for you.** Run a credit-spending benchmark (the PTC grid, compare, longhorizon,
+- **ASK, waits for you.** Run a credit-spending benchmark (the programmatic tool calling grid, compare, longhorizon,
   citations), scaffold or refresh an `edges/<key>/` bundle, raise the per-run spend cap. These change
   the repo or the bill, so they run only on an explicit token, never twice for the same edge without a
   fresh one.

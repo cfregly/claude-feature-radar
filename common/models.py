@@ -30,7 +30,7 @@ class Model:
 
 
 # Verified 2026-06-23 against platform.claude.com (pricing, effort, adaptive-thinking) and a live call.
-# Claude Mythos 5 is also PTC-capable and priced like Fable 5 on the live page, but it is limited
+# Claude Mythos 5 is also programmatic tool calling-capable and priced like Fable 5 on the live page, but it is limited
 # availability and no code path resolves it, so it stays a doc-support fact (docs/CITED_FACTS.md), not a
 # runtime registry row. The registry carries only models the code actually selects and runs.
 MODELS: dict[str, Model] = {

@@ -2,7 +2,7 @@
 
 Nothing here estimates. It reads the token counts the API actually returned and multiplies by
 the rates in models.py. Code execution runtime billing is tracked separately from token usage, so
-this module does not claim an all-in production COGS number for PTC or code-execution workloads.
+this module does not claim an all-in production COGS number for programmatic tool calling or code-execution workloads.
 """
 
 from __future__ import annotations

@@ -42,3 +42,9 @@
 {"edge_key": "cache_diagnostics", "demo_kind": "other", "run_date": "2026-06-25", "action": "ask-run-demonstrator", "gate": "ask"}
 {"edge_key": "citations", "demo_kind": "grounding_resolution", "run_date": "2026-06-25", "action": "ask-run-demonstrator", "gate": "ask"}
 {"edge_key": "search_results", "demo_kind": "byo_rag_grounding", "run_date": "2026-06-25", "action": "ask-run-demonstrator", "gate": "ask"}
+{"edge_key": "programmatic_tool_calling", "demo_kind": "token_accounting", "run_date": "2026-06-29", "action": "drafted", "outbox": "state/outbox/2026-06-29-programmatic_tool_calling.md"}
+{"edge_key": "programmatic_tool_calling", "demo_kind": "token_accounting", "run_date": "2026-06-29", "action": "ask-run-demonstrator", "gate": "ask"}
+{"edge_key": "task_budgets", "demo_kind": "other", "run_date": "2026-06-29", "action": "ask-run-demonstrator", "gate": "ask"}
+{"edge_key": "cache_diagnostics", "demo_kind": "other", "run_date": "2026-06-29", "action": "ask-run-demonstrator", "gate": "ask"}
+{"edge_key": "citations", "demo_kind": "grounding_resolution", "run_date": "2026-06-29", "action": "ask-run-demonstrator", "gate": "ask"}
+{"edge_key": "search_results", "demo_kind": "byo_rag_grounding", "run_date": "2026-06-29", "action": "ask-run-demonstrator", "gate": "ask"}
