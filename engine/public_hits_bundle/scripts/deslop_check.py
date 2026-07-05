@@ -31,13 +31,12 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
 def targets():
-    """Every prose surface a reader sees: the root README, the repo-level docs (CLAUDE.md, AGENTS.md,
+    """Every prose surface a reader sees: the root README, the repo-level docs (CLAUDE.md,
     SKILL.md), and each artifact's README. Artifact code modules are not deslopped (a semicolon is valid
     Python), only the rendered prose is."""
     docs = [
         ROOT / "README.md",
         ROOT / "CLAUDE.md",
-        ROOT / "AGENTS.md",
         ROOT / "SKILL.md",
         ROOT / "docs" / "confirmed-improvements.md",
     ]

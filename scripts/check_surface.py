@@ -15,7 +15,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SELF = "check_surface.py"
 VALUE_BAR = "adversarially-confirmed to add value"
-VALUE_BAR_DOCS = ("AGENTS.md", "CLAUDE.md", "README.md", "SKILL.md")
+VALUE_BAR_DOCS = ("CLAUDE.md", "README.md", "SKILL.md")
 
 # Rule 1: no internal build-process or external-repo leakage in committed source. The repo must read
 # as self-contained (CLAUDE.md "keep it forkable: no references to anything outside this repo").

@@ -1,0 +1,508 @@
+Source: https://developers.openai.com/api/docs/guides/tools-file-search
+Snapshot fetched 2026-07-02. Verbatim excerpts for citation grounding.
+
+File search | OpenAI API
+Home API Docs Guides and concepts for the OpenAI API API reference Endpoints, parameters, and responses Codex Docs Guides, concepts, and product docs for Codex Use cases Example workflows and tasks teams hand to Codex ChatGPT Apps SDK Build apps to extend ChatGPT Workspace Agents Trigger published ChatGPT workspace agents Commerce Build commerce flows in ChatGPT Ads Publish and measure ads in ChatGPT Resources Showcase Demo apps to get inspired Blog Learnings and experiences from developers Cookbook Notebook examples for building with OpenAI models Learn Docs, videos, and demo apps for building with OpenAI Community Programs, meetups, and support for builders Start searching API Dashboard Search the API docs Search docs Suggested responses create reasoning_effort realtime prompt caching Primary navigation API API Reference Codex ChatGPT Resources Search docs Suggested responses create reasoning_effort realtime prompt caching Get started Overview Quickstart Models Pricing SDKs and CLI OpenAI SDK Agents SDK OpenAI CLI Latest: GPT-5.5 Prompt guidance Core concepts Text generation Code generation Images and vision Audio and speech Structured output Function calling Responses API Using tools Agents SDK Overview Quickstart Agent definitions Models and providers Running agents Sandbox agents Orchestration Guardrails Results and state Integrations and observability Evaluate agent workflows Voice agents ChatKit Overview Customize Widgets Actions Advanced integrations Tools Web search MCP and Connectors Secure MCP Tunnel Skills Shell Computer use File search and retrieval File search Retrieval Tool search More tools Apply Patch Local shell Image generation Code interpreter Run and scale Conversation state Background mode Streaming WebSocket mode Webhooks File inputs Context management Compaction Counting tokens Prompt caching Prompting Overview Prompt engineering Citation formatting Migration guide Reasoning Reasoning models Reasoning best practices Evaluation Red teaming Realtime and audio Overview Voice agents Live translation Transcription Realtime transcription Speech to text Speech generation Realtime prompting guide Connection methods WebRTC WebSocket SIP Realtime sessions Managing conversations Voice activity detection Realtime with tools Webhooks and server-side controls Managing costs Specialized models Image generation Video generation Deep research Embeddings Moderation Going live Production best practices Workload identity federation Overview Kubernetes AWS Microsoft Azure Google Cloud GitHub Actions SPIFFE Deployment checklist Amazon Bedrock Latency optimization Overview Predicted Outputs Priority processing Cost optimization Overview Batch Flex processing Accuracy optimization Safety Safety best practices Safety checks Cybersecurity checks Under 18 API Guidance Legacy APIs Agent Builder Overview Migration guide Node reference Safety in building agents Evals Getting started Working with evals Prompt optimizer External models Best practices Graders Fine-tuning Optimization cycle Supervised fine-tuning Vision fine-tuning Direct preference optimization Reinforcement fine-tuning RFT use cases Best practices Assistants API Migration guide Deep dive Tools Resources Terms and policies Changelog Your data Permissions Rate limits IP egress ranges Admin APIs Deprecations MCP for deep research Developer mode ChatGPT Actions Introduction Getting started Actions library Authentication Production Data retrieval Sending files Docs Use cases Getting Started Overview Quickstart Explore use cases Import to Codex Pricing Concepts Prompting Customization Memories Chronicle Sandboxing Auto-review Subagents Workflows Models Cyber Safety Glossary Using Codex App Overview Features Settings Review Automations Worktrees Local Environments In-app browser Chrome extension Computer Use Appshots Commands Windows Troubleshooting IDE Extension Overview Features Settings IDE Commands Slash commands CLI Overview Features Command Line Options Slash commands Web Overview Environments Internet Access Integrations GitHub Slack Linear Codex Security Overview Codex Security plugin Quickstart Run a security scan Run a deep scan Review code changes Triage a backlog Fix findings Export and track findings Changelog Codex Security cloud Setup Improving the threat model FAQ Configuration Config File Config Basics Advanced Config Config Reference Environment Variables Sample Config Permissions Speed Rules Hooks AGENTS.md MCP Plugins Overview Build plugins Sites Skills Overview Record & Replay Subagents Administration Authentication Overview Access tokens Agent approvals & security Remote connections Deployment Amazon Bedrock Enterprise Admin Setup Governance Managed configuration Windows Automation Non-interactive Mode Codex SDK App Server MCP Server GitHub Action Learn Best practices Videos Community Blog Mastering Codex Remote for engineering Using skills to accelerate OSS maintenance View all Cookbooks Build an Agent Improvement Loop with Traces, Evals, and Codex Build iterative repair loops with Codex View all Building AI Teams Releases Changelog Feature Maturity Open Source Home Collections Apps SDK Workspace Agents Commerce Ads Home Quickstart Core Concepts MCP Apps in ChatGPT MCP Server UX principles UI guidelines Plan Research use cases Define tools Design components Build Set up your server Build your ChatGPT UI Authenticate users Manage state Monetize your app Examples Deploy Deploy your app Connect from ChatGPT Test your integration Submit your app Conversion apps Restaurant reservation spec Product checkout spec Guides Optimize Metadata Security & Privacy Troubleshooting Resources Changelog App submission guidelines Reference Home Get started Trigger workspace agent runs Authenticate with Workspace Agent access tokens Home Guides Get started Best practices File Upload Overview Products API Overview Feeds Products Promotions Ads Overview Measurement JavaScript Pixel Image tag Conversions API Supported events Advertiser API Overview Quickstart Product feeds Campaign Targeting API Reference Authentication Campaigns Ad Groups Ads Ad Account Insights Files Showcase Blog Cookbook Learn Community Home API examples Sites All posts Recent Making private MCP servers reachable without making them public Mastering Codex Remote for engineering How Perplexity Brought Voice Search to Millions Using the Realtime API Designing delightful frontends with GPT-5.4 From prompts to products: One year of Responses Topics General API Apps SDK Audio Codex Home Topics Agents Evals Multimodal Text Guardrails Optimization ChatGPT Codex gpt-oss Contribute Cookbook on GitHub Home OpenAI Developers plugin Docs MCP Categories Demo apps Videos Topics Agents Audio & Voice Computer Use Codex Evals gpt-oss Fine-tuning Image generation Scaling Tools Video generation Community Programs Codex Ambassadors Codex for Students Codex for Open Source OpenAI for Startups Events Meetups Spaces Developer Forum Discord Reddit X API Dashboard Get started Overview Quickstart Models Pricing SDKs and CLI OpenAI SDK Agents SDK OpenAI CLI Latest: GPT-5.5 Prompt guidance Core concepts Text generation Code generation Images and vision Audio and speech Structured output Function calling Responses API Using tools Agents SDK Overview Quickstart Agent definitions Models and providers Running agents Sandbox agents Orchestration Guardrails Results and state Integrations and observability Evaluate agent workflows Voice agents ChatKit Overview Customize Widgets Actions Advanced integrations Tools Web search MCP and Connectors Secure MCP Tunnel Skills Shell Computer use File search and retrieval File search Retrieval Tool search More tools Apply Patch Local shell Image generation Code interpreter Run and scale Conversation state Background mode Streaming WebSocket mode Webhooks File inputs Context management Compaction Counting tokens Prompt caching Prompting Overview Prompt engineering Citation formatting Migration guide Reasoning Reasoning models Reasoning best practices Evaluation Red teaming Realtime and audio Overview Voice agents Live translation Transcription Realtime transcription Speech to text Speech generation Realtime prompting guide Connection methods WebRTC WebSocket SIP Realtime sessions Managing conversations Voice activity detection Realtime with tools Webhooks and server-side controls Managing costs Specialized models Image generation Video generation Deep research Embeddings Moderation Going live Production best practices Workload identity federation Overview Kubernetes AWS Microsoft Azure Google Cloud GitHub Actions SPIFFE Deployment checklist Amazon Bedrock Latency optimization Overview Predicted Outputs Priority processing Cost optimization Overview Batch Flex processing Accuracy optimization Safety Safety best practices Safety checks Cybersecurity checks Under 18 API Guidance Legacy APIs Agent Builder Overview Migration guide Node reference Safety in building agents Evals Getting started Working with evals Prompt optimizer External models Best practices Graders Fine-tuning Optimization cycle Supervised fine-tuning Vision fine-tuning Direct preference optimization Reinforcement fine-tuning RFT use cases Best practices Assistants API Migration guide Deep dive Tools Resources Terms and policies Changelog Your data Permissions Rate limits IP egress ranges Admin APIs Deprecations MCP for deep research Developer mode ChatGPT Actions Introduction Getting started Actions library Authentication Production Data retrieval Sending files *+*]:mt-3"> Copy Page File search Allow models to search your files for relevant information before generating a response. Copy Page File search is a tool available in the Responses API .
+It enables models to retrieve information in a knowledge base of previously uploaded files through semantic and keyword search.
+By creating vector stores and uploading files to them, you can augment the models’ inherent knowledge by giving them access to these knowledge bases or vector_stores .
+To learn more about how vector stores and semantic search work, refer to our
+retrieval guide .
+This is a hosted tool managed by OpenAI, meaning you don’t have to implement code on your end to handle its execution.
+When the model decides to use it, it will automatically call the tool, retrieve information from your files, and return an output.
+How to use
+Prior to using file search with the Responses API, you need to have set up a knowledge base in a vector store and uploaded files to it.
+Create a vector store and upload a file Follow these steps to create a vector store and upload a file to it. You can use this example file or upload your own. Upload the file to the File API Upload a file python 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+import requests
+from io import BytesIO
+from openai import OpenAI
+client = OpenAI()
+def create_file ( client, file_path ):
+if file_path.startswith( "http://" ) or file_path.startswith( "https://" ):
+# Download the file content from the URL
+response = requests.get(file_path)
+file_content = BytesIO(response.content)
+file_name = file_path.split( "/" )[- 1 ]
+file_tuple = (file_name, file_content)
+result = client.files.create(
+file=file_tuple,
+purpose= "assistants"
+)
+else :
+# Handle local file path
+with open (file_path, "rb" ) as file_content:
+result = client.files.create(
+file=file_content,
+purpose= "assistants"
+)
+print (result. id )
+return result. id
+# Replace with your own file path or URL
+file_id = create_file(client, "https://cdn.openai.com/API/docs/deep_research_blog.pdf" ) 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+import fs from "fs" ;
+import OpenAI from "openai" ;
+const openai = new OpenAI();
+async function createFile ( filePath ) {
+let result;
+if (filePath.startsWith( "http://" ) || filePath.startsWith( "https://" )) {
+// Download the file content from the URL
+const res = await fetch(filePath);
+const buffer = await res.arrayBuffer();
+const urlParts = filePath.split( "/" );
+const fileName = urlParts[urlParts.length - 1 ];
+const file = new File([buffer], fileName);
+result = await openai.files.create({
+file : file,
+purpose : "assistants" ,
+});
+} else {
+// Handle local file path
+const fileContent = fs.createReadStream(filePath);
+result = await openai.files.create({
+file : fileContent,
+purpose : "assistants" ,
+});
+}
+return result.id;
+}
+// Replace with your own file path or URL
+const fileId = await createFile(
+"https://cdn.openai.com/API/docs/deep_research_blog.pdf"
+);
+console .log(fileId); Create a vector store Create a vector store python 1
+2
+3
+4
+vector_store = client.vector_stores.create(
+name= "knowledge_base"
+)
+print (vector_store. id ) 1
+2
+3
+4
+const vectorStore = await openai.vectorStores.create({
+name : "knowledge_base" ,
+});
+console .log(vectorStore.id); Add the file to the vector store Add a file to a vector store python 1
+2
+3
+4
+5
+result = client.vector_stores.files.create(
+vector_store_id=vector_store. id ,
+file_id=file_id
+)
+print (result) 1
+2
+3
+4
+5
+6
+await openai.vectorStores.files.create(
+vectorStore.id,
+{
+file_id : fileId,
+}
+}); Check status Run this code until the file is ready to be used (i.e., when the status is completed ). Check status python 1
+2
+3
+4
+result = client.vector_stores.files. list (
+vector_store_id=vector_store. id
+)
+print (result) 1
+2
+3
+4
+const result = await openai.vectorStores.files.list({
+vector_store_id : vectorStore.id,
+});
+console .log(result);
+Once your knowledge base is set up, you can include the file_search tool in the list of tools available to the model, along with the list of vector stores in which to search.
+File search tool python 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+from openai import OpenAI
+client = OpenAI()
+response = client.responses.create(
+model= "gpt-5.5" ,
+input = "What is deep research by OpenAI?" ,
+tools=[{
+"type" : "file_search" ,
+"vector_store_ids" : [ "<vector_store_id>" ]
+}]
+)
+print (response) 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+import OpenAI from "openai" ;
+const openai = new OpenAI();
+const response = await openai.responses.create({
+model : "gpt-5.5" ,
+input : "What is deep research by OpenAI?" ,
+tools : [
+{
+type : "file_search" ,
+vector_store_ids : [ "<vector_store_id>" ],
+},
+],
+});
+console .log(response); 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+using OpenAI.Responses;
+string key = Environment.GetEnvironmentVariable( "OPENAI_API_KEY" )!;
+OpenAIResponseClient client = new (model: "gpt-5.5" , apiKey: key);
+ResponseCreationOptions options = new ();
+options.Tools.Add(ResponseTool.CreateFileSearchTool([ "<vector_store_id>" ]));
+OpenAIResponse response = (OpenAIResponse)client.CreateResponse([
+ResponseItem.CreateUserMessageItem([
+ResponseContentPart.CreateInputTextPart( "What is deep research by OpenAI?" ),
+]),
+], options);
+Console.WriteLine(response.GetOutputText());
+When this tool is called by the model, you will receive a response with multiple outputs:
+A file_search_call output item, which contains the id of the file search call.
+A message output item, which contains the response from the model, along with the file citations.
+File search response json 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+{
+"output" : [
+{
+"type" : "file_search_call" ,
+"id" : "fs_67c09ccea8c48191ade9367e3ba71515" ,
+"status" : "completed" ,
+"queries" : [ "What is deep research?" ],
+"search_results" : null
+},
+{
+"id" : "msg_67c09cd3091c819185af2be5d13d87de" ,
+"type" : "message" ,
+"role" : "assistant" ,
+"content" : [
+{
+"type" : "output_text" ,
+"text" : "Deep research is a sophisticated capability that allows for extensive inquiry and synthesis of information across various domains. It is designed to conduct multi-step research tasks, gather data from multiple online sources, and provide comprehensive reports similar to what a research analyst would produce. This functionality is particularly useful in fields requiring detailed and accurate information..." ,
+"annotations" : [
+{
+"type" : "file_citation" ,
+"index" : 992 ,
+"file_id" : "file-2dtbBZdjtDKS8eqWxqbgDi" ,
+"filename" : "deep_research_blog.pdf"
+},
+{
+"type" : "file_citation" ,
+"index" : 992 ,
+"file_id" : "file-2dtbBZdjtDKS8eqWxqbgDi" ,
+"filename" : "deep_research_blog.pdf"
+},
+{
+"type" : "file_citation" ,
+"index" : 1176 ,
+"file_id" : "file-2dtbBZdjtDKS8eqWxqbgDi" ,
+"filename" : "deep_research_blog.pdf"
+},
+{
+"type" : "file_citation" ,
+"index" : 1176 ,
+"file_id" : "file-2dtbBZdjtDKS8eqWxqbgDi" ,
+"filename" : "deep_research_blog.pdf"
+}
+]
+}
+]
+}
+]
+}
+Retrieval customization
+Limiting the number of results
+Using the file search tool with the Responses API, you can customize the number of results you want to retrieve from the vector stores. This can help reduce both token usage and latency, but may come at the cost of reduced answer quality.
+Limit the number of results python 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+response = client.responses.create(
+model= "gpt-5.5" ,
+input = "What is deep research by OpenAI?" ,
+tools=[{
+"type" : "file_search" ,
+"vector_store_ids" : [ "<vector_store_id>" ],
+"max_num_results" : 2
+}]
+)
+print (response) 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+const response = await openai.responses.create({
+model : "gpt-5.5" ,
+input : "What is deep research by OpenAI?" ,
+tools : [{
+type : "file_search" ,
+vector_store_ids : [ "<vector_store_id>" ],
+max_num_results : 2 ,
+}],
+});
+console .log(response);
+Include search results in the response
+While you can see annotations (references to files) in the output text, the file search call will not return search results by default.
+To include search results in the response, you can use the include parameter when creating the response.
+Include search results python 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+response = client.responses.create(
+model= "gpt-5.5" ,
+input = "What is deep research by OpenAI?" ,
+tools=[{
+"type" : "file_search" ,
+"vector_store_ids" : [ "<vector_store_id>" ]
+}],
+include=[ "file_search_call.results" ]
+)
+print (response) 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+const response = await openai.responses.create({
+model : "gpt-5.5" ,
+input : "What is deep research by OpenAI?" ,
+tools : [{
+type : "file_search" ,
+vector_store_ids : [ "<vector_store_id>" ],
+}],
+include : [ "file_search_call.results" ],
+});
+console .log(response);
+Metadata filtering
+You can filter the search results based on the metadata of the files. For more details, refer to our retrieval guide , which covers:
+How to set attributes on vector store files
+How to define filters
+Metadata filtering python 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+response = client.responses.create(
+model= "gpt-5.5" ,
+input = "What is deep research by OpenAI?" ,
+tools=[{
+"type" : "file_search" ,
+"vector_store_ids" : [ "<vector_store_id>" ],
+"filters" : {
+"type" : "in" ,
+"key" : "category" ,
+"value" : [ "blog" , "announcement" ]
+}
+}]
+)
+print (response) 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+const response = await openai.responses.create({
+model : "gpt-5.5" ,
+input : "What is deep research by OpenAI?" ,
+tools : [{
+type : "file_search" ,
+vector_store_ids : [ "<vector_store_id>" ],
+filters : {
+type : "in" ,
+key : "category" ,
+value : [ "blog" , "announcement" ]
+}
+}]
+});
+console .log(response);
+Supported files
+For text/ MIME types, the encoding must be one of utf-8 , utf-16 , or ascii .
+File format MIME type .c text/x-c .cpp text/x-c++ .cs text/x-csharp .css text/css .doc application/msword .docx application/vnd.openxmlformats-officedocument.wordprocessingml.document .go text/x-golang .html text/html .java text/x-java .js text/javascript .json application/json .md text/markdown .pdf application/pdf .php text/x-php .pptx application/vnd.openxmlformats-officedocument.presentationml.presentation .py text/x-python .py text/x-script.python .rb text/x-ruby .sh application/x-sh .tex text/x-tex .ts application/typescript .txt text/plain
+Usage notes
+API Availability Rate limits Notes Responses Chat Completions Assistants Tier 1
+100 RPM Tier 2 and 3
+500 RPM Tier 4 and 5
+1000 RPM Pricing
+ZDR and data residency Ask AI
+Docs agent
+Loading docs agent...

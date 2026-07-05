@@ -1,0 +1,360 @@
+Source: https://ai.google.dev/gemini-api/docs/interactions/interactions-overview
+Snapshot fetched 2026-07-02. Verbatim excerpts for citation grounding.
+
+Interactions API  |  Gemini API  |  Google AI for Developers
+Skip to main content
+/
+English
+Deutsch
+Español – América Latina
+Français
+Indonesia
+Italiano
+Polski
+Português – Brasil
+Shqip
+Tiếng Việt
+Türkçe
+Русский
+עברית
+العربيّة
+فارسی
+हिंदी
+বাংলা
+ภาษาไทย
+中文 – 简体
+中文 – 繁體
+日本語
+한국어
+Get API key
+Cookbook
+Community
+Sign in
+Docs
+API reference
+Gemini API
+Docs
+API reference
+Get API key
+Cookbook
+Community
+Get started
+Overview
+Get Started
+API keys
+Libraries
+Pricing
+Interactions API
+Coding agent setup
+Models
+All models
+Current: Gemini 3.5
+Nano Banana
+Veo
+Gemini Omni Flash
+Lyria 3
+Lyria RealTime
+Imagen
+Text-to-speech
+Live
+Live Translate
+Embeddings
+Robotics
+Core capabilities
+Text
+Image
+Image generation 🍌 Image understanding
+Video
+Video overview Video understanding
+Documents
+Speech and audio
+Speech generation Audio understanding
+Thinking
+Thinking Thought signatures
+Structured outputs
+Function calling
+Long context
+Agents
+Overview
+Quickstart
+Antigravity Agent
+Building managed agents
+Environments
+Deep Research Agent
+Tools
+Overview
+Google Search
+Google Maps
+Code execution
+URL context
+Computer Use
+File Search
+Combine Tools and Function calling
+Live API
+Overview
+Get started
+Get started using the GenAI SDK Get started using raw WebSockets
+Capabilities
+Live Translation
+Tool use
+Session management
+Ephemeral tokens
+Best practices
+Optimization
+Overview
+Batch API
+Webhooks
+Flex inference
+Priority inference
+Context caching
+Guides
+Streaming
+Background execution
+File input
+Input methods Files API
+OpenAI compatibility
+Media resolution
+Token counting
+Prompt engineering
+Logs and datasets
+Get started with logs Data logging and sharing
+Safety
+Safety settings Safety guidance
+Frameworks
+LangChain & LangGraph CrewAI LlamaIndex Vercel AI SDK Temporal
+Resources
+Release notes
+Deprecations
+Migration
+Migrate to Gen AI SDK Migrate to Interactions API Interactions breaking changes (May 2026)
+Rate limits
+Billing info
+API troubleshooting
+Status
+Partner and library integrations
+Google AI Studio
+Quickstart Vibe code in Build mode Developing Full-Stack Apps Build Android Apps Deploying your app Agents in AI Studio Playground Try out LearnLM Troubleshooting Access for Workspace users
+Google Cloud Platform
+Gemini Enterprise Agent Platform Gemini API OAuth authentication
+Policies
+Terms of service
+Available regions
+Abuse monitoring
+Feedback information
+The Interactions API is now generally available. We recommend using this API for access to all the latest features and models.
+Home
+Gemini API
+Docs
+Send feedback
+Interactions API
+The Interactions API is our new interface and the most straightforward way
+to build with Gemini models and agents. As of June 2026, it is Generally
+Available and the recommended interface for all new projects.
+While it is now considered legacy, the original
+generateContent API
+remains fully supported.
+Why use the Interactions API?
+New capabilities out of the box : Optional server-side conversation
+state using previous_interaction_id , observable execution steps for
+debugging and UI rendering, and background execution for long-running
+tasks using background=true .
+Lower cost with higher cache hit rates : Server-side state management
+enables more efficient context caching across turns, reducing token costs
+for multi-turn conversations.
+Built for frontier models and agents : Purpose-built for thinking
+models, multi-step tool use, and complex reasoning flows — simplifying
+the process of building, debugging, and orchestrating agentic
+applications.
+Single API for models and agents : One unified interface for calling
+Gemini models and agents directly such as Deep Research and custom
+managed agents — no separate endpoints or patterns to learn.
+Where new things launch : Going forward, new models and capabilities
+beyond the core mainline family, along with new agentic capabilities
+and tools, will launch on the Interactions API.
+By default, the Interactions API stores requests so you can leverage
+the server-side state management features by using
+previous_interaction_id . You can opt into stateless behavior by setting
+store=false . See the data retention section for
+details.
+Get started
+Set up your coding agent : Connect to the Gemini Docs MCP and install
+the gemini-interactions-api skill to give your assistant direct access to
+the latest developer docs and best practices.
+Set up your coding agent →
+Migrate from generateContent : If you have an existing integration,
+follow the Migration Guide to
+transition to the Interactions API.
+Get started : Get started in the Interactions API Get started
+guide .
+Feature Guides
+Explore the specific capabilities of the Interactions API through these guides. You can use the toggle on these pages to switch between generateContent and Interactions API:
+Text generation
+Image generation
+Image understanding
+Audio understanding
+Video understanding
+Document processing
+Function calling
+Structured output
+Deep Research Agent
+Flex inference
+Priority inference
+How the Interactions API works
+The Interactions API centers around a core resource: the Interaction . An Interaction represents a complete turn in a conversation or task. It acts as a session record, containing the entire history of an interaction as a chronological sequence of execution steps . These steps include model thoughts, server-side or client-side tool calls and results (like function_call and function_result ), and the final model_output . The stored resource (retrieved via interactions.get ) also includes user_input steps for full context, though the interactions.create response only returns model-generated steps.
+When you make a call to
+interactions.create , you are
+creating a new Interaction resource.
+Server-side state management
+You can use the id of a completed interaction in a subsequent call using the
+previous_interaction_id parameter to continue the conversation. The server
+uses this ID to retrieve the conversation history, saving you from having to
+resend the entire chat history.
+The previous_interaction_id parameter preserves only the conversation history (inputs and outputs)
+using previous_interaction_id . The other parameters are interaction-scoped
+and apply only to the specific interaction you are currently generating:
+tools
+system_instruction
+generation_config (including thinking_level , temperature , etc.)
+This means you must re-specify these parameters in each new interaction if you
+want them to apply. This server-side state management is optional; you can also
+operate in stateless mode by sending the full conversation history in each
+request.
+Data storage and retention
+By default, the API stores all Interaction objects ( store=true ) in order to
+simplify use of server-side state management features (with
+previous_interaction_id ), background execution (using background=true ) and
+observability purposes.
+Paid Tier : The system retains interactions for 55 days .
+Free Tier : The system retains interactions for 1 day .
+If you don't want this, you can
+set store=false in your request. This control is separate from state
+management; you can opt out of storage for any interaction. However, note that
+store=false is incompatible with background execution and prevents using
+previous_interaction_id for subsequent turns.
+You can delete stored interactions at any time using the delete method found in
+the API Reference . You can only delete interactions if
+you know the interaction ID.
+After the retention period expires, your data will be
+deleted automatically.
+The system processes Interaction objects according to the terms .
+Best practices
+Cache hit rate : Using previous_interaction_id to continue
+conversations allows the system to more easily utilize implicit caching for
+the conversation history, which improves performance and reduces costs.
+Mixing interactions : You have the flexibility to mix and match Agent and
+Model interactions within a conversation. For example, you can use a
+specialized agent, like the Deep Research agent, for initial data
+collection, and then use a standard Gemini model for follow-up tasks such as
+summarizing or reformatting, linking these steps with the
+previous_interaction_id .
+Supported models & agents
+Model Name
+Type
+Model ID
+Gemini 3.5 Flash
+Model
+gemini-3.5-flash
+Gemini 3.1 Pro Preview
+Model
+gemini-3.1-pro-preview
+Gemini 3.1 Flash-Lite
+Model
+gemini-3.1-flash-lite
+Gemini 3 Flash Preview
+Model
+gemini-3-flash-preview
+Gemini 2.5 Pro
+Model
+gemini-2.5-pro
+Gemini 2.5 Flash
+Model
+gemini-2.5-flash
+Gemini 2.5 Flash-lite
+Model
+gemini-2.5-flash-lite
+Gemini 3 Pro Image
+Model
+gemini-3-pro-image
+Gemini 3.1 Flash Image
+Model
+gemini-3.1-flash-image
+Gemini 3.1 Flash TTS Preview
+Model
+gemini-3.1-flash-tts-preview
+Gemma 4 31B IT
+Model
+gemma-4-31b-it
+Gemma 4 26B MoE IT
+Model
+gemma-4-26b-a4b-it
+Lyria 3 Clip Preview
+Model
+lyria-3-clip-preview
+Lyria 3 Pro Preview
+Model
+lyria-3-pro-preview
+Deep Research Preview
+Agent
+deep-research-preview-04-2026
+Deep Research Preview
+Agent
+deep-research-max-preview-04-2026
+Antigravity Preview
+Agent
+antigravity-preview-05-2026
+SDKs
+You can use latest version of the Google GenAI SDKs in order to access
+Interactions API.
+On Python, this is google-genai package from 2.3.0 version onwards.
+On JavaScript, this is @google/genai package from 2.3.0 version
+onwards.
+You can learn more about how to install the SDKs on
+Libraries page.
+Limitations
+Remote MCP : Gemini 3 does not support remote MCP, this is coming soon.
+The following features are supported by the
+generateContent API but are not yet
+available in the Interactions API:
+Video metadata : The video_metadata field, used to set clipping
+intervals and custom frame rates for video understanding.
+Batch API
+Automatic function calling (Python)
+Explicit caching : Note that server-side implicit caching is available in the Interactions API
+via previous_interaction_id .
+Feedback
+Your feedback is critical to the development of the Interactions API.
+Share your thoughts, report bugs, or request features on our
+Google AI Developer Community Forum .
+What's next
+Try the Interactions API quickstart notebook .
+Learn more about the Gemini Deep Research Agent .
+Send feedback
+Except as otherwise noted, the content of this page is licensed under the Creative Commons Attribution 4.0 License , and code samples are licensed under the Apache 2.0 License . For details, see the Google Developers Site Policies . Java is a registered trademark of Oracle and/or its affiliates.
+Last updated 2026-06-26 UTC.
+Need to tell us more?
+[[["Easy to understand","easyToUnderstand","thumb-up"],["Solved my problem","solvedMyProblem","thumb-up"],["Other","otherUp","thumb-up"]],[["Missing the information I need","missingTheInformationINeed","thumb-down"],["Too complicated / too many steps","tooComplicatedTooManySteps","thumb-down"],["Out of date","outOfDate","thumb-down"],["Samples / code issue","samplesCodeIssue","thumb-down"],["Other","otherDown","thumb-down"]],["Last updated 2026-06-26 UTC."],[],[]]
+Terms
+Privacy
+Manage cookies
+English
+Deutsch
+Español – América Latina
+Français
+Indonesia
+Italiano
+Polski
+Português – Brasil
+Shqip
+Tiếng Việt
+Türkçe
+Русский
+עברית
+العربيّة
+فارسی
+हिंदी
+বাংলা
+ภาษาไทย
+中文 – 简体
+中文 – 繁體
+日本語
+한국어
