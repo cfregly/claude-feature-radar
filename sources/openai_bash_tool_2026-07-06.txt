@@ -1,0 +1,1636 @@
+Source: https://developers.openai.com/api/docs/guides/tools-shell
+Snapshot fetched 2026-07-06. Verbatim excerpts for citation grounding.
+
+Shell | OpenAI API
+Home API Docs Guides and concepts for the OpenAI API API reference Endpoints, parameters, and responses Codex Docs Guides, concepts, and product docs for Codex Use cases Example workflows and tasks teams hand to Codex ChatGPT Apps SDK Build apps to extend ChatGPT Workspace Agents Trigger published ChatGPT workspace agents Commerce Build commerce flows in ChatGPT Ads Publish and measure ads in ChatGPT Resources Showcase Demo apps to get inspired Blog Learnings and experiences from developers Cookbook Notebook examples for building with OpenAI models Learn Docs, videos, and demo apps for building with OpenAI Community Programs, meetups, and support for builders Start searching API Dashboard Search the API docs Search docs Suggested responses create reasoning_effort realtime prompt caching Primary navigation API API Reference Codex ChatGPT Resources Search docs Suggested responses create reasoning_effort realtime prompt caching Get started Overview Quickstart Models Pricing SDKs and CLI OpenAI SDK Agents SDK OpenAI CLI Latest: GPT-5.5 Prompt guidance Core concepts Text generation Code generation Images and vision Audio and speech Structured output Function calling Responses API Using tools Agents SDK Overview Quickstart Agent definitions Models and providers Running agents Sandbox agents Orchestration Guardrails Results and state Integrations and observability Evaluate agent workflows Voice agents ChatKit Overview Customize Widgets Actions Advanced integrations Tools Web search MCP and Connectors Secure MCP Tunnel Skills Shell Computer use File search and retrieval File search Retrieval Tool search More tools Apply Patch Local shell Image generation Code interpreter Run and scale Conversation state Background mode Streaming WebSocket mode Webhooks File inputs Context management Compaction Counting tokens Prompt caching Prompting Overview Prompt engineering Citation formatting Migration guide Reasoning Reasoning models Reasoning best practices Evaluation Red teaming Realtime and audio Overview Voice agents Live translation Transcription Realtime transcription Speech to text Speech generation Realtime prompting guide Connection methods WebRTC WebSocket SIP Realtime sessions Managing conversations Voice activity detection Realtime with tools Webhooks and server-side controls Managing costs Specialized models Image generation Video generation Deep research Embeddings Moderation Going live Production best practices Workload identity federation Overview Kubernetes AWS Microsoft Azure Google Cloud GitHub Actions SPIFFE Deployment checklist Amazon Bedrock Latency optimization Overview Predicted Outputs Priority processing Cost optimization Overview Batch Flex processing Accuracy optimization Safety Safety best practices Safety checks Cybersecurity checks Under 18 API Guidance Legacy APIs Agent Builder Overview Migration guide Node reference Safety in building agents Evals Getting started Working with evals Prompt optimizer External models Best practices Graders Fine-tuning Optimization cycle Supervised fine-tuning Vision fine-tuning Direct preference optimization Reinforcement fine-tuning RFT use cases Best practices Assistants API Migration guide Deep dive Tools Resources Terms and policies Changelog Your data Permissions Rate limits IP egress ranges Admin APIs Deprecations MCP for deep research Developer mode ChatGPT Actions Introduction Getting started Actions library Authentication Production Data retrieval Sending files Docs Use cases Getting Started Overview Quickstart Explore use cases Import to Codex Pricing Concepts Prompting Customization Memories Chronicle Sandboxing Auto-review Subagents Workflows Models Cyber Safety Glossary Using Codex App Overview Features Settings Review Automations Worktrees Local Environments In-app browser Chrome extension Computer Use Appshots Commands Windows Troubleshooting IDE Extension Overview Features Settings IDE Commands Slash commands CLI Overview Features Command Line Options Slash commands Web Overview Environments Internet Access Integrations GitHub Slack Linear Codex Security Overview Codex Security plugin Quickstart Run a security scan Run a deep scan Review code changes Triage a backlog Fix findings Export and track findings Changelog Codex Security cloud Setup Improving the threat model FAQ Configuration Config File Config Basics Advanced Config Config Reference Environment Variables Sample Config Permissions Speed Rules Hooks AGENTS.md MCP Plugins Overview Build plugins Sites Skills Overview Record & Replay Subagents Administration Authentication Overview Access tokens Agent approvals & security Remote connections Deployment Amazon Bedrock Enterprise Admin Setup Governance Managed configuration Windows Automation Non-interactive Mode Codex SDK App Server MCP Server GitHub Action Learn Best practices Videos Community Blog Mastering Codex Remote for engineering Using skills to accelerate OSS maintenance View all Cookbooks Build an Agent Improvement Loop with Traces, Evals, and Codex Build iterative repair loops with Codex View all Building AI Teams Releases Changelog Feature Maturity Open Source Home Collections Apps SDK Workspace Agents Commerce Ads Home Quickstart Core Concepts MCP Apps in ChatGPT MCP Server UX principles UI guidelines Plan Research use cases Define tools Design components Build Set up your server Build your ChatGPT UI Authenticate users Manage state Monetize your app Examples Deploy Deploy your app Connect from ChatGPT Test your integration Submit your app Conversion apps Restaurant reservation spec Product checkout spec Guides Optimize Metadata Security & Privacy Troubleshooting Resources Changelog App submission guidelines Reference Home Get started Trigger workspace agent runs Authenticate with Workspace Agent access tokens Home Guides Get started Best practices File Upload Overview Products API Overview Feeds Products Promotions Ads Overview Measurement JavaScript Pixel Image tag Conversions API Supported events Advertiser API Overview Quickstart Product feeds Campaign Targeting API Reference Authentication Campaigns Ad Groups Ads Ad Account Insights Files Showcase Blog Cookbook Learn Community Home API examples Sites All posts Recent Making private MCP servers reachable without making them public Mastering Codex Remote for engineering How Perplexity Brought Voice Search to Millions Using the Realtime API Designing delightful frontends with GPT-5.4 From prompts to products: One year of Responses Topics General API Apps SDK Audio Codex Home Topics Agents Evals Multimodal Text Guardrails Optimization ChatGPT Codex gpt-oss Contribute Cookbook on GitHub Home OpenAI Developers plugin Docs MCP Categories Demo apps Videos Topics Agents Audio & Voice Computer Use Codex Evals gpt-oss Fine-tuning Image generation Scaling Tools Video generation Community Programs Codex Ambassadors Codex for Students Codex for Open Source OpenAI for Startups Events Meetups Spaces Developer Forum Discord Reddit X API Dashboard Get started Overview Quickstart Models Pricing SDKs and CLI OpenAI SDK Agents SDK OpenAI CLI Latest: GPT-5.5 Prompt guidance Core concepts Text generation Code generation Images and vision Audio and speech Structured output Function calling Responses API Using tools Agents SDK Overview Quickstart Agent definitions Models and providers Running agents Sandbox agents Orchestration Guardrails Results and state Integrations and observability Evaluate agent workflows Voice agents ChatKit Overview Customize Widgets Actions Advanced integrations Tools Web search MCP and Connectors Secure MCP Tunnel Skills Shell Computer use File search and retrieval File search Retrieval Tool search More tools Apply Patch Local shell Image generation Code interpreter Run and scale Conversation state Background mode Streaming WebSocket mode Webhooks File inputs Context management Compaction Counting tokens Prompt caching Prompting Overview Prompt engineering Citation formatting Migration guide Reasoning Reasoning models Reasoning best practices Evaluation Red teaming Realtime and audio Overview Voice agents Live translation Transcription Realtime transcription Speech to text Speech generation Realtime prompting guide Connection methods WebRTC WebSocket SIP Realtime sessions Managing conversations Voice activity detection Realtime with tools Webhooks and server-side controls Managing costs Specialized models Image generation Video generation Deep research Embeddings Moderation Going live Production best practices Workload identity federation Overview Kubernetes AWS Microsoft Azure Google Cloud GitHub Actions SPIFFE Deployment checklist Amazon Bedrock Latency optimization Overview Predicted Outputs Priority processing Cost optimization Overview Batch Flex processing Accuracy optimization Safety Safety best practices Safety checks Cybersecurity checks Under 18 API Guidance Legacy APIs Agent Builder Overview Migration guide Node reference Safety in building agents Evals Getting started Working with evals Prompt optimizer External models Best practices Graders Fine-tuning Optimization cycle Supervised fine-tuning Vision fine-tuning Direct preference optimization Reinforcement fine-tuning RFT use cases Best practices Assistants API Migration guide Deep dive Tools Resources Terms and policies Changelog Your data Permissions Rate limits IP egress ranges Admin APIs Deprecations MCP for deep research Developer mode ChatGPT Actions Introduction Getting started Actions library Authentication Production Data retrieval Sending files *+*]:mt-3"> svg]:h-4 [&>svg]:w-4"> Cookbook example Build a coding agent with GPT-5.1 and the shell tool Copy Page Shell Run shell commands in hosted containers or your own local runtime. Copy Page The shell tool gives models the ability to work inside a complete terminal environment. We support shell for local execution and for hosted execution through the Responses API.
+The shell tool lets models run commands through either:
+Hosted shell containers managed by OpenAI.
+A local shell runtime that you host and execute yourself.
+Shell is available through the Responses API . It’s not available via the Chat Completions API.
+Running arbitrary shell commands can be dangerous. Always sandbox execution,
+apply allowlists or denylists where possible, and log tool activity for
+auditing.
+Hosted shell quickstart
+Hosted shell is a native and streamlined option for tasks that need richer, deterministic processing, from running calculations to working with multimedia.
+Use container_auto when you want OpenAI to provision and manage a container for the request.
+Shell tool with container_auto curl 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+curl -L 'https://api.openai.com/v1/responses' \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer $OPENAI_API_KEY " \
+-d '{
+"model": "gpt-5.5",
+"tools": [
+{ "type": "shell", "environment": { "type": "container_auto" } }
+],
+"input": [
+{
+"type": "message",
+"role": "user",
+"content": [
+{ "type": "input_text", "text": "Execute: ls -lah /mnt/data && python --version && node --version" }
+]
+}
+],
+"tool_choice": "auto"
+}' 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+import OpenAI from "openai" ;
+const client = new OpenAI();
+const response = await client.responses.create({
+model : "gpt-5.5" ,
+tools : [{ type : "shell" , environment : { type : "container_auto" } }],
+input : [
+{
+type : "message" ,
+role : "user" ,
+content : [
+{
+type : "input_text" ,
+text : "Execute: ls -lah /mnt/data && python --version && node --version" ,
+},
+],
+},
+],
+tool_choice : "auto" ,
+});
+console .log(response.output_text); 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+from openai import OpenAI
+client = OpenAI()
+response = client.responses.create(
+model= "gpt-5.5" ,
+tools=[{ "type" : "shell" , "environment" : { "type" : "container_auto" }}],
+input =[
+{
+"type" : "message" ,
+"role" : "user" ,
+"content" : [
+{
+"type" : "input_text" ,
+"text" : "Execute: ls -lah /mnt/data && python --version && node --version" ,
+}
+],
+}
+],
+tool_choice= "auto" ,
+)
+print (response.output_text)
+Hosted runtime details
+Runtime is currently based on Debian 12 and may change over time.
+Default working directory is /mnt/data .
+/mnt/data is always present and is the supported path for user-downloadable artifacts.
+Hosted shell doesn’t support interactive TTY sessions.
+Hosted shell commands don’t run with sudo .
+You can run services inside the container when your workflow needs them.
+Current preinstalled languages include:
+Python 3.11
+Node.js 22.16
+Java 17.0
+PHP 8.2
+Ruby 3.1
+Go 1.23
+Reuse a container across requests
+If you need a long-running environment for iterative workflows, create a container and then reference it in subsequent Responses API calls.
+1. Create a container
+Create a reusable container curl 1
+2
+3
+4
+5
+6
+7
+8
+curl -L 'https://api.openai.com/v1/containers' \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer $OPENAI_API_KEY " \
+-d '{
+"name": "analysis-container",
+"memory_limit": "1g",
+"expires_after": { "anchor": "last_active_at", "minutes": 20 }
+}' 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+import OpenAI from "openai" ;
+const client = new OpenAI();
+const container = await client.containers.create({
+name : "analysis-container" ,
+memory_limit : "1g" ,
+expires_after : { anchor : "last_active_at" , minutes : 20 },
+});
+console .log(container.id); 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+from openai import OpenAI
+client = OpenAI()
+container = client.containers.create(
+name= "analysis-container" ,
+memory_limit= "1g" ,
+expires_after={ "anchor" : "last_active_at" , "minutes" : 20 },
+)
+print (container. id )
+2. Reference the container in Responses
+Use shell with container_reference curl 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+curl -L 'https://api.openai.com/v1/responses' \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer $OPENAI_API_KEY " \
+-d '{
+"model": "gpt-5.5",
+"tools": [
+{
+"type": "shell",
+"environment": {
+"type": "container_reference",
+"container_id": "cntr_08f3d96c87a585390069118b594f7481a088b16cda7d9415fe"
+}
+}
+],
+"input": "List files in the container and show disk usage."
+}' 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+import OpenAI from "openai" ;
+const client = new OpenAI();
+const response = await client.responses.create({
+model : "gpt-5.5" ,
+tools : [
+{
+type : "shell" ,
+environment : {
+type : "container_reference" ,
+container_id : "cntr_08f3d96c87a585390069118b594f7481a088b16cda7d9415fe" ,
+},
+},
+],
+input : "List files in the container and show disk usage." ,
+});
+console .log(response.output_text); 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+from openai import OpenAI
+client = OpenAI()
+response = client.responses.create(
+model= "gpt-5.5" ,
+tools=[
+{
+"type" : "shell" ,
+"environment" : {
+"type" : "container_reference" ,
+"container_id" : "cntr_08f3d96c87a585390069118b594f7481a088b16cda7d9415fe" ,
+},
+}
+],
+input = "List files in the container and show disk usage." ,
+)
+print (response.output_text)
+Attach skills
+Skills are reusable, versioned bundles that you can mount in hosted shell environments. This defines the available skills, and at shell execution time the model decides whether to invoke them.
+Use the Skills guide for upload and versioning details.
+Create a container with attached skills curl 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+curl -L 'https://api.openai.com/v1/containers' \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer $OPENAI_API_KEY " \
+-d '{
+"name": "skill-container",
+"skills": [
+{ "type": "skill_reference", "skill_id": "skill_4db6f1a2c9e73508b41f9da06e2c7b5f" },
+{ "type": "skill_reference", "skill_id": "openai-spreadsheets", "version": "latest" }
+]
+}' 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+import OpenAI from "openai" ;
+const client = new OpenAI();
+const container = await client.containers.create({
+name : "skill-container" ,
+skills : [
+{ type : "skill_reference" , skill_id : "skill_4db6f1a2c9e73508b41f9da06e2c7b5f" },
+{ type : "skill_reference" , skill_id : "openai-spreadsheets" , version : "latest" },
+],
+});
+console .log(container.id); 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+from openai import OpenAI
+client = OpenAI()
+container = client.containers.create(
+name= "skill-container" ,
+skills=[
+{ "type" : "skill_reference" , "skill_id" : "skill_4db6f1a2c9e73508b41f9da06e2c7b5f" },
+{ "type" : "skill_reference" , "skill_id" : "openai-spreadsheets" , "version" : "latest" },
+],
+)
+print (container. id )
+Network access
+Hosted containers don’t have outbound network access by default.
+To enable it:
+An admin must configure your org allow list in the dashboard.
+You must explicitly set network_policy on the container environment in your request.
+Shell tool with network allowlist curl 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+curl -L 'https://api.openai.com/v1/responses' \
+-H "Authorization: Bearer $OPENAI_API_KEY " \
+-H "Content-Type: application/json" \
+-d '{
+"model": "gpt-5.5",
+"tool_choice": "required",
+"tools": [
+{
+"type": "shell",
+"environment": {
+"type": "container_auto",
+"network_policy": {
+"type": "allowlist",
+"allowed_domains": ["pypi.org", "files.pythonhosted.org", "github.com"]
+}
+}
+}
+],
+"input": [
+{
+"role": "user",
+"content": "In the container, pip install httpx beautifulsoup4, fetch release pages, and write /mnt/data/release_digest.md."
+}
+]
+}' 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+import OpenAI from "openai" ;
+const client = new OpenAI();
+const response = await client.responses.create({
+model : "gpt-5.5" ,
+tool_choice : "required" ,
+tools : [
+{
+type : "shell" ,
+environment : {
+type : "container_auto" ,
+network_policy : {
+type : "allowlist" ,
+allowed_domains : [ "pypi.org" , "files.pythonhosted.org" , "github.com" ],
+},
+},
+},
+],
+input : [
+{
+role : "user" ,
+content :
+"In the container, pip install httpx beautifulsoup4, fetch release pages, and write /mnt/data/release_digest.md." ,
+},
+],
+});
+console .log(response.output_text); 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+from openai import OpenAI
+client = OpenAI()
+response = client.responses.create(
+model= "gpt-5.5" ,
+tool_choice= "required" ,
+tools=[
+{
+"type" : "shell" ,
+"environment" : {
+"type" : "container_auto" ,
+"network_policy" : {
+"type" : "allowlist" ,
+"allowed_domains" : [ "pypi.org" , "files.pythonhosted.org" , "github.com" ],
+},
+},
+}
+],
+input =[
+{
+"role" : "user" ,
+"content" : "In the container, pip install httpx beautifulsoup4, fetch release pages, and write /mnt/data/release_digest.md." ,
+}
+],
+)
+print (response.output_text)
+Allowlisting domains introduces security risks such as prompt
+injection-driven data exfiltration. Only allowlist domains you trust and that
+attackers cannot use to receive exfiltrated data. Carefully review the Risks
+and safety section below before using this tool.
+Network policy precedence
+When multiple controls are present:
+Your org allow list defines the full set of allowed_domains .
+Request-level network_policy further restricts access.
+Requests fail if allowed_domains includes domains outside your org allow list.
+Data retention and container lifecycle
+Hosted containers used by Hosted Shell and Code Interpreter may write temporary application state to the container filesystem (backed by ephemeral block storage) while the container is active. Container data is deleted when the container expires or is explicitly deleted.
+For more details on data controls, see ZDR and data residency .
+Download artifacts
+Hosted shell can produce downloadable files. Use the same container/files APIs as code interpreter to retrieve artifacts written under /mnt/data .
+Additional data controls
+If you want to keep content and files ephemeral within the hosted lifecycle, you can inline files in the request and mount inline skills in the container.
+Use inline files and inline skills curl 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+INLINE_ZIP=$(base64 -i ./csv_insights.zip)
+REPORT_CSV=$(base64 -i ./report.csv)
+CONTAINER_ID=$(
+curl -sL 'https://api.openai.com/v1/containers' \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer $OPENAI_API_KEY " \
+-d '{
+"name": "inline-skill-container",
+"skills": [
+{
+"type": "inline",
+"name": "csv-insights",
+"description": "Summarize CSV files and produce a markdown report.",
+"source": {
+"type": "base64",
+"media_type": "application/zip",
+"data": "' " $INLINE_ZIP " '"
+}
+}
+]
+}' | jq -r '.id'
+)
+curl -L 'https://api.openai.com/v1/responses' \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer $OPENAI_API_KEY " \
+-d '{
+"model": "gpt-5.5",
+"tools": [
+{
+"type": "shell",
+"environment": {
+"type": "container_reference",
+"container_id": "' " $CONTAINER_ID " '"
+}
+}
+],
+"input": [
+{
+"role": "user",
+"content": [
+{
+"type": "input_file",
+"filename": "report.csv",
+"file_data": "data:text/csv;base64,' " ${REPORT_CSV} " '"
+},
+{
+"type": "input_text",
+"text": "Use the csv-insights skill to summarize report.csv."
+}
+]
+}
+]
+}' 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+import fs from "fs" ;
+import OpenAI from "openai" ;
+const client = new OpenAI();
+const inlineZip = fs.readFileSync( "csv_insights.zip" ).toString( "base64" );
+const reportCsv = fs.readFileSync( "report.csv" ).toString( "base64" );
+const container = await client.containers.create({
+name : "inline-skill-container" ,
+skills : [
+{
+type : "inline" ,
+name : "csv-insights" ,
+description : "Summarize CSV files and produce a markdown report." ,
+source : {
+type : "base64" ,
+media_type : "application/zip" ,
+data : inlineZip,
+},
+},
+],
+});
+const response = await client.responses.create({
+model : "gpt-5.5" ,
+tools : [
+{
+type : "shell" ,
+environment : {
+type : "container_reference" ,
+container_id : container.id,
+},
+},
+],
+input : [
+{
+role : "user" ,
+content : [
+{
+type : "input_file" ,
+filename : "report.csv" ,
+file_data : `data:text/csv;base64, ${reportCsv} ` ,
+},
+{
+type : "input_text" ,
+text : "Use the csv-insights skill to summarize report.csv." ,
+},
+],
+},
+],
+});
+console .log(response.output_text); 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+import base64
+from openai import OpenAI
+client = OpenAI()
+with open ( "csv_insights.zip" , "rb" ) as f:
+inline_zip = base64.b64encode(f.read()).decode( "utf-8" )
+with open ( "report.csv" , "rb" ) as f:
+base64_string = base64.b64encode(f.read()).decode( "utf-8" )
+container = client.containers.create(
+name= "inline-skill-container" ,
+skills=[
+{
+"type" : "inline" ,
+"name" : "csv-insights" ,
+"description" : "Summarize CSV files and produce a markdown report." ,
+"source" : {
+"type" : "base64" ,
+"media_type" : "application/zip" ,
+"data" : inline_zip,
+},
+}
+],
+)
+response = client.responses.create(
+model= "gpt-5.5" ,
+tools=[
+{
+"type" : "shell" ,
+"environment" : {
+"type" : "container_reference" ,
+"container_id" : container. id ,
+},
+}
+],
+input =[
+{
+"role" : "user" ,
+"content" : [
+{
+"type" : "input_file" ,
+"filename" : "report.csv" ,
+"file_data" : f"data:text/csv;base64, {base64_string} " ,
+},
+{
+"type" : "input_text" ,
+"text" : "Use the csv-insights skill to summarize report.csv." ,
+},
+],
+}
+],
+)
+print (response.output_text)
+For follow-up requests, pass the same container_id with container_reference . The mounted skills and existing container files remain available while the container is active.
+Proactively delete a container
+You can explicitly delete the container when the work is done instead of waiting for inactivity expiration.
+Delete a container curl curl -L -X DELETE 'https://api.openai.com/v1/containers/container_id' \
+-H "Authorization: Bearer $OPENAI_API_KEY " import OpenAI from "openai" ;
+const client = new OpenAI();
+const deleted = await client.containers.delete( "container_id" );
+console .log(deleted); from openai import OpenAI
+client = OpenAI()
+deleted = client.containers.delete( "container_id" )
+print (deleted)
+Domain secrets
+Use domain_secrets when a domain in your allowed_domains list requires private authorization headers, such as Authorization: Bearer <token> .
+Each secret entry includes:
+Target domain
+Friendly secret name
+Secret value
+At runtime:
+The model and runtime see placeholder names (for example, $API_KEY ) instead of raw credentials.
+The auth-translation sidecar applies raw secret values only for approved destinations.
+Raw secret values don’t persist on API servers and don’t appear in model-visible context.
+This lets the assistant call protected services while reducing leakage risk.
+Shell tool with domain_secrets curl 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+curl -L 'https://api.openai.com/v1/responses' \
+-H "Authorization: Bearer $OPENAI_API_KEY " \
+-H "Content-Type: application/json" \
+-d '{
+"model": "gpt-5.5",
+"input": [
+{
+"role": "user",
+"content": "Use curl to call https://httpbin.org/headers with header Authorization: Bearer $API_KEY. Tell me what you see in the final text response."
+}
+],
+"tool_choice": "required",
+"tools": [
+{
+"type": "shell",
+"environment": {
+"type": "container_auto",
+"network_policy": {
+"type": "allowlist",
+"allowed_domains": ["httpbin.org"],
+"domain_secrets": [
+{
+"domain": "httpbin.org",
+"name": "API_KEY",
+"value": "debug-secret-123"
+}
+]
+}
+}
+}
+]
+}' 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+import OpenAI from "openai" ;
+const client = new OpenAI();
+const response = await client.responses.create({
+model : "gpt-5.5" ,
+input : [
+{
+role : "user" ,
+content :
+"Use curl to call https://httpbin.org/headers with header Authorization: Bearer $API_KEY. Tell me what you see in the final text response." ,
+},
+],
+tool_choice : "required" ,
+tools : [
+{
+type : "shell" ,
+environment : {
+type : "container_auto" ,
+network_policy : {
+type : "allowlist" ,
+allowed_domains : [ "httpbin.org" ],
+domain_secrets : [
+{
+domain : "httpbin.org" ,
+name : "API_KEY" ,
+value : "debug-secret-123" ,
+},
+],
+},
+},
+},
+],
+});
+console .log(response.output_text); 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+from openai import OpenAI
+client = OpenAI()
+response = client.responses.create(
+model= "gpt-5.5" ,
+input =[
+{
+"role" : "user" ,
+"content" : "Use curl to call https://httpbin.org/headers with header Authorization: Bearer $API_KEY. Tell me what you see in the final text response." ,
+}
+],
+tool_choice= "required" ,
+tools=[
+{
+"type" : "shell" ,
+"environment" : {
+"type" : "container_auto" ,
+"network_policy" : {
+"type" : "allowlist" ,
+"allowed_domains" : [ "httpbin.org" ],
+"domain_secrets" : [
+{
+"domain" : "httpbin.org" ,
+"name" : "API_KEY" ,
+"value" : "debug-secret-123" ,
+}
+],
+},
+},
+}
+],
+)
+print (response.output_text)
+Multi-turn workflows
+To continue work in the same hosted environment, reuse the container and pass previous_response_id .
+Continue a shell workflow curl 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+curl -L 'https://api.openai.com/v1/responses' \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer $OPENAI_API_KEY " \
+-d '{
+"model": "gpt-5.5",
+"previous_response_id": "resp_2a8e5c9174d63b0f18a4c572de9f64a1b3c76d508e12f9ab47",
+"tools": [
+{
+"type": "shell",
+"environment": {
+"type": "container_reference",
+"container_id": "cntr_f19c2b51e4a06793d82d54a7be0fc9154d3361ab28ce7f6041"
+}
+}
+],
+"input": "Read /mnt/data/top5.csv and report the top candidate."
+}' 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+import OpenAI from "openai" ;
+const client = new OpenAI();
+const response = await client.responses.create({
+model : "gpt-5.5" ,
+previous_response_id : "resp_2a8e5c9174d63b0f18a4c572de9f64a1b3c76d508e12f9ab47" ,
+tools : [
+{
+type : "shell" ,
+environment : {
+type : "container_reference" ,
+container_id : "cntr_f19c2b51e4a06793d82d54a7be0fc9154d3361ab28ce7f6041" ,
+},
+},
+],
+input : "Read /mnt/data/top5.csv and report the top candidate." ,
+});
+console .log(response.output_text); 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+from openai import OpenAI
+client = OpenAI()
+response = client.responses.create(
+model= "gpt-5.5" ,
+previous_response_id= "resp_2a8e5c9174d63b0f18a4c572de9f64a1b3c76d508e12f9ab47" ,
+tools=[
+{
+"type" : "shell" ,
+"environment" : {
+"type" : "container_reference" ,
+"container_id" : "cntr_f19c2b51e4a06793d82d54a7be0fc9154d3361ab28ce7f6041" ,
+},
+}
+],
+input = "Read /mnt/data/top5.csv and report the top candidate." ,
+)
+print (response.output_text)
+Shell output in Responses
+Hosted shell and local shell use the same output item types. Shell runs are represented by paired output items:
+shell_call : commands requested by the model.
+shell_call_output : command output and exit outcomes.
+Example shell_call item 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+{
+"type" : "shell_call" ,
+"call_id" : "call_9d14ac6f2b73485e91c0f4da6e1b27c8" ,
+"action" : {
+"commands" : [ "ls -l" ],
+"timeout_ms" : 120000 ,
+"max_output_length" : 4096
+},
+"status" : "in_progress"
+}
+Local shell mode
+You can also run shell commands in your own local runtime by executing shell_call actions and sending shell_call_output back to the model.
+Use this mode when you need full control over execution environment, filesystem access, or existing internal tooling.
+Local shell request curl 1
+2
+3
+4
+5
+6
+7
+8
+9
+curl -L 'https://api.openai.com/v1/responses' \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer $OPENAI_API_KEY " \
+-d '{
+"model": "gpt-5.5",
+"instructions": "The local bash shell environment is on Mac.",
+"input": "find me the largest pdf file in ~/Documents",
+"tools": [{ "type": "shell", "environment": { "type": "local" } }]
+}' 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+from openai import OpenAI
+client = OpenAI()
+response = client.responses.create(
+model= "gpt-5.5" ,
+instructions= "The local bash shell environment is on Mac." ,
+input = "find me the largest pdf file in ~/Documents" ,
+tools=[{ "type" : "shell" , "environment" : { "type" : "local" }}],
+)
+print (response) 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+import OpenAI from "openai" ;
+const client = new OpenAI();
+const response = await client.responses.create({
+model : "gpt-5.5" ,
+instructions : "The local bash shell environment is on Mac." ,
+input : "find me the largest pdf file in ~/Documents" ,
+tools : [{ type : "shell" , environment : { type : "local" } }],
+});
+console .log(response);
+When you receive shell_call output items:
+Execute requested commands in your runtime.
+Capture stdout , stderr , and outcome.
+Return results as shell_call_output in the next request.
+Local shell executor example python 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+@dataclass
+class CmdResult :
+stdout: str
+stderr: str
+exit_code: int | None
+timed_out: bool
+class ShellExecutor :
+def __init__ ( self, default_timeout: float = 60 ):
+self.default_timeout = default_timeout
+def run ( self, cmd: str , timeout: float | None = None ) -> CmdResult:
+t = timeout or self.default_timeout
+p = subprocess.Popen(
+cmd,
+shell= True ,
+stdout=subprocess.PIPE,
+stderr=subprocess.PIPE,
+text= True ,
+)
+try :
+out, err = p.communicate(timeout=t)
+return CmdResult(out, err, p.returncode, False )
+except subprocess.TimeoutExpired:
+p.kill()
+out, err = p.communicate()
+return CmdResult(out, err, p.returncode, True ) 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+import { exec } from "node:child_process/promises" ;
+class ShellExecutor {
+constructor ( defaultTimeoutMs = 60_000 ) {
+this .defaultTimeoutMs = defaultTimeoutMs;
+}
+async run ( cmd, timeoutMs ) {
+const timeout = timeoutMs ?? this .defaultTimeoutMs;
+try {
+const { stdout, stderr } = await exec(cmd, { timeout });
+return { stdout, stderr, exitCode : 0 , timedOut : false };
+} catch (error) {
+const timedOut = Boolean (error?.killed) && error?.signal === "SIGTERM" ;
+const exitCode = timedOut ? null : error?.code ?? null ;
+return {
+stdout : error?.stdout ?? "" ,
+stderr : error?.stderr ?? String (error),
+exitCode,
+timedOut,
+};
+}
+}
+}
+Example shell_call_output payload 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+{
+"type" : "shell_call_output" ,
+"call_id" : "call_3ef1b8c79a4d6520f9e3ab7d41c68f25" ,
+"max_output_length" : 4096 ,
+"output" : [
+{
+"stdout" : "..." ,
+"stderr" : "..." ,
+"outcome" : {
+"type" : "exit" ,
+"exit_code" : 0
+}
+},
+{
+"stdout" : "..." ,
+"stderr" : "..." ,
+"outcome" : {
+"type" : "timeout"
+}
+}
+]
+}
+For legacy migration details, see the older Local shell guide .
+Use local shell with Agents SDK
+If you are using the Agents SDK , you can pass your own shell executor implementation to the shell tool helper.
+Use local shell with Agents SDK javascript 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+import {
+Agent,
+run,
+withTrace,
+Shell,
+ShellAction,
+ShellResult,
+shellTool,
+} from "@openai/agents" ;
+class LocalShell implements Shell {
+async run(action: ShellAction): Promise <ShellResult> {
+return {
+output : [
+{
+stdout : "Shell is not available. Needs to be implemented first." ,
+stderr : "" ,
+outcome : {
+type : "exit" ,
+exitCode : 1 ,
+},
+},
+],
+maxOutputLength : action.maxOutputLength,
+};
+}
+}
+const shell = new LocalShell();
+const agent = new Agent({
+name : "Shell Assistant" ,
+model : "gpt-5.5" ,
+instructions :
+"You can execute shell commands to inspect the repository. Keep responses concise and include command output when helpful." ,
+tools : [
+shellTool({
+shell,
+needsApproval : true ,
+onApproval : async (_ctx, _approvalItem) => {
+return { approve : true };
+},
+}),
+],
+});
+await withTrace( "shell-tool-example" , async () => {
+const result = await run(agent, "Show the Node.js version." );
+console .log( `\nFinal response:\n ${result.finalOutput} ` );
+}); 1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+from agents import (
+Agent,
+Runner,
+ShellCallOutcome,
+ShellCommandOutput,
+ShellCommandRequest,
+ShellResult,
+ShellTool,
+)
+class LocalShell :
+async def __call__ ( self, request: ShellCommandRequest ) -> ShellResult:
+action = request.data.action
+return ShellResult(
+output=[
+ShellCommandOutput(
+command= "(not executed)" ,
+stdout= "Shell is not available. Needs to be implemented first." ,
+stderr= "" ,
+outcome=ShellCallOutcome( type = "exit" , exit_code= 1 ),
+)
+],
+max_output_length=action.max_output_length,
+)
+shell_tool = ShellTool(
+executor=LocalShell(),
+needs_approval= True ,
+on_approval= lambda _ctx, _approval_item: { "approve" : True },
+)
+agent = Agent(
+name= "Shell Assistant" ,
+model= "gpt-5.5" ,
+instructions= "You can execute shell commands to inspect the repository. Keep responses concise and include command output when helpful." ,
+tools=[shell_tool],
+)
+async def main ():
+result = await Runner.run(agent, input = "Show the Node.js version." )
+print ( f"\nFinal response:\n {result.final_output} " )
+if __name__ == "__main__" :
+import asyncio
+asyncio.run(main())
+You can find working examples in the SDK repositories.
+Shell tool example - TypeScript TypeScript example for the shell tool in the Agents SDK.
+Shell tool example - Python Python example for the shell tool in the Agents SDK.
+Handling common errors
+If a command exceeds your execution timeout, return a timeout outcome and include partial captured output.
+If max_output_length is present on shell_call , include it in shell_call_output .
+Don’t rely on interactive commands; shell tool execution should be non-interactive.
+Preserve non-zero exit outputs so the model can reason about recovery steps.
+Risks and safety
+Enabling network access in the Containers API is a powerful capability, and it introduces meaningful security and data-governance risk. By default, network access isn’t enabled. When enabled, outbound access should remain tightly scoped to trusted domains needed for the task.
+Network-enabled containers can interact with third-party services and package registries. That creates risks including data leakage, prompt-injection-driven tool misuse, and accidental access beyond intended boundaries. These risks increase when policies are broad, static, or inconsistently enforced.
+Understand prompt injection risks from network-retrieved content
+Any external content fetched over the network may contain hidden instructions intended to manipulate model behavior. Treat untrusted network content as potentially adversarial, and require additional caution for actions that can modify data or systems.
+Connect only to trusted destinations
+Allow only domains you trust and actively maintain. Be cautious with intermediaries and aggregators that proxy to other services, and review their data handling and retention practices before you add them to your allowed domains list.
+Build in reviews before and after requests are executed
+Review the shell tool command and execution output, which are provided in the Responses API response. Capture requested hosts and actual outbound destinations for each session. Periodically review logs to verify access patterns match expectations, detect drift, and identify suspicious behavior.
+Validate data residency and retention requirements
+OpenAI data controls apply within OpenAI boundaries. However, data transmitted to third-party services over network connections is subject to their data retention policies. Ensure external endpoints meet your residency, retention, and compliance requirements. Ask AI
+Docs agent
+Loading docs agent...

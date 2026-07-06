@@ -1,0 +1,421 @@
+Source: https://ai.google.dev/gemini-api/docs/tokens
+Snapshot fetched 2026-07-06. Verbatim excerpts for citation grounding.
+
+Understand and count tokens  |  Gemini API  |  Google AI for Developers
+Skip to main content
+/
+English
+Deutsch
+Español – América Latina
+Français
+Indonesia
+Italiano
+Polski
+Português – Brasil
+Shqip
+Tiếng Việt
+Türkçe
+Русский
+עברית
+العربيّة
+فارسی
+हिंदी
+বাংলা
+ภาษาไทย
+中文 – 简体
+中文 – 繁體
+日本語
+한국어
+Get API key
+Cookbook
+Community
+Sign in
+Docs
+API reference
+Gemini API
+Docs
+API reference
+Get API key
+Cookbook
+Community
+Get started
+Overview
+Get Started
+API keys
+Libraries
+Pricing
+Interactions API
+Coding agent setup
+Models
+All models
+Current: Gemini 3.5
+Nano Banana
+Veo
+Gemini Omni Flash
+Lyria 3
+Lyria RealTime
+Imagen
+Text-to-speech
+Live
+Live Translate
+Embeddings
+Robotics
+Core capabilities
+Text
+Image
+Image generation 🍌 Image understanding
+Video
+Video overview Video understanding
+Documents
+Speech and audio
+Speech generation Audio understanding
+Thinking
+Thinking Thought signatures
+Structured outputs
+Function calling
+Long context
+Agents
+Overview
+Quickstart
+Antigravity Agent
+Building managed agents
+Environments
+Deep Research Agent
+Tools
+Overview
+Google Search
+Google Maps
+Code execution
+URL context
+Computer Use
+File Search
+Combine Tools and Function calling
+Live API
+Overview
+Get started
+Get started using the GenAI SDK Get started using raw WebSockets
+Capabilities
+Live Translation
+Tool use
+Session management
+Ephemeral tokens
+Best practices
+Optimization
+Overview
+Batch API
+Webhooks
+Flex inference
+Priority inference
+Context caching
+Guides
+Streaming
+Background execution
+File input
+Input methods Files API
+OpenAI compatibility
+Media resolution
+Token counting
+Prompt engineering
+Logs and datasets
+Get started with logs Data logging and sharing
+Safety
+Safety settings Safety guidance
+Frameworks
+LangChain & LangGraph CrewAI LlamaIndex Vercel AI SDK Temporal
+Resources
+Release notes
+Deprecations
+Migration
+Migrate to Gen AI SDK Migrate to Interactions API Interactions breaking changes (May 2026)
+Rate limits
+Billing info
+API troubleshooting
+Status
+Partner and library integrations
+Google AI Studio
+Quickstart Vibe code in Build mode Developing Full-Stack Apps Build Android Apps Deploying your app Agents in AI Studio Playground Try out LearnLM Troubleshooting Access for Workspace users
+Google Cloud Platform
+Gemini Enterprise Agent Platform Gemini API OAuth authentication
+Policies
+Terms of service
+Available regions
+Abuse monitoring
+Feedback information
+The Interactions API is now generally available. We recommend using this API for access to all the latest features and models.
+Home
+Gemini API
+Docs
+Send feedback
+Understand and count tokens
+Note: This version of the page covers the Interactions API . You can use the toggle on this page to switch to the generateContent API version of this page .
+Gemini and other generative AI models process input and output at a granularity
+called a token .
+For Gemini models, a token is equivalent to about 4 characters.
+100 tokens is equal to about 60-80 English words.
+About tokens
+Tokens can be single characters like z or whole words like cat . Long words
+are broken up into several tokens. The set of all tokens used by the model is
+called the vocabulary, and the process of splitting text into tokens is called
+tokenization .
+When billing is enabled, the cost of a call to the Gemini API is
+determined in part by the number of input and output tokens, so knowing how to
+count tokens can be helpful.
+Count tokens
+All input to and output from the Gemini API is tokenized, including text, image
+files, and other non-text modalities.
+You can count tokens in the following ways:
+Call count_tokens with the input of the request. Returns the total
+number of tokens in the input only . Make this call before sending input
+to check the size of your requests.
+Use the usage on the interaction response. Returns token
+counts for input ( total_input_tokens ), output ( total_output_tokens ),
+thinking ( total_thought_tokens ), cached content
+( total_cached_tokens ), tool use ( total_tool_use_tokens ),
+and total ( total_tokens ).
+Count text tokens
+Python # This will only work for SDK newer than 2.0.0
+from google import genai
+client = genai . Client ()
+prompt = "The quick brown fox jumps over the lazy dog."
+# Count tokens before sending
+total_tokens = client . models . count_tokens (
+model = "gemini-3.5-flash" ,
+contents = prompt
+)
+print ( "total_tokens:" , total_tokens . total_tokens )
+# Get usage from interaction
+interaction = client . interactions . create (
+model = "gemini-3.5-flash" ,
+input = prompt
+)
+print ( interaction . usage )
+JavaScript // This will only work for SDK newer than 2.0.0
+import { GoogleGenAI } from '@google/genai' ;
+const client = new GoogleGenAI ({});
+const prompt = "The quick brown fox jumps over the lazy dog." ;
+// Count tokens before sending
+const countResponse = await client . models . countTokens ({
+model : "gemini-3.5-flash" ,
+contents : prompt ,
+});
+console . log ( countResponse . totalTokens );
+// Get usage from interaction
+const interaction = await client . interactions . create ({
+model : "gemini-3.5-flash" ,
+input : prompt ,
+});
+console . log ( interaction . usage );
+REST # Specifies the API revision to avoid breaking changes when they become default
+curl -X POST "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:countTokens" \
+-H "x-goog-api-key: $GEMINI_API_KEY " \
+-H "Content-Type: application/json" \
+-d '{"contents": [{"parts": [{"text": "The quick brown fox."}]}]}'
+Count multi-turn tokens
+Count tokens across conversation history using previous_interaction_id :
+Python # This will only work for SDK newer than 2.0.0
+# First interaction
+interaction1 = client . interactions . create (
+model = "gemini-3.5-flash" ,
+input = "Hi, my name is Bob"
+)
+# Second interaction continues the conversation
+interaction2 = client . interactions . create (
+model = "gemini-3.5-flash" ,
+input = "What's my name?" ,
+previous_interaction_id = interaction1 . id
+)
+# Usage includes tokens from both turns
+print ( f "Input tokens: { interaction2 . usage . total_input_tokens } " )
+print ( f "Output tokens: { interaction2 . usage . total_output_tokens } " )
+print ( f "Total tokens: { interaction2 . usage . total_tokens } " )
+JavaScript // This will only work for SDK newer than 2.0.0
+// First interaction
+const interaction1 = await client . interactions . create ({
+model : "gemini-3.5-flash" ,
+input : "Hi, my name is Bob"
+});
+// Second interaction continues the conversation
+const interaction2 = await client . interactions . create ({
+model : "gemini-3.5-flash" ,
+input : "What's my name?" ,
+previous_interaction_id : interaction1 . id
+});
+console . log ( `Input tokens: ${ interaction2 . usage . total_input_tokens } ` );
+console . log ( `Output tokens: ${ interaction2 . usage . total_output_tokens } ` );
+Count multimodal tokens
+All input to the Gemini API is tokenized, including images, video, and audio.
+Key points about tokenization:
+Images : Images ≤384 pixels in both dimensions count as 258 tokens. Larger
+images are tiled into 768x768 pixel tiles, each counting as 258 tokens.
+Video : 263 tokens per second
+Audio : 32 tokens per second
+Image tokens
+Python # This will only work for SDK newer than 2.0.0
+uploaded_file = client . files . upload ( file = "path/to/image.jpg" )
+# Count tokens for image + text
+total_tokens = client . models . count_tokens (
+model = "gemini-3.5-flash" ,
+contents = [ "Tell me about this image" , uploaded_file ]
+)
+print ( f "Total tokens: { total_tokens } " )
+# Generate with image
+interaction = client . interactions . create (
+model = "gemini-3.5-flash" ,
+input = [
+{ "type" : "text" , "text" : "Tell me about this image" },
+{ "type" : "image" , "uri" : uploaded_file . uri , "mime_type" : uploaded_file . mime_type }
+]
+)
+print ( interaction . usage )
+JavaScript // This will only work for SDK newer than 2.0.0
+const uploadedFile = await client . files . upload ({
+file : "path/to/image.jpg" ,
+config : { mimeType : "image/jpeg" }
+});
+// Count tokens
+const countResponse = await client . models . countTokens ({
+model : "gemini-3.5-flash" ,
+contents : [
+{ text : "Tell me about this image" },
+{ fileData : { fileUri : uploadedFile . uri , mimeType : uploadedFile . mimeType } }
+]
+});
+console . log ( countResponse . totalTokens );
+Inline data example:
+Python # This will only work for SDK newer than 2.0.0
+import base64
+with open ( 'image.jpg' , 'rb' ) as f :
+image_bytes = f . read ()
+interaction = client . interactions . create (
+model = "gemini-3.5-flash" ,
+input = [
+{ "type" : "text" , "text" : "Describe this image" },
+{
+"type" : "image" ,
+"data" : base64 . b64encode ( image_bytes ) . decode ( 'utf-8' ),
+"mime_type" : "image/jpeg"
+}
+]
+)
+print ( interaction . usage )
+Video tokens
+Python # This will only work for SDK newer than 2.0.0
+import time
+video_file = client . files . upload ( file = "path/to/video.mp4" )
+while not video_file . state or video_file . state . name != "ACTIVE" :
+print ( "Processing video..." )
+time . sleep ( 5 )
+video_file = client . files . get ( name = video_file . name )
+# A 60-second video is approximately 263 * 60 = 15,780 tokens
+total_tokens = client . models . count_tokens (
+model = "gemini-3.5-flash" ,
+contents = [ "Summarize this video" , video_file ]
+)
+print ( f "Total tokens: { total_tokens } " )
+# Generate with video
+interaction = client . interactions . create (
+model = "gemini-3.5-flash" ,
+input = [
+{ "type" : "text" , "text" : "Summarize this video" },
+{ "type" : "video" , "uri" : video_file . uri , "mime_type" : video_file . mime_type }
+]
+)
+print ( interaction . usage )
+Audio tokens
+Python # This will only work for SDK newer than 2.0.0
+audio_file = client . files . upload ( file = "path/to/audio.mp3" )
+# A 60-second audio clip is approximately 32 * 60 = 1,920 tokens
+total_tokens = client . models . count_tokens (
+model = "gemini-3.5-flash" ,
+contents = [ "Transcribe this audio" , audio_file ]
+)
+print ( f "Total tokens: { total_tokens } " )
+# Generate with audio
+interaction = client . interactions . create (
+model = "gemini-3.5-flash" ,
+input = [
+{ "type" : "text" , "text" : "Transcribe this audio" },
+{ "type" : "audio" , "uri" : audio_file . uri , "mime_type" : audio_file . mime_type }
+]
+)
+print ( interaction . usage )
+Count system instruction tokens
+System instructions are counted as part of the input tokens:
+Python # This will only work for SDK newer than 2.0.0
+interaction = client . interactions . create (
+model = "gemini-3.5-flash" ,
+input = "Hello!" ,
+system_instruction = "You are a helpful assistant who speaks like a pirate."
+)
+# system_instruction tokens included in total_input_tokens
+print ( f "Input tokens: { interaction . usage . total_input_tokens } " )
+Count tool tokens
+Tools (functions, code execution, Google Search) are also counted:
+Python # This will only work for SDK newer than 2.0.0
+tools = [
+{
+"type" : "function" ,
+"name" : "get_weather" ,
+"description" : "Get current weather" ,
+"parameters" : {
+"type" : "object" ,
+"properties" : {
+"location" : { "type" : "string" }
+}
+}
+}
+]
+interaction = client . interactions . create (
+model = "gemini-3.5-flash" ,
+input = "What's the weather in Tokyo?" ,
+tools = tools
+)
+print ( f "Input tokens: { interaction . usage . total_input_tokens } " )
+print ( f "Tool use tokens: { interaction . usage . total_tool_use_tokens } " )
+Context window
+Each Gemini model has a maximum number of tokens it can handle. The context
+window defines the combined limit of input and output tokens.
+Get context window size programmatically
+Python # This will only work for SDK newer than 2.0.0
+model_info = client . models . get ( model = "gemini-3.5-flash" )
+print ( f "Input token limit: { model_info . input_token_limit } " )
+print ( f "Output token limit: { model_info . output_token_limit } " )
+JavaScript // This will only work for SDK newer than 2.0.0
+const modelInfo = await client . models . get ({ model : "gemini-3.5-flash" });
+console . log ( `Input token limit: ${ modelInfo . inputTokenLimit } ` );
+console . log ( `Output token limit: ${ modelInfo . outputTokenLimit } ` );
+Find context window sizes on the models page.
+What's next
+Text generation : Generation basics
+Caching : Reduce costs with caching
+Pricing : Understand costs
+Send feedback
+Except as otherwise noted, the content of this page is licensed under the Creative Commons Attribution 4.0 License , and code samples are licensed under the Apache 2.0 License . For details, see the Google Developers Site Policies . Java is a registered trademark of Oracle and/or its affiliates.
+Last updated 2026-06-22 UTC.
+Need to tell us more?
+[[["Easy to understand","easyToUnderstand","thumb-up"],["Solved my problem","solvedMyProblem","thumb-up"],["Other","otherUp","thumb-up"]],[["Missing the information I need","missingTheInformationINeed","thumb-down"],["Too complicated / too many steps","tooComplicatedTooManySteps","thumb-down"],["Out of date","outOfDate","thumb-down"],["Samples / code issue","samplesCodeIssue","thumb-down"],["Other","otherDown","thumb-down"]],["Last updated 2026-06-22 UTC."],[],[]]
+Terms
+Privacy
+Manage cookies
+English
+Deutsch
+Español – América Latina
+Français
+Indonesia
+Italiano
+Polski
+Português – Brasil
+Shqip
+Tiếng Việt
+Türkçe
+Русский
+עברית
+العربيّة
+فارسی
+हिंदी
+বাংলা
+ภาษาไทย
+中文 – 简体
+中文 – 繁體
+日本語
+한국어

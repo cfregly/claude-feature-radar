@@ -1,0 +1,304 @@
+Source: https://ai.google.dev/gemini-api/docs/priority-inference
+Snapshot fetched 2026-07-06. Verbatim excerpts for citation grounding.
+
+Priority inference  |  Gemini API  |  Google AI for Developers
+Skip to main content
+/
+English
+Deutsch
+Español – América Latina
+Français
+Indonesia
+Italiano
+Polski
+Português – Brasil
+Shqip
+Tiếng Việt
+Türkçe
+Русский
+עברית
+العربيّة
+فارسی
+हिंदी
+বাংলা
+ภาษาไทย
+中文 – 简体
+中文 – 繁體
+日本語
+한국어
+Get API key
+Cookbook
+Community
+Sign in
+Docs
+API reference
+Gemini API
+Docs
+API reference
+Get API key
+Cookbook
+Community
+Get started
+Overview
+Get Started
+API keys
+Libraries
+Pricing
+Interactions API
+Coding agent setup
+Models
+All models
+Current: Gemini 3.5
+Nano Banana
+Veo
+Gemini Omni Flash
+Lyria 3
+Lyria RealTime
+Imagen
+Text-to-speech
+Live
+Live Translate
+Embeddings
+Robotics
+Core capabilities
+Text
+Image
+Image generation 🍌 Image understanding
+Video
+Video overview Video understanding
+Documents
+Speech and audio
+Speech generation Audio understanding
+Thinking
+Thinking Thought signatures
+Structured outputs
+Function calling
+Long context
+Agents
+Overview
+Quickstart
+Antigravity Agent
+Building managed agents
+Environments
+Deep Research Agent
+Tools
+Overview
+Google Search
+Google Maps
+Code execution
+URL context
+Computer Use
+File Search
+Combine Tools and Function calling
+Live API
+Overview
+Get started
+Get started using the GenAI SDK Get started using raw WebSockets
+Capabilities
+Live Translation
+Tool use
+Session management
+Ephemeral tokens
+Best practices
+Optimization
+Overview
+Batch API
+Webhooks
+Flex inference
+Priority inference
+Context caching
+Guides
+Streaming
+Background execution
+File input
+Input methods Files API
+OpenAI compatibility
+Media resolution
+Token counting
+Prompt engineering
+Logs and datasets
+Get started with logs Data logging and sharing
+Safety
+Safety settings Safety guidance
+Frameworks
+LangChain & LangGraph CrewAI LlamaIndex Vercel AI SDK Temporal
+Resources
+Release notes
+Deprecations
+Migration
+Migrate to Gen AI SDK Migrate to Interactions API Interactions breaking changes (May 2026)
+Rate limits
+Billing info
+API troubleshooting
+Status
+Partner and library integrations
+Google AI Studio
+Quickstart Vibe code in Build mode Developing Full-Stack Apps Build Android Apps Deploying your app Agents in AI Studio Playground Try out LearnLM Troubleshooting Access for Workspace users
+Google Cloud Platform
+Gemini Enterprise Agent Platform Gemini API OAuth authentication
+Policies
+Terms of service
+Available regions
+Abuse monitoring
+Feedback information
+The Interactions API is now generally available. We recommend using this API for access to all the latest features and models.
+Home
+Gemini API
+Docs
+Send feedback
+Priority inference
+Description: Learn how to optimize latency with the Priority inference tier in the Interactions API
+Note: This version of the page covers the Interactions API . You can use the toggle on this page to switch to the generateContent API version of this page . Preview: The Gemini Priority API is in
+Preview .
+The Gemini Priority API is a premium inference tier designed for
+business-critical workloads that require lower latency and the highest
+reliability at a premium price point. Priority tier traffic is prioritized above
+standard API and Flex tier traffic.
+Priority inference is available across the Interactions API endpoints.
+How to use Priority
+To use the Priority tier, set the service_tier field in your request to priority . The default tier is standard if the field is omitted.
+Python from google import genai
+client = genai . Client ()
+interaction = client . interactions . create (
+model = "gemini-3.5-flash" ,
+input = "Triage this critical customer support ticket immediately." ,
+service_tier = 'priority'
+)
+print ( interaction . output_text )
+JavaScript import { GoogleGenAI } from '@google/genai' ;
+const ai = new GoogleGenAI ({});
+async function main () {
+const interaction = await ai . interactions . create ({
+model : "gemini-3.5-flash" ,
+input : "Triage this critical customer support ticket immediately." ,
+service_tier : "priority"
+});
+console . log ( interaction . output_text );
+}
+await main ();
+REST curl -X POST "https://generativelanguage.googleapis.com/v1beta/interactions" \
+-H "Content-Type: application/json" \
+-H "x-goog-api-key: $GEMINI_API_KEY " \
+-d '{
+"model": "gemini-3.5-flash",
+"input": "Triage this critical customer support ticket immediately.",
+"service_tier": "priority"
+}'
+How Priority inference works
+Priority inference routes requests to high-criticality compute queues, offering
+predictable, fast performance for user-facing applications. Its primary
+mechanism is a graceful server-side downgrade to standard processing for traffic
+that exceeds dynamic limits, ensuring application stability instead of failing
+the request.
+Feature
+Priority
+Standard
+Flex
+Batch
+Pricing
+75-100% more than Standard
+Full price
+50% discount
+50% discount
+Latency
+Seconds
+Seconds to minutes
+Minutes (1–15 min target)
+Up to 24 hours
+Reliability
+High (Non-sheddable)
+High / Medium-high
+Best-effort (Sheddable)
+High (for throughput)
+Interface
+Synchronous
+Synchronous
+Synchronous
+Asynchronous
+Key benefits
+Low latency : Designed for second response times for interactive,
+user-facing AI tools.
+High reliability : Traffic is treated with the highest criticality and is
+strictly non-sheddable.
+Graceful degradation : Traffic spikes exceeding dynamic limits are
+automatically downgraded to the Standard tier for processing instead of failing,
+preventing service outages.
+Low friction : Uses the same synchronous create method as the
+standard and Flex tiers.
+Use cases
+Priority processing is ideal for business-critical workflows where performance
+and reliability are paramount.
+Interactive AI applications : Customer service chatbots and copilots where
+users pay a premium and expect fast, consistent responses.
+Real-time decision engines : Systems requiring highly reliable, low-latency
+outcomes, such as live ticket triaging or fraud detection.
+Premium customer features : Developers who need to guarantee higher service
+level objectives (SLOs) for paying customers.
+Rate limits
+Priority consumption holds its own rate limits even though consumption is
+counted towards overall interactive traffic rate limits . The default rate limits
+for Priority inference are 0.3x standard rate limit for Model / Tier
+Graceful downgrade logic
+If Priority limits are exceeded due to congestion, overflow requests are
+automatically and gracefully downgraded to Standard processing instead of
+failing with a 503 or 429 error. Downgraded requests are billed at the standard
+rate, not the Priority premium rate.
+Client responsibility
+Response monitoring : Developers should monitor the x-gemini-service-tier
+header in the API response to detect if requests are being frequently downgraded to
+standard .
+Retries : Clients must implement retry logic/exponential backoff for
+standard errors, such as DEADLINE_EXCEEDED .
+Pricing
+Priority inference is priced at 75-100% more than the standard API and billed per token.
+Supported models
+The following models support Priority inference:
+Model
+Priority inference
+Gemini 3.5 Flash
+✔️
+Gemini 3.1 Flash-Lite
+✔️
+Gemini 3.1 Pro Preview
+✔️
+Gemini 3 Flash Preview
+✔️
+Gemini 2.5 Pro
+✔️
+Gemini 2.5 Flash
+✔️
+Gemini 2.5 Flash-Lite
+✔️
+What's next
+Flex inference for cost reduction.
+Tokens : Understand tokens.
+Send feedback
+Except as otherwise noted, the content of this page is licensed under the Creative Commons Attribution 4.0 License , and code samples are licensed under the Apache 2.0 License . For details, see the Google Developers Site Policies . Java is a registered trademark of Oracle and/or its affiliates.
+Last updated 2026-06-22 UTC.
+Need to tell us more?
+[[["Easy to understand","easyToUnderstand","thumb-up"],["Solved my problem","solvedMyProblem","thumb-up"],["Other","otherUp","thumb-up"]],[["Missing the information I need","missingTheInformationINeed","thumb-down"],["Too complicated / too many steps","tooComplicatedTooManySteps","thumb-down"],["Out of date","outOfDate","thumb-down"],["Samples / code issue","samplesCodeIssue","thumb-down"],["Other","otherDown","thumb-down"]],["Last updated 2026-06-22 UTC."],[],[]]
+Terms
+Privacy
+Manage cookies
+English
+Deutsch
+Español – América Latina
+Français
+Indonesia
+Italiano
+Polski
+Português – Brasil
+Shqip
+Tiếng Việt
+Türkçe
+Русский
+עברית
+العربيّة
+فارسی
+हिंदी
+বাংলা
+ภาษาไทย
+中文 – 简体
+中文 – 繁體
+日本語
+한국어

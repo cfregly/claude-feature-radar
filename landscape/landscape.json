@@ -1,60 +1,60 @@
 {
-  "as_of_date": "2026-07-02",
+  "as_of_date": "2026-07-06",
   "capabilities": {
     "claude:release_notes": {
       "vendor": "claude",
       "key": "release_notes",
       "source_url": "https://platform.claude.com/docs/en/release-notes/overview",
       "kind": "changelog",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "unknown",
       "status": "beta",
       "beta_header": "mcp-tunnels-2026-06-22",
       "evidence_quote": "Claude Platform - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Release notes Overview System prompts Migration guides Migrating to Managed ",
-      "content_hash": "2b67a81cc6dca1c5e25c209cd3a7c4f43291e1fa575ceda5d7a573e3d5885cb3"
+      "content_hash": "2857cadc3ba4026df50079517e7356ec2fb69f9656423f8cf4cea7e940d99f15"
     },
     "claude:overview": {
       "vendor": "claude",
       "key": "overview",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/overview",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "unknown",
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Features overview - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overv",
-      "content_hash": "d906f816920fee11d725d151aa55c4cd6d1c721c0d0e2b2d241c85ec739770ae"
+      "content_hash": "31ef952042d96f35093bbb75eb6c320648353d9c1d22ac7fef911e611aae1fd8"
     },
     "claude:beta_headers": {
       "vendor": "claude",
       "key": "beta_headers",
       "source_url": "https://platform.claude.com/docs/en/api/beta-headers",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "unknown",
       "status": "beta",
       "beta_header": "files-api-2025-04-14",
       "evidence_quote": "Beta headers - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K \ue104 Log in \ue0dd API reference \ue027 Beta headers Loading... Loading... Loading... Loadin",
-      "content_hash": "18517a5d9d9431bcf9e50022540a166a49f50e690bd7963f294e9c0951667022"
+      "content_hash": "c6c54edee5396813f5e8b27f7513a3b6b49d38835dce0a89d1f5820fd73683ed"
     },
     "claude:programmatic_tool_calling": {
       "vendor": "claude",
       "key": "programmatic_tool_calling",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Programmatic tool calling - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Featur",
-      "content_hash": "f80476cdf63a42a8a4b78b042e4df577a59f14f2e3574e5de61008b98d97a668"
+      "content_hash": "8d1bae7758a4f2548fc5eb61d03dee14a575d77aa377b713e11fe6b05d7348a6"
     },
     "claude:citations": {
       "vendor": "claude",
       "key": "citations",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/citations",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "beta",
       "beta_header": null,
@@ -66,7 +66,7 @@
       "key": "context_editing",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/context-editing",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "beta",
       "beta_header": "context-management-2025-06-27",
@@ -78,7 +78,7 @@
       "key": "memory_tool",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "beta",
       "beta_header": null,
@@ -90,7 +90,7 @@
       "key": "code_execution",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "beta",
       "beta_header": "files-api-2025-04-14",
@@ -102,7 +102,7 @@
       "key": "prompt_caching",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "beta",
       "beta_header": null,
@@ -114,7 +114,7 @@
       "key": "managed_agents",
       "source_url": "https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "unverified",
       "beta_header": null,
@@ -126,7 +126,7 @@
       "key": "managed_agents_overview",
       "source_url": "https://platform.claude.com/docs/en/managed-agents/overview",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "beta",
       "beta_header": "managed-agents-2026-04-01",
@@ -138,7 +138,7 @@
       "key": "managed_agents_sessions",
       "source_url": "https://platform.claude.com/docs/en/managed-agents/sessions",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "beta",
       "beta_header": "managed-agents-2026-04-01",
@@ -150,7 +150,7 @@
       "key": "managed_agents_environments",
       "source_url": "https://platform.claude.com/docs/en/managed-agents/environments",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "beta",
       "beta_header": "managed-agents-2026-04-01",
@@ -162,7 +162,7 @@
       "key": "managed_agents_multi_agent",
       "source_url": "https://platform.claude.com/docs/en/managed-agents/multi-agent",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "beta",
       "beta_header": "managed-agents-2026-04-01",
@@ -174,7 +174,7 @@
       "key": "fallback_credit",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/fallback-credit",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "beta",
       "beta_header": "fallback-credit-2026-06-01",
@@ -186,19 +186,19 @@
       "key": "adaptive_thinking",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "beta",
       "beta_header": "interleaved-thinking-2025-05-14",
       "evidence_quote": "Adaptive thinking - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overv",
-      "content_hash": "9ce5bd82cc33c33544b39473565d04cb2d3f7a2040ca1423202414929cc2f8ac"
+      "content_hash": "6dac825e4a4b72ca6d243dee96526b42d2e0b4ca1e316f0ab44809f3ebaa9b23"
     },
     "claude:effort": {
       "vendor": "claude",
       "key": "effort",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/effort",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "beta",
       "beta_header": null,
@@ -210,7 +210,7 @@
       "key": "task_budgets",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/task-budgets",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "beta",
       "beta_header": "task-budgets-2026-03-13",
@@ -222,7 +222,7 @@
       "key": "fast_mode",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/fast-mode",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "speed",
       "status": "beta",
       "beta_header": "fast-mode-2026-02-01",
@@ -234,7 +234,7 @@
       "key": "structured_outputs",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "beta",
       "beta_header": "structured-outputs-2025-11-13",
@@ -246,7 +246,7 @@
       "key": "batch_processing",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/batch-processing",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "speed",
       "status": "beta",
       "beta_header": "output-300k-2026-03-24",
@@ -258,7 +258,7 @@
       "key": "search_results",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/search-results",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "beta",
       "beta_header": null,
@@ -270,31 +270,31 @@
       "key": "web_search_tool",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Web search tool - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overvie",
-      "content_hash": "74cc16e33d31bec038dd3c29a622c638e2650a99b7903ffbef464275a13b50ce"
+      "content_hash": "4a124809ecc28dfe5c82873de4b9c95792b8a07fa187d2c46266c4f73c013402"
     },
     "claude:web_fetch_tool": {
       "vendor": "claude",
       "key": "web_fetch_tool",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-fetch-tool",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Web fetch tool - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview",
-      "content_hash": "7144716f7877871f2fbd0f8c263c03f91873765be3651e0cce05674db3b54f84"
+      "content_hash": "b4f2bee1db0d28f9db47d2b38c5f80f127744003a0ad8b8a9dfd5faa1d2c54df"
     },
     "claude:advisor_tool": {
       "vendor": "claude",
       "key": "advisor_tool",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "beta",
       "beta_header": "advisor-tool-2026-03-01",
@@ -306,7 +306,7 @@
       "key": "bash_tool",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/bash-tool",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "beta",
       "beta_header": null,
@@ -318,19 +318,19 @@
       "key": "computer_use",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "beta",
       "beta_header": "computer-use-2025-11-24",
       "evidence_quote": "Computer use tool - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overv",
-      "content_hash": "f629fd94fe0808cc5c4974b4abea494cb3e88a148ab00b64496e89e1865dd4a0"
+      "content_hash": "c2edd6a6b39ec85840b0bef777076793322aabb143560df20b8cf35c62ef45e4"
     },
     "claude:text_editor": {
       "vendor": "claude",
       "key": "text_editor",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/text-editor-tool",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "beta",
       "beta_header": null,
@@ -342,7 +342,7 @@
       "key": "tool_search",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "beta",
       "beta_header": null,
@@ -354,7 +354,7 @@
       "key": "fine_grained_tool_streaming",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/fine-grained-tool-streaming",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "speed",
       "status": "beta",
       "beta_header": "fine-grained-tool-streaming-2025-05-14",
@@ -366,7 +366,7 @@
       "key": "context_windows",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/context-windows",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "beta",
       "beta_header": "interleaved-thinking-2025-05-14",
@@ -378,7 +378,7 @@
       "key": "compaction",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/compaction",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "beta",
       "beta_header": "compact-2026-01-12",
@@ -390,7 +390,7 @@
       "key": "mid_conversation_system",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/mid-conversation-system-messages",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "speed",
       "status": "beta",
       "beta_header": null,
@@ -402,7 +402,7 @@
       "key": "cache_diagnostics",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "beta",
       "beta_header": "cache-diagnosis-2026-04-07",
@@ -414,19 +414,19 @@
       "key": "token_counting",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/token-counting",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Token counting - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview",
-      "content_hash": "41450502a884026b6d850da231e1e3abecddd68ccc0874f2f7e3c5ecfbdfd410"
+      "content_hash": "020e90825a3620ada22cd57e30c1c1adf0009b08e8ee16addc7ca2e4e375fe92"
     },
     "claude:files": {
       "vendor": "claude",
       "key": "files",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/files",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "beta",
       "beta_header": "files-api-2025-04-14",
@@ -438,7 +438,7 @@
       "key": "pdf_support",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/pdf-support",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "beta",
       "beta_header": "files-api-2025-04-14",
@@ -450,7 +450,7 @@
       "key": "agent_skills",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "beta",
       "beta_header": "code-execution-2025-08-25",
@@ -462,7 +462,7 @@
       "key": "mcp_connector",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/mcp-connector",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "beta",
       "beta_header": "mcp-client-2025-11-20",
@@ -474,19 +474,19 @@
       "key": "enterprise_managed_mcp_authorization",
       "source_url": "https://claude.com/blog/enterprise-managed-auth",
       "kind": "blog",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Meet Claude Products Claude Claude Code Claude Cowork @Claude Features Claude for Chrome Claude for Microsoft 365 Skills Claude apps built for Design Science Security Models Mythos Fable Opus Sonnet Haiku Platform Build on Claude Overview P",
-      "content_hash": "210a3bd81d2b53c8c956f1cd3482363a759c0eafc5390ac7e3665f003d768111"
+      "content_hash": "c9244f57e5b934a5c645aa0c885ab5818fdcb199bc81e81e242b4848154b50aa"
     },
     "claude:cmek": {
       "vendor": "claude",
       "key": "cmek",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/cmek",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "beta",
       "beta_header": null,
@@ -498,7 +498,7 @@
       "key": "cmek_aws_kms",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/cmek-aws-kms",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -510,7 +510,7 @@
       "key": "cmek_google_cloud_kms",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/cmek-google-cloud-kms",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -522,7 +522,7 @@
       "key": "cmek_azure_key_vault",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/cmek-azure-key-vault",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -534,7 +534,7 @@
       "key": "access_transparency",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/access-transparency",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -546,7 +546,7 @@
       "key": "api_and_data_retention",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/api-and-data-retention",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -558,7 +558,7 @@
       "key": "data_residency",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/data-residency",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -570,7 +570,7 @@
       "key": "admin_api",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/admin-api",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -582,7 +582,7 @@
       "key": "admin_api_keys",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/admin-api-keys",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -594,7 +594,7 @@
       "key": "authentication",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/authentication",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -606,7 +606,7 @@
       "key": "compliance_api",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/compliance-api",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -618,7 +618,7 @@
       "key": "compliance_api_access",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/compliance-api-access",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -630,7 +630,7 @@
       "key": "compliance_activity_feed",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -642,7 +642,7 @@
       "key": "compliance_integration_patterns",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/compliance-integration-patterns",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -654,7 +654,7 @@
       "key": "compliance_org_data",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/compliance-org-data",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -666,7 +666,7 @@
       "key": "workload_identity_federation",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/workload-identity-federation",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -678,7 +678,7 @@
       "key": "wif_admin_api",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/wif-admin-api",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -690,7 +690,7 @@
       "key": "wif_reference",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/wif-reference",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -702,7 +702,7 @@
       "key": "ip_addresses",
       "source_url": "https://platform.claude.com/docs/en/api/ip-addresses",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -714,331 +714,331 @@
       "key": "news",
       "source_url": "https://www.anthropic.com/news",
       "kind": "blog",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "unknown",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Newsroom \\ Anthropic Skip to main content Skip to footer Research Policy Commitments Learn News Try Claude Newsroom Press inquires press@anthropic.com Non-media inquiries How to get support Media assets Download press kit Redeploying Fable ",
-      "content_hash": "173aec6771be2276a927f7e834c04ad872f62f8cc37c4888ca092012e62c1ec6"
+      "content_hash": "48a2e98c4aa8e0edb7531723f5e1a3bdea34c44888dc84ded1c04bc154d679d0"
     },
     "anthropic:opus_4_8": {
       "vendor": "anthropic",
       "key": "opus_4_8",
       "source_url": "https://www.anthropic.com/news/claude-opus-4-8",
       "kind": "blog",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Introducing Claude Opus 4.8 \\ Anthropic Skip to main content Skip to footer Research Policy Commitments Learn News Try Claude Product Announcements Introducing Claude Opus 4.8 May 28, 2026 We\u2019re upgrading Claude Opus to a new version: Claud",
-      "content_hash": "2c51711c4b637d0b48e2e109a871f48a1ae710fbff3bee62802b44cab334f85c"
+      "content_hash": "7962742f77524adf2f2d7745cfbdcff90d22336cd430b982bdb50604ee5ed58b"
     },
     "anthropic:fable_mythos_5": {
       "vendor": "anthropic",
       "key": "fable_mythos_5",
       "source_url": "https://www.anthropic.com/news/claude-fable-5-mythos-5",
       "kind": "blog",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "ga",
       "beta_header": null,
       "evidence_quote": "Claude Fable 5 and Claude Mythos 5 \\ Anthropic Skip to main content Skip to footer Research Policy Commitments Learn News Try Claude Announcements Claude Fable 5 and Claude Mythos 5 Jun 9, 2026 Update Claude Mythos 5 and Fable 5 redeployed ",
-      "content_hash": "b3d3126fef687d16633e0737f5c9241b17f7adca293aa17c007efc782dbb41e5"
+      "content_hash": "17f86c24526c45cdea2d27d67791dcf9c4da0e70a09662a09db7d0f122c4fd82"
     },
     "anthropic:fable_mythos_access": {
       "vendor": "anthropic",
       "key": "fable_mythos_access",
       "source_url": "https://www.anthropic.com/news/fable-mythos-access",
       "kind": "blog",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "unknown",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Statement on the US government directive to suspend access to Fable 5 and Mythos 5 \\ Anthropic Skip to main content Skip to footer Research Policy Commitments Learn News Try Claude Announcements Statement on the US government directive to s",
-      "content_hash": "0a57583650972cb161f40ad767aee78281d6b6c8a9800bc8cd8322754b915895"
+      "content_hash": "44f90e42dfaf8ae07c3582897f0243ef21301cd1044150bbd2c7f0067928cda7"
     },
     "anthropic:claude_4": {
       "vendor": "anthropic",
       "key": "claude_4",
       "source_url": "https://www.anthropic.com/news/claude-4",
       "kind": "blog",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Introducing Claude 4 \\ Anthropic Skip to main content Skip to footer Research Policy Commitments Learn News Try Claude Announcements Introducing Claude 4 May 22, 2025 Today, we\u2019re introducing the next generation of Claude models: Claude Opu",
-      "content_hash": "8e7880c05c4936035561325e08e401d821c451c3e7b979dc8782ad519c1eeb9b"
+      "content_hash": "a51074b54181a322a2a21381ba6db126248cdf765148113c2e48f7cf6a85b526"
     },
     "anthropic:claude_apps_release_notes": {
       "vendor": "anthropic",
       "key": "claude_apps_release_notes",
       "source_url": "https://support.claude.com/en/articles/12138966-release-notes",
       "kind": "changelog",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "unknown",
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Release notes | Claude Help Center Skip to main content API Docs Release Notes How to Get Support English Fran\u00e7ais Deutsch Bahasa Indonesia Italiano \u65e5\u672c\u8a9e \ud55c\uad6d\uc5b4 Portugu\u00eas P\u0443\u0441\u0441\u043a\u0438\u0439 \u7b80\u4f53\u4e2d\u6587 Espa\u00f1ol \u7e41\u9ad4\u4e2d\u6587 English API Docs Release Notes How to Get Suppo",
-      "content_hash": "e11044dd24aed9a9477de0b4d26ea14e1a7fc87f7ae61473a879cc858d70376e"
+      "content_hash": "9121ac6e293bfd25b185a1c3698bb069782d3f41bbef7262faa1f8a4a9c80495"
     },
     "anthropic:claude_devs_x": {
       "vendor": "anthropic",
       "key": "claude_devs_x",
       "source_url": "https://x.com/ClaudeDevs",
       "kind": "blog",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "unknown",
-      "status": "beta",
+      "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Twitter feed for: @ClaudeDevs. Generated by https://nitter.net",
-      "content_hash": "29709c887312bed37b9fd9c1bc225408fcb1c6cdc6c2abe29fc8103218827fef"
+      "content_hash": "e4a5a6ce3829eb613e59d02645b1155d277c2b679b1fe459b2646c87630c841e"
     },
     "claude:claude_code_changelog": {
       "vendor": "claude",
       "key": "claude_code_changelog",
       "source_url": "https://code.claude.com/docs/en/changelog",
       "kind": "changelog",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
-      "status": "beta",
+      "status": "ga",
       "beta_header": null,
       "evidence_quote": "Claude Code changelog - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page E",
-      "content_hash": "bfe37680290ba3110c4bac11d6e94b92690cdcf0fac1ed968805a17ec4bfa8f8"
+      "content_hash": "cbb77f42aa90d64ea759ebf4a6abbd0aa1ab4eb5b57d8d0b2d4475b62fde5264"
     },
     "claude:claude_code_whats_new": {
       "vendor": "claude",
       "key": "claude_code_whats_new",
       "source_url": "https://code.claude.com/docs/en/whats-new",
       "kind": "changelog",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "What's new - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page English Sear",
-      "content_hash": "c1c9d12fb4de10443c6aa26e7c84988132810f871b4dd60721b2acc8958712f5"
+      "content_hash": "cbb5d9b0a85458bd7056011c8d303ef6b4e10c6403a38724e5c9a14d28a4c5e6"
     },
     "claude:claude_code_overview": {
       "vendor": "claude",
       "key": "claude_code_overview",
       "source_url": "https://docs.claude.com/en/docs/claude-code/overview",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
-      "status": "beta",
+      "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Overview - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page English Search",
-      "content_hash": "5bf206c104f95bc6cfcaa05ebe66bf0a2c864f0a41c9144f74dc343c229c9d73"
+      "content_hash": "e4f4daf71f9b7e0d808564643b99482a2be18a03a3d45021481bafec94832654"
     },
     "claude:claude_code_github_actions": {
       "vendor": "claude",
       "key": "claude_code_github_actions",
       "source_url": "https://docs.claude.com/en/docs/claude-code/github-actions",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "beta",
       "beta_header": null,
       "evidence_quote": "Claude Code GitHub Actions - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home p",
-      "content_hash": "3fdc89c5c50a232d9a969487bb494b52e2531d2c6b5d3a49a27417bb6c577091"
+      "content_hash": "8a217b17b17444cf3d84fbdfc1d09a5afb058d32e4e34c7bb4410eb981e80aaf"
     },
     "claude:claude_code_sdk": {
       "vendor": "claude",
       "key": "claude_code_sdk",
       "source_url": "https://docs.claude.com/en/docs/claude-code/sdk",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Agent SDK overview - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page Engl",
-      "content_hash": "27b87a5520c90456addaef80ac7dc4f81d1da2c5d93c77256413bbd8fd6f73de"
+      "content_hash": "b6e6679435954323afb0b7b97c254fe046f766c091d527797f47ccbf76146d1b"
     },
     "claude:claude_code_hooks": {
       "vendor": "claude",
       "key": "claude_code_hooks",
       "source_url": "https://docs.claude.com/en/docs/claude-code/hooks",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Hooks reference - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page English",
-      "content_hash": "6d9122fb31c217be327bac7e30198af80fa5d557b2ef2addf8849fd131b5496a"
+      "content_hash": "e1c049ddee1eab3e429603c0c2ce232006254d91f0c2872803cb140b9cabf283"
     },
     "claude:claude_code_plugins": {
       "vendor": "claude",
       "key": "claude_code_plugins",
       "source_url": "https://docs.claude.com/en/docs/claude-code/plugins",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Create plugins - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page English ",
-      "content_hash": "1837acec62e04e2830b9287a7c7be6c51d35d78f3ce7ffca0c4a47c6dd1ad670"
+      "content_hash": "0ac39c2011ba95669fba7fb48eea8550bd6bd5876c897e08d074a4b9f30a92d4"
     },
     "claude:claude_code_security": {
       "vendor": "claude",
       "key": "claude_code_security",
       "source_url": "https://code.claude.com/docs/en/security",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Security - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page English Search",
-      "content_hash": "a8837fb1b2621ae09b2a8c6db110e30f66447b3aef5e0dceba6a425ec4d03b76"
+      "content_hash": "7ee3977c73ca80fdb137d4e20a9b1b5c02ea30baafc9e621f1e96a27e51b83c8"
     },
     "claude:claude_code_code_review": {
       "vendor": "claude",
       "key": "claude_code_code_review",
       "source_url": "https://code.claude.com/docs/en/code-review",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
-      "status": "beta",
+      "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Code Review - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page English Sea",
-      "content_hash": "cd217adb110a8f61d32409cb5c93550d4df28e35a214e39ad7e2da34612d5760"
+      "content_hash": "eca7c4464805127f40a9c8ff330f2d97ebc13c679fd3ec27ccc8f98f31206a8a"
     },
     "claude:claude_code_permissions": {
       "vendor": "claude",
       "key": "claude_code_permissions",
       "source_url": "https://code.claude.com/docs/en/permissions",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Configure permissions - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page E",
-      "content_hash": "20c4f0019fdab895561a801997f9dd3514bdb35b5001a1ef494071e17e016f31"
+      "content_hash": "b6f3ef60ab030c28d4bc2978f65679151abbde9755f8c67e4851d4ad6d76ef6b"
     },
     "claude:claude_code_settings": {
       "vendor": "claude",
       "key": "claude_code_settings",
       "source_url": "https://code.claude.com/docs/en/settings",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Claude Code settings - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page En",
-      "content_hash": "f4e8a12661823550645e70abde3534bcfb8fa153f33147a414ccd5648c007fe7"
+      "content_hash": "1f5671848ee9828e5db8da786dc350f5a246cc297b511f59b562055ae1b7d00f"
     },
     "claude:claude_code_server_managed_settings": {
       "vendor": "claude",
       "key": "claude_code_server_managed_settings",
       "source_url": "https://code.claude.com/docs/en/server-managed-settings",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Configure server-managed settings - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs",
-      "content_hash": "f4efc09ddbd09eb1a96d9c831513b5b281a0a5d50956c8d3b36aa2ca1347857f"
+      "content_hash": "f17400414d00937b2576604e05953fcba076d94114d4c876f27b9a31d8737076"
     },
     "claude:claude_code_managed_mcp": {
       "vendor": "claude",
       "key": "claude_code_managed_mcp",
       "source_url": "https://code.claude.com/docs/en/managed-mcp",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Control MCP server access for your organization - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Cl",
-      "content_hash": "f262aba52faedc228e1a8c41396aadabf6502f03975129f8264966b543c6f6fb"
+      "content_hash": "9ccdcebd221fb231b36428debf9a4c10d77ff6b2e470bfd000336616721889b0"
     },
     "claude:claude_code_network_config": {
       "vendor": "claude",
       "key": "claude_code_network_config",
       "source_url": "https://code.claude.com/docs/en/network-config",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Enterprise network configuration - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs ",
-      "content_hash": "be86e056d451aee72783dcc49a9d11072f7b04910a185df60eb7b3a9e65be700"
+      "content_hash": "74cfb186245eb6083465eec764bf697b312df59063e418db02cae51bf28088ae"
     },
     "claude:claude_code_data_usage": {
       "vendor": "claude",
       "key": "claude_code_data_usage",
       "source_url": "https://code.claude.com/docs/en/data-usage",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Data usage - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page English Sear",
-      "content_hash": "45e3df6fa4281a3ca3bcd086c81c760b1e0db01f97f48ff98dac8bc6133f67a1"
+      "content_hash": "667d78a43b89d77382d5f9a94440a517745884a5df89b2ecd17bd0d85710b3b6"
     },
     "claude:claude_code_zero_data_retention": {
       "vendor": "claude",
       "key": "claude_code_zero_data_retention",
       "source_url": "https://code.claude.com/docs/en/zero-data-retention",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Zero data retention - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page Eng",
-      "content_hash": "4f8e8db3aba36b9c2d050f697eb5f2cc87e75fbb69f1e3876cb2688fcec63226"
+      "content_hash": "8aa2b63f18d990948a5aed28a232b0de279cfb1abbca80a8eb3d2141286eddd3"
     },
     "claude:claude_code_legal_compliance": {
       "vendor": "claude",
       "key": "claude_code_legal_compliance",
       "source_url": "https://code.claude.com/docs/en/legal-and-compliance",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Legal and compliance - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page En",
-      "content_hash": "e6f3e46d2e7245fadd5eeeeeb7b04a8b6946770dd035ee9c444e6807b6477ea8"
+      "content_hash": "be2d90b72a89bb0da89867eb12db840cce987bab3a754ec444a309a8f6d0f90d"
     },
     "claude:security_guidance": {
       "vendor": "claude",
       "key": "security_guidance",
       "source_url": "https://code.claude.com/docs/en/security-guidance",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
-      "status": "beta",
+      "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Catch security issues as Claude writes code - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude",
-      "content_hash": "9bc20302d323968713dfa79209c3228d478181cc5fda6fcbb14cbbdb13044900"
+      "content_hash": "2feb7f61da2cc0dfd3182b83532d8e13df5842d2211ec7a06dbdc15145535fe6"
     },
     "claude:claude_code_github_releases": {
       "vendor": "claude",
       "key": "claude_code_github_releases",
       "source_url": "https://github.com/anthropics/claude-code/releases",
       "kind": "changelog",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "ga",
       "beta_header": null,
       "evidence_quote": "Releases \u00b7 anthropics/claude-code \u00b7 GitHub",
-      "content_hash": "f7098ba4a9c0f9b2e642c8bcc56c8dee7354ac74e570f012c48fcb408ccc0182"
+      "content_hash": "2efdc65aadb54d2e55d4971603693412641b80adcc1b092cb81120d5be6cad69"
     },
     "claude:pricing": {
       "vendor": "claude",
       "key": "pricing",
       "source_url": "https://platform.claude.com/docs/en/about-claude/pricing",
       "kind": "pricing",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "unverified",
       "beta_header": null,
       "evidence_quote": "Pricing - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Models Models overview Model IDs and versioning Choosing a model Introducing Claude ",
-      "content_hash": "e5e0259a6afe9fc3cdb8061915c8aef0e0713a94d34f2e18024e141915068e5b"
+      "content_hash": "02a0d68f1531c069e8447fa8b0a71848570e6d5725507cd9488235d1d776da59"
     },
     "openai:compaction": {
       "vendor": "openai",
       "key": "compaction",
       "source_url": "https://developers.openai.com/api/docs/guides/compaction",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "unverified",
       "beta_header": null,
@@ -1050,7 +1050,7 @@
       "key": "prompt_caching",
       "source_url": "https://developers.openai.com/api/docs/guides/prompt-caching",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "unverified",
       "beta_header": null,
@@ -1062,7 +1062,7 @@
       "key": "reasoning",
       "source_url": "https://developers.openai.com/api/docs/guides/reasoning",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "unverified",
       "beta_header": null,
@@ -1074,7 +1074,7 @@
       "key": "token_counting",
       "source_url": "https://developers.openai.com/api/docs/guides/token-counting",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "unverified",
       "beta_header": null,
@@ -1086,7 +1086,7 @@
       "key": "rate_limits",
       "source_url": "https://developers.openai.com/api/docs/guides/rate-limits",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "unverified",
       "beta_header": null,
@@ -1098,7 +1098,7 @@
       "key": "priority_processing",
       "source_url": "https://developers.openai.com/api/docs/guides/priority-processing",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "unknown",
       "status": "unverified",
       "beta_header": null,
@@ -1110,7 +1110,7 @@
       "key": "code_execution",
       "source_url": "https://developers.openai.com/api/docs/guides/tools-code-interpreter",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "unverified",
       "beta_header": null,
@@ -1122,7 +1122,7 @@
       "key": "tool_search",
       "source_url": "https://developers.openai.com/api/docs/guides/tools-tool-search",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "unverified",
       "beta_header": null,
@@ -1134,7 +1134,7 @@
       "key": "mcp_connector",
       "source_url": "https://developers.openai.com/api/docs/guides/tools-connectors-mcp",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -1146,7 +1146,7 @@
       "key": "web_search_tool",
       "source_url": "https://developers.openai.com/api/docs/guides/tools-web-search",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "unverified",
       "beta_header": null,
@@ -1158,7 +1158,7 @@
       "key": "file_search",
       "source_url": "https://developers.openai.com/api/docs/guides/tools-file-search",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "unverified",
       "beta_header": null,
@@ -1170,7 +1170,7 @@
       "key": "structured_outputs",
       "source_url": "https://developers.openai.com/api/docs/guides/structured-outputs",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "beta",
       "beta_header": "gpt-4o-mini-2024-07-18",
@@ -1182,7 +1182,7 @@
       "key": "batch_processing",
       "source_url": "https://developers.openai.com/api/docs/guides/batch",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "speed",
       "status": "unverified",
       "beta_header": null,
@@ -1194,7 +1194,7 @@
       "key": "computer_use",
       "source_url": "https://developers.openai.com/api/docs/guides/tools-computer-use",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "ga",
       "beta_header": null,
@@ -1206,7 +1206,7 @@
       "key": "bash_tool",
       "source_url": "https://developers.openai.com/api/docs/guides/tools-shell",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -1218,7 +1218,7 @@
       "key": "files",
       "source_url": "https://developers.openai.com/api/docs/guides/file-inputs",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
@@ -1230,7 +1230,7 @@
       "key": "pricing",
       "source_url": "https://developers.openai.com/api/docs/pricing",
       "kind": "pricing",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "beta",
       "beta_header": "o4-mini-2025-04-16",
@@ -1242,7 +1242,7 @@
       "key": "gpt_5_5_model",
       "source_url": "https://developers.openai.com/api/docs/models/gpt-5.5",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "unknown",
       "status": "unverified",
       "beta_header": null,
@@ -1254,7 +1254,7 @@
       "key": "file_search",
       "source_url": "https://ai.google.dev/gemini-api/docs/file-search",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "unverified",
       "beta_header": null,
@@ -1266,7 +1266,7 @@
       "key": "caching",
       "source_url": "https://ai.google.dev/gemini-api/docs/caching",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "unverified",
       "beta_header": null,
@@ -1278,7 +1278,7 @@
       "key": "token_counting",
       "source_url": "https://ai.google.dev/gemini-api/docs/tokens",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "unverified",
       "beta_header": null,
@@ -1290,7 +1290,7 @@
       "key": "google_search",
       "source_url": "https://ai.google.dev/gemini-api/docs/google-search",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "unverified",
       "beta_header": null,
@@ -1302,7 +1302,7 @@
       "key": "long_context",
       "source_url": "https://ai.google.dev/gemini-api/docs/long-context",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "unverified",
       "beta_header": null,
@@ -1314,7 +1314,7 @@
       "key": "code_execution",
       "source_url": "https://ai.google.dev/gemini-api/docs/code-execution",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "unverified",
       "beta_header": null,
@@ -1326,7 +1326,7 @@
       "key": "structured_outputs",
       "source_url": "https://ai.google.dev/gemini-api/docs/structured-output",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "unverified",
       "beta_header": null,
@@ -1338,7 +1338,7 @@
       "key": "batch_processing",
       "source_url": "https://ai.google.dev/gemini-api/docs/batch-api",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "speed",
       "status": "unverified",
       "beta_header": null,
@@ -1350,7 +1350,7 @@
       "key": "computer_use",
       "source_url": "https://ai.google.dev/gemini-api/docs/computer-use",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "unverified",
       "beta_header": null,
@@ -1362,7 +1362,7 @@
       "key": "thinking",
       "source_url": "https://ai.google.dev/gemini-api/docs/thinking",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "unverified",
       "beta_header": null,
@@ -1374,7 +1374,7 @@
       "key": "document_processing",
       "source_url": "https://ai.google.dev/gemini-api/docs/document-processing",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "accuracy",
       "status": "unverified",
       "beta_header": null,
@@ -1386,7 +1386,7 @@
       "key": "interactions",
       "source_url": "https://ai.google.dev/gemini-api/docs/interactions/interactions-overview",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "ga",
       "beta_header": null,
@@ -1398,7 +1398,7 @@
       "key": "priority_inference",
       "source_url": "https://ai.google.dev/gemini-api/docs/priority-inference",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "unknown",
       "status": "unverified",
       "beta_header": null,
@@ -1410,7 +1410,7 @@
       "key": "tools",
       "source_url": "https://ai.google.dev/gemini-api/docs/tools",
       "kind": "doc",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "reliability",
       "status": "unverified",
       "beta_header": null,
@@ -1422,7 +1422,7 @@
       "key": "pricing",
       "source_url": "https://ai.google.dev/gemini-api/docs/pricing",
       "kind": "pricing",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "axis": "cost",
       "status": "unverified",
       "beta_header": null,
@@ -1432,22 +1432,22 @@
   },
   "content_hashes": {
     "https://platform.claude.com/docs/en/release-notes/overview": {
-      "hash": "2b67a81cc6dca1c5e25c209cd3a7c4f43291e1fa575ceda5d7a573e3d5885cb3",
+      "hash": "2857cadc3ba4026df50079517e7356ec2fb69f9656423f8cf4cea7e940d99f15",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/overview": {
-      "hash": "d906f816920fee11d725d151aa55c4cd6d1c721c0d0e2b2d241c85ec739770ae",
+      "hash": "31ef952042d96f35093bbb75eb6c320648353d9c1d22ac7fef911e611aae1fd8",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/api/beta-headers": {
-      "hash": "18517a5d9d9431bcf9e50022540a166a49f50e690bd7963f294e9c0951667022",
+      "hash": "c6c54edee5396813f5e8b27f7513a3b6b49d38835dce0a89d1f5820fd73683ed",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling": {
-      "hash": "f80476cdf63a42a8a4b78b042e4df577a59f14f2e3574e5de61008b98d97a668",
+      "hash": "8d1bae7758a4f2548fc5eb61d03dee14a575d77aa377b713e11fe6b05d7348a6",
       "etag": null,
       "last_modified": null
     },
@@ -1507,7 +1507,7 @@
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking": {
-      "hash": "9ce5bd82cc33c33544b39473565d04cb2d3f7a2040ca1423202414929cc2f8ac",
+      "hash": "6dac825e4a4b72ca6d243dee96526b42d2e0b4ca1e316f0ab44809f3ebaa9b23",
       "etag": null,
       "last_modified": null
     },
@@ -1542,12 +1542,12 @@
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool": {
-      "hash": "74cc16e33d31bec038dd3c29a622c638e2650a99b7903ffbef464275a13b50ce",
+      "hash": "4a124809ecc28dfe5c82873de4b9c95792b8a07fa187d2c46266c4f73c013402",
       "etag": null,
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-fetch-tool": {
-      "hash": "7144716f7877871f2fbd0f8c263c03f91873765be3651e0cce05674db3b54f84",
+      "hash": "b4f2bee1db0d28f9db47d2b38c5f80f127744003a0ad8b8a9dfd5faa1d2c54df",
       "etag": null,
       "last_modified": null
     },
@@ -1562,7 +1562,7 @@
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool": {
-      "hash": "f629fd94fe0808cc5c4974b4abea494cb3e88a148ab00b64496e89e1865dd4a0",
+      "hash": "c2edd6a6b39ec85840b0bef777076793322aabb143560df20b8cf35c62ef45e4",
       "etag": null,
       "last_modified": null
     },
@@ -1602,7 +1602,7 @@
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/build-with-claude/token-counting": {
-      "hash": "41450502a884026b6d850da231e1e3abecddd68ccc0874f2f7e3c5ecfbdfd410",
+      "hash": "020e90825a3620ada22cd57e30c1c1adf0009b08e8ee16addc7ca2e4e375fe92",
       "etag": null,
       "last_modified": null
     },
@@ -1627,9 +1627,9 @@
       "last_modified": null
     },
     "https://claude.com/blog/enterprise-managed-auth": {
-      "hash": "210a3bd81d2b53c8c956f1cd3482363a759c0eafc5390ac7e3665f003d768111",
+      "hash": "c9244f57e5b934a5c645aa0c885ab5818fdcb199bc81e81e242b4848154b50aa",
       "etag": null,
-      "last_modified": "Thu, 02 Jul 2026 14:46:31 GMT"
+      "last_modified": "Fri, 03 Jul 2026 03:29:53 GMT"
     },
     "https://platform.claude.com/docs/en/manage-claude/cmek": {
       "hash": "dfbc23d0f6eb18a85ba595fca708731f66987d2e58c877d89e83ab81617d833e",
@@ -1727,224 +1727,224 @@
       "last_modified": null
     },
     "https://www.anthropic.com/news": {
-      "hash": "173aec6771be2276a927f7e834c04ad872f62f8cc37c4888ca092012e62c1ec6",
+      "hash": "48a2e98c4aa8e0edb7531723f5e1a3bdea34c44888dc84ded1c04bc154d679d0",
       "etag": null,
       "last_modified": null
     },
     "https://www.anthropic.com/news/claude-opus-4-8": {
-      "hash": "2c51711c4b637d0b48e2e109a871f48a1ae710fbff3bee62802b44cab334f85c",
+      "hash": "7962742f77524adf2f2d7745cfbdcff90d22336cd430b982bdb50604ee5ed58b",
       "etag": null,
       "last_modified": null
     },
     "https://www.anthropic.com/news/claude-fable-5-mythos-5": {
-      "hash": "b3d3126fef687d16633e0737f5c9241b17f7adca293aa17c007efc782dbb41e5",
+      "hash": "17f86c24526c45cdea2d27d67791dcf9c4da0e70a09662a09db7d0f122c4fd82",
       "etag": null,
       "last_modified": null
     },
     "https://www.anthropic.com/news/fable-mythos-access": {
-      "hash": "0a57583650972cb161f40ad767aee78281d6b6c8a9800bc8cd8322754b915895",
+      "hash": "44f90e42dfaf8ae07c3582897f0243ef21301cd1044150bbd2c7f0067928cda7",
       "etag": null,
       "last_modified": null
     },
     "https://www.anthropic.com/news/claude-4": {
-      "hash": "8e7880c05c4936035561325e08e401d821c451c3e7b979dc8782ad519c1eeb9b",
+      "hash": "a51074b54181a322a2a21381ba6db126248cdf765148113c2e48f7cf6a85b526",
       "etag": null,
       "last_modified": null
     },
     "https://support.claude.com/en/articles/12138966-release-notes": {
-      "hash": "e11044dd24aed9a9477de0b4d26ea14e1a7fc87f7ae61473a879cc858d70376e",
+      "hash": "9121ac6e293bfd25b185a1c3698bb069782d3f41bbef7262faa1f8a4a9c80495",
       "etag": null,
       "last_modified": null
     },
     "https://x.com/ClaudeDevs": {
-      "hash": "29709c887312bed37b9fd9c1bc225408fcb1c6cdc6c2abe29fc8103218827fef",
+      "hash": "e4a5a6ce3829eb613e59d02645b1155d277c2b679b1fe459b2646c87630c841e",
       "etag": null,
       "last_modified": null
     },
     "https://code.claude.com/docs/en/changelog": {
-      "hash": "bfe37680290ba3110c4bac11d6e94b92690cdcf0fac1ed968805a17ec4bfa8f8",
+      "hash": "cbb77f42aa90d64ea759ebf4a6abbd0aa1ab4eb5b57d8d0b2d4475b62fde5264",
       "etag": null,
       "last_modified": null
     },
     "https://code.claude.com/docs/en/whats-new": {
-      "hash": "c1c9d12fb4de10443c6aa26e7c84988132810f871b4dd60721b2acc8958712f5",
+      "hash": "cbb5d9b0a85458bd7056011c8d303ef6b4e10c6403a38724e5c9a14d28a4c5e6",
       "etag": null,
       "last_modified": null
     },
     "https://docs.claude.com/en/docs/claude-code/overview": {
-      "hash": "5bf206c104f95bc6cfcaa05ebe66bf0a2c864f0a41c9144f74dc343c229c9d73",
+      "hash": "e4f4daf71f9b7e0d808564643b99482a2be18a03a3d45021481bafec94832654",
       "etag": null,
       "last_modified": null
     },
     "https://docs.claude.com/en/docs/claude-code/github-actions": {
-      "hash": "3fdc89c5c50a232d9a969487bb494b52e2531d2c6b5d3a49a27417bb6c577091",
+      "hash": "8a217b17b17444cf3d84fbdfc1d09a5afb058d32e4e34c7bb4410eb981e80aaf",
       "etag": null,
       "last_modified": null
     },
     "https://docs.claude.com/en/docs/claude-code/sdk": {
-      "hash": "27b87a5520c90456addaef80ac7dc4f81d1da2c5d93c77256413bbd8fd6f73de",
+      "hash": "b6e6679435954323afb0b7b97c254fe046f766c091d527797f47ccbf76146d1b",
       "etag": null,
       "last_modified": null
     },
     "https://docs.claude.com/en/docs/claude-code/hooks": {
-      "hash": "6d9122fb31c217be327bac7e30198af80fa5d557b2ef2addf8849fd131b5496a",
+      "hash": "e1c049ddee1eab3e429603c0c2ce232006254d91f0c2872803cb140b9cabf283",
       "etag": null,
       "last_modified": null
     },
     "https://docs.claude.com/en/docs/claude-code/plugins": {
-      "hash": "1837acec62e04e2830b9287a7c7be6c51d35d78f3ce7ffca0c4a47c6dd1ad670",
+      "hash": "0ac39c2011ba95669fba7fb48eea8550bd6bd5876c897e08d074a4b9f30a92d4",
       "etag": null,
       "last_modified": null
     },
     "https://code.claude.com/docs/en/security": {
-      "hash": "a8837fb1b2621ae09b2a8c6db110e30f66447b3aef5e0dceba6a425ec4d03b76",
+      "hash": "7ee3977c73ca80fdb137d4e20a9b1b5c02ea30baafc9e621f1e96a27e51b83c8",
       "etag": null,
       "last_modified": null
     },
     "https://code.claude.com/docs/en/code-review": {
-      "hash": "cd217adb110a8f61d32409cb5c93550d4df28e35a214e39ad7e2da34612d5760",
+      "hash": "eca7c4464805127f40a9c8ff330f2d97ebc13c679fd3ec27ccc8f98f31206a8a",
       "etag": null,
       "last_modified": null
     },
     "https://code.claude.com/docs/en/permissions": {
-      "hash": "20c4f0019fdab895561a801997f9dd3514bdb35b5001a1ef494071e17e016f31",
+      "hash": "b6f3ef60ab030c28d4bc2978f65679151abbde9755f8c67e4851d4ad6d76ef6b",
       "etag": null,
       "last_modified": null
     },
     "https://code.claude.com/docs/en/settings": {
-      "hash": "f4e8a12661823550645e70abde3534bcfb8fa153f33147a414ccd5648c007fe7",
+      "hash": "1f5671848ee9828e5db8da786dc350f5a246cc297b511f59b562055ae1b7d00f",
       "etag": null,
       "last_modified": null
     },
     "https://code.claude.com/docs/en/server-managed-settings": {
-      "hash": "f4efc09ddbd09eb1a96d9c831513b5b281a0a5d50956c8d3b36aa2ca1347857f",
+      "hash": "f17400414d00937b2576604e05953fcba076d94114d4c876f27b9a31d8737076",
       "etag": null,
       "last_modified": null
     },
     "https://code.claude.com/docs/en/managed-mcp": {
-      "hash": "f262aba52faedc228e1a8c41396aadabf6502f03975129f8264966b543c6f6fb",
+      "hash": "9ccdcebd221fb231b36428debf9a4c10d77ff6b2e470bfd000336616721889b0",
       "etag": null,
       "last_modified": null
     },
     "https://code.claude.com/docs/en/network-config": {
-      "hash": "be86e056d451aee72783dcc49a9d11072f7b04910a185df60eb7b3a9e65be700",
+      "hash": "74cfb186245eb6083465eec764bf697b312df59063e418db02cae51bf28088ae",
       "etag": null,
       "last_modified": null
     },
     "https://code.claude.com/docs/en/data-usage": {
-      "hash": "45e3df6fa4281a3ca3bcd086c81c760b1e0db01f97f48ff98dac8bc6133f67a1",
+      "hash": "667d78a43b89d77382d5f9a94440a517745884a5df89b2ecd17bd0d85710b3b6",
       "etag": null,
       "last_modified": null
     },
     "https://code.claude.com/docs/en/zero-data-retention": {
-      "hash": "4f8e8db3aba36b9c2d050f697eb5f2cc87e75fbb69f1e3876cb2688fcec63226",
+      "hash": "8aa2b63f18d990948a5aed28a232b0de279cfb1abbca80a8eb3d2141286eddd3",
       "etag": null,
       "last_modified": null
     },
     "https://code.claude.com/docs/en/legal-and-compliance": {
-      "hash": "e6f3e46d2e7245fadd5eeeeeb7b04a8b6946770dd035ee9c444e6807b6477ea8",
+      "hash": "be2d90b72a89bb0da89867eb12db840cce987bab3a754ec444a309a8f6d0f90d",
       "etag": null,
       "last_modified": null
     },
     "https://code.claude.com/docs/en/security-guidance": {
-      "hash": "9bc20302d323968713dfa79209c3228d478181cc5fda6fcbb14cbbdb13044900",
+      "hash": "2feb7f61da2cc0dfd3182b83532d8e13df5842d2211ec7a06dbdc15145535fe6",
       "etag": null,
       "last_modified": null
     },
     "https://github.com/anthropics/claude-code/releases": {
-      "hash": "f7098ba4a9c0f9b2e642c8bcc56c8dee7354ac74e570f012c48fcb408ccc0182",
-      "etag": "W/\"2ee6a6b7d38baee002fc1cffe500cc06\"",
+      "hash": "2efdc65aadb54d2e55d4971603693412641b80adcc1b092cb81120d5be6cad69",
+      "etag": "W/\"0a051700f0e9700576ce0fd3ef12a15b\"",
       "last_modified": null
     },
     "https://platform.claude.com/docs/en/about-claude/pricing": {
-      "hash": "e5e0259a6afe9fc3cdb8061915c8aef0e0713a94d34f2e18024e141915068e5b",
+      "hash": "02a0d68f1531c069e8447fa8b0a71848570e6d5725507cd9488235d1d776da59",
       "etag": null,
       "last_modified": null
     },
     "https://developers.openai.com/api/docs/guides/compaction": {
       "hash": "2711c583fd3819524c2bed89f42ce324d709b014580f6cf4d7eac94972dcbb64",
-      "etag": "\"9a2f2ce4885bf1c182da2a3199f8d597\"",
-      "last_modified": "Thu, 02 Jul 2026 07:18:43 GMT"
+      "etag": "\"339b9cfe68e1e25480a612856f315750\"",
+      "last_modified": "Sun, 05 Jul 2026 03:41:38 GMT"
     },
     "https://developers.openai.com/api/docs/guides/prompt-caching": {
       "hash": "e6deb0b9b2c29f211cefdf28843bcb07de0f7f2029ea254979dacc35a7c54ff0",
-      "etag": "\"3fe0ce9551f733c86b8217c48afb5f56\"",
-      "last_modified": "Thu, 02 Jul 2026 07:21:40 GMT"
+      "etag": "\"2c74daef241664625c4ff5926b134563\"",
+      "last_modified": "Sun, 05 Jul 2026 03:43:04 GMT"
     },
     "https://developers.openai.com/api/docs/guides/reasoning": {
       "hash": "fd901d87da724de33e81a28c27ef156bf07a1d1e92f75a02a29529736a7dc8c9",
-      "etag": "\"d84f58adc740abf2efea9eb6fa28f16f\"",
-      "last_modified": "Thu, 02 Jul 2026 07:15:48 GMT"
+      "etag": "\"18d0a6560bc7a676b952c09cbcfad7c6\"",
+      "last_modified": "Sun, 05 Jul 2026 03:41:12 GMT"
     },
     "https://developers.openai.com/api/docs/guides/token-counting": {
       "hash": "785b81d7b37b2ae567b07c9d6425247b6d364b10f000d50e92da4cc222231670",
-      "etag": "\"605bdf0439d6de6d88fda3d5fb027ea2\"",
-      "last_modified": "Thu, 02 Jul 2026 07:23:35 GMT"
+      "etag": "\"b708517bd6ba58a96f0d45a5a43bf9c2\"",
+      "last_modified": "Sun, 05 Jul 2026 03:44:36 GMT"
     },
     "https://developers.openai.com/api/docs/guides/rate-limits": {
       "hash": "53fc0b37c21d317004b58628358a1d7119632a9be2a64edd1719bd23aa01b077",
-      "etag": "\"a710fbf0fcf1a5949c757fc6bd417078\"",
-      "last_modified": "Thu, 02 Jul 2026 07:15:53 GMT"
+      "etag": "\"25bf6a5922932f10e048072611b02d77\"",
+      "last_modified": "Sun, 05 Jul 2026 03:43:13 GMT"
     },
     "https://developers.openai.com/api/docs/guides/priority-processing": {
       "hash": "cab2e5f0093f2e7ef565bc20687c76cbecfafeb2c8ff34e6dfa2ab2139835ef1",
-      "etag": "\"08ff7ddb1ee00f3806ab78b8570279eb\"",
-      "last_modified": "Thu, 02 Jul 2026 07:21:37 GMT"
+      "etag": "\"d1d28796b457cdf28476385d30c67d52\"",
+      "last_modified": "Sun, 05 Jul 2026 03:42:05 GMT"
     },
     "https://developers.openai.com/api/docs/guides/tools-code-interpreter": {
       "hash": "3ca670ebe97045bac15fcc1f5400e8a8fffb315208053c955603dfba7e284a5b",
-      "etag": "\"16d97d50346e502855f4d2ca7e8fbfb0\"",
-      "last_modified": "Thu, 02 Jul 2026 07:23:38 GMT"
+      "etag": "\"9c8ebb38bbbb4af06f9546a37766ec44\"",
+      "last_modified": "Sun, 05 Jul 2026 03:41:55 GMT"
     },
     "https://developers.openai.com/api/docs/guides/tools-tool-search": {
       "hash": "f22778e307d149889133d48b50397835ee8d2c571599b1e6c13202ca0e655bbb",
-      "etag": "\"0ce198e83927d5fadc34b75bdecc9048\"",
-      "last_modified": "Thu, 02 Jul 2026 07:23:51 GMT"
+      "etag": "\"46a0e98f8119e8cb0a563090931c1577\"",
+      "last_modified": "Sun, 05 Jul 2026 03:41:17 GMT"
     },
     "https://developers.openai.com/api/docs/guides/tools-connectors-mcp": {
       "hash": "1aaacd1ea203af1ecc7bde929427cf3b033f8f6d2d54ec8e9ba892d839afc787",
-      "etag": "\"d0d83043c524ddf4c83aa129e2613e75\"",
-      "last_modified": "Thu, 02 Jul 2026 07:18:56 GMT"
+      "etag": "\"ce37fb54a7ddaac7f47779483f2cac5f\"",
+      "last_modified": "Sun, 05 Jul 2026 03:43:07 GMT"
     },
     "https://developers.openai.com/api/docs/guides/tools-web-search": {
       "hash": "63f5f24f8d6e33f1c45f25e2ec4e589d5a88e834a192570d898b67c2d7abce6a",
-      "etag": "\"a3ae008bbb31dbfb9e1e5d62095d89c8\"",
-      "last_modified": "Thu, 02 Jul 2026 07:21:07 GMT"
+      "etag": "\"fefab4d741d9206786fff4355dd0581b\"",
+      "last_modified": "Sun, 05 Jul 2026 03:41:24 GMT"
     },
     "https://developers.openai.com/api/docs/guides/tools-file-search": {
       "hash": "56c70f5af302bad54ea0b91290c88d779e475d92dbf01de2676d0e8a260bfe34",
-      "etag": "\"0d3e755808c49a5a84002011afddcb41\"",
-      "last_modified": "Thu, 02 Jul 2026 08:23:39 GMT"
+      "etag": "\"0dd3123d2682f571cf3ffab55f689d44\"",
+      "last_modified": "Sun, 05 Jul 2026 03:44:42 GMT"
     },
     "https://developers.openai.com/api/docs/guides/structured-outputs": {
       "hash": "56e132da117b453fc912020ca9b8aa7084b41c8c37668044a21eefe8f244ed91",
-      "etag": "\"43ec3d34efaaaccc7955afc2a4b02a88\"",
-      "last_modified": "Thu, 02 Jul 2026 07:16:13 GMT"
+      "etag": "\"2ed1ebb0acfdd2ef1fbac1434a15a955\"",
+      "last_modified": "Sun, 05 Jul 2026 03:43:24 GMT"
     },
     "https://developers.openai.com/api/docs/guides/batch": {
       "hash": "1378f8ec55c9e16b069a7554a75a7d976fab7974dc836d0e46c9fe8085625f93",
-      "etag": "\"56ab9804db5e6eb93ff0204772cb6d6f\"",
-      "last_modified": "Thu, 02 Jul 2026 07:18:47 GMT"
+      "etag": "\"693231b4f318586097aee97b6bed4014\"",
+      "last_modified": "Sun, 05 Jul 2026 03:41:30 GMT"
     },
     "https://developers.openai.com/api/docs/guides/tools-computer-use": {
       "hash": "ca2dac4ac8b5727667af6741890bd59b3a78987bf9b684922fc5e879b5270727",
-      "etag": "\"e1aff9979c806ce6b7ebac78789596ef\"",
-      "last_modified": "Thu, 02 Jul 2026 07:17:43 GMT"
+      "etag": "\"5937021d3cf99a0798d7f1cf5750e3e3\"",
+      "last_modified": "Sun, 05 Jul 2026 03:43:18 GMT"
     },
     "https://developers.openai.com/api/docs/guides/tools-shell": {
       "hash": "2b85a7ab8c436643c6082d92d3d11ce55b19528384feec1154eb964369e83bdd",
-      "etag": "\"786b1c150f280b48e63468d055421d23\"",
-      "last_modified": "Thu, 02 Jul 2026 07:18:42 GMT"
+      "etag": "\"227ac0c8dae6159891768a57d8b00d25\"",
+      "last_modified": "Sun, 05 Jul 2026 03:43:01 GMT"
     },
     "https://developers.openai.com/api/docs/guides/file-inputs": {
       "hash": "04d937b013d082f05900ac0b6681bc83c004e82f328775f5fb5d3b3a066a09e7",
-      "etag": "\"81b10eb64203d4b1f4d3bb46be8c484f\"",
-      "last_modified": "Thu, 02 Jul 2026 07:21:11 GMT"
+      "etag": "\"13750a43a48eea61918f90fba225ce79\"",
+      "last_modified": "Sun, 05 Jul 2026 03:42:41 GMT"
     },
     "https://developers.openai.com/api/docs/pricing": {
       "hash": "6c5b340a1c6c4990c1778e2ce3e58483fc469254580ffd863a25b76e1d6c6757",
-      "etag": "\"18a3dc26e9dfd75185027db7ac3f3e21\"",
-      "last_modified": "Thu, 02 Jul 2026 07:14:46 GMT"
+      "etag": "\"2b2d88b3669d2c581cac6928b8ee9a7d\"",
+      "last_modified": "Sun, 05 Jul 2026 03:41:25 GMT"
     },
     "https://developers.openai.com/api/docs/models/gpt-5.5": {
       "hash": "330134aba044d25e6f99695f788cf0c6b2fae71caa732d45c3e6c85e168cebc8",
@@ -2034,7 +2034,7 @@
       "axis": "cost",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Programmatic tool calling - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Featur",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/programmatic-tool-calling",
       "value_score": 3,
@@ -2082,7 +2082,7 @@
       "axis": "reliability",
       "status": "beta",
       "beta_header": "task-budgets-2026-03-13",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Task budgets - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview U",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/task-budgets",
       "value_score": 3,
@@ -2130,7 +2130,7 @@
       "axis": "cost",
       "status": "beta",
       "beta_header": "cache-diagnosis-2026-04-07",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Cache diagnostics - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overv",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics",
       "value_score": 3,
@@ -2170,7 +2170,7 @@
       "axis": "accuracy",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Citations - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Usin",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/citations",
       "value_score": 2,
@@ -2223,7 +2223,7 @@
       "axis": "accuracy",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Search results - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/search-results",
       "value_score": 2,
@@ -2263,7 +2263,7 @@
       "axis": "reliability",
       "status": "beta",
       "beta_header": "context-management-2025-06-27",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Context editing - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overvie",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/context-editing",
       "value_score": 3,
@@ -2307,7 +2307,7 @@
       "axis": "reliability",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Memory tool - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Us",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool",
       "value_score": 3,
@@ -2325,7 +2325,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2344,7 +2344,7 @@
       "axis": "cost",
       "status": "beta",
       "beta_header": "files-api-2025-04-14",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Code execution tool - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features ove",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/code-execution-tool",
       "value_score": 3,
@@ -2392,7 +2392,7 @@
       "axis": "cost",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Prompt caching - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
       "value_score": 3,
@@ -2410,7 +2410,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2425,7 +2425,7 @@
       "axis": "reliability",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Self-hosted sandboxes - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Overview Quickstart Prototype in Console Define your agent",
       "source_url": "https://platform.claude.com/docs/en/managed-agents/self-hosted-sandboxes",
       "value_score": 3,
@@ -2443,7 +2443,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2462,7 +2462,7 @@
       "axis": "reliability",
       "status": "beta",
       "beta_header": "managed-agents-2026-04-01",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Claude Managed Agents overview - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Overview Quickstart Prototype in Console Define y",
       "source_url": "https://platform.claude.com/docs/en/managed-agents/overview",
       "value_score": 3,
@@ -2480,7 +2480,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "managed-agents-2026-04-01",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2498,7 +2498,7 @@
       "axis": "reliability",
       "status": "beta",
       "beta_header": "managed-agents-2026-04-01",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Start a session - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Overview Quickstart Prototype in Console Define your agent Agent",
       "source_url": "https://platform.claude.com/docs/en/managed-agents/sessions",
       "value_score": 3,
@@ -2516,7 +2516,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "managed-agents-2026-04-01",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2534,7 +2534,7 @@
       "axis": "reliability",
       "status": "beta",
       "beta_header": "managed-agents-2026-04-01",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Cloud environment setup - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Overview Quickstart Prototype in Console Define your age",
       "source_url": "https://platform.claude.com/docs/en/managed-agents/environments",
       "value_score": 3,
@@ -2552,7 +2552,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "managed-agents-2026-04-01",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2570,7 +2570,7 @@
       "axis": "reliability",
       "status": "beta",
       "beta_header": "managed-agents-2026-04-01",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Multi-agent sessions - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Overview Quickstart Prototype in Console Define your agent ",
       "source_url": "https://platform.claude.com/docs/en/managed-agents/multi-agent",
       "value_score": 3,
@@ -2588,7 +2588,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "managed-agents-2026-04-01",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2606,7 +2606,7 @@
       "axis": "security",
       "status": "beta",
       "beta_header": "fallback-credit-2026-06-01",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Fallback credit - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overvie",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/fallback-credit",
       "value_score": 3,
@@ -2624,7 +2624,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "fallback-credit-2026-06-01",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2642,7 +2642,7 @@
       "axis": "cost",
       "status": "beta",
       "beta_header": "advisor-tool-2026-03-01",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Advisor tool - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview U",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool",
       "value_score": 3,
@@ -2660,7 +2660,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "advisor-tool-2026-03-01",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2678,7 +2678,7 @@
       "axis": "security",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Bash tool - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Usin",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/bash-tool",
       "value_score": 3,
@@ -2696,7 +2696,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2711,7 +2711,7 @@
       "axis": "reliability",
       "status": "beta",
       "beta_header": "computer-use-2025-11-24",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Computer use tool - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overv",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool",
       "value_score": 3,
@@ -2729,7 +2729,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "computer-use-2025-11-24",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2744,7 +2744,7 @@
       "axis": "reliability",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Text editor tool - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overvi",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/text-editor-tool",
       "value_score": 3,
@@ -2762,7 +2762,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2780,7 +2780,7 @@
       "axis": "cost",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Tool search tool - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overvi",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool",
       "value_score": 3,
@@ -2798,7 +2798,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2813,7 +2813,7 @@
       "axis": "reliability",
       "status": "beta",
       "beta_header": "interleaved-thinking-2025-05-14",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Context windows - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overvie",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/context-windows",
       "value_score": 3,
@@ -2831,7 +2831,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "interleaved-thinking-2025-05-14",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2849,7 +2849,7 @@
       "axis": "reliability",
       "status": "beta",
       "beta_header": "compact-2026-01-12",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Compaction - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Usi",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/compaction",
       "value_score": 3,
@@ -2867,7 +2867,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "compact-2026-01-12",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2882,7 +2882,7 @@
       "axis": "cost",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Token counting - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/token-counting",
       "value_score": 3,
@@ -2900,7 +2900,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2915,7 +2915,7 @@
       "axis": "security",
       "status": "beta",
       "beta_header": "files-api-2025-04-14",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Files API - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Usin",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/files",
       "value_score": 3,
@@ -2933,7 +2933,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "files-api-2025-04-14",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2948,7 +2948,7 @@
       "axis": "reliability",
       "status": "beta",
       "beta_header": "code-execution-2025-08-25",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Agent Skills - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview U",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview",
       "value_score": 3,
@@ -2966,7 +2966,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "code-execution-2025-08-25",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -2984,7 +2984,7 @@
       "axis": "security",
       "status": "beta",
       "beta_header": "mcp-client-2025-11-20",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "MCP connector - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview ",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/mcp-connector",
       "value_score": 3,
@@ -3002,7 +3002,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "mcp-client-2025-11-20",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3017,7 +3017,7 @@
       "axis": "security",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Meet Claude Products Claude Claude Code Claude Cowork @Claude Features Claude for Chrome Claude for Microsoft 365 Skills Claude apps built for Design Science Security Models Mythos Fable Opus Sonnet Haiku Platform Build on Claude Overview P",
       "source_url": "https://claude.com/blog/enterprise-managed-auth",
       "value_score": 3,
@@ -3035,7 +3035,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3053,7 +3053,7 @@
       "axis": "security",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "A customer-managed encryption key (CMEK) lets you provision an encryption key in your own AWS KMS , Google Cloud KMS , or Azure Key Vault and have Anthropic use it to encrypt certain workspace data at rest. You retain full control of the ke",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/cmek",
       "value_score": 3,
@@ -3071,7 +3071,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3089,7 +3089,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Configure AWS KMS for CMEK - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overview Create ",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/cmek-aws-kms",
       "value_score": 3,
@@ -3107,7 +3107,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3125,7 +3125,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Configure Google Cloud KMS for CMEK - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overvie",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/cmek-google-cloud-kms",
       "value_score": 3,
@@ -3143,7 +3143,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3161,7 +3161,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Configure Azure Key Vault for CMEK - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overview",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/cmek-azure-key-vault",
       "value_score": 3,
@@ -3179,7 +3179,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3197,7 +3197,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Access Transparency - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overview Create an Admi",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/access-transparency",
       "value_score": 3,
@@ -3215,7 +3215,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3233,7 +3233,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "API and data retention - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overview Create an A",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/api-and-data-retention",
       "value_score": 3,
@@ -3251,7 +3251,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3269,7 +3269,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Data residency - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overview Create an Admin API",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/data-residency",
       "value_score": 3,
@@ -3287,7 +3287,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3305,7 +3305,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Admin API - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overview Create an Admin API key ",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/admin-api",
       "value_score": 3,
@@ -3323,7 +3323,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3341,7 +3341,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Create an Admin API key - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overview Create an ",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/admin-api-keys",
       "value_score": 3,
@@ -3359,7 +3359,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3377,7 +3377,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Authentication - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overview Create an Admin API",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/authentication",
       "value_score": 3,
@@ -3395,7 +3395,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3413,7 +3413,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Compliance API - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overview Create an Admin API",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/compliance-api",
       "value_score": 3,
@@ -3431,7 +3431,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3449,7 +3449,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Get access to the Compliance API - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overview C",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/compliance-api-access",
       "value_score": 3,
@@ -3467,7 +3467,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3485,7 +3485,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Query the Activity Feed - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overview Create an ",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/compliance-activity-feed",
       "value_score": 3,
@@ -3503,7 +3503,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3521,7 +3521,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Design your compliance integration - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overview",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/compliance-integration-patterns",
       "value_score": 3,
@@ -3539,7 +3539,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3557,7 +3557,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "List organizations, users, roles, groups, and settings - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Aut",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/compliance-org-data",
       "value_score": 3,
@@ -3575,7 +3575,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3593,7 +3593,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Workload Identity Federation - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overview Creat",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/workload-identity-federation",
       "value_score": 3,
@@ -3611,7 +3611,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3629,7 +3629,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Manage WIF with the Admin API - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overview Crea",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/wif-admin-api",
       "value_score": 3,
@@ -3647,7 +3647,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3665,7 +3665,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "WIF reference - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Organization Admin API Workspaces Authentication Overview Create an Admin API ",
       "source_url": "https://platform.claude.com/docs/en/manage-claude/wif-reference",
       "value_score": 3,
@@ -3683,7 +3683,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3701,7 +3701,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "IP addresses - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K \ue104 Log in \ue0dd API reference \ue027 IP addresses Loading... Loading... Loading... Loadin",
       "source_url": "https://platform.claude.com/docs/en/api/ip-addresses",
       "value_score": 3,
@@ -3719,7 +3719,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3735,9 +3735,9 @@
       "key": "claude_code_changelog",
       "vendor": "claude",
       "axis": "reliability",
-      "status": "beta",
+      "status": "ga",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Claude Code changelog - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page E",
       "source_url": "https://code.claude.com/docs/en/changelog",
       "value_score": 3,
@@ -3753,9 +3753,9 @@
         "score_gate": "machine-checkable gate to be defined by the demonstrator",
         "lead_basis": "within-claude-only",
         "maturity": {
-          "claude": "beta",
+          "claude": "ga",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3773,7 +3773,7 @@
       "axis": "reliability",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "What's new - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page English Sear",
       "source_url": "https://code.claude.com/docs/en/whats-new",
       "value_score": 3,
@@ -3791,7 +3791,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3807,9 +3807,9 @@
       "key": "claude_code_overview",
       "vendor": "claude",
       "axis": "reliability",
-      "status": "beta",
+      "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Overview - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page English Search",
       "source_url": "https://docs.claude.com/en/docs/claude-code/overview",
       "value_score": 3,
@@ -3825,9 +3825,9 @@
         "score_gate": "machine-checkable gate to be defined by the demonstrator",
         "lead_basis": "within-claude-only",
         "maturity": {
-          "claude": "beta",
+          "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3845,7 +3845,7 @@
       "axis": "security",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Claude Code GitHub Actions - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home p",
       "source_url": "https://docs.claude.com/en/docs/claude-code/github-actions",
       "value_score": 3,
@@ -3863,7 +3863,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3881,7 +3881,7 @@
       "axis": "reliability",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Agent SDK overview - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page Engl",
       "source_url": "https://docs.claude.com/en/docs/claude-code/sdk",
       "value_score": 3,
@@ -3899,7 +3899,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3917,7 +3917,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Hooks reference - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page English",
       "source_url": "https://docs.claude.com/en/docs/claude-code/hooks",
       "value_score": 3,
@@ -3935,7 +3935,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3953,7 +3953,7 @@
       "axis": "reliability",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Create plugins - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page English ",
       "source_url": "https://docs.claude.com/en/docs/claude-code/plugins",
       "value_score": 3,
@@ -3971,7 +3971,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -3989,7 +3989,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Security - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page English Search",
       "source_url": "https://code.claude.com/docs/en/security",
       "value_score": 3,
@@ -4007,7 +4007,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4023,9 +4023,9 @@
       "key": "claude_code_code_review",
       "vendor": "claude",
       "axis": "security",
-      "status": "beta",
+      "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Code Review - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page English Sea",
       "source_url": "https://code.claude.com/docs/en/code-review",
       "value_score": 3,
@@ -4041,9 +4041,9 @@
         "score_gate": "machine-checkable gate to be defined by the demonstrator",
         "lead_basis": "absence-of-evidence",
         "maturity": {
-          "claude": "beta",
+          "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4061,7 +4061,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Configure permissions - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page E",
       "source_url": "https://code.claude.com/docs/en/permissions",
       "value_score": 3,
@@ -4079,7 +4079,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4097,7 +4097,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Claude Code settings - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page En",
       "source_url": "https://code.claude.com/docs/en/settings",
       "value_score": 3,
@@ -4115,7 +4115,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4133,7 +4133,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Configure server-managed settings - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs",
       "source_url": "https://code.claude.com/docs/en/server-managed-settings",
       "value_score": 3,
@@ -4151,7 +4151,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4169,7 +4169,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Control MCP server access for your organization - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Cl",
       "source_url": "https://code.claude.com/docs/en/managed-mcp",
       "value_score": 3,
@@ -4187,7 +4187,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4205,7 +4205,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Enterprise network configuration - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs ",
       "source_url": "https://code.claude.com/docs/en/network-config",
       "value_score": 3,
@@ -4223,7 +4223,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4241,7 +4241,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Data usage - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page English Sear",
       "source_url": "https://code.claude.com/docs/en/data-usage",
       "value_score": 3,
@@ -4259,7 +4259,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4277,7 +4277,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Zero data retention - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page Eng",
       "source_url": "https://code.claude.com/docs/en/zero-data-retention",
       "value_score": 3,
@@ -4295,7 +4295,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4313,7 +4313,7 @@
       "axis": "security",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Legal and compliance - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude Code Docs home page En",
       "source_url": "https://code.claude.com/docs/en/legal-and-compliance",
       "value_score": 3,
@@ -4331,7 +4331,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4347,9 +4347,9 @@
       "key": "security_guidance",
       "vendor": "claude",
       "axis": "security",
-      "status": "beta",
+      "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Catch security issues as Claude writes code - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further. Skip to main content Claude",
       "source_url": "https://code.claude.com/docs/en/security-guidance",
       "value_score": 3,
@@ -4365,9 +4365,9 @@
         "score_gate": "machine-checkable gate to be defined by the demonstrator",
         "lead_basis": "absence-of-evidence",
         "maturity": {
-          "claude": "beta",
+          "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4385,7 +4385,7 @@
       "axis": "reliability",
       "status": "ga",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Releases \u00b7 anthropics/claude-code \u00b7 GitHub",
       "source_url": "https://github.com/anthropics/claude-code/releases",
       "value_score": 3,
@@ -4403,7 +4403,7 @@
         "maturity": {
           "claude": "ga",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4421,7 +4421,7 @@
       "axis": "cost",
       "status": "unverified",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Pricing - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Models Models overview Model IDs and versioning Choosing a model Introducing Claude ",
       "source_url": "https://platform.claude.com/docs/en/about-claude/pricing",
       "value_score": 3,
@@ -4439,7 +4439,7 @@
         "maturity": {
           "claude": "unverified",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4454,7 +4454,7 @@
       "axis": "accuracy",
       "status": "beta",
       "beta_header": "interleaved-thinking-2025-05-14",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Adaptive thinking - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overv",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/adaptive-thinking",
       "value_score": 2,
@@ -4472,7 +4472,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "interleaved-thinking-2025-05-14",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4490,7 +4490,7 @@
       "axis": "accuracy",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Effort - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Using t",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/effort",
       "value_score": 2,
@@ -4508,7 +4508,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4526,7 +4526,7 @@
       "axis": "speed",
       "status": "beta",
       "beta_header": "fast-mode-2026-02-01",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Fast mode (research preview) - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Fea",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/fast-mode",
       "value_score": 2,
@@ -4544,7 +4544,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "fast-mode-2026-02-01",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4562,7 +4562,7 @@
       "axis": "accuracy",
       "status": "beta",
       "beta_header": "structured-outputs-2025-11-13",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Structured outputs - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features over",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",
       "value_score": 2,
@@ -4580,7 +4580,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "structured-outputs-2025-11-13",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4595,7 +4595,7 @@
       "axis": "speed",
       "status": "beta",
       "beta_header": "output-300k-2026-03-24",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Batch processing - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overvi",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/batch-processing",
       "value_score": 2,
@@ -4613,7 +4613,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "output-300k-2026-03-24",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4628,7 +4628,7 @@
       "axis": "accuracy",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Web search tool - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overvie",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool",
       "value_score": 2,
@@ -4646,7 +4646,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4661,7 +4661,7 @@
       "axis": "accuracy",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Web fetch tool - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-fetch-tool",
       "value_score": 2,
@@ -4679,7 +4679,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4697,7 +4697,7 @@
       "axis": "speed",
       "status": "beta",
       "beta_header": "fine-grained-tool-streaming-2025-05-14",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Fine-grained tool streaming - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Feat",
       "source_url": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/fine-grained-tool-streaming",
       "value_score": 2,
@@ -4715,7 +4715,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "fine-grained-tool-streaming-2025-05-14",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4733,7 +4733,7 @@
       "axis": "speed",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Mid-conversation system messages - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/mid-conversation-system-messages",
       "value_score": 2,
@@ -4751,7 +4751,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4769,7 +4769,7 @@
       "axis": "accuracy",
       "status": "beta",
       "beta_header": "files-api-2025-04-14",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "PDF support - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overview Us",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/pdf-support",
       "value_score": 2,
@@ -4787,7 +4787,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "files-api-2025-04-14",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4805,7 +4805,7 @@
       "axis": "unknown",
       "status": "beta",
       "beta_header": "mcp-tunnels-2026-06-22",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Claude Platform - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K Release notes Overview System prompts Migration guides Migrating to Managed ",
       "source_url": "https://platform.claude.com/docs/en/release-notes/overview",
       "value_score": 1,
@@ -4823,7 +4823,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "mcp-tunnels-2026-06-22",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4841,7 +4841,7 @@
       "axis": "unknown",
       "status": "beta",
       "beta_header": null,
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Features overview - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K First steps Intro to Claude Quickstart Building with Claude Features overv",
       "source_url": "https://platform.claude.com/docs/en/build-with-claude/overview",
       "value_score": 1,
@@ -4859,7 +4859,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": null,
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
@@ -4877,7 +4877,7 @@
       "axis": "unknown",
       "status": "beta",
       "beta_header": "files-api-2025-04-14",
-      "fetched_date": "2026-07-02",
+      "fetched_date": "2026-07-06",
       "evidence_quote": "Beta headers - Claude Platform Docs Claude Platform Docs Messages Managed Agents Admin Resources \ue027 \ue04a API reference English \ue027 \ue04f Console Log in \ue0d3 \ue062 \ue0d3 Search... \u2318K \ue104 Log in \ue0dd API reference \ue027 Beta headers Loading... Loading... Loading... Loadin",
       "source_url": "https://platform.claude.com/docs/en/api/beta-headers",
       "value_score": 1,
@@ -4895,7 +4895,7 @@
         "maturity": {
           "claude": "beta",
           "beta_header": "files-api-2025-04-14",
-          "fetched_date": "2026-07-02"
+          "fetched_date": "2026-07-06"
         },
         "repro": {
           "command": "",
